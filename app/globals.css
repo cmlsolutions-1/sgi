@@ -8,27 +8,27 @@
 /* === TEMA CLARO PARA TODO EL PROYECTO === */
 :root {
   /* Fondo general */
-  --background: #F1F1F1;
+  --background: #f1f1f1;
   --foreground: #000000;
 
   /* Cards blancas */
-  --card: #FEFFFF;
+  --card: #feffff;
   --card-foreground: #000000;
 
   /* Popover (menús flotantes) */
-  --popover: #FEFFFF;
+  --popover: #feffff;
   --popover-foreground: #000000;
 
   /* Colores principales (puedes ajustarlos si quieres) */
   --primary: oklch(0.6 0.15 250);
-  --primary-foreground: #FFFFFF;
+  --primary-foreground: #ffffff;
 
   /* Secundarios */
   --secondary: oklch(0.9 0.02 250);
   --secondary-foreground: #000000;
 
   /* Muted */
-  --muted: #E4E4E4;
+  --muted: #e4e4e4;
   --muted-foreground: #555;
 
   /* Acentos */
@@ -37,11 +37,11 @@
 
   /* Botón destructivo */
   --destructive: oklch(0.65 0.2 25);
-  --destructive-foreground: #FFFFFF;
+  --destructive-foreground: #ffffff;
 
   /* Bordes e inputs */
-  --border: #D4D4D4;
-  --input: #FFFFFF;
+  --border: #d4d4d4;
+  --input: #ffffff;
   --ring: oklch(0.65 0.18 250);
 
   /* Charts */
@@ -55,12 +55,12 @@
 
   /* === SIDEBAR (NEGRO) === */
   --sidebar: #000000;
-  --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: oklch(0.65 0.18 250);
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #1A1A1A;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #2A2A2A;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #4bbdbd; /* Selección activa */
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #6edb72; /* Hover (cuando pasa el mouse)*/
+  --sidebar-accent-foreground: #ffffff; /* Hover */
+  --sidebar-border: #2a2a2a;
   --sidebar-ring: oklch(0.65 0.18 250);
 
   /* Estados */
@@ -70,15 +70,15 @@
 
 /* OPCIONAL: mantener dark mode si lo usas */
 .dark {
-  --background: #F1F1F1;
+  --background: #f1f1f1;
   --foreground: #000000;
-  --card: #FEFFFF;
+  --card: #feffff;
   --card-foreground: #000000;
-  --popover: #FEFFFF;
+  --popover: #feffff;
   --popover-foreground: #000000;
 
-  --sidebar: #13325E;
-  --sidebar-foreground: #FFFFFF;
+  --sidebar: #13325e;
+  --sidebar-foreground: #ffffff; /* Texto del sidebar*/
 }
 
 @theme inline {

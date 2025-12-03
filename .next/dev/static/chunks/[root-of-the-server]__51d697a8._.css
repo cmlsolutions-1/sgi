@@ -5476,9 +5476,9 @@
   --radius: .5rem;
   --sidebar: #000;
   --sidebar-foreground: #fff;
-  --sidebar-primary: #0f92f7;
+  --sidebar-primary: #4bbdbd;
   --sidebar-primary-foreground: #fff;
-  --sidebar-accent: #1a1a1a;
+  --sidebar-accent: #6edb72;
   --sidebar-accent-foreground: #fff;
   --sidebar-border: #2a2a2a;
   --sidebar-ring: #0f92f7;
@@ -5498,7 +5498,6 @@
     --chart-3: lab(63.9147% 48.8658 61.0566);
     --chart-4: lab(56.2784% 54.5394 -46.2099);
     --chart-5: lab(66.6355% -46.7249 -19.1129);
-    --sidebar-primary: lab(58.4262% -3.61189 -60.3039);
     --sidebar-ring: lab(58.4262% -3.61189 -60.3039);
     --success: lab(69.679% -50.5617 42.4636);
     --warning: lab(82.7728% 14.5452 88.3447);
