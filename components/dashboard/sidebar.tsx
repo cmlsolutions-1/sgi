@@ -108,7 +108,7 @@ export function Sidebar() {
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                    <item.icon className="h-5 w-5 shrink-0" />
                     {!collapsed && <span>{item.name}</span>}
                   </div>
                   {!collapsed && (
@@ -138,7 +138,7 @@ export function Sidebar() {
                         >
                           {/* Renderizado condicional del ícono del subitem */}
                           {subItem.icon && (
-                            <subItem.icon className="h-4 w-4 flex-shrink-0" /> // Tamaño un poco más pequeño
+                            <subItem.icon className="h-4 w-4 shrink-0" /> // Tamaño un poco más pequeño
                           )}
                           {!collapsed && <span>{subItem.name}</span>}
                         </Link>
@@ -165,7 +165,7 @@ export function Sidebar() {
                   : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
               )}
             >
-              <item.icon className="h-5 w-5 flex-shrink-0" />
+              <item.icon className="h-5 w-5 shrink-0" />
               {!collapsed && <span>{item.name}</span>}
             </Link>
           );
@@ -180,7 +180,7 @@ export function Sidebar() {
             "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
           )}
         >
-          <Settings className="h-5 w-5 flex-shrink-0" />
+          <Settings className="h-5 w-5 shrink-0" />
           {!collapsed && <span>Configuración</span>}
         </Link>
       </div>
