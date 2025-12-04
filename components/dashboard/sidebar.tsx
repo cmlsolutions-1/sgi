@@ -15,13 +15,42 @@ import {
   ChevronRight,
   Shield,
   ClipboardCheck,
+  ChevronDown,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-const navigation = [
+// Definir tipos para los subitems de navegación
+type SubNavigationItem = {
+  name: string;
+  href: string;
+  icon?: React.ElementType; // El ícono es opcional para subitems
+};
+
+// Definir tipos para los ítems de navegación principales
+type NavigationItem = {
+  name: string;
+  href: string; // Obligatorio para ítems normales
+  icon: React.ElementType; // Obligatorio para ítems normales
+  subItems?: never; // No tiene subItems
+} | {
+  name: string;
+  icon: React.ElementType; // Obligatorio para ítems con subItems
+  subItems: SubNavigationItem[]; // Ahora es de tipo SubNavigationItem[]
+  href?: never; // No tiene href
+};
+
+const navigation: NavigationItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Usuarios", href: "/dashboard/users", icon: Users },
-  { name: "Roles", href: "/dashboard/roles", icon: Shield },
+  { 
+    name: "Usuarios", 
+    icon: Users,
+    subItems: [
+      { name: "Gestión de Usuarios", href: "/dashboard/users" },
+      { name: "Roles", href: "/dashboard/roles", icon: Shield }, // Ahora 'icon' es válido aquí
+      // Puedes agregar más subitems aquí
+    ]
+  },
+  // { name: "Roles", href: "/dashboard/roles", icon: Shield }, // Puedes mover esta línea a subItems si lo deseas
   { name: "Documentos", href: "/dashboard/documents", icon: FileText },
   { name: "Cargar Archivos", href: "/dashboard/upload", icon: Upload },
   { name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle },
@@ -31,6 +60,11 @@ const navigation = [
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const pathname = usePathname()
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+
+  const toggleDropdown = (name: string) => {
+    setOpenDropdown(openDropdown === name ? null : name);
+  };
 
   return (
     <aside
@@ -60,7 +94,66 @@ export function Sidebar() {
 
       <nav className="flex-1 p-2 space-y-1">
         {navigation.map((item) => {
-          const isActive = pathname === item.href
+          // Comprobar si el ítem tiene subItems (menú desplegable)
+          if (item.subItems) {
+            return (
+              <div key={item.name}>
+                <button
+                  onClick={() => !collapsed && toggleDropdown(item.name)}
+                  className={cn(
+                    "flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                    openDropdown === item.name 
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground" 
+                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                    {!collapsed && <span>{item.name}</span>}
+                  </div>
+                  {!collapsed && (
+                    <ChevronDown 
+                      className={cn(
+                        "h-4 w-4 transition-transform duration-200",
+                        openDropdown === item.name ? "rotate-180" : ""
+                      )} 
+                    />
+                  )}
+                </button>
+                
+                {!collapsed && openDropdown === item.name && (
+                  <div className="ml-8 mt-1 space-y-1 pl-2 border-l border-sidebar-border">
+                    {item.subItems.map((subItem) => {
+                      const isSubActive = pathname === subItem.href;
+                      return (
+                        <Link
+                          key={subItem.href}
+                          href={subItem.href}
+                          className={cn(
+                            "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors", // Ajusté el padding horizontal
+                            isSubActive
+                              ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                          )}
+                        >
+                          {/* Renderizado condicional del ícono del subitem */}
+                          {subItem.icon && (
+                            <subItem.icon className="h-4 w-4 flex-shrink-0" /> // Tamaño un poco más pequeño
+                          )}
+                          {!collapsed && <span>{subItem.name}</span>}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
+          // Si no tiene subItems, es un ítem normal con href
+          // TypeScript ahora sabe que item.href existe gracias a la verificación anterior
+          const isActive = pathname === item.href;
+
           return (
             <Link
               key={item.name}
@@ -75,7 +168,7 @@ export function Sidebar() {
               <item.icon className="h-5 w-5 flex-shrink-0" />
               {!collapsed && <span>{item.name}</span>}
             </Link>
-          )
+          );
         })}
       </nav>
 
