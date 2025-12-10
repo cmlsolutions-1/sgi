@@ -45,15 +45,16 @@ const navigation: NavigationItem[] = [
     name: "Usuarios", 
     icon: Users,
     subItems: [
-      { name: "Gestión de Usuarios", href: "/dashboard/users" },
-      { name: "Roles", href: "/dashboard/roles", icon: Shield }, // Ahora 'icon' es válido aquí
+      { name: "Gestión de Usuarios", href: "/dashboard/users", icon: Users },
+      { name: "Roles", href: "/dashboard/roles", icon: Shield }, 
+      { name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle },// Ahora 'icon' es válido aquí
       // Puedes agregar más subitems aquí
     ]
   },
   // { name: "Roles", href: "/dashboard/roles", icon: Shield }, // Puedes mover esta línea a subItems si lo deseas
   { name: "Documentos", href: "/dashboard/documents", icon: FileText },
   { name: "Cargar Archivos", href: "/dashboard/upload", icon: Upload },
-  { name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle },
+  //{ name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle },
   { name: "Auditorías", href: "/dashboard/audits", icon: ClipboardCheck },
 ]
 

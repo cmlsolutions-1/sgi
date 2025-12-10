@@ -505,7 +505,9 @@ __turbopack_context__.s([
     "monthlyData",
     ()=>monthlyData,
     "roles",
-    ()=>roles
+    ()=>roles,
+    "typeContract",
+    ()=>typeContract
 ]);
 const mockUsers = [
     {
@@ -513,7 +515,7 @@ const mockUsers = [
         name: "Carlos Rodríguez",
         email: "carlos@sgc.com",
         role: "admin",
-        department: "Dirección",
+        password: "123456789",
         status: "active",
         createdAt: "2024-01-15"
     },
@@ -522,7 +524,7 @@ const mockUsers = [
         name: "María García",
         email: "maria@sgc.com",
         role: "auditor",
-        department: "Calidad",
+        password: "123456789",
         status: "active",
         createdAt: "2024-02-20"
     },
@@ -531,7 +533,7 @@ const mockUsers = [
         name: "Juan Pérez",
         email: "juan@sgc.com",
         role: "supervisor",
-        department: "Producción",
+        password: "123456789",
         status: "active",
         createdAt: "2024-03-10"
     },
@@ -540,7 +542,7 @@ const mockUsers = [
         name: "Ana Martínez",
         email: "ana@sgc.com",
         role: "empleado",
-        department: "Recursos Humanos",
+        password: "123456789",
         status: "active",
         createdAt: "2024-04-05"
     },
@@ -549,7 +551,7 @@ const mockUsers = [
         name: "Luis Hernández",
         email: "luis@sgc.com",
         role: "empleado",
-        department: "Producción",
+        password: "123456789",
         status: "inactive",
         createdAt: "2024-05-12"
     },
@@ -558,7 +560,7 @@ const mockUsers = [
         name: "Sofia López",
         email: "sofia@sgc.com",
         role: "auditor",
-        department: "Calidad",
+        password: "123456789",
         status: "active",
         createdAt: "2024-06-08"
     },
@@ -567,7 +569,7 @@ const mockUsers = [
         name: "Diego Torres",
         email: "diego@sgc.com",
         role: "supervisor",
-        department: "Logística",
+        password: "123456789",
         status: "active",
         createdAt: "2024-07-22"
     },
@@ -576,7 +578,7 @@ const mockUsers = [
         name: "Laura Sánchez",
         email: "laura@sgc.com",
         role: "empleado",
-        department: "Ventas",
+        password: "123456789",
         status: "active",
         createdAt: "2024-08-15"
     }
@@ -588,6 +590,7 @@ const mockEmployees = [
         email: "carlos@sgc.com",
         position: "Director de Calidad",
         department: "Dirección",
+        typeContract: "Ocasional",
         phone: "+57 300 123 4567",
         hireDate: "2020-03-15",
         birthDate: "1985-06-20",
@@ -645,6 +648,7 @@ const mockEmployees = [
         email: "maria@sgc.com",
         position: "Auditora de Calidad",
         department: "Calidad",
+        typeContract: "Ocasional",
         phone: "+57 301 234 5678",
         hireDate: "2021-07-01",
         birthDate: "1990-02-14",
@@ -687,6 +691,7 @@ const mockEmployees = [
         email: "juan@sgc.com",
         position: "Supervisor de Producción",
         department: "Producción",
+        typeContract: "Ocasional",
         phone: "+57 302 345 6789",
         hireDate: "2019-11-20",
         birthDate: "1988-09-05",
@@ -722,6 +727,7 @@ const mockEmployees = [
         email: "ana@sgc.com",
         position: "Analista de RRHH",
         department: "Recursos Humanos",
+        typeContract: "Ocasional",
         phone: "+57 303 456 7890",
         hireDate: "2022-01-10",
         birthDate: "1992-12-01",
@@ -757,6 +763,7 @@ const mockEmployees = [
         position: "Operario de Producción",
         department: "Producción",
         phone: "+57 304 567 8901",
+        typeContract: "Ocasional",
         hireDate: "2023-03-05",
         birthDate: "1995-07-18",
         address: "Carrera 50 #30-15, Bogotá",
@@ -1119,6 +1126,13 @@ const departments = [
     "Logística",
     "Recursos Humanos",
     "Ventas"
+];
+const typeContract = [
+    "Término Fijo",
+    "Término Indefinido",
+    "Obra o Labor",
+    "Aprendizaje",
+    "Ocasional"
 ];
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);

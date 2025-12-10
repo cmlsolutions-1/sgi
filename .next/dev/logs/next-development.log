@@ -1,74 +1,3406 @@
-[00:00:03.834] Server  LOG      ✓ Ready in 2.7s
-[00:00:19.391] Server  LOG      ○ Compiling /dashboard/users ...
-[00:00:28.694] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:29.295] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:29.295] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/users","route":"/dashboard/users"}
-[00:00:29.295] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1764824181401}
-[00:00:36.436] Server  LOG      ○ Compiling /dashboard ...
-[00:00:40.657] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:05.452] Server  LOG      ✓ Ready in 3.7s
+[00:00:11.586] Server  LOG      ○ Compiling / ...
+[00:00:22.804] Server  LOG      ○ Compiling /dashboard ...
+[00:00:28.900] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:40.657] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:28.907] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:40.658] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:28.916] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:40.658] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:28.932] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:40.658] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:30.058] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:31.143] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:40.658] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:31.143] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:40.658] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:31.143] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:40.658] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:31.143] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:40.658] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1764824192122}
-[00:00:46.607] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1764824198663}
-[00:00:49.866] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:31.143] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:49.866] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:31.143] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:49.866] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:31.143] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:49.866] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:31.143] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:49.866] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:00:49.866] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:00:49.866] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:00:49.866] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:00:49.866] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1764824201626}
+[00:00:31.309] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:31.309] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[00:00:31.309] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765325391178}
+[00:00:38.496] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765325398373}
+[00:00:41.450] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:00:41.450] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:16:20.483] Server  LOG      ✓ Compiled in 775ms
+[00:16:30.003] Server  LOG      ✓ Compiled in 2.5s
+[00:16:42.327] Server  LOG      ✓ Compiled in 275ms
+[00:16:43.573] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:226:16
+Parsing ecmascript source code failed
+  224 |             </Button>
+  225 |           </div>
+> 226 |         </form>
+      |                ^
+> 227 |       </DialogContent>
+      | ^^^^^^^
+  228 |     </Dialog>
+  229 |   );
+  230 | }
+
+Expected '</', got 'jsx text (
+      )'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[00:16:46.696] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:226:16
+Parsing ecmascript source code failed
+  224 |             </Button>
+  225 |           </div>
+> 226 |         </form>
+      |                ^
+> 227 |       </DialogContent>
+      | ^^^^^^^
+  228 |     </Dialog>
+  229 |   );
+  230 | }
+
+Expected '</', got 'jsx text (
+      )'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[00:16:50.582] Server  LOG      ✓ Compiled in 459ms
+[00:17:23.212] Server  LOG      ✓ Compiled in 173ms
+[00:17:25.507] Server  LOG      ✓ Compiled in 382ms
+[00:17:33.127] Server  LOG      ✓ Compiled in 611ms
+[00:17:48.361] Server  LOG      ✓ Compiled in 426ms
+[00:19:00.303] Server  LOG      ✓ Compiled in 887ms
+[00:19:00.395] Browser ERROR   ./lib/mock-data.ts:508:14
+Ecmascript file had an error
+  506 | export const departments = ["Dirección", "Calidad", "Producción", "Logística", "Recursos Humanos", "Ventas"]
+  507 |
+> 508 | export const departments = ["Dirección", "Calidad", "Producción", "Logística", "Recursos Humanos", "Ventas"]
+      |              ^^^^^^^^^^^
+  509 |
+
+the name `departments` is defined multiple times
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:19:08.285] Server  LOG      ✓ Compiled in 553ms
+[00:19:10.401] Server  LOG      ✓ Compiled in 378ms
+[00:19:41.054] Server  LOG      ✓ Compiled in 317ms
+[00:19:43.976] Server  LOG      ✓ Compiled in 1476ms
+[00:19:46.745] Server  LOG      ✓ Compiled in 977ms
+[00:19:48.657] Server  LOG      ✓ Compiled in 841ms
+[00:19:51.633] Server  LOG      ✓ Compiled in 520ms
+[00:19:53.803] Server  LOG      ✓ Compiled in 295ms
+[00:20:07.535] Server  LOG      ✓ Compiled in 230ms
+[00:20:21.762] Server  LOG      ✓ Compiled in 187ms
+[00:20:38.216] Server  LOG      ✓ Compiled in 1192ms
+[00:20:40.800] Server  LOG      ✓ Compiled in 656ms
+[00:20:54.249] Server  LOG      ✓ Compiled in 249ms
+[00:21:00.342] Server  LOG      ✓ Compiled in 524ms
+[00:21:01.483] Server  LOG      ✓ Compiled in 246ms
+[00:21:05.949] Server  LOG      ✓ Compiled in 447ms
+[00:21:08.562] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:179:33
+Parsing ecmascript source code failed
+  177 |               <Label>Tipo de contrato</Label>
+  178 |               <Select
+> 179 |                 value={formData.}
+      |                                 ^
+  180 |                 onValueChange={(value) =>
+  181 |                   setFormData({ ...formData, department: value })
+  182 |                 }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[00:21:09.525] Server  LOG      ✓ Compiled in 230ms
+[00:21:34.791] Server  LOG      ✓ Compiled in 251ms
+[00:21:36.152] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:23:34
+Parsing ecmascript source code failed
+  21 |   SelectValue,
+  22 | } from "@/components/ui/select";
+> 23 | import { roles, departments, typ type User, type Role } from "@/lib/mock-data";
+     |                                  ^^^^
+  24 | import { Plus, Pencil } from "lucide-react";
+  25 | import { typeContract } from '../../lib/mock-data';
+  26 |
+
+Expected ',', got 'type'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[00:21:36.568] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:23:43
+Parsing ecmascript source code failed
+  21 |   SelectValue,
+  22 | } from "@/components/ui/select";
+> 23 | import { roles, departments, typeContract type User, type Role } from "@/lib/mock-data";
+     |                                           ^^^^
+  24 | import { Plus, Pencil } from "lucide-react";
+  25 | import { typeContract } from '../../lib/mock-data';
+  26 |
+
+Expected ',', got 'type'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[00:21:37.471] Server  LOG      ✓ Compiled in 328ms
+[00:21:37.598] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:25:10
+Ecmascript file had an error
+  23 | import { roles, departments, typeContract, type User, type Role } from "@/lib/mock-data";
+  24 | import { Plus, Pencil } from "lucide-react";
+> 25 | import { typeContract } from '../../lib/mock-data';
+     |          ^^^^^^^^^^^^
+  26 |
+  27 | interface UserFormDialogProps {
+  28 |   user?: User;
+
+the name `typeContract` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[00:21:48.667] Server  LOG      ✓ Compiled in 298ms
+[00:22:28.838] Server  LOG      ✓ Compiled in 383ms
+[00:22:29.581] Browser ERROR   ./lib/mock-data.ts:92:5
+Parsing ecmascript source code failed
+  90 |     department: "Dirección",
+  91 |     typeContract
+> 92 |     status: "active",
+     |     ^^^^^^
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+  95 |   {
+
+Unexpected token `status`. Expected ... , *,  (, [, :, , ?, =, an identifier, public, protected, private, readonly, <.
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:22:30.362] Server  LOG      ✓ Compiled in 583ms
+[00:22:32.791] Server  LOG      ✓ Compiled in 335ms
+[00:22:33.043] Server  ERROR    ⨯ ./lib/mock-data.ts:92:5
+Parsing ecmascript source code failed
+  90 |     department: "Dirección",
+  91 |     typeContract,""
+> 92 |     status: "active",
+     |     ^^^^^^
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+  95 |   {
+
+Unexpected token `status`. Expected identifier
+
+Import traces:
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+
+[00:22:33.100] Server  ERROR    ⨯ ./lib/mock-data.ts:92:5
+Parsing ecmascript source code failed
+  90 |     department: "Dirección",
+  91 |     typeContract,""
+> 92 |     status: "active",
+     |     ^^^^^^
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+  95 |   {
+
+Unexpected token `status`. Expected identifier
+
+Import traces:
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+
+[00:22:33.574] Browser ERROR   ./lib/mock-data.ts:92:5
+Parsing ecmascript source code failed
+  90 |     department: "Dirección",
+  91 |     typeContract,""
+> 92 |     status: "active",
+     |     ^^^^^^
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+  95 |   {
+
+Unexpected token `status`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:22:33.574] Browser ERROR   ./lib/mock-data.ts:92:5
+Parsing ecmascript source code failed
+  90 |     department: "Dirección",
+  91 |     typeContract,""
+> 92 |     status: "active",
+     |     ^^^^^^
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+  95 |   {
+
+Unexpected token `status`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:22:36.079] Server  LOG      ○ Compiling /_error ...
+[00:22:37.779] Server  LOG      ✓ Compiled in 3.8s
+[00:22:38.569] Browser ERROR   ./lib/mock-data.ts:91:20
+Parsing ecmascript source code failed
+  89 |     role: "admin",
+  90 |     department: "Dirección",
+> 91 |     typeContract,"",
+     |                    ^
+  92 |     status: "active",
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:22:38.569] Browser ERROR   ./lib/mock-data.ts:91:20
+Parsing ecmascript source code failed
+  89 |     role: "admin",
+  90 |     department: "Dirección",
+> 91 |     typeContract,"",
+     |                    ^
+  92 |     status: "active",
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:22:39.569] Browser ERROR   ./lib/mock-data.ts:91:22
+Parsing ecmascript source code failed
+  89 |     role: "admin",
+  90 |     department: "Dirección",
+> 91 |     typeContract,"aa",
+     |                      ^
+  92 |     status: "active",
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:22:44.652] Browser ERROR   ./lib/mock-data.ts:91:22
+Parsing ecmascript source code failed
+  89 |     role: "admin",
+  90 |     department: "Dirección",
+> 91 |     typeContract,"aa",
+     |                      ^
+  92 |     status: "active",
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:22:44.652] Browser ERROR   ./lib/mock-data.ts:91:22
+Parsing ecmascript source code failed
+  89 |     role: "admin",
+  90 |     department: "Dirección",
+> 91 |     typeContract,"aa",
+     |                      ^
+  92 |     status: "active",
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:22:44.894] Server  ERROR    ⨯ ./lib/mock-data.ts:91:22
+Parsing ecmascript source code failed
+  89 |     role: "admin",
+  90 |     department: "Dirección",
+> 91 |     typeContract,"aa",
+     |                      ^
+  92 |     status: "active",
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+
+[00:22:46.467] Browser ERROR   uncaughtError: Error: ./lib/mock-data.ts:91:22
+Parsing ecmascript source code failed
+  89 |     role: "admin",
+  90 |     department: "Dirección",
+> 91 |     typeContract,"aa",
+     |                      ^
+  92 |     status: "active",
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+
+[00:22:47.870] Browser ERROR   ./lib/mock-data.ts:91:22
+Parsing ecmascript source code failed
+  89 |     role: "admin",
+  90 |     department: "Dirección",
+> 91 |     typeContract,"aa",
+     |                      ^
+  92 |     status: "active",
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:22:47.870] Browser ERROR   ./lib/mock-data.ts:91:22
+Parsing ecmascript source code failed
+  89 |     role: "admin",
+  90 |     department: "Dirección",
+> 91 |     typeContract,"aa",
+     |                      ^
+  92 |     status: "active",
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[00:22:47.870] Browser ERROR   ./lib/mock-data.ts:91:22
+Parsing ecmascript source code failed
+  89 |     role: "admin",
+  90 |     department: "Dirección",
+> 91 |     typeContract,"aa",
+     |                      ^
+  92 |     status: "active",
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:22:48.582] Browser ERROR   ./lib/mock-data.ts:91:22
+Parsing ecmascript source code failed
+  89 |     role: "admin",
+  90 |     department: "Dirección",
+> 91 |     typeContract,"aa",
+     |                      ^
+  92 |     status: "active",
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:22:48.583] Browser ERROR   ./lib/mock-data.ts:91:22
+Parsing ecmascript source code failed
+  89 |     role: "admin",
+  90 |     department: "Dirección",
+> 91 |     typeContract,"aa",
+     |                      ^
+  92 |     status: "active",
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:23:00.577] Browser ERROR   ./lib/mock-data.ts:92:22
+Parsing ecmascript source code failed
+  90 |     role: "admin",
+  91 |     department: "Dirección",
+> 92 |     typeContract,"aa",
+     |                      ^
+  93 |     status: "active",
+  94 |     createdAt: "2024-01-15",
+  95 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:23:02.581] Browser ERROR   ./lib/mock-data.ts:92:22
+Parsing ecmascript source code failed
+  90 |     role: "admin",
+  91 |     department: "Dirección",
+> 92 |     typeContract,"aa",
+     |                      ^
+  93 |     status: "active",
+  94 |     createdAt: "2024-01-15",
+  95 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:23:06.584] Browser ERROR   ./lib/mock-data.ts:92:22
+Parsing ecmascript source code failed
+  90 |     role: "admin",
+  91 |     department: "Dirección",
+> 92 |     typeContract,"aa",
+     |                      ^
+  93 |     status: "active",
+  94 |     createdAt: "2024-01-15",
+  95 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:23:27.766] Browser ERROR   ./lib/mock-data.ts:91:22
+Parsing ecmascript source code failed
+  89 |     role: "admin",
+  90 |     department: "Dirección",
+> 91 |     typeContract,"aa",
+     |                      ^
+  92 |     status: "active",
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:23:37.569] Browser ERROR   ./lib/mock-data.ts:91:21
+Parsing ecmascript source code failed
+  89 |     role: "admin",
+  90 |     department: "Dirección",
+> 91 |     typeContract,"T",
+     |                     ^
+  92 |     status: "active",
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:23:44.568] Browser ERROR   ./lib/mock-data.ts:91:29
+Parsing ecmascript source code failed
+  89 |     role: "admin",
+  90 |     department: "Dirección",
+> 91 |     typeContract,"Ocasional",
+     |                             ^
+  92 |     status: "active",
+  93 |     createdAt: "2024-01-15",
+  94 |   },
+
+Unexpected token `,`. Expected identifier
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:23:53.375] Server  LOG      ✓ Compiled in 220ms
+[00:23:58.105] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:23:59.565] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:23:59.565] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/users","route":"/dashboard/users"}
+[00:23:59.565] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765326798732}
+[00:24:01.886] Server  LOG      ✓ Compiled in 230ms
+[00:24:03.442] Browser ERROR   ./lib/mock-data.ts:168:5
+Parsing ecmascript source code failed
+  166 |     department: "Dirección",
+  167 |     typeContract
+> 168 |     phone: "+57 300 123 4567",
+      |     ^^^^^
+  169 |     hireDate: "2020-03-15",
+  170 |     birthDate: "1985-06-20",
+  171 |     address: "Calle 45 #12-30, Bogotá",
+
+Unexpected token `phone`. Expected ... , *,  (, [, :, , ?, =, an identifier, public, protected, private, readonly, <.
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:24:04.828] Server  LOG      ✓ Compiled in 181ms
+[00:24:05.657] Browser ERROR   ./lib/mock-data.ts:168:10
+Parsing ecmascript source code failed
+  166 |     department: "Dirección",
+  167 |     typeContract: 
+> 168 |     phone: "+57 300 123 4567",
+      |          ^
+  169 |     hireDate: "2020-03-15",
+  170 |     birthDate: "1985-06-20",
+  171 |     address: "Calle 45 #12-30, Bogotá",
+
+Expected ',', got ':'
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:24:10.795] Server  LOG      ✓ Compiled in 352ms
+[00:24:11.664] Browser ERROR   ./lib/mock-data.ts:168:5
+Parsing ecmascript source code failed
+  166 |     department: "Dirección",
+  167 |     typeContract: "Ocasional"
+> 168 |     phone: "+57 300 123 4567",
+      |     ^^^^^
+  169 |     hireDate: "2020-03-15",
+  170 |     birthDate: "1985-06-20",
+  171 |     address: "Calle 45 #12-30, Bogotá",
+
+Expected ',', got 'phone'
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:24:22.090] Server  LOG      ✓ Compiled in 605ms
+[00:24:26.121] Server  LOG      ✓ Compiled in 271ms
+[00:24:30.641] Server  LOG      ✓ Compiled in 691ms
+[00:24:35.008] Server  LOG      ✓ Compiled in 357ms
+[00:28:27.597] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765327067561}
+[00:28:58.909] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/1 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/1","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765327098896}
+[00:29:32.905] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765327132841}
+[00:50:20.228] Server  LOG      ✓ Compiled in 327ms
+[00:50:23.753] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:179:33
+Parsing ecmascript source code failed
+  177 |               <Label>Tipo de contrato</Label>
+  178 |               <Select
+> 179 |                 value={formData.}
+      |                                 ^
+  180 |                 onValueChange={(value) =>
+  181 |                   setFormData({ ...formData, typeContract: value })
+  182 |                 }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[00:50:27.468] Server  LOG      ✓ Compiled in 2.5s
+[00:50:30.645] Server  LOG      ✓ Compiled in 1245ms
+[00:50:56.034] Server  LOG      ✓ Compiled in 3.4s
+[00:52:15.865] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765328495836}
+[00:52:19.940] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/roles color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/roles","o":"http://localhost:3000/dashboard/roles","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765328499989}
+[00:56:03.067] Server  LOG      ✓ Compiled in 1899ms
+[00:56:13.128] Server  LOG      ✓ Compiled in 579ms
+[00:56:16.382] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:56:20.128] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:56:20.128] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/roles","route":"/dashboard/roles"}
+[00:56:20.128] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/roles color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/roles","o":"http://localhost:3000/dashboard/roles","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765328740200}
+[00:56:32.661] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:56:33.057] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:56:33.057] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/roles","route":"/dashboard/roles"}
+[00:56:33.057] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/roles color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/roles","o":"http://localhost:3000/dashboard/roles","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765328753133}
+[00:56:37.744] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765328757674}
+[01:02:08.364] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765329088445}
+[01:02:13.128] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765329093153}
+[01:02:18.065] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765329098141}
+[01:02:43.948] Server  LOG      ✓ Compiled in 192ms
+[01:02:45.184] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_47b2313c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[01:02:45.191] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[01:02:45.706] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[01:02:45.714] Server  ERROR    ⨯ ReferenceError: icon is not defined
+[01:02:52.080] Server  LOG      ✓ Compiled in 222ms
+[01:02:52.176] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:02:53.584] Browser ERROR   uncaughtError: Error: Could not parse module '[project]/components/dashboard/sidebar.tsx'
+
+Expression expected
+[01:02:54.433] Server  LOG      ✓ Compiled in 497ms
+[01:02:56.905] Server  LOG      ✓ Compiled in 914ms
+[01:02:59.603] Server  LOG      ✓ Compiled in 1328ms
+[01:03:01.426] Server  LOG      ✓ Compiled in 1055ms
+[01:03:04.868] Browser ERROR   ./components/dashboard/sidebar.tsx:48:72
+Parsing ecmascript source code failed
+  46 |     icon: Users,
+  47 |     subItems: [
+> 48 |       { name: "Gestión de Usuarios", href: "/dashboard/users", icon:  },
+     |                                                                        ^
+  49 |       { name: "Roles", href: "/dashboard/roles", icon: Shield }, 
+  50 |       { name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle },// Ahora 'icon' es válido aquí
+  51 |       // Puedes agregar más subitems aquí
+
+Expression expected
+
+Import trace:
+  Server Component:
+    ./components/dashboard/sidebar.tsx
+    ./app/dashboard/layout.tsx
+[01:03:04.920] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[01:03:05.129] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[01:03:05.176] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[01:03:05.195] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[01:03:05.210] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[01:03:05.227] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[01:03:05.244] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[01:03:05.257] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[01:03:05.262] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[01:03:05.321] Server  LOG      ✓ Compiled in 1088ms
+[01:03:05.373] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[01:03:05.391] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[01:03:05.402] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[01:03:10.375] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:03:11.885] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:03:11.885] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/users","route":"/dashboard/users"}
+[01:03:11.885] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765329151964}
+[01:03:19.454] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/roles color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/roles","o":"http://localhost:3000/dashboard/roles","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765329159509}
+[01:03:21.248] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765329161253}
+[01:07:16.982] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:07:16.983] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:17:26.316] Server  LOG      ✓ Compiled in 214ms
+[01:17:39.660] Server  LOG      ✓ Compiled in 309ms
+[01:17:44.608] Server  LOG      ✓ Compiled in 258ms
+[01:19:56.473] Server  LOG      ✓ Compiled in 436ms
+[01:20:07.730] Server  LOG      ✓ Compiled in 290ms
+[01:20:10.680] Server  LOG      ✓ Compiled in 224ms
+[01:20:30.408] Server  LOG      ✓ Compiled in 215ms
+[01:20:31.566] Browser ERROR   A component is changing an uncontrolled input to be controlled. This is likely caused by the value changing from undefined to a defined value, which should not happen. Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://react.dev/link/controlled-components
+[01:20:50.772] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:20:51.257] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:20:51.257] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/users","route":"/dashboard/users"}
+[01:20:51.257] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765330211359}
+[01:20:53.527] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:20:53.528] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:21:11.239] Server  LOG      ✓ Compiled in 154ms
+[01:21:17.788] Server  LOG      ✓ Compiled in 231ms
+[01:21:23.194] Server  LOG      ✓ Compiled in 180ms
+[01:21:28.291] Server  LOG      ✓ Compiled in 300ms
+[01:24:21.054] Server  LOG      ✓ Compiled in 4.8s
+[01:24:21.583] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:126:46
+Parsing ecmascript source code failed
+  124 |             <Input
+  125 |               id="email"
+> 126 |               type="<div className="space-y-2">
+      |                                              ^^
+  127 |               <Label htmlFor="email">Correo Electrónico</Label>
+  128 |               <Input
+  129 |                 id="email"
+
+Unterminated string constant
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:24:32.849] Server  LOG      ✓ Compiled in 642ms
+[01:24:59.390] Server  LOG      ✓ Compiled in 515ms
+[01:25:02.447] Server  LOG      ✓ Compiled in 735ms
+[01:25:03.759] Server  LOG      ✓ Compiled in 578ms
+[01:25:08.254] Server  LOG      ✓ Compiled in 737ms
+[01:25:11.442] Server  LOG      ✓ Compiled in 1135ms
+[01:25:15.480] Server  LOG      ✓ Compiled in 501ms
+[01:25:16.757] Server  LOG      ✓ Compiled in 565ms
+[01:25:18.337] Server  LOG      ✓ Compiled in 412ms
+[01:25:19.474] Server  ERROR    ⨯ ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+
+[01:25:23.849] Browser ERROR   A component is changing a controlled input to be uncontrolled. This is likely caused by the value changing from a defined to undefined, which should not happen. Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://react.dev/link/controlled-components
+[01:25:23.849] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:25:23.849] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:25:23.849] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:25:23.849] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:25:23.849] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:25:23.849] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:25:23.964] Server  ERROR    ⨯ ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+
+[01:25:24.745] Browser ERROR   uncaughtError: Error: ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+
+[01:25:25.570] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:25:25.570] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:25:37.562] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:25:40.601] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:25:42.790] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:25:51.570] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:25:53.699] Browser ERROR   ./lib/mock-data.ts:92:5
+Parsing ecmascript source code failed
+  90 |     role: "admin",
+  91 |     pas
+> 92 |     department: "Dirección",
+     |     ^^^^^^^^^^
+  93 |     status: "active",
+  94 |     createdAt: "2024-01-15",
+  95 |   },
+
+Unexpected token `department`. Expected ... , *,  (, [, :, , ?, =, an identifier, public, protected, private, readonly, <.
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[01:25:53.699] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:25:55.656] Browser ERROR   ./lib/mock-data.ts:92:5
+Parsing ecmascript source code failed
+  90 |     role: "admin",
+  91 |     password
+> 92 |     department: "Dirección",
+     |     ^^^^^^^^^^
+  93 |     status: "active",
+  94 |     createdAt: "2024-01-15",
+  95 |   },
+
+Unexpected token `department`. Expected ... , *,  (, [, :, , ?, =, an identifier, public, protected, private, readonly, <.
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[01:25:55.656] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:25:56.578] Browser ERROR   ./lib/mock-data.ts:92:15
+Parsing ecmascript source code failed
+  90 |     role: "admin",
+  91 |     password:
+> 92 |     department: "Dirección",
+     |               ^
+  93 |     status: "active",
+  94 |     createdAt: "2024-01-15",
+  95 |   },
+
+Expected ',', got ':'
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[01:25:56.578] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:25:58.574] Browser ERROR   ./lib/mock-data.ts:92:5
+Parsing ecmascript source code failed
+  90 |     role: "admin",
+  91 |     password: ""
+> 92 |     department: "Dirección",
+     |     ^^^^^^^^^^
+  93 |     status: "active",
+  94 |     createdAt: "2024-01-15",
+  95 |   },
+
+Expected ',', got 'department'
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[01:25:58.574] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:26:00.795] Server  LOG      ✓ Compiled in 240ms
+[01:26:01.569] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:26:05.239] Server  LOG      ✓ Compiled in 235ms
+[01:26:05.577] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:26:11.190] Server  LOG      ✓ Compiled in 139ms
+[01:26:11.743] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:26:13.690] Server  LOG      ✓ Compiled in 150ms
+[01:26:14.585] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:26:15.927] Server  LOG      ✓ Compiled in 104ms
+[01:26:16.605] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:26:19.325] Server  LOG      ✓ Compiled in 370ms
+[01:26:19.569] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:26:23.328] Server  LOG      ✓ Compiled in 449ms
+[01:26:24.575] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:26:26.563] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:26:28.665] Server  LOG      ✓ Compiled in 545ms
+[01:26:29.577] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:26:31.077] Server  LOG      ✓ Compiled in 230ms
+[01:26:31.891] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:127:31
+Parsing ecmascript source code failed
+  125 |               id="password"
+  126 |               type="password"
+> 127 |               value={formData.}
+      |                               ^
+  128 |               onChange={(e) =>
+  129 |                 setFormData({ ...formData, password: e.target.value })
+  130 |               }
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:26:43.914] Server  LOG      ✓ Compiled in 105ms
+[01:26:48.884] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:26:49.494] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:26:49.494] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/users","route":"/dashboard/users"}
+[01:26:49.494] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765330569611}
+[01:26:50.769] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:26:50.769] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:26:52.680] Browser ERROR   A component is changing an uncontrolled input to be controlled. This is likely caused by the value changing from undefined to a defined value, which should not happen. Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://react.dev/link/controlled-components
+[01:27:16.332] Server  LOG      ✓ Compiled in 147ms
+[01:27:20.439] Server  LOG      ✓ Compiled in 140ms
+[01:27:23.375] Server  LOG      ✓ Compiled in 303ms
+[01:27:28.355] Server  LOG      ✓ Compiled in 249ms
+[01:27:29.604] Server  LOG      ✓ Compiled in 426ms
+[01:29:51.422] Server  LOG      ✓ Compiled in 148ms
+[01:29:57.577] Server  LOG      ✓ Compiled in 1124ms
+[01:29:58.892] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:25:10
+Parsing ecmascript source code failed
+  23 | import { roles, departments, typeContract, type User, type Role } from "@/lib/mock-data";
+  24 | import { Plus, Pencil } from "lucide-react";
+> 25 | import { , EyeOff } from "lucide-react";
+     |          ^
+  26 |
+  27 |
+  28 | interface UserFormDialogProps {
+
+Unexpected token `,`. Expected identifier or string
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:29:59.574] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:25:10
+Parsing ecmascript source code failed
+  23 | import { roles, departments, typeContract, type User, type Role } from "@/lib/mock-data";
+  24 | import { Plus, Pencil,Eye } from "lucide-react";
+> 25 | import { , EyeOff } from "lucide-react";
+     |          ^
+  26 |
+  27 |
+  28 | interface UserFormDialogProps {
+
+Unexpected token `,`. Expected identifier or string
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:30:03.566] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:25:10
+Parsing ecmascript source code failed
+  23 | import { roles, departments, typeContract, type User, type Role } from "@/lib/mock-data";
+  24 | import { Plus, Pencil,Eye } from "lucide-react";
+> 25 | import { ,  } from "lucide-react";
+     |          ^
+  26 |
+  27 |
+  28 | interface UserFormDialogProps {
+
+Unexpected token `,`. Expected identifier or string
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:30:04.647] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:25:10
+Parsing ecmascript source code failed
+  23 | import { roles, departments, typeContract, type User, type Role } from "@/lib/mock-data";
+  24 | import { Plus, Pencil,Eye, EyeOff } from "lucide-react";
+> 25 | import { ,  } from "lucide-react";
+     |          ^
+  26 |
+  27 |
+  28 | interface UserFormDialogProps {
+
+Unexpected token `,`. Expected identifier or string
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:30:07.229] Server  LOG      ✓ Compiled in 240ms
+[01:30:59.830] Server  LOG      ✓ Compiled in 196ms
+[01:31:00.572] Browser ERROR   uncaughtError: ReferenceError: showPassword is not defined
+[01:31:19.464] Server  LOG      ✓ Compiled in 638ms
+[01:31:19.616] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[01:31:21.220] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_1c13323f._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[01:31:21.251] Server  ERROR    ⨯ ReferenceError: showPassword is not defined
+[01:31:21.283] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[01:31:21.284] Browser ERROR   uncaughtError: ReferenceError: showPassword is not defined
+[01:31:24.837] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:31:25.748] Server  LOG      ✓ Compiled in 238ms
+[01:31:26.124] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[01:31:26.126] Browser ERROR   uncaughtError: ReferenceError: showPassword is not defined
+[01:31:26.698] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_1c13323f._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[01:31:26.699] Server  ERROR    ⨯ ReferenceError: showPassword is not defined
+[01:31:27.718] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:31:28.573] Browser ERROR   uncaughtError: ReferenceError: showPassword is not defined
+[01:31:30.750] Server  LOG      ✓ Compiled in 172ms
+[01:31:31.135] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[01:31:31.945] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_1c13323f._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[01:31:31.949] Server  ERROR    ⨯ ReferenceError: showPassword is not defined
+[01:31:33.397] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:31:34.569] Browser ERROR   uncaughtError: ReferenceError: showPassword is not defined
+[01:31:36.656] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[01:31:36.659] Server  LOG      ✓ Compiled in 150ms
+[01:31:37.271] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_1c13323f._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[01:31:37.278] Server  ERROR    ⨯ ReferenceError: showPassword is not defined
+[01:31:38.100] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:31:39.565] Browser ERROR   uncaughtError: ReferenceError: showPassword is not defined
+[01:31:40.373] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[01:31:40.399] Server  LOG      ✓ Compiled in 206ms
+[01:31:41.210] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_1c13323f._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[01:31:41.289] Server  ERROR    ⨯ ReferenceError: showPassword is not defined
+[01:31:44.066] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:31:49.804] Browser ERROR   uncaughtError: ReferenceError: showPassword is not defined
+[01:31:58.069] Server  LOG      ✓ Compiled in 386ms
+[01:31:58.365] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[01:32:01.555] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:32:03.744] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:32:03.744] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/users","route":"/dashboard/users"}
+[01:32:03.744] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765330883863}
+[01:32:07.875] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:32:07.875] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:32:16.401] Browser ERROR   A component is changing an uncontrolled input to be controlled. This is likely caused by the value changing from undefined to a defined value, which should not happen. Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://react.dev/link/controlled-components
+[01:34:49.325] Server  LOG      ✓ Compiled in 444ms
+[01:34:52.802] Server  LOG      ✓ Compiled in 393ms
+[01:34:55.297] Server  LOG      ✓ Compiled in 241ms
+[01:34:58.211] Server  LOG      ✓ Compiled in 238ms
+[01:35:00.914] Server  LOG      ✓ Compiled in 363ms
+[01:35:03.713] Server  LOG      ✓ Compiled in 258ms
+[01:35:07.522] Server  LOG      ✓ Compiled in 334ms
+[01:35:13.037] Server  LOG      ✓ Compiled in 216ms
+[01:37:54.482] Server  LOG      ✓ Compiled in 459ms
+[01:37:55.865] Server  LOG      ✓ Compiled in 497ms
+[01:38:04.206] Server  LOG      ✓ Compiled in 200ms
+[01:38:14.233] Server  LOG      ✓ Compiled in 243ms
+[01:38:21.139] Server  LOG      ✓ Compiled in 364ms
+[01:38:23.168] Server  LOG      ✓ Compiled in 406ms
+[01:38:28.598] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:38:28.598] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:41:41.118] Server  LOG      ✓ Compiled in 214ms
+[01:41:41.567] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:192:17
+Parsing ecmascript source code failed
+  190 |             </Select>
+  191 |           </div>
+> 192 |           </div>
+      |                 ^
+> 193 |
+      | ^
+> 194 |           <div className="flex justify-end gap-3 pt-4">
+      | ^^^^^^^^^^^
+  195 |             <Button
+  196 |               type="button"
+  197 |               variant="outline"
+
+Expected '</', got 'jsx text (
+
+          )'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:41:45.542] Server  LOG      ✓ Compiled in 775ms
+[01:41:48.391] Server  LOG      ✓ Compiled in 430ms
+[01:42:06.464] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:42:06.464] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:42:40.073] Server  LOG      ✓ Compiled in 195ms
+[01:42:54.551] Server  LOG      ✓ Compiled in 321ms
+[01:43:23.107] Server  LOG      ✓ Compiled in 252ms
+[01:43:23.633] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:193:17
+Parsing ecmascript source code failed
+  191 |
+  192 |       
+> 193 |           </div>
+      |                 ^
+> 194 |
+      | ^
+> 195 |           <div className="flex justify-end gap-3 pt-4">
+      | ^^^^^^^^^^^
+  196 |             <Button
+  197 |               type="button"
+  198 |               variant="outline"
+
+Expected '</', got 'jsx text (
+
+          )'
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:43:33.531] Server  LOG      ✓ Compiled in 162ms
+[01:45:28.883] Server  LOG      ✓ Compiled in 912ms
+[01:45:31.854] Server  LOG      ✓ Compiled in 277ms
+[01:45:58.535] Server  LOG      ✓ Compiled in 227ms
+[01:45:59.607] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:64:10
+Ecmascript file had an error
+  62 |   const [showPassword, setShowPassword] = useState(false);
+  63 |
+> 64 |   const [formData, setFormData] = useState({
+     |          ^^^^^^^^
+  65 |     password: "",
+  66 |     createdAt: new Date().toLocaleDateString("es-CO", {
+  67 |       day: "2-digit",
+
+the name `formData` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:45:59.607] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:64:20
+Ecmascript file had an error
+  62 |   const [showPassword, setShowPassword] = useState(false);
+  63 |
+> 64 |   const [formData, setFormData] = useState({
+     |                    ^^^^^^^^^^^
+  65 |     password: "",
+  66 |     createdAt: new Date().toLocaleDateString("es-CO", {
+  67 |       day: "2-digit",
+
+the name `setFormData` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:46:43.062] Server  LOG      ✓ Compiled in 537ms
+[01:46:43.742] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:44:10
+Ecmascript file had an error
+  42 |   );
+  43 |
+> 44 |   const [formData, setFormData] = useState({
+     |          ^^^^^^^^
+  45 |     password: "",
+  46 |     createdAt: new Date().toLocaleDateString("es-CO", {
+  47 |       day: "2-digit",
+
+the name `formData` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:46:43.742] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:44:20
+Ecmascript file had an error
+  42 |   );
+  43 |
+> 44 |   const [formData, setFormData] = useState({
+     |                    ^^^^^^^^^^^
+  45 |     password: "",
+  46 |     createdAt: new Date().toLocaleDateString("es-CO", {
+  47 |       day: "2-digit",
+
+the name `setFormData` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:47:01.832] Server  LOG      ✓ Compiled in 167ms
+[01:47:02.566] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:45:10
+Ecmascript file had an error
+  43 |   );
+  44 |
+> 45 |   const [formData, setFormData] = useState({
+     |          ^^^^^^^^
+  46 |     password: "",
+  47 |     createdAt: new Date().toLocaleDateString("es-CO", {
+  48 |       day: "2-digit",
+
+the name `formData` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:47:02.566] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:45:20
+Ecmascript file had an error
+  43 |   );
+  44 |
+> 45 |   const [formData, setFormData] = useState({
+     |                    ^^^^^^^^^^^
+  46 |     password: "",
+  47 |     createdAt: new Date().toLocaleDateString("es-CO", {
+  48 |       day: "2-digit",
+
+the name `setFormData` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:47:09.625] Server  LOG      ✓ Compiled in 162ms
+[01:47:10.567] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:49:10
+Ecmascript file had an error
+  47 |   );
+  48 |
+> 49 |   const [formData, setFormData] = useState({
+     |          ^^^^^^^^
+  50 |     password: "",
+  51 |     createdAt: new Date().toLocaleDateString("es-CO", {
+  52 |       day: "2-digit",
+
+the name `formData` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:47:10.567] Browser ERROR   ./components/dashboard/user-form-dialog.tsx:49:20
+Ecmascript file had an error
+  47 |   );
+  48 |
+> 49 |   const [formData, setFormData] = useState({
+     |                    ^^^^^^^^^^^
+  50 |     password: "",
+  51 |     createdAt: new Date().toLocaleDateString("es-CO", {
+  52 |       day: "2-digit",
+
+the name `setFormData` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/user-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/user-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[01:47:21.910] Server  LOG      ✓ Compiled in 659ms
+[01:47:25.358] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:47:25.358] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[02:06:25.194] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[02:06:25.194] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[02:08:00.358] Server  LOG      ✓ Compiled in 363ms
+[02:08:16.539] Server  LOG      ✓ Compiled in 196ms
+[02:08:22.403] Server  LOG      ✓ Compiled in 192ms
+[02:08:41.229] Server  LOG      ✓ Compiled in 257ms
+[02:08:47.008] Server  LOG      ✓ Compiled in 166ms
+[02:08:51.335] Server  LOG      ✓ Compiled in 417ms
+[02:08:55.850] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[02:08:55.851] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[02:14:05.184] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[02:14:05.184] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[02:18:15.564] Server  LOG      ✓ Compiled in 332ms
+[02:18:16.715] Browser ERROR   uncaughtError: ReferenceError: matchesDept is not defined
+[02:18:32.891] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:18:34.031] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_1c13323f._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:18:34.058] Server  ERROR    ⨯ ReferenceError: matchesDept is not defined
+[02:18:34.075] Server  LOG      ✓ Compiled in 224ms
+[02:18:34.082] Browser ERROR   uncaughtError: ReferenceError: matchesDept is not defined
+[02:18:35.734] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:18:37.852] Browser ERROR   uncaughtError: ReferenceError: matchesDept is not defined
+[02:18:45.243] Server  LOG      ✓ Compiled in 213ms
+[02:18:45.257] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:18:45.877] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_1c13323f._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:18:45.878] Server  ERROR    ⨯ ReferenceError: matchesDept is not defined
+[02:18:46.895] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:18:47.663] Browser ERROR   uncaughtError: ReferenceError: matchesDept is not defined
+[02:19:07.618] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:19:07.658] Server  LOG      ✓ Compiled in 214ms
+[02:19:10.799] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:19:13.867] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[02:19:13.867] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/users","route":"/dashboard/users"}
+[02:19:13.867] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765333712796}
+[02:19:18.503] Server  LOG      ✓ Compiled in 336ms
+[02:19:22.857] Server  LOG      ✓ Compiled in 181ms
+[02:19:25.033] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <RedirectBoundary>
+      <RedirectErrorBoundary router={{...}}>
+        <InnerLayoutRouter url="/dashboard..." tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
+          <SegmentViewNode type="page" pagePath="dashboard/...">
+            <SegmentTrieNode>
+            <ClientPageRoot Component={function UsersPage} serverProvidedParams={{...}}>
+              <UsersPage params={Promise} searchParams={Promise}>
+                <div className="space-y-6">
+                  <div>
+                  <Card>
+                  <Card className="bg-card bo...">
+                    <div data-slot="card" className="text-card-...">
+                      <CardHeader className="pb-3">
+                        <div data-slot="card-header" className="@container...">
+                          <CardTitle className="text-base ...">
+                            <div data-slot="card-title" className="text-base ...">
++                             8
+-                             0
+                              ...
+                      ...
+          ...
+        ...
+
+[02:20:55.602] Server  LOG      ✓ Compiled in 162ms
+[02:21:51.180] Server  LOG      ✓ Compiled in 279ms
+[02:21:51.575] Browser ERROR   ./app/dashboard/users/page.tsx:42:3
+Parsing ecmascript source code failed
+  40 |     return matchesSearch && matchesRole && 
+  41 |     //&& matchesDept
+> 42 |   })
+     |   ^
+  43 |
+  44 |   const handleSaveUser = (userData: Partial<User>) => {
+  45 |     const existingIndex = users.findIndex((u) => u.id === userData.id)
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[02:21:56.350] Server  LOG      ✓ Compiled in 545ms
+[02:22:05.818] Server  LOG      ✓ Compiled in 169ms
+[02:22:06.577] Browser ERROR   ./app/dashboard/users/page.tsx:39:11
+Ecmascript file had an error
+  37 |       user.name.toLowerCase().includes(search.toLowerCase()) || user.email.toLowerCase().includes(search.toLowerCase())
+  38 |     const matchesRole = roleFilter === "all" || user.role === roleFilter
+> 39 |     const matchesRole = roleFilter === "all" || user.role === roleFilter
+     |           ^^^^^^^^^^^
+  40 |     //const matchesDept = departmentFilter === "all" || user.department === departmentFilter
+  41 |     return matchesSearch && matchesRole 
+  42 |     //&& matchesDept
+
+the name `matchesRole` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[02:22:21.359] Server  LOG      ✓ Compiled in 235ms
+[02:22:22.449] Server  LOG      ✓ Compiled in 226ms
+[02:22:33.364] Server  LOG      ✓ Compiled in 744ms
+[02:22:43.635] Server  LOG      ✓ Compiled in 324ms
+[02:22:44.931] Browser ERROR   uncaughtError: ReferenceError: statusFilter is not defined
+[02:22:49.462] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:22:49.484] Server  LOG      ✓ Compiled in 189ms
+[02:22:50.356] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_1c13323f._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:22:50.357] Server  ERROR    ⨯ ReferenceError: statusFilter is not defined
+[02:22:53.165] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:22:55.565] Browser ERROR   uncaughtError: ReferenceError: statusFilter is not defined
+[02:23:08.066] Server  LOG      ✓ Compiled in 280ms
+[02:23:08.570] Browser ERROR   ./app/dashboard/users/page.tsx:39:58
+Parsing ecmascript source code failed
+  37 |       user.name.toLowerCase().includes(search.toLowerCase()) || user.email.toLowerCase().includes(search.toLowerCase())
+  38 |     const matchesRole = roleFilter === "all" || user.role === roleFilter
+> 39 |     const matchesStatus = statusFilter === "all" || user..department === departmentFilter
+     |                                                          ^
+  40 |     return matchesSearch && matchesRole 
+  41 |     //&& matchesDept
+  42 |   })
+
+Expected ident
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[02:23:10.459] Server  LOG      ✓ Compiled in 507ms
+[02:23:10.921] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:23:11.127] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_1c13323f._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:23:11.131] Server  ERROR    ⨯ ReferenceError: statusFilter is not defined
+[02:23:12.227] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:23:14.578] Browser ERROR   uncaughtError: ReferenceError: statusFilter is not defined
+[02:23:14.596] Server  LOG      ✓ Compiled in 229ms
+[02:23:15.569] Browser ERROR   ./app/dashboard/users/page.tsx:39:59
+Parsing ecmascript source code failed
+  37 |       user.name.toLowerCase().includes(search.toLowerCase()) || user.email.toLowerCase().includes(search.toLowerCase())
+  38 |     const matchesRole = roleFilter === "all" || user.role === roleFilter
+> 39 |     const matchesStatus = statusFilter === "all" || user. === statusFilter
+     |                                                           ^^^
+  40 |     //const matchesDept = departmentFilter === "all" || user.department === departmentFilter
+  41 |     return matchesSearch && matchesRole 
+  42 |     //&& matchesDept
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[02:23:18.217] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:23:18.890] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_1c13323f._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:23:18.892] Server  ERROR    ⨯ ReferenceError: statusFilter is not defined
+[02:23:20.452] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:23:21.627] Browser ERROR   uncaughtError: ReferenceError: statusFilter is not defined
+[02:23:40.958] Server  LOG      ✓ Compiled in 211ms
+[02:23:41.819] Browser ERROR   ./app/dashboard/users/page.tsx:33:10
+Ecmascript file had an error
+  31 |   const [search, setSearch] = useState("")
+  32 |   const [roleFilter, setRoleFilter] = useState<string>("all")
+> 33 |   const [roleFilter, setRoleFilter] = useState<string>("all")
+     |          ^^^^^^^^^^
+  34 |   const [departmentFilter, setDepartmentFilter] = useState<string>("all")
+  35 |
+  36 |   const filteredUsers = users.filter((user) => {
+
+the name `roleFilter` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[02:23:41.819] Browser ERROR   ./app/dashboard/users/page.tsx:33:22
+Ecmascript file had an error
+  31 |   const [search, setSearch] = useState("")
+  32 |   const [roleFilter, setRoleFilter] = useState<string>("all")
+> 33 |   const [roleFilter, setRoleFilter] = useState<string>("all")
+     |                      ^^^^^^^^^^^^^
+  34 |   const [departmentFilter, setDepartmentFilter] = useState<string>("all")
+  35 |
+  36 |   const filteredUsers = users.filter((user) => {
+
+the name `setRoleFilter` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[02:23:46.455] Server  LOG      ✓ Compiled in 182ms
+[02:23:46.576] Browser ERROR   ./app/dashboard/users/page.tsx:33:24
+Ecmascript file had an error
+  31 |   const [search, setSearch] = useState("")
+  32 |   const [roleFilter, setRoleFilter] = useState<string>("all")
+> 33 |   const [statusFilter, setRoleFilter] = useState<string>("all")
+     |                        ^^^^^^^^^^^^^
+  34 |   const [departmentFilter, setDepartmentFilter] = useState<string>("all")
+  35 |
+  36 |   const filteredUsers = users.filter((user) => {
+
+the name `setRoleFilter` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[02:23:51.649] Server  LOG      ✓ Compiled in 282ms
+[02:23:51.661] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:23:55.856] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:23:57.572] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[02:23:57.572] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/users","route":"/dashboard/users"}
+[02:23:57.572] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765333997214}
+[02:24:19.874] Server  LOG      ✓ Compiled in 212ms
+[02:24:20.571] Browser ERROR   ./app/dashboard/users/page.tsx:44:3
+Parsing ecmascript source code failed
+  42 |     return matchesSearch && matchesRole &&
+  43 |     //&& matchesDept
+> 44 |   })
+     |   ^
+  45 |
+  46 |   const handleSaveUser = (userData: Partial<User>) => {
+  47 |     const existingIndex = users.findIndex((u) => u.id === userData.id)
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[02:24:23.567] Browser ERROR   ./app/dashboard/users/page.tsx:44:3
+Parsing ecmascript source code failed
+  42 |     return matchesSearch && matchesRole && 
+  43 |     //&& matchesDept
+> 44 |   })
+     |   ^
+  45 |
+  46 |   const handleSaveUser = (userData: Partial<User>) => {
+  47 |     const existingIndex = users.findIndex((u) => u.id === userData.id)
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[02:24:25.488] Server  LOG      ✓ Compiled in 233ms
+[02:24:56.450] Server  LOG      ✓ Compiled in 141ms
+[02:25:34.546] Server  LOG      ✓ Compiled in 254ms
+[02:25:39.806] Server  LOG      ✓ Compiled in 304ms
+[02:25:40.575] Browser ERROR   uncaughtError: ReferenceError: s is not defined
+[02:25:41.232] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:25:42.008] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_1c13323f._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:25:42.014] Server  ERROR    ⨯ ReferenceError: sta is not defined
+[02:25:42.059] Server  LOG      ✓ Compiled in 177ms
+[02:25:42.063] Browser ERROR   uncaughtError: ReferenceError: sta is not defined
+[02:25:42.750] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:25:43.945] Browser ERROR   uncaughtError: ReferenceError: sta is not defined
+[02:25:51.478] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:25:51.493] Server  LOG      ✓ Compiled in 476ms
+[02:25:54.660] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:25:55.572] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[02:25:55.572] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/users","route":"/dashboard/users"}
+[02:25:55.572] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765334115267}
+[02:26:17.008] Server  LOG      ✓ Compiled in 314ms
+[02:26:18.232] Server  LOG      ✓ Compiled in 370ms
+[02:26:18.576] Browser ERROR   ./app/dashboard/users/page.tsx:105:26
+Parsing ecmascript source code failed
+  103 |                 <SelectContent>
+  104 |                   <SelectItem value="all">Todos</SelectItem>
+> 105 |                   {users..map((dept) => (
+      |                          ^
+  106 |                     <SelectItem key={dept} value={dept}>
+  107 |                       {dept}
+  108 |                     </SelectItem>
+
+Expected '</', got '.'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[02:26:22.572] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'map')
+[02:26:23.271] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:26:23.285] Server  LOG      ✓ Compiled in 236ms
+[02:26:23.979] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_1c13323f._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:26:23.980] Server  ERROR    ⨯ TypeError: Cannot read properties of undefined (reading 'map')
+[02:26:24.000] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'map')
+[02:26:24.932] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:26:29.648] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'map')
+[02:26:30.363] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:26:30.367] Server  LOG      ✓ Compiled in 249ms
+[02:26:32.652] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:26:34.619] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[02:26:34.619] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/users","route":"/dashboard/users"}
+[02:26:34.619] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765334154499}
+[02:27:13.448] Server  LOG      ✓ Compiled in 217ms
+[02:27:14.887] Server  LOG      ✓ Compiled in 206ms
+[02:27:15.577] Browser ERROR   ./app/dashboard/users/page.tsx:105:25
+Parsing ecmascript source code failed
+  103 |                 <SelectContent>
+  104 |                   <SelectItem value="all">Todos</SelectItem>
+> 105 |                   {User..map((dept) => (
+      |                         ^
+  106 |                     <SelectItem key={dept} value={dept}>
+  107 |                       {dept}
+  108 |                     </SelectItem>
+
+Expected '</', got '.'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[02:27:19.571] Browser ERROR   uncaughtError: ReferenceError: User is not defined
+[02:27:19.616] Server  LOG      ✓ Compiled in 185ms
+[02:27:19.659] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:27:20.387] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_1c13323f._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:27:20.390] Server  ERROR    ⨯ ReferenceError: User is not defined
+[02:27:21.402] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:27:22.238] Server  LOG      ✓ Compiled in 186ms
+[02:27:22.254] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:27:22.255] Browser ERROR   uncaughtError: ReferenceError: User is not defined
+[02:27:23.433] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_1c13323f._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:27:23.448] Server  ERROR    ⨯ ReferenceError: User is not defined
+[02:27:25.903] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:27:26.856] Browser ERROR   uncaughtError: ReferenceError: User is not defined
+[02:27:42.933] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:27:42.948] Server  LOG      ✓ Compiled in 393ms
+[02:27:45.789] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:27:46.819] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[02:27:46.819] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/users","route":"/dashboard/users"}
+[02:27:46.819] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765334226710}
+[02:39:28.344] Server  LOG      ✓ Compiled in 159ms
+[02:39:35.244] Server  LOG      ✓ Compiled in 365ms
+[02:39:39.987] Server  LOG      ✓ Compiled in 308ms
+[02:40:15.976] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765334976119}
+[02:40:44.331] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765335004442}
+[02:40:49.560] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/roles color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/roles","o":"http://localhost:3000/dashboard/roles","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765335009690}
+[02:40:50.365] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765335010444}
+[02:43:33.315] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765335173406}
+[02:43:34.924] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765335175022}
+[02:44:09.042] Server  LOG      ○ Compiling /dashboard/audits ...
+[02:44:10.333] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/settings color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/settings","o":"http://localhost:3000/dashboard/settings","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765335210470}
+[02:44:30.555] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/audits color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/audits","o":"http://localhost:3000/dashboard/audits","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765335230637}
+[02:44:38.914] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/upload color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/upload","o":"http://localhost:3000/dashboard/upload","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765335238993}
+[02:44:43.388] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765335243539}
+[02:44:46.190] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765335246303}
+[02:44:49.106] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765335249202}
+[02:45:54.220] Server  LOG      ✓ Compiled in 216ms
+[02:45:57.631] Browser ERROR   uncaughtError: ReferenceError: UserFormDialog is not defined
+[02:46:38.524] Server  LOG      ✓ Compiled in 222ms
+[02:46:38.625] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:46:39.447] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_78b3ca38._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:46:39.453] Server  ERROR    ⨯ ReferenceError: Emplo is not defined
+[02:46:41.452] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:46:42.619] Browser ERROR   uncaughtError: ReferenceError: Emplo is not defined
+[02:46:44.672] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:46:44.721] Server  LOG      ✓ Compiled in 187ms
+[02:46:45.707] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_78b3ca38._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:46:45.723] Server  ERROR    ⨯ ReferenceError: Employee is not defined
+[02:46:46.987] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:46:48.777] Browser ERROR   uncaughtError: ReferenceError: Employee is not defined
+[02:46:57.833] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:46:57.871] Server  LOG      ✓ Compiled in 198ms
+[02:46:58.631] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_78b3ca38._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:46:58.632] Server  ERROR    ⨯ ReferenceError: EmployeeForm is not defined
+[02:47:02.480] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:47:04.563] Browser ERROR   uncaughtError: ReferenceError: EmployeeForm is not defined
+[02:47:23.325] Server  LOG      ✓ Compiled in 376ms
+[02:47:23.573] Browser ERROR   ./app/dashboard/employees/page.tsx:43:17
+Parsing ecmascript source code failed
+  41 |           <p className="text-muted-foreground">Gestión del talento humano</p>
+  42 |         </div>
+> 43 |         < onSave={handleSaveUser} />
+     |                 ^
+  44 |       </div>
+  45 |
+  46 |       {/* Stats Cards */}
+
+Expected '</', got '='
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/page.tsx [Server Component]
+[02:47:26.337] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:47:26.344] Server  LOG      ✓ Compiled in 317ms
+[02:47:26.540] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_78b3ca38._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:47:26.542] Server  ERROR    ⨯ ReferenceError: EmployeeForm is not defined
+[02:47:27.771] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:47:28.372] Server  LOG      ✓ Compiled in 177ms
+[02:47:28.377] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:47:28.381] Browser ERROR   uncaughtError: ReferenceError: EmployeeForm is not defined
+[02:47:28.988] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_78b3ca38._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:47:28.990] Server  ERROR    ⨯ ReferenceError: Em is not defined
+[02:47:29.733] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:47:31.325] Browser ERROR   uncaughtError: ReferenceError: Em is not defined
+[02:47:33.018] Server  LOG      ✓ Compiled in 228ms
+[02:47:33.372] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:47:33.924] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_78b3ca38._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:47:33.926] Server  ERROR    ⨯ ReferenceError: Emplo is not defined
+[02:47:35.080] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:47:36.285] Server  LOG      ✓ Compiled in 635ms
+[02:47:37.020] Browser ERROR   uncaughtError: ReferenceError: Emplo is not defined
+[02:47:37.055] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:47:38.178] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_dfc95027._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[02:47:38.180] Server  ERROR    ⨯ ReferenceError: handleSaveUser is not defined
+[02:47:40.506] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:47:42.806] Browser ERROR   uncaughtError: ReferenceError: handleSaveUser is not defined
+[02:49:09.214] Server  LOG      ✓ Compiled in 293ms
+[02:49:20.318] Server  LOG      ✓ Compiled in 380ms
+[02:49:22.167] Server  LOG      ✓ Compiled in 583ms
+[02:49:24.862] Server  LOG      ✓ Compiled in 1000ms
+[02:49:26.458] Server  LOG      ✓ Compiled in 822ms
+[02:49:29.942] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:49:40.782] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:49:40.837] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:49:42.424] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:49:42.425] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[02:51:46.033] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:51:47.732] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[02:51:47.732] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
+[02:51:47.732] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765335666913}
+[02:51:55.212] Server  LOG      ✓ Compiled in 321ms
+[02:52:03.817] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[02:52:03.821] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[03:00:05.009] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[03:00:05.009] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[03:11:05.922] Server  LOG      ✓ Compiled in 341ms
+[03:11:07.690] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[03:11:44.037] Server  LOG      ✓ Compiled in 688ms
+[03:11:44.944] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[03:11:48.642] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765336865491}
+[03:11:51.859] Server  LOG      ✓ Compiled in 440ms
+[03:11:53.103] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[03:11:54.581] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[03:11:54.581] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
+[03:11:54.581] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765336873957}
+[03:11:55.158] Server  LOG      ✓ Compiled in 495ms
+[03:29:45.350] Server  LOG      ✓ Compiled in 542ms
+[03:29:53.278] Server  LOG      ✓ Compiled in 2.7s
+[03:29:56.542] Server  LOG      ✓ Compiled in 1546ms
+[03:30:43.417] Server  LOG      ✓ Compiled in 519ms
+[03:31:18.001] Server  LOG      ✓ Compiled in 712ms
+[03:31:18.970] Browser ERROR   ./lib/mock-data.ts:237:3
+Parsing ecmascript source code failed
+  235 |     status: "active",
+  236 |   }, */
+> 237 |   export const mockEmployee = {
+      |   ^^^^^^
+  238 |     id: "emp-001",
+  239 |     companyId: "comp-001",
+  240 |     userId: "usr-123",
+
+Expression expected
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[03:31:21.548] Server  LOG      ✓ Compiled in 477ms
+[03:31:22.945] Browser ERROR   ./lib/mock-data.ts:237:3
+Parsing ecmascript source code failed
+  235 |     status: "active",
+  236 |   }, */
+> 237 |   export const mockEmployee = {
+      |   ^^^^^^
+  238 |   id: "emp-001",
+  239 |   companyId: "comp-001",
+  240 |   userId: "usr-123",
+
+Expression expected
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[03:31:29.496] Server  LOG      ✓ Compiled in 882ms
+[03:31:30.804] Browser ERROR   ./lib/mock-data.ts:237:5
+Parsing ecmascript source code failed
+  235 |     status: "active",
+  236 |   }, */
+> 237 |   id: "emp-001",
+      |     ^
+  238 |   companyId: "comp-001",
+  239 |   userId: "usr-123",
+  240 |   document: "1025487965",
+
+Expected ',', got ':'
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[03:31:54.011] Browser ERROR   uncaughtError: Error: ./lib/mock-data.ts:249:2
+Parsing ecmascript source code failed
+  247 |   typeContract: "Término indefinido",
+  248 |   status: true,
+> 249 | };
+      |  ^
+  250 | ]
+  251 |
+  252 | // Mock Documents
+
+Expected ',', got ';'
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+
+[03:31:55.058] Server  LOG      ✓ Compiled in 595ms
+[03:31:58.890] Browser ERROR   ./lib/mock-data.ts:249:2
+Parsing ecmascript source code failed
+  247 |   typeContract: "Término indefinido",
+  248 |   status: true,
+> 249 | };
+      |  ^
+  250 | ]
+  251 |
+  252 | // Mock Documents
+
+Expected ',', got ';'
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[03:31:58.890] Browser ERROR   ./lib/mock-data.ts:249:2
+Parsing ecmascript source code failed
+  247 |   typeContract: "Término indefinido",
+  248 |   status: true,
+> 249 | };
+      |  ^
+  250 | ]
+  251 |
+  252 | // Mock Documents
+
+Expected ',', got ';'
+
+Import traces:
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Client Component Browser]
+    ./app/dashboard/users/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Client Component SSR]
+    ./app/dashboard/users/page.tsx [Server Component]
+[03:31:58.890] Browser ERROR   ./lib/mock-data.ts:249:2
+Parsing ecmascript source code failed
+  247 |   typeContract: "Término indefinido",
+  248 |   status: true,
+> 249 | };
+      |  ^
+  250 | ]
+  251 |
+  252 | // Mock Documents
+
+Expected ',', got ';'
+
+Import traces:
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./app/dashboard/employees/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./app/dashboard/employees/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/page.tsx [Server Component]
+[03:31:58.890] Browser ERROR   ./lib/mock-data.ts:249:2
+Parsing ecmascript source code failed
+  247 |   typeContract: "Término indefinido",
+  248 |   status: true,
+> 249 | };
+      |  ^
+  250 | ]
+  251 |
+  252 | // Mock Documents
+
+Expected ',', got ';'
+
+Import traces:
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+[03:31:58.890] Browser ERROR   ./lib/mock-data.ts:249:2
+Parsing ecmascript source code failed
+  247 |   typeContract: "Término indefinido",
+  248 |   status: true,
+> 249 | };
+      |  ^
+  250 | ]
+  251 |
+  252 | // Mock Documents
+
+Expected ',', got ';'
+
+Import traces:
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[03:31:58.890] Browser ERROR   ./lib/mock-data.ts:249:2
+Parsing ecmascript source code failed
+  247 |   typeContract: "Término indefinido",
+  248 |   status: true,
+> 249 | };
+      |  ^
+  250 | ]
+  251 |
+  252 | // Mock Documents
+
+Expected ',', got ';'
+
+Import traces:
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./app/dashboard/audits/page.tsx [Client Component Browser]
+    ./app/dashboard/audits/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./app/dashboard/audits/page.tsx [Client Component SSR]
+    ./app/dashboard/audits/page.tsx [Server Component]
+[03:31:58.890] Browser ERROR   ./lib/mock-data.ts:249:2
+Parsing ecmascript source code failed
+  247 |   typeContract: "Término indefinido",
+  248 |   status: true,
+> 249 | };
+      |  ^
+  250 | ]
+  251 |
+  252 | // Mock Documents
+
+Expected ',', got ';'
+
+Import traces:
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./app/dashboard/upload/page.tsx [Client Component Browser]
+    ./app/dashboard/upload/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./app/dashboard/upload/page.tsx [Client Component SSR]
+    ./app/dashboard/upload/page.tsx [Server Component]
+[03:31:58.890] Browser ERROR   ./lib/mock-data.ts:249:2
+Parsing ecmascript source code failed
+  247 |   typeContract: "Término indefinido",
+  248 |   status: true,
+> 249 | };
+      |  ^
+  250 | ]
+  251 |
+  252 | // Mock Documents
+
+Expected ',', got ';'
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[03:31:58.906] Browser ERROR   ./lib/mock-data.ts:249:2
+Parsing ecmascript source code failed
+  247 |   typeContract: "Término indefinido",
+  248 |   status: true,
+> 249 | };
+      |  ^
+  250 | ]
+  251 |
+  252 | // Mock Documents
+
+Expected ',', got ';'
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[03:32:01.268] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_dfc95027._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[03:32:01.319] Server  ERROR    ⨯ TypeError: Cannot read properties of undefined (reading 'length')
+[03:32:01.585] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_dfc95027._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[03:32:01.589] Server  ERROR    ⨯ TypeError: Cannot read properties of undefined (reading 'length')
+[03:32:01.735] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_dfc95027._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[03:32:01.738] Server  ERROR    ⨯ TypeError: Cannot read properties of undefined (reading 'length')
+[03:32:01.893] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_dfc95027._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[03:32:01.899] Server  ERROR    ⨯ TypeError: Cannot read properties of undefined (reading 'length')
+[03:32:02.474] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_dfc95027._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[03:32:02.510] Server  ERROR    ⨯ TypeError: Cannot read properties of undefined (reading 'length')
+[03:32:02.918] Server  LOG      ✓ Compiled in 0ms
+[03:32:05.272] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[03:32:07.570] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[03:32:13.813] Server  LOG      ✓ Compiled in 502ms
+[03:32:14.064] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[03:32:15.443] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_dfc95027._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[03:32:15.468] Server  ERROR    ⨯ TypeError: Cannot read properties of undefined (reading 'length')
+[03:32:19.244] Server  LOG      ✓ Compiled in 787ms
+[03:32:24.122] Server  LOG      ✓ Compiled in 285ms
+[03:32:24.801] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[03:32:28.211] Browser ERROR   uncaughtError: Error: Switched to client rendering because the server rendering errored:
+
+Cannot read properties of undefined (reading 'length')
+[03:32:28.211] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[03:32:28.212] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[03:32:28.212] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
+[03:32:28.212] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765338107239}
+[03:32:28.356] Server  LOG      ✓ Compiled in 91ms
+[03:32:29.655] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_dfc95027._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[03:32:29.682] Server  ERROR    ⨯ TypeError: Cannot read properties of undefined (reading 'length')
+[03:32:31.547] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[03:32:32.747] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[03:39:05.103] Server  LOG      ✓ Compiled in 1332ms
+[03:39:05.249] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[03:39:05.262] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[03:39:15.712] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[03:39:16.294] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[03:39:16.294] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
+[03:39:16.294] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765338516446}
+[03:39:16.557] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. emp-001
+[03:39:30.653] Server  LOG      ✓ Compiled in 732ms
+[03:39:31.176] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[03:52:57.439] Server  LOG      ✓ Compiled in 922ms
+[03:53:02.951] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[03:53:05.488] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_dfc95027._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[03:53:05.500] Server  ERROR    ⨯ TypeError: Cannot read properties of undefined (reading 'length')
+[03:53:05.529] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[03:53:09.638] Server  LOG      ✓ Compiled in 915ms
+[03:53:10.070] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[03:53:12.890] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[03:53:15.718] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[03:53:15.745] Server  LOG      ✓ Compiled in 282ms
+[03:53:17.353] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_dfc95027._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[03:53:17.356] Server  ERROR    ⨯ TypeError: Cannot read properties of undefined (reading 'length')
+[03:53:18.507] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[03:53:19.617] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[04:03:47.522] Server  LOG      ✓ Compiled in 836ms
+[04:03:48.140] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[04:03:50.007] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_dfc95027._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[04:03:50.021] Server  ERROR    ⨯ TypeError: Cannot read properties of undefined (reading 'length')
+[04:03:53.936] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[04:03:54.681] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[04:04:06.740] Server  LOG      ✓ Compiled in 229ms
+[04:04:06.775] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[04:04:08.094] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_dfc95027._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[04:04:08.098] Server  ERROR    ⨯ TypeError: Cannot read properties of undefined (reading 'length')
+[04:04:09.337] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[04:04:10.574] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[04:11:52.961] Server  LOG      ✓ Compiled in 682ms
+[04:11:53.795] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[04:11:59.943] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[04:12:00.598] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[04:12:00.598] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
+[04:12:00.598] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765340480504}
+[04:12:21.809] Server  LOG      ✓ Compiled in 478ms
+[04:12:25.796] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[04:13:35.339] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[04:13:35.350] Server  LOG      ✓ Compiled in 226ms
+[04:13:37.284] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765340575808}
+[04:13:40.111] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[04:13:41.574] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[04:13:41.574] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
+[04:13:41.574] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765340581620}
+[04:15:34.631] Server  LOG      ✓ Compiled in 359ms
+[04:15:39.412] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <RedirectErrorBoundary router={{...}}>
+      <InnerLayoutRouter url="/dashboard..." tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
+        <SegmentViewNode type="page" pagePath="dashboard/...">
+          <SegmentTrieNode>
+          <ClientPageRoot Component={function EmployeesPage} serverProvidedParams={{...}}>
+            <EmployeesPage params={Promise} searchParams={Promise}>
+              <div className="space-y-6">
+                <div>
+                <div className="grid grid-...">
+                  <Card>
+                  <Card className="bg-card bo...">
+                    <div data-slot="card" className="text-card-...">
+                      <CardContent className="p-4">
+                        <div data-slot="card-content" className="p-4">
+                          <div className="flex items...">
+                            <div>
+                              <p>
+                              <p className="text-2xl font-bold text-accent">
++                               2
+-                               0
+                            ...
+                  ...
+                ...
+        ...
+      ...
+
+[04:15:49.879] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-002 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-002","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765340710033}
+[04:16:00.904] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765340720994}
+[04:16:12.420] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[04:16:12.420] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[04:16:53.844] Server  LOG      ✓ Compiled in 202ms
+[04:16:55.760] Server  LOG      ✓ Compiled in 270ms
+[04:17:01.386] Server  LOG      ✓ Compiled in 619ms
+[04:17:02.998] Server  LOG      ✓ Compiled in 345ms
+[04:26:24.551] Server  LOG      ✓ Compiled in 785ms
+[04:26:51.626] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[04:26:51.626] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[04:32:02.556] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[04:32:02.556] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[04:34:18.749] Server  LOG      ✓ Compiled in 337ms
+[04:35:12.626] Server  LOG      ✓ Compiled in 588ms
+[04:37:14.787] Server  LOG      ✓ Compiled in 268ms
+[04:37:15.578] Browser ERROR   ./app/dashboard/employees/page.tsx:179:6
+Parsing ecmascript source code failed
+  177 |         )})}
+  178 |       </div>
+> 179 |     </div>
+      |      ^^^^^
+  180 |   )
+  181 | }
+
+Unterminated regexp literal
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/page.tsx [Server Component]
+[04:37:18.592] Browser ERROR   ./app/dashboard/employees/page.tsx:179:6
+Parsing ecmascript source code failed
+  177 |         )})}
+  178 |       </div>
+> 179 |     </div>
+      |      ^^^^^
+  180 |   )
+  181 | }
+
+Unterminated regexp literal
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/page.tsx [Server Component]
+[04:37:23.177] Server  LOG      ✓ Compiled in 1178ms
+[04:38:09.566] Server  LOG      ✓ Compiled in 540ms
+[04:38:24.752] Server  LOG      ✓ Compiled in 537ms
+[04:38:30.597] Server  LOG      ✓ Compiled in 350ms
+[04:38:31.968] Server  LOG      ✓ Compiled in 437ms
+[04:39:30.966] Server  LOG      ✓ Compiled in 269ms
+[04:41:15.507] Server  LOG      ✓ Compiled in 680ms
+[04:41:27.179] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[04:41:27.180] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[04:42:41.477] Server  LOG      ✓ Compiled in 258ms
+[04:42:48.479] Server  LOG      ✓ Compiled in 306ms
+[04:43:08.208] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[04:43:08.676] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[04:43:08.677] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
+[04:43:08.677] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765342348834}
+[04:43:11.059] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[04:43:11.059] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[04:43:55.276] Server  LOG      ✓ Compiled in 648ms
+[04:44:33.232] Server  LOG      ✓ Compiled in 1056ms
+[04:44:41.825] Server  LOG      ✓ Compiled in 486ms
+[04:44:43.727] Server  LOG      ✓ Compiled in 619ms
+[04:44:46.823] Server  LOG      ✓ Compiled in 841ms
+[04:45:06.484] Browser ERROR   uncaughtError: Error: An unexpected Turbopack error occurred. Please see the output of `next dev` for more details.
+[04:45:13.861] Browser ERROR   uncaughtError: Error: An unexpected Turbopack error occurred. Please see the output of `next dev` for more details.
+[04:45:39.578] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[04:45:40.832] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[04:45:40.832] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
+[04:45:40.832] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765342500988}
+[04:45:41.825] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[04:45:41.825] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[04:46:02.016] Server  LOG      ✓ Compiled in 478ms
+[04:46:12.381] Server  LOG      ✓ Compiled in 397ms
+[04:46:18.013] Server  LOG      ✓ Compiled in 815ms
+[04:46:42.175] Server  LOG      ✓ Compiled in 630ms
+[04:46:47.017] Server  LOG      ✓ Compiled in 787ms
+[04:47:22.962] Server  LOG      ✓ Compiled in 643ms
+[04:47:31.324] Server  LOG      ✓ Compiled in 1395ms
+[04:47:36.937] Server  LOG      ✓ Compiled in 860ms
+[04:47:43.756] Server  LOG      ✓ Compiled in 237ms
+[04:47:44.890] Server  LOG      ✓ Compiled in 301ms
+[04:47:52.272] Server  LOG      ✓ Compiled in 331ms
+[04:48:07.910] Server  LOG      ✓ Compiled in 916ms
+[04:48:21.070] Server  LOG      ✓ Compiled in 805ms
+[04:48:42.191] Server  LOG      ✓ Compiled in 223ms
+[04:48:46.663] Server  LOG      ✓ Compiled in 1121ms
+[04:48:54.065] Server  LOG      ✓ Compiled in 850ms
+[04:48:55.277] Browser ERROR   uncaughtError: Error: An unexpected Turbopack error occurred. Please see the output of `next dev` for more details.
+[04:49:11.881] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[04:49:12.345] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[04:49:12.345] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
+[04:49:12.345] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765342712512}
+[04:49:13.134] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[04:49:13.134] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[04:49:18.384] Server  LOG      ✓ Compiled in 189ms
+[04:49:28.978] Server  LOG      ✓ Compiled in 889ms
+[04:49:34.469] Server  LOG      ✓ Compiled in 1290ms
+[04:49:37.969] Server  LOG      ✓ Compiled in 305ms
+[04:49:48.443] Server  LOG      ✓ Compiled in 543ms
+[04:49:49.740] Browser ERROR   ./components/dashboard/employee-form-dialog.tsx:228:62
+Parsing ecmascript source code failed
+  226 |           <div className="grid grid-cols-6 md:grid-cols-3 lg:grid-cols-3 gap-3">
+  227 |
+> 228 |           <div className="space-y-2 <div className="space-y-2">
+      |                                                              ^^
+  229 |               <Label htmlFor="jobId">Cargo/Posición</Label>
+  230 |               <Select
+  231 |                 value={formData.jobId}
+
+Unterminated string constant
+
+Import traces:
+  Client Component Browser:
+    ./components/dashboard/employee-form-dialog.tsx [Client Component Browser]
+    ./app/dashboard/employees/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/dashboard/employee-form-dialog.tsx [Client Component SSR]
+    ./app/dashboard/employees/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/page.tsx [Server Component]
+[04:49:49.851] Server  LOG      ✓ Compiled in 396ms
+[04:49:55.955] Server  LOG      ✓ Compiled in 261ms
+[04:49:59.108] Server  LOG      ✓ Compiled in 1093ms
+[04:50:05.234] Server  LOG      ✓ Compiled in 607ms
+[04:50:13.631] Server  LOG      ✓ Compiled in 920ms
+[04:50:56.361] Server  LOG      ✓ Compiled in 578ms
+[04:51:01.259] Server  LOG      ✓ Compiled in 260ms
+[04:51:17.548] Server  LOG      ✓ Compiled in 592ms
+[04:51:24.367] Server  LOG      ✓ Compiled in 928ms
+[04:52:10.999] Server  LOG      ✓ Compiled in 300ms
+[04:52:23.396] Server  LOG      ✓ Compiled in 229ms
+[04:52:28.825] Server  LOG      ✓ Compiled in 307ms

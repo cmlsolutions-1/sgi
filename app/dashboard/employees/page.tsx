@@ -7,30 +7,51 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { mockEmployees, departments } from "@/lib/mock-data"
+import { mockEmployees, departments, Employee,typeContract } from "@/lib/mock-data"
 import { Search, Filter, Eye, Users, Award, GraduationCap } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
+import { EmployeeFormDialog } from "@/components/dashboard/employee-form-dialog"
 
 export default function EmployeesPage() {
   const [search, setSearch] = useState("")
   const [departmentFilter, setDepartmentFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [employees] = useState<Employee[]>(mockEmployees) 
 
-  const filteredEmployees = mockEmployees.filter((emp) => {
+  const filteredEmployees = employees.filter((emp) => {
     const matchesSearch =
-      emp.name.toLowerCase().includes(search.toLowerCase()) || emp.position.toLowerCase().includes(search.toLowerCase())
-    const matchesDept = departmentFilter === "all" || emp.department === departmentFilter
-    const matchesStatus = statusFilter === "all" || emp.status === statusFilter
+      emp.name.toLowerCase().includes(search.toLowerCase()) || 
+      (emp.position && emp.position.toLowerCase().includes(search.toLowerCase()))
+    const matchesDept = departmentFilter === "all" || 
+      (emp.department && emp.department === departmentFilter)
+    // Convertir el estado booleano a string para la comparación
+    const empStatusString = typeof emp.status === 'boolean' ? 
+      (emp.status ? 'active' : 'inactive') : emp.status
+    const statusFilterString = statusFilter === 'all' ? 'all' : statusFilter
+    const matchesStatus = statusFilterString === "all" || 
+      empStatusString === statusFilterString
     return matchesSearch && matchesDept && matchesStatus
   })
 
-  // Stats
+  const handleSaveUser = (employeeData: Partial<Employee>) => {
+    // Implementa la lógica de guardado si es necesario
+    console.log("Guardar empleado:", employeeData)
+  }
+
+  // Stats - adaptado para manejar el nuevo tipo de status
   const stats = {
-    total: mockEmployees.length,
-    active: mockEmployees.filter((e) => e.status === "active").length,
-    certifications: mockEmployees.reduce((acc, e) => acc + e.certifications.length, 0),
-    trainings: mockEmployees.reduce((acc, e) => acc + e.trainings.filter((t) => t.status === "completed").length, 0),
+    total: employees.length,
+    active: employees.filter((e) => {
+      return typeof e.status === 'boolean' ? e.status : e.status === 'active'
+    }).length,
+    certifications: employees.reduce((acc, e) => {
+      return acc + (e.certifications ? e.certifications.length : 0)
+    }, 0),
+    trainings: employees.reduce((acc, e) => {
+      if (!e.trainings) return acc
+      return acc + e.trainings.filter((t) => t.status === "completed").length
+    }, 0),
   }
 
   return (
@@ -40,6 +61,7 @@ export default function EmployeesPage() {
           <h1 className="text-2xl font-bold text-foreground">Hoja de Vida de Funcionarios</h1>
           <p className="text-muted-foreground">Gestión del talento humano</p>
         </div>
+        <EmployeeFormDialog onSave={handleSaveUser} />
       </div>
 
       {/* Stats Cards */}
@@ -135,7 +157,12 @@ export default function EmployeesPage() {
 
       {/* Employees Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredEmployees.map((employee) => (
+        {filteredEmployees.map((employee) => {
+          // Convertir el estado booleano a string para mostrar
+          const displayStatus = typeof employee.status === 'boolean' ? 
+            (employee.status ? 'active' : 'inactive') : employee.status
+          
+          return (
           <Card key={employee.id} className="bg-card border-border hover:border-primary/50 transition-colors">
             <CardContent className="p-4">
               <div className="flex items-start gap-4">
@@ -150,17 +177,17 @@ export default function EmployeesPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="font-medium">{employee.name}</h3>
+                      <h3 className="font-medium">{employee.name} {employee.lastName}</h3>
                       <p className="text-sm text-muted-foreground">{employee.position}</p>
                     </div>
                     <Badge
                       variant="secondary"
                       className={cn(
                         "text-xs",
-                        employee.status === "active" ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground",
+                        displayStatus === "active" ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground",
                       )}
                     >
-                      {employee.status === "active" ? "Activo" : "Inactivo"}
+                      {displayStatus === "active" ? "Activo" : "Inactivo"}
                     </Badge>
                   </div>
                 </div>
@@ -169,16 +196,16 @@ export default function EmployeesPage() {
               <div className="mt-4 space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Departamento</span>
-                  <span>{employee.department}</span>
+                  <span>{employee.department || "N/A"}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Ingreso</span>
-                  <span>{employee.hireDate}</span>
+                  <span>{employee.hireDate || employee.entryDate || "N/A"}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Certificaciones</span>
                   <Badge variant="outline" className="text-xs">
-                    {employee.certifications.length}
+                    {employee.certifications ? employee.certifications.length : 0}
                   </Badge>
                 </div>
               </div>
@@ -193,7 +220,7 @@ export default function EmployeesPage() {
               </div>
             </CardContent>
           </Card>
-        ))}
+        )})}
       </div>
     </div>
   )

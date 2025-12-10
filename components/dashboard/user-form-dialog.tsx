@@ -20,8 +20,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { roles, departments, type User, type Role } from "@/lib/mock-data";
-import { Plus, Pencil } from "lucide-react";
+import {
+  roles,
+  departments,
+  typeContract,
+  type User,
+  type Role,
+} from "@/lib/mock-data";
+import { Plus, Pencil, Eye, EyeOff } from "lucide-react";
 
 interface UserFormDialogProps {
   user?: User;
@@ -36,8 +42,12 @@ export function UserFormDialog({ user, onSave, trigger }: UserFormDialogProps) {
       name: "",
       email: "",
       role: "empleado",
-      department: "",
       status: "active",
+      createdAt: new Date().toLocaleDateString("es-CO", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }),
     }
   );
 
@@ -54,11 +64,12 @@ export function UserFormDialog({ user, onSave, trigger }: UserFormDialogProps) {
         name: "",
         email: "",
         role: "empleado",
-        department: "",
         status: "active",
       });
     }
   };
+
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -77,42 +88,31 @@ export function UserFormDialog({ user, onSave, trigger }: UserFormDialogProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nombre</Label>
+              <Label htmlFor="name">Compañia</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                placeholder="Nombre del usuario"
+                placeholder="Nombre de la compañía"
                 className="bg-secondary border-border"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="name">Apellido</Label>
+              <Label htmlFor="name">Nombre de Usuario</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                placeholder="Apellido del usuario"
+                placeholder="Nombre de usuario"
                 className="bg-secondary border-border"
                 required
               />
             </div>
-          </div>
-          <div className="space-y-2">
-            <Label>Cedula </Label>
-            <Input
-              id="id"
-              name="id"
-              value={formData.id}
-              placeholder="Cedula del usuario"
-              className="bg-secondary border-border"
-              required
-            />
           </div>
 
           <div className="space-y-2">
@@ -130,7 +130,32 @@ export function UserFormDialog({ user, onSave, trigger }: UserFormDialogProps) {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2 relative">
+            <Label htmlFor="password">Contraseña</Label>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                placeholder="crea contraseña"
+                className="bg-secondary border-border pr-10"
+                required
+              />
+              {/* Botón para mostrar/ocultar */}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>Rol</Label>
               <Select
@@ -153,43 +178,33 @@ export function UserFormDialog({ user, onSave, trigger }: UserFormDialogProps) {
             </div>
 
             <div className="space-y-2">
-              <Label>Departamento</Label>
+              <Label>Estado</Label>
               <Select
-                value={formData.department}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, department: value })
+                value={formData.status}
+                onValueChange={(value: "active" | "inactive") =>
+                  setFormData({ ...formData, status: value })
                 }
               >
                 <SelectTrigger className="bg-secondary border-border">
-                  <SelectValue placeholder="Seleccionar" />
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {departments.map((dept) => (
-                    <SelectItem key={dept} value={dept}>
-                      {dept}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="active">Activo</SelectItem>
+                  <SelectItem value="inactive">Inactivo</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label>Estado</Label>
-            <Select
-              value={formData.status}
-              onValueChange={(value: "active" | "inactive") =>
-                setFormData({ ...formData, status: value })
-              }
-            >
-              <SelectTrigger className="bg-secondary border-border">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Activo</SelectItem>
-                <SelectItem value="inactive">Inactivo</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <Label htmlFor="createdAt">Fecha de creación</Label>
+              <Input
+                id="createdAt"
+                type="text"
+                value={formData.createdAt}
+                readOnly
+                className="bg-secondary border-border text-gray-500 cursor-not-allowed"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">

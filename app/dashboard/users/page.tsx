@@ -30,14 +30,17 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>(mockUsers)
   const [search, setSearch] = useState("")
   const [roleFilter, setRoleFilter] = useState<string>("all")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
   const [departmentFilter, setDepartmentFilter] = useState<string>("all")
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.name.toLowerCase().includes(search.toLowerCase()) || user.email.toLowerCase().includes(search.toLowerCase())
     const matchesRole = roleFilter === "all" || user.role === roleFilter
-    const matchesDept = departmentFilter === "all" || user.department === departmentFilter
-    return matchesSearch && matchesRole && matchesDept
+    const matchesStatus = statusFilter === "all" || user.status === statusFilter
+    //const matchesDept = departmentFilter === "all" || user.department === departmentFilter
+    return matchesSearch && matchesRole && matchesStatus
+    //&& matchesDept
   })
 
   const handleSaveUser = (userData: Partial<User>) => {
@@ -93,19 +96,18 @@ export default function UsersPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-[180px] bg-secondary border-0">
-                  <SelectValue placeholder="Departamento" />
+                  <SelectValue placeholder="Estado" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  {departments.map((dept) => (
-                    <SelectItem key={dept} value={dept}>
-                      {dept}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="all">Todos los estados</SelectItem>
+                  <SelectItem value="active">Activo</SelectItem>
+                  <SelectItem value="inactive">Inactivo</SelectItem>
                 </SelectContent>
               </Select>
+
             </div>
           </div>
         </CardContent>
@@ -124,7 +126,7 @@ export default function UsersPage() {
                   <th className="text-left py-3 px-2 text-xs font-medium text-muted-foreground">Usuario</th>
                   <th className="text-left py-3 px-2 text-xs font-medium text-muted-foreground">Correo</th>
                   <th className="text-left py-3 px-2 text-xs font-medium text-muted-foreground">Rol</th>
-                  <th className="text-left py-3 px-2 text-xs font-medium text-muted-foreground">Departamento</th>
+                  {/* <th className="text-left py-3 px-2 text-xs font-medium text-muted-foreground">Departamento</th> */}
                   <th className="text-left py-3 px-2 text-xs font-medium text-muted-foreground">Estado</th>
                   <th className="text-left py-3 px-2 text-xs font-medium text-muted-foreground">Creado</th>
                   <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">Acciones</th>
@@ -152,7 +154,7 @@ export default function UsersPage() {
                         {roleLabels[user.role]}
                       </Badge>
                     </td>
-                    <td className="py-3 px-2 text-sm text-muted-foreground">{user.department}</td>
+                    {/* <td className="py-3 px-2 text-sm text-muted-foreground">{user.department}</td> */}
                     <td className="py-3 px-2">
                       <Badge
                         variant="secondary"
