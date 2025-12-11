@@ -1,12 +1,9 @@
 {
-  "/dashboard/audits/page": "app/dashboard/audits/page.js",
   "/dashboard/documents/page": "app/dashboard/documents/page.js",
   "/dashboard/employees/[id]/page": "app/dashboard/employees/[id]/page.js",
   "/dashboard/employees/page": "app/dashboard/employees/page.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/dashboard/roles/page": "app/dashboard/roles/page.js",
-  "/dashboard/settings/page": "app/dashboard/settings/page.js",
-  "/dashboard/upload/page": "app/dashboard/upload/page.js",
   "/dashboard/users/page": "app/dashboard/users/page.js",
   "/page": "app/page.js"
 }

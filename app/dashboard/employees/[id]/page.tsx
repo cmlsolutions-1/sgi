@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
-import { mockEmployees } from "@/lib/mock-data"
+import { mockEmployees, mockUsers } from "@/lib/mock-data"
 import {
   ArrowLeft,
   Mail,
@@ -21,6 +21,7 @@ import {
   Star,
   Building,
   User,
+  Activity,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -39,6 +40,7 @@ const trainingStatusLabels = {
 export default function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const employee = mockEmployees.find((e) => e.id === id)
+  const user = mockUsers.find((e) => e.id === id)
 
   if (!employee) {
     notFound()
@@ -110,7 +112,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="h-4 w-4 text-muted-foreground" />
-                  <span>{employee.email}</span>
+                  <span>{user?.email}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Phone className="h-4 w-4 text-muted-foreground" />
@@ -137,6 +139,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           <TabsTrigger value="certifications">Certificaciones</TabsTrigger>
           <TabsTrigger value="trainings">Capacitaciones</TabsTrigger>
           <TabsTrigger value="evaluations">Evaluaciones</TabsTrigger>
+          <TabsTrigger value="socialSecurity">Seguridad Social</TabsTrigger>
         </TabsList>
 
         <TabsContent value="info">
@@ -265,6 +268,45 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                 ))}
                 {employee.evaluations.length === 0 && (
                   <p className="text-sm text-muted-foreground text-center py-8">No hay evaluaciones registradas</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="socialSecurity">
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-base font-medium flex items-center gap-2">
+                <Activity className="h-5 w-5" />
+                Aportes Seguridad Social
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {employee.trainings.map((training) => (
+                  <div
+                    key={training.id}
+                    className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-border"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                        <Activity className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">{training.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {training.date} • {training.duration}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge variant="secondary" className={cn("text-xs", trainingStatusColors[training.status])}>
+                      {trainingStatusLabels[training.status]}
+                    </Badge>
+                  </div>
+                ))}
+                {employee.trainings.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-8">No hay capacitaciones registradas</p>
                 )}
               </div>
             </CardContent>

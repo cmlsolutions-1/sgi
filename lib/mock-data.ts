@@ -85,7 +85,30 @@ export interface Company extends BaseEntity {
   address: string;
   phone: string;
   email: string;
-  registrationDate: string; // ISO o string formateado
+  registrationDate: string; 
+}
+
+//aportes seguridad social
+export interface SocialSecurity extends BaseEntity {
+  employeeId: string;            
+  epsId: string;
+  arlId: string;
+  pensionId: string;
+  compensationBoxId: string;
+  startDate: string;
+  endDate?: string;              
+}
+
+//tipos de entidades seguridad social
+export type SocialSecurityType =
+  | "EPS"
+  | "ARL"
+  | "PENSION"
+  | "CAJA_COMPENSACION";
+
+export interface TypeSocialSecurity extends BaseEntity {
+  name: string;
+  type: SocialSecurityType;
 }
 
 // =====================================
@@ -111,33 +134,33 @@ export interface Job extends BaseEntity {
 // Employee
 // =====================================
 export interface Employee extends BaseEntity {
-  id: string; // Asegúrate de que exista el id
-  name: string; // Asegúrate de que exista el nombre
-  position?: string; // Cargo, puede ser opcional
-  department?: string; // Departamento, puede ser opcional
-  typeContract?: string; // Tipo de contrato, puede ser opcional
-  phone?: string; // Teléfono, puede ser opcional
-  hireDate?: string; // Fecha de contratación, puede ser opcional
-  birthDate?: string; // Fecha de nacimiento, puede ser opcional
-  address?: string; // Dirección, puede ser opcional
-  education?: string; // Educación, puede ser opcional
-  certifications?: string[]; // Certificaciones, puede ser opcional
+  id: string; 
+  name: string; 
+  position?: string; 
+  department?: string; 
+  typeContract?: string; 
+  phone?: string; 
+  hireDate?: string;
+  birthDate?: string; 
+  address?: string; 
+  education?: string; 
+  certifications?: string[]; 
   trainings?: {
     id: string;
     name: string;
     date: string;
     duration: string;
     status: string;
-  }[]; // Capacitaciones, puede ser opcional
-  evaluations?: Evaluation[]; // Evaluaciones, puede ser opcional
-  status: boolean | "active" | "inactive"; // Estado, puede ser booleano o string
+  }[]; 
+  evaluations?: Evaluation[]; 
+  status: boolean | "active" | "inactive";
   companyId: string;
   userId: string;
   document: string;
   lastName: string;
   jobId: string;
   workAreId: string;
-  entryDate: string; // "9 de septiembre del 2025" o formato ISO
+  entryDate: string; 
 }
 
 export const mockTopicTrainings: TopicTraining[] = [
@@ -161,7 +184,8 @@ export const mockTopicTrainings: TopicTraining[] = [
     id: "topic-003",
     companyId: "comp-001",
     name: "Trabajo en Alturas",
-    description: "Certificación obligatoria para trabajos superiores a 2 metros",
+    description:
+      "Certificación obligatoria para trabajos superiores a 2 metros",
     isActive: true,
     status: true,
   },
@@ -603,7 +627,8 @@ export const mockWorkArea = {
   id: "area-001",
   companyId: "comp-001",
   name: "Desarrollo de Software",
-  description: "Área encargada del análisis, diseño y desarrollo de soluciones tecnológicas",
+  description:
+    "Área encargada del análisis, diseño y desarrollo de soluciones tecnológicas",
   status: true,
 };
 
@@ -618,18 +643,90 @@ export const mockJob = {
 
 // Monthly data for charts
 export const monthlyData = [
-  { month: "Ene", noConformidades: 8, acciones: 12, auditorias: 2, satisfaccion: 88 },
-  { month: "Feb", noConformidades: 6, acciones: 10, auditorias: 1, satisfaccion: 89 },
-  { month: "Mar", noConformidades: 10, acciones: 15, auditorias: 2, satisfaccion: 87 },
-  { month: "Abr", noConformidades: 5, acciones: 8, auditorias: 1, satisfaccion: 90 },
-  { month: "May", noConformidades: 7, acciones: 11, auditorias: 2, satisfaccion: 91 },
-  { month: "Jun", noConformidades: 4, acciones: 6, auditorias: 1, satisfaccion: 92 },
-  { month: "Jul", noConformidades: 6, acciones: 9, auditorias: 2, satisfaccion: 90 },
-  { month: "Ago", noConformidades: 3, acciones: 5, auditorias: 1, satisfaccion: 93 },
-  { month: "Sep", noConformidades: 5, acciones: 7, auditorias: 2, satisfaccion: 91 },
-  { month: "Oct", noConformidades: 4, acciones: 6, auditorias: 1, satisfaccion: 92 },
-  { month: "Nov", noConformidades: 3, acciones: 5, auditorias: 2, satisfaccion: 94 },
-  { month: "Dic", noConformidades: 2, acciones: 4, auditorias: 1, satisfaccion: 92 },
+  {
+    month: "Ene",
+    noConformidades: 8,
+    acciones: 12,
+    auditorias: 2,
+    satisfaccion: 88,
+  },
+  {
+    month: "Feb",
+    noConformidades: 6,
+    acciones: 10,
+    auditorias: 1,
+    satisfaccion: 89,
+  },
+  {
+    month: "Mar",
+    noConformidades: 10,
+    acciones: 15,
+    auditorias: 2,
+    satisfaccion: 87,
+  },
+  {
+    month: "Abr",
+    noConformidades: 5,
+    acciones: 8,
+    auditorias: 1,
+    satisfaccion: 90,
+  },
+  {
+    month: "May",
+    noConformidades: 7,
+    acciones: 11,
+    auditorias: 2,
+    satisfaccion: 91,
+  },
+  {
+    month: "Jun",
+    noConformidades: 4,
+    acciones: 6,
+    auditorias: 1,
+    satisfaccion: 92,
+  },
+  {
+    month: "Jul",
+    noConformidades: 6,
+    acciones: 9,
+    auditorias: 2,
+    satisfaccion: 90,
+  },
+  {
+    month: "Ago",
+    noConformidades: 3,
+    acciones: 5,
+    auditorias: 1,
+    satisfaccion: 93,
+  },
+  {
+    month: "Sep",
+    noConformidades: 5,
+    acciones: 7,
+    auditorias: 2,
+    satisfaccion: 91,
+  },
+  {
+    month: "Oct",
+    noConformidades: 4,
+    acciones: 6,
+    auditorias: 1,
+    satisfaccion: 92,
+  },
+  {
+    month: "Nov",
+    noConformidades: 3,
+    acciones: 5,
+    auditorias: 2,
+    satisfaccion: 94,
+  },
+  {
+    month: "Dic",
+    noConformidades: 2,
+    acciones: 4,
+    auditorias: 1,
+    satisfaccion: 92,
+  },
 ];
 
 // Department distribution
@@ -648,6 +745,19 @@ export const roles: { value: Role; label: string }[] = [
   { value: "empleado", label: "Empleado" },
 ];
 
-export const departments = ["Dirección", "Calidad", "Producción", "Logística", "Recursos Humanos", "Ventas"];
+export const departments = [
+  "Dirección",
+  "Calidad",
+  "Producción",
+  "Logística",
+  "Recursos Humanos",
+  "Ventas",
+];
 
-export const typeContract = ["Término Fijo", "Término Indefinido", "Obra o Labor", "Aprendizaje", "Ocasional"];
+export const typeContract = [
+  "Término Fijo",
+  "Término Indefinido",
+  "Obra o Labor",
+  "Aprendizaje",
+  "Ocasional",
+];
