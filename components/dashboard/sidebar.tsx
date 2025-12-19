@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Users,
@@ -16,8 +16,8 @@ import {
   Shield,
   ClipboardCheck,
   ChevronDown,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // Definir tipos para los subitems de navegación
 type SubNavigationItem = {
@@ -27,41 +27,43 @@ type SubNavigationItem = {
 };
 
 // Definir tipos para los ítems de navegación principales
-type NavigationItem = {
-  name: string;
-  href: string; // Obligatorio para ítems normales
-  icon: React.ElementType; // Obligatorio para ítems normales
-  subItems?: never; // No tiene subItems
-} | {
-  name: string;
-  icon: React.ElementType; // Obligatorio para ítems con subItems
-  subItems: SubNavigationItem[]; // Ahora es de tipo SubNavigationItem[]
-  href?: never; // No tiene href
-};
+type NavigationItem =
+  | {
+      name: string;
+      href: string; // Obligatorio para ítems normales
+      icon: React.ElementType; // Obligatorio para ítems normales
+      subItems?: never; // No tiene subItems
+    }
+  | {
+      name: string;
+      icon: React.ElementType; // Obligatorio para ítems con subItems
+      subItems: SubNavigationItem[]; // Ahora es de tipo SubNavigationItem[]
+      href?: never; // No tiene href
+    };
 
 const navigation: NavigationItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { 
-    name: "Usuarios", 
+  {
+    name: "Usuarios",
     icon: Users,
     subItems: [
       { name: "Gestión de Usuarios", href: "/dashboard/users", icon: Users },
-      { name: "Roles", href: "/dashboard/roles", icon: Shield }, 
-      { name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle },// Ahora 'icon' es válido aquí
+      { name: "Roles", href: "/dashboard/roles", icon: Shield },
+      { name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle }, // Ahora 'icon' es válido aquí
       // Puedes agregar más subitems aquí
-    ]
+    ],
   },
   // { name: "Roles", href: "/dashboard/roles", icon: Shield }, // Puedes mover esta línea a subItems si lo deseas
   { name: "Documentos", href: "/dashboard/documents", icon: FileText },
   { name: "Cargar Archivos", href: "/dashboard/upload", icon: Upload },
   //{ name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle },
   { name: "Auditorías", href: "/dashboard/audits", icon: ClipboardCheck },
-]
+];
 
 export function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false)
-  const pathname = usePathname()
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const [collapsed, setCollapsed] = useState(false);
+  const pathname = usePathname();
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const toggleDropdown = (name: string) => {
     setOpenDropdown(openDropdown === name ? null : name);
@@ -71,16 +73,20 @@ export function Sidebar() {
     <aside
       className={cn(
         "flex flex-col h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300",
-        collapsed ? "w-16" : "w-64",
+        collapsed ? "w-16" : "w-64"
       )}
     >
       <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border">
         {!collapsed && (
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">SGC</span>
+              <span className="text-primary-foreground font-bold text-sm">
+                SGC
+              </span>
             </div>
-            <span className="font-semibold text-sidebar-foreground">SafeCloud</span>
+            <span className="font-semibold text-sidebar-foreground">
+              SafeCloud
+            </span>
           </div>
         )}
         <Button
@@ -89,7 +95,11 @@ export function Sidebar() {
           onClick={() => setCollapsed(!collapsed)}
           className="text-sidebar-foreground hover:bg-sidebar-accent"
         >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          {collapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
         </Button>
       </div>
 
@@ -103,9 +113,9 @@ export function Sidebar() {
                   onClick={() => !collapsed && toggleDropdown(item.name)}
                   className={cn(
                     "flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                    openDropdown === item.name 
-                      ? "bg-sidebar-primary text-sidebar-primary-foreground" 
-                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    openDropdown === item.name
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -113,15 +123,15 @@ export function Sidebar() {
                     {!collapsed && <span>{item.name}</span>}
                   </div>
                   {!collapsed && (
-                    <ChevronDown 
+                    <ChevronDown
                       className={cn(
                         "h-4 w-4 transition-transform duration-200",
                         openDropdown === item.name ? "rotate-180" : ""
-                      )} 
+                      )}
                     />
                   )}
                 </button>
-                
+
                 {!collapsed && openDropdown === item.name && (
                   <div className="ml-8 mt-1 space-y-1 pl-2 border-l border-sidebar-border">
                     {item.subItems.map((subItem) => {
@@ -134,7 +144,7 @@ export function Sidebar() {
                             "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors", // Ajusté el padding horizontal
                             isSubActive
                               ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                           )}
                         >
                           {/* Renderizado condicional del ícono del subitem */}
@@ -163,7 +173,7 @@ export function Sidebar() {
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                 isActive
                   ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               )}
             >
               <item.icon className="h-5 w-5 shrink-0" />
@@ -178,7 +188,7 @@ export function Sidebar() {
           href="/dashboard/settings"
           className={cn(
             "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-            "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+            "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
           )}
         >
           <Settings className="h-5 w-5 shrink-0" />
@@ -186,5 +196,5 @@ export function Sidebar() {
         </Link>
       </div>
     </aside>
-  )
+  );
 }
