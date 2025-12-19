@@ -1789,6 +1789,10 @@
     border-color: var(--sidebar-border);
   }
 
+  .border-success {
+    border-color: var(--success);
+  }
+
   .border-transparent {
     border-color: #0000;
   }
@@ -1933,6 +1937,16 @@
     background-color: var(--secondary);
   }
 
+  .bg-secondary\/30 {
+    background-color: var(--secondary);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .bg-secondary\/30 {
+      background-color: color-mix(in oklab, var(--secondary) 30%, transparent);
+    }
+  }
+
   .bg-secondary\/50 {
     background-color: var(--secondary);
   }
@@ -1953,6 +1967,16 @@
 
   .bg-sidebar-primary {
     background-color: var(--sidebar-primary);
+  }
+
+  .bg-success\/5 {
+    background-color: var(--success);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .bg-success\/5 {
+      background-color: color-mix(in oklab, var(--success) 5%, transparent);
+    }
   }
 
   .bg-transparent {
@@ -2377,6 +2401,10 @@
 
   .text-sidebar-primary-foreground {
     color: var(--sidebar-primary-foreground);
+  }
+
+  .text-success {
+    color: var(--success);
   }
 
   .text-warning {

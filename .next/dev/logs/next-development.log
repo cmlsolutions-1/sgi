@@ -1,293 +1,92 @@
-[00:00:04.235] Server  LOG      ✓ Ready in 3s
-[00:00:10.846] Server  LOG      ○ Compiling / ...
-[00:00:27.095] Server  LOG      ○ Compiling /dashboard ...
-[00:00:51.856] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:03.467] Server  LOG      ✓ Ready in 2.4s
+[00:00:44.313] Server  LOG      ○ Compiling / ...
+[00:00:59.712] Server  LOG      ○ Compiling /dashboard ...
+[00:01:27.954] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:51.883] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:28.023] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:51.907] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:28.080] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:51.927] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:28.141] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:54.538] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:57.669] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:33.990] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:55.260] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:57.669] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:55.261] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:57.669] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:55.261] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:57.669] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:55.261] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:57.669] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:55.261] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:57.669] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:55.261] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:57.669] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:55.261] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:57.669] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:55.261] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:57.887] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:57.887] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:00:57.887] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765426874987}
-[00:01:05.922] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765426882953}
-[00:01:09.622] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:01:09.622] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:01:49.136] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765426926239}
-[00:02:23.353] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765426960392}
-[00:02:29.818] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765426966911}
-[00:02:33.266] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765426970299}
-[00:02:38.049] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765426975125}
-[00:02:51.464] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765426988561}
-[00:05:17.930] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/roles color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/roles","o":"http://localhost:3000/dashboard/roles","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765427135011}
-[00:05:42.456] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765427159507}
-[00:05:50.294] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765427167292}
-[00:06:03.038] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765427180123}
-[00:06:33.695] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765427210702}
-[00:06:35.239] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:06:35.239] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:08:43.779] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765427340877}
-[00:09:08.342] Server  LOG      ✓ Compiled in 464ms
-[00:09:11.326] Server  LOG      ✓ Compiled in 348ms
-[00:09:29.551] Server  LOG      ✓ Compiled in 287ms
-[00:09:31.317] Browser ERROR   ./app/dashboard/employees/[id]/page.tsx:113:35
-Parsing ecmascript source code failed
-  111 |                 <div className="flex items-center gap-2 text-sm">
-  112 |                   <Mail className="h-4 w-4 text-muted-foreground" />
-> 113 |                   <span>{employee.}</span>
-      |                                   ^
-  114 |                 </div>
-  115 |                 <div className="flex items-center gap-2 text-sm">
-  116 |                   <Phone className="h-4 w-4 text-muted-foreground" />
+[00:02:03.609] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:02:03.609] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[00:02:03.609] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118347807}
+[00:02:32.031] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118378717}
+[00:02:40.063] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118386753}
+[00:02:40.363] Browser ERROR   uncaughtError: ReferenceError: socialSecurityContributions is not defined
+[00:05:59.200] Server  LOG      ✓ Compiled in 372ms
+[00:05:59.230] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:06:03.024] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_9bbd6ac5._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:06:03.035] Server  ERROR    ⨯ ReferenceError: avgScore is not defined
+[00:06:04.175] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:06:06.979] Browser ERROR   uncaughtError: Error: Switched to client rendering because the server rendering errored:
 
-Expected '</', got '}'
+avgScore is not defined
+[00:06:06.979] Browser ERROR   uncaughtError: ReferenceError: avgScore is not defined
+[00:06:11.992] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:06:12.010] Server  LOG      ✓ Compiled in 240ms
+[00:06:16.036] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_9bbd6ac5._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:06:16.043] Server  ERROR    ⨯ ReferenceError: avgScore is not defined
+[00:06:18.263] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:06:18.418] Server  LOG      ✓ Compiled in 4ms
+[00:06:19.802] Browser ERROR   uncaughtError: Error: Switched to client rendering because the server rendering errored:
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
-    ./app/dashboard/employees/[id]/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
-    ./app/dashboard/employees/[id]/page.tsx [Server Component]
-[00:10:19.765] Server  LOG      ✓ Compiled in 300ms
-[00:10:33.644] Server  LOG      ✓ Compiled in 210ms
-[00:10:33.879] Browser ERROR   ./app/dashboard/employees/[id]/page.tsx:42:9
-Ecmascript file had an error
-  40 |   const { id } = use(params)
-  41 |   const employee = mockEmployees.find((e) => e.id === id)
-> 42 |   const employee = mockEmployees.find((e) => e.id === id)
-     |         ^^^^^^^^
-  43 |
-  44 |   if (!employee) {
-  45 |     notFound()
-
-the name `employee` is defined multiple times
-
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
-    ./app/dashboard/employees/[id]/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
-    ./app/dashboard/employees/[id]/page.tsx [Server Component]
-[00:10:36.762] Server  LOG      ✓ Compiled in 372ms
-[00:10:40.992] Server  LOG      ✓ Compiled in 617ms
-[00:10:42.884] Browser ERROR   uncaughtError: ReferenceError: mock is not defined
-[00:10:44.961] Server  LOG      ✓ Compiled in 615ms
-[00:10:45.004] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:10:46.108] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765427462370}
-[00:10:48.829] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:10:49.878] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:10:49.878] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees/emp-001","route":"/dashboard/employees/[id]"}
-[00:10:49.878] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765427466488}
-[00:10:52.670] Server  LOG      ✓ Compiled in 248ms
-[00:10:59.643] Server  LOG      ✓ Compiled in 164ms
-[00:10:59.872] Browser ERROR   ./app/dashboard/employees/[id]/page.tsx:114:31
-Parsing ecmascript source code failed
-  112 |                 <div className="flex items-center gap-2 text-sm">
-  113 |                   <Mail className="h-4 w-4 text-muted-foreground" />
-> 114 |                   <span>{user.}</span>
-      |                               ^
-  115 |                 </div>
-  116 |                 <div className="flex items-center gap-2 text-sm">
-  117 |                   <Phone className="h-4 w-4 text-muted-foreground" />
-
-Expected '</', got '}'
-
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
-    ./app/dashboard/employees/[id]/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
-    ./app/dashboard/employees/[id]/page.tsx [Server Component]
-[00:11:01.944] Server  LOG      ✓ Compiled in 291ms
-[00:11:03.055] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'email')
-[00:11:07.250] Server  LOG      ✓ Compiled in 556ms
-[00:11:08.882] Browser ERROR   ./app/dashboard/employees/[id]/page.tsx:114:31
-Parsing ecmascript source code failed
-  112 |                 <div className="flex items-center gap-2 text-sm">
-  113 |                   <Mail className="h-4 w-4 text-muted-foreground" />
-> 114 |                   <span>{user.}</span>
-      |                               ^
-  115 |                 </div>
-  116 |                 <div className="flex items-center gap-2 text-sm">
-  117 |                   <Phone className="h-4 w-4 text-muted-foreground" />
-
-Expected '</', got '}'
-
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
-    ./app/dashboard/employees/[id]/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
-    ./app/dashboard/employees/[id]/page.tsx [Server Component]
-[00:11:11.390] Server  LOG      ✓ Compiled in 213ms
-[00:11:12.851] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_9bbd6ac5._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:11:12.861] Server  ERROR    ⨯ TypeError: Cannot read properties of undefined (reading 'e')
-[00:11:14.304] Server  LOG      ✓ Compiled in 455ms
-[00:11:15.887] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:11:22.433] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:11:23.997] Browser ERROR   uncaughtError: Error: Switched to client rendering because the server rendering errored:
-
-Cannot read properties of undefined (reading 'e')
-[00:11:24.924] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:11:24.924] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees/emp-001","route":"/dashboard/employees/[id]"}
-[00:11:24.924] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765427501691}
-[00:11:45.340] Server  LOG      ✓ Compiled in 325ms
-[00:11:45.870] Browser ERROR   ./app/dashboard/employees/[id]/page.tsx:114:31
-Parsing ecmascript source code failed
-  112 |                 <div className="flex items-center gap-2 text-sm">
-  113 |                   <Mail className="h-4 w-4 text-muted-foreground" />
-> 114 |                   <span>{user.}</span>
-      |                               ^
-  115 |                 </div>
-  116 |                 <div className="flex items-center gap-2 text-sm">
-  117 |                   <Phone className="h-4 w-4 text-muted-foreground" />
-
-Expected '</', got '}'
-
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
-    ./app/dashboard/employees/[id]/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
-    ./app/dashboard/employees/[id]/page.tsx [Server Component]
-[00:12:05.418] Server  LOG      ✓ Compiled in 377ms
-[00:12:05.873] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'email')
-[00:12:13.665] Server  LOG      ✓ Compiled in 164ms
-[00:12:13.800] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:12:15.656] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:12:16.873] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:12:16.873] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees/emp-001","route":"/dashboard/employees/[id]"}
-[00:12:16.873] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765427553930}
-[00:12:41.510] Server  LOG      ✓ Compiled in 227ms
-[00:13:34.757] Server  LOG      ✓ Compiled in 358ms
-[00:18:49.953] Server  LOG      ✓ Compiled in 235ms
-[00:18:56.449] Server  LOG      ✓ Compiled in 351ms
-[00:19:11.997] Server  LOG      ✓ Compiled in 253ms
-[00:19:20.993] Server  LOG      ✓ Compiled in 206ms
-[00:19:47.626] Server  LOG      ✓ Compiled in 254ms
-[00:20:16.429] Server  LOG      ✓ Compiled in 497ms
-[00:20:18.186] Server  LOG      ✓ Compiled in 236ms
-[00:20:21.568] Server  LOG      ✓ Compiled in 237ms
-[00:20:23.322] Server  LOG      ✓ Compiled in 185ms
-[00:20:25.278] Server  LOG      ✓ Compiled in 234ms
-[00:20:33.787] Server  LOG      ✓ Compiled in 245ms
-[00:24:00.756] Server  LOG      ✓ Compiled in 193ms
-[00:24:35.564] Server  LOG      ✓ Compiled in 237ms
-[00:24:59.585] Server  LOG      ✓ Compiled in 279ms
-[00:57:15.169] Server  LOG      ✓ Compiled in 347ms
-[00:57:15.880] Browser ERROR   ./lib/mock-data.ts:92:8
-Parsing ecmascript source code failed
-  90 |
-  91 | //aportes seguridad social
-> 92 | export interface SocialSecurity extends BaseEntity {
-     |        ^^^^^^^^^
-  93 |   id: string;
-  94 |   epsId: string;
-  95 |   arlId: string;
-
-Expected '{', got 'interface'
-
-Import traces:
-  Server Component:
-    ./lib/mock-data.ts
-    ./app/dashboard/page.tsx
-
-  Client Component Browser:
-    ./lib/mock-data.ts [Client Component Browser]
-    ./components/dashboard/findings-table.tsx [Client Component Browser]
-    ./components/dashboard/findings-table.tsx [Server Component]
-    ./app/dashboard/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./lib/mock-data.ts [Client Component SSR]
-    ./components/dashboard/findings-table.tsx [Client Component SSR]
-    ./components/dashboard/findings-table.tsx [Server Component]
-    ./app/dashboard/page.tsx [Server Component]
-[00:57:16.885] Server  LOG      ✓ Compiled in 347ms
-[01:06:17.626] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[01:06:17.626] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[01:06:17.626] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[01:06:17.626] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[01:06:17.627] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[01:06:17.627] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[01:06:17.627] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[01:06:17.627] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[01:06:17.627] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765430794070}
-[01:06:20.270] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1765430797343}
+avgScore is not defined
+[00:06:19.802] Browser ERROR   uncaughtError: ReferenceError: avgScore is not defined
+[00:06:21.827] Server  LOG      ✓ Compiled in 373ms
+[00:06:21.859] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:06:23.641] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:06:25.697] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:06:25.697] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees/emp-001","route":"/dashboard/employees/[id]"}
+[00:06:25.697] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118612107}
+[00:07:36.391] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118683065}
+[00:07:45.597] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:07:45.597] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:08:07.357] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118714044}
+[00:09:18.798] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118785420}
+[00:09:22.919] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:09:22.919] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:09:40.675] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118807343}
+[00:18:06.658] Server  LOG      ✓ Compiled in 182ms

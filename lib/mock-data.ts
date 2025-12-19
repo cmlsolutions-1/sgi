@@ -2,6 +2,9 @@
 
 export type Role = "admin" | "auditor" | "supervisor" | "empleado";
 
+// Tipos de estado para capacitaciones
+export type TrainingStatus = "completed" | "in-progress" | "pending";
+
 export interface User {
   id: string;
   name: string;
@@ -18,6 +21,7 @@ export interface Training extends BaseEntity {
   topicId: string;
   date: string; // ISO o string normal
   durationInHours: number;
+  status: boolean | TrainingStatus;
 }
 
 export interface TopicTraining extends BaseEntity {
@@ -25,6 +29,7 @@ export interface TopicTraining extends BaseEntity {
   name: string;
   description: string;
   isActive: boolean;
+  status: boolean; 
 }
 
 export interface EmployeeTraining extends BaseEntity {
@@ -32,6 +37,17 @@ export interface EmployeeTraining extends BaseEntity {
   employeeId: string;
   isAttended: boolean;
   urlCertificate: string | null;
+  status: boolean; 
+}
+
+export interface SocialSecurityContribution {
+  id: string;
+  employeeId: string;
+  type: "EPS" | "ARL" | "PENSION" | "CAJA_COMPENSACION";
+  entityName: string;
+  startDate: string;
+  endDate?: string;
+  status: boolean;
 }
 
 export interface Evaluation {
@@ -76,7 +92,6 @@ export interface QualityIndicator {
 
 export interface BaseEntity {
   id: string;
-  status: boolean | "active" | "inactive";
 }
 
 export interface Company extends BaseEntity {
@@ -150,7 +165,7 @@ export interface Employee extends BaseEntity {
     name: string;
     date: string;
     duration: string;
-    status: string;
+    status: TrainingStatus;
   }[]; 
   evaluations?: Evaluation[]; 
   status: boolean | "active" | "inactive";
@@ -161,6 +176,7 @@ export interface Employee extends BaseEntity {
   jobId: string;
   workAreId: string;
   entryDate: string; 
+  socialSecurity?: SocialSecurityContribution[];
 }
 
 export const mockTopicTrainings: TopicTraining[] = [
@@ -368,6 +384,24 @@ export const mockEmployees: Employee[] = [
         comments: "Excelente desempeño",
       },
     ],
+    socialSecurity: [
+      {
+        id: "ss-001",
+        employeeId: "emp-001",
+        type: "EPS",
+        entityName: "Salud Total",
+        startDate: "2025-01-01",
+        status: true
+      },
+      {
+        id: "ss-002",
+        employeeId: "emp-001",
+        type: "PENSION",
+        entityName: "Porvenir",
+        startDate: "2025-01-01",
+        status: true
+      }
+    ]
   },
   {
     id: "emp-002",
@@ -407,6 +441,7 @@ export const mockEmployees: Employee[] = [
         comments: "Buen desempeño",
       },
     ],
+    socialSecurity: [] // Sin registros
   },
 ];
 
