@@ -1,92 +1,511 @@
-[00:00:03.467] Server  LOG      ✓ Ready in 2.4s
-[00:00:44.313] Server  LOG      ○ Compiling / ...
-[00:00:59.712] Server  LOG      ○ Compiling /dashboard ...
-[00:01:27.954] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:05.289] Server  LOG      ✓ Ready in 3.8s
+[00:00:30.297] Server  LOG      ○ Compiling / ...
+[00:00:38.358] Server  LOG      ○ Compiling /dashboard ...
+[00:00:45.483] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:28.023] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:45.490] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:28.080] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:45.495] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:28.141] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:45.500] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:33.990] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:01:55.260] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:46.685] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:48.056] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:55.261] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:48.057] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:55.261] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:48.057] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:55.261] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:48.057] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:55.261] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:48.057] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:55.261] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:48.057] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:55.261] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:48.057] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:55.261] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:48.057] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:03.609] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:02:03.609] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:02:03.609] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118347807}
-[00:02:32.031] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118378717}
-[00:02:40.063] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118386753}
-[00:02:40.363] Browser ERROR   uncaughtError: ReferenceError: socialSecurityContributions is not defined
-[00:05:59.200] Server  LOG      ✓ Compiled in 372ms
-[00:05:59.230] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:06:03.024] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_9bbd6ac5._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:06:03.035] Server  ERROR    ⨯ ReferenceError: avgScore is not defined
-[00:06:04.175] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:06:06.979] Browser ERROR   uncaughtError: Error: Switched to client rendering because the server rendering errored:
+[00:00:48.217] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:48.217] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[00:00:48.217] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766270767680}
+[00:08:23.020] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766271222481}
+[00:08:28.803] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766271228264}
+[00:08:35.080] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+[00:08:35.080] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+[00:08:35.080] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+[00:08:35.080] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+[00:08:35.080] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+[00:08:35.080] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+[00:08:35.080] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+[00:08:35.080] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+[00:08:35.080] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766271234027}
+[00:08:59.359] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766271258791}
+[00:09:03.485] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:09:03.485] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:09:13.651] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766271273111}
+[00:09:52.395] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/users color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/users","o":"http://localhost:3000/dashboard/users","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766271311821}
+[00:10:21.170] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/roles color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/roles","o":"http://localhost:3000/dashboard/roles","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766271340590}
+[00:10:45.096] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766271364504}
+[00:11:18.682] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-002 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-002","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766271398148}
+[00:12:02.255] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766271441641}
+[00:12:05.086] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:12:05.086] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:12:32.339] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-002 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-002","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766271471804}
+[00:14:16.394] Server  LOG      ✓ Compiled in 1103ms
+[00:19:38.620] Server  LOG      ✓ Compiled in 249ms
+[00:19:38.987] Browser ERROR   React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element. vclassName vclassname
+[00:19:41.140] Server  LOG      ✓ Compiled in 578ms
+[00:19:45.411] Server  LOG      ✓ Compiled in 437ms
+[00:20:00.669] Server  LOG      ✓ Compiled in 247ms
+[00:20:05.822] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766271925225}
+[00:20:07.827] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766271927287}
+[00:23:50.708] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766272149873}
+[00:27:05.580] Server  LOG      ✓ Compiled in 515ms
+[00:27:08.926] Browser ERROR   ./app/dashboard/employees/[id]/page.tsx:611:14
+Parsing ecmascript source code failed
+  609 |         </form>
+  610 |       </DialogContent>
+> 611 |     </Dialog>
+      |              ^
+> 612 |                       </div>
+      | ^^^^^^^^^^^^^^^^^^^^^^^
+  613 |                       
+  614 |                       {hasContributionForType && (
+  615 |                         <div className="mt-3 text-sm">
 
-avgScore is not defined
-[00:06:06.979] Browser ERROR   uncaughtError: ReferenceError: avgScore is not defined
-[00:06:11.992] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:06:12.010] Server  LOG      ✓ Compiled in 240ms
-[00:06:16.036] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_9bbd6ac5._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:06:16.043] Server  ERROR    ⨯ ReferenceError: avgScore is not defined
-[00:06:18.263] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:06:18.418] Server  LOG      ✓ Compiled in 4ms
-[00:06:19.802] Browser ERROR   uncaughtError: Error: Switched to client rendering because the server rendering errored:
+Expected '</', got 'jsx text (
+                      )'
 
-avgScore is not defined
-[00:06:19.802] Browser ERROR   uncaughtError: ReferenceError: avgScore is not defined
-[00:06:21.827] Server  LOG      ✓ Compiled in 373ms
-[00:06:21.859] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:06:23.641] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:06:25.697] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:06:25.697] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees/emp-001","route":"/dashboard/employees/[id]"}
-[00:06:25.697] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118612107}
-[00:07:36.391] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118683065}
-[00:07:45.597] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:07:45.597] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:08:07.357] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118714044}
-[00:09:18.798] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118785420}
-[00:09:22.919] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:09:22.919] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:09:40.675] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766118807343}
-[00:18:06.658] Server  LOG      ✓ Compiled in 182ms
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+[00:27:08.937] Server  LOG      ✓ Compiled in 386ms
+[00:27:12.577] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-002 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-002","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766272352033}
+[00:27:38.027] Server  LOG      ✓ Compiled in 608ms
+[00:27:39.004] Server  LOG      ✓ Compiled in 405ms
+[00:27:40.177] Browser ERROR   ./app/dashboard/employees/[id]/page.tsx:611:14
+Parsing ecmascript source code failed
+  609 |         </form>
+  610 |       </DialogContent>
+> 611 |     </Dialog>
+      |              ^
+> 612 |                       </div>
+      | ^^^^^^^^^^^^^^^^^^^^^^^
+  613 |                       
+  614 |                       {hasContributionForType && (
+  615 |                         <div className="mt-3 text-sm">
+
+Expected '</', got 'jsx text (
+                      )'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+[00:35:15.165] Server  ERROR    ⨯ ./app/dashboard/employees/[id]/page.tsx:31:1
+Module not found: Can't resolve '@/components/dashboard/social-security-form-dialog'
+  29 | } from "lucide-react"
+  30 | import { cn } from "@/lib/utils"
+> 31 | import { SocialSecurityFormDialog } from "@/components/dashboard/social-security-form-dialog"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  32 |
+  33 | type TrainingStatus = "completed" | "in-progress" | "pending";
+  34 |
+
+Import map: aliased to relative './components/dashboard/social-security-form-dialog' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:35:15.219] Server  ERROR    ⨯ ./app/dashboard/employees/[id]/page.tsx:31:1
+Module not found: Can't resolve '@/components/dashboard/social-security-form-dialog'
+  29 | } from "lucide-react"
+  30 | import { cn } from "@/lib/utils"
+> 31 | import { SocialSecurityFormDialog } from "@/components/dashboard/social-security-form-dialog"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  32 |
+  33 | type TrainingStatus = "completed" | "in-progress" | "pending";
+  34 |
+
+Import map: aliased to relative './components/dashboard/social-security-form-dialog' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:35:15.261] Server  ERROR    ⨯ ./app/dashboard/employees/[id]/page.tsx:31:1
+Module not found: Can't resolve '@/components/dashboard/social-security-form-dialog'
+  29 | } from "lucide-react"
+  30 | import { cn } from "@/lib/utils"
+> 31 | import { SocialSecurityFormDialog } from "@/components/dashboard/social-security-form-dialog"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  32 |
+  33 | type TrainingStatus = "completed" | "in-progress" | "pending";
+  34 |
+
+Import map: aliased to relative './components/dashboard/social-security-form-dialog' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:35:15.299] Server  ERROR    ⨯ ./app/dashboard/employees/[id]/page.tsx:31:1
+Module not found: Can't resolve '@/components/dashboard/social-security-form-dialog'
+  29 | } from "lucide-react"
+  30 | import { cn } from "@/lib/utils"
+> 31 | import { SocialSecurityFormDialog } from "@/components/dashboard/social-security-form-dialog"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  32 |
+  33 | type TrainingStatus = "completed" | "in-progress" | "pending";
+  34 |
+
+Import map: aliased to relative './components/dashboard/social-security-form-dialog' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:35:15.335] Server  ERROR    ⨯ ./app/dashboard/employees/[id]/page.tsx:31:1
+Module not found: Can't resolve '@/components/dashboard/social-security-form-dialog'
+  29 | } from "lucide-react"
+  30 | import { cn } from "@/lib/utils"
+> 31 | import { SocialSecurityFormDialog } from "@/components/dashboard/social-security-form-dialog"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  32 |
+  33 | type TrainingStatus = "completed" | "in-progress" | "pending";
+  34 |
+
+Import map: aliased to relative './components/dashboard/social-security-form-dialog' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:35:15.353] Server  ERROR    ⨯ ./app/dashboard/employees/[id]/page.tsx:31:1
+Module not found: Can't resolve '@/components/dashboard/social-security-form-dialog'
+  29 | } from "lucide-react"
+  30 | import { cn } from "@/lib/utils"
+> 31 | import { SocialSecurityFormDialog } from "@/components/dashboard/social-security-form-dialog"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  32 |
+  33 | type TrainingStatus = "completed" | "in-progress" | "pending";
+  34 |
+
+Import map: aliased to relative './components/dashboard/social-security-form-dialog' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:35:15.384] Server  ERROR    ⨯ ./app/dashboard/employees/[id]/page.tsx:31:1
+Module not found: Can't resolve '@/components/dashboard/social-security-form-dialog'
+  29 | } from "lucide-react"
+  30 | import { cn } from "@/lib/utils"
+> 31 | import { SocialSecurityFormDialog } from "@/components/dashboard/social-security-form-dialog"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  32 |
+  33 | type TrainingStatus = "completed" | "in-progress" | "pending";
+  34 |
+
+Import map: aliased to relative './components/dashboard/social-security-form-dialog' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:35:15.421] Server  ERROR    ⨯ ./app/dashboard/employees/[id]/page.tsx:31:1
+Module not found: Can't resolve '@/components/dashboard/social-security-form-dialog'
+  29 | } from "lucide-react"
+  30 | import { cn } from "@/lib/utils"
+> 31 | import { SocialSecurityFormDialog } from "@/components/dashboard/social-security-form-dialog"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  32 |
+  33 | type TrainingStatus = "completed" | "in-progress" | "pending";
+  34 |
+
+Import map: aliased to relative './components/dashboard/social-security-form-dialog' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:35:15.500] Server  ERROR    ⨯ ./app/dashboard/employees/[id]/page.tsx:31:1
+Module not found: Can't resolve '@/components/dashboard/social-security-form-dialog'
+  29 | } from "lucide-react"
+  30 | import { cn } from "@/lib/utils"
+> 31 | import { SocialSecurityFormDialog } from "@/components/dashboard/social-security-form-dialog"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  32 |
+  33 | type TrainingStatus = "completed" | "in-progress" | "pending";
+  34 |
+
+Import map: aliased to relative './components/dashboard/social-security-form-dialog' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:35:15.506] Server  ERROR    ⨯ ./app/dashboard/employees/[id]/page.tsx:31:1
+Module not found: Can't resolve '@/components/dashboard/social-security-form-dialog'
+  29 | } from "lucide-react"
+  30 | import { cn } from "@/lib/utils"
+> 31 | import { SocialSecurityFormDialog } from "@/components/dashboard/social-security-form-dialog"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  32 |
+  33 | type TrainingStatus = "completed" | "in-progress" | "pending";
+  34 |
+
+Import map: aliased to relative './components/dashboard/social-security-form-dialog' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:35:15.553] Server  ERROR    ⨯ ./app/dashboard/employees/[id]/page.tsx:31:1
+Module not found: Can't resolve '@/components/dashboard/social-security-form-dialog'
+  29 | } from "lucide-react"
+  30 | import { cn } from "@/lib/utils"
+> 31 | import { SocialSecurityFormDialog } from "@/components/dashboard/social-security-form-dialog"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  32 |
+  33 | type TrainingStatus = "completed" | "in-progress" | "pending";
+  34 |
+
+Import map: aliased to relative './components/dashboard/social-security-form-dialog' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:35:15.566] Server  ERROR    ⨯ ./app/dashboard/employees/[id]/page.tsx:31:1
+Module not found: Can't resolve '@/components/dashboard/social-security-form-dialog'
+  29 | } from "lucide-react"
+  30 | import { cn } from "@/lib/utils"
+> 31 | import { SocialSecurityFormDialog } from "@/components/dashboard/social-security-form-dialog"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  32 |
+  33 | type TrainingStatus = "completed" | "in-progress" | "pending";
+  34 |
+
+Import map: aliased to relative './components/dashboard/social-security-form-dialog' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:35:15.574] Server  LOG      ✓ Compiled in 885ms
+[00:35:17.842] Browser ERROR   ./app/dashboard/employees/[id]/page.tsx:31:1
+Module not found: Can't resolve '@/components/dashboard/social-security-form-dialog'
+  29 | } from "lucide-react"
+  30 | import { cn } from "@/lib/utils"
+> 31 | import { SocialSecurityFormDialog } from "@/components/dashboard/social-security-form-dialog"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  32 |
+  33 | type TrainingStatus = "completed" | "in-progress" | "pending";
+  34 |
+
+Import map: aliased to relative './components/dashboard/social-security-form-dialog' inside of [project]/
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component Browser]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/employees/[id]/page.tsx [Client Component SSR]
+    ./app/dashboard/employees/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[00:36:44.048] Server  LOG      ✓ Compiled in 274ms
+[00:36:44.969] Browser ERROR   uncaughtError: ReferenceError: useState is not defined
+[00:36:58.887] Server  LOG      ✓ Compiled in 224ms
+[00:36:58.929] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:37:00.554] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-002 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-002","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766272939085}
+[00:37:02.431] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:37:03.976] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:37:03.976] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees/emp-002","route":"/dashboard/employees/[id]"}
+[00:37:03.976] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-002 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-002","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1766272942665}
+[00:37:30.085] Server  LOG      ✓ Compiled in 436ms
+[00:38:07.138] Server  LOG      ✓ Compiled in 196ms
+[00:40:38.033] Server  LOG      ✓ Compiled in 159ms
+[00:41:22.060] Server  LOG      ✓ Compiled in 329ms
+[00:42:56.002] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:42:56.002] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:45:38.183] Server  LOG      ✓ Compiled in 285ms
+[00:45:53.087] Server  LOG      ✓ Compiled in 401ms
+[00:46:46.224] Server  LOG      ✓ Compiled in 391ms
+[00:46:53.951] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:46:53.951] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:46:59.551] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:46:59.551] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:47:02.635] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:47:02.636] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:47:04.777] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:47:04.777] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.

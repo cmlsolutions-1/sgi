@@ -387,6 +387,7 @@ __turbopack_context__.n(__TURBOPACK__imported__module__$5b$project$5d2f$componen
 "use strict";
 
 // Datos mock para el sistema de gestión de calidad
+//Roles
 __turbopack_context__.s([
     "departmentData",
     ()=>departmentData,
@@ -682,7 +683,7 @@ const mockEmployees = [
                 comments: "Buen desempeño"
             }
         ],
-        socialSecurity: [] // Sin registros
+        socialSecurity: []
     }
 ];
 const mockDocuments = [

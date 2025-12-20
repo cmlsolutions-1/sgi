@@ -1,6 +1,6 @@
 "use client"
 
-import { use } from "react"
+import { use, useState } from "react"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -27,6 +27,7 @@ import {
   CircleDashed
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { SocialSecurityFormDialog } from "@/components/dashboard/SocialSecurityFormDialog"
 
 type TrainingStatus = "completed" | "in-progress" | "pending";
 
@@ -60,7 +61,19 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   }
 
   // Datos de seguridad social del empleado
-  const socialSecurityContributions: SocialSecurityContribution[] = employee.socialSecurity || [];
+  const [socialSecurityContributions, setSocialSecurityContributions] = useState<SocialSecurityContribution[]>(
+    employee.socialSecurity || []
+  );
+
+  // Estado para el diálogo de seguridad social
+  const [socialSecurityDialog, setSocialSecurityDialog] = useState<{
+    open: boolean;
+    type: "EPS" | "ARL" | "PENSION" | "CAJA_COMPENSACION";
+  }>({
+    open: false,
+    type: "EPS"
+  });
+
 
   // Función para verificar si un tipo de contribución está registrado
   const hasContribution = (type: string) => {
@@ -71,6 +84,10 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     ? employee.evaluations.reduce((acc, e) => acc + e.score, 0) / employee.evaluations.length
     : 0
 
+     // Función para guardar una nueva contribución
+  const handleSaveContribution = (contribution: SocialSecurityContribution) => {
+    setSocialSecurityContributions(prev => [...prev, contribution]);
+  };
 
   return (
     <div className="space-y-6">
@@ -329,11 +346,17 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                             <span className="text-sm font-medium text-success">Completado</span>
                           </div>
                         ) : (
-                          <Button variant="outline" size="sm" className="gap-1">
+                          <Button className="gap-1"
+                          onClick={() => setSocialSecurityDialog({ 
+                            open: true, 
+                            type: type.name as "EPS" | "ARL" | "PENSION" | "CAJA_COMPENSACION" 
+                          })}
+                        >
                             <Plus className="h-4 w-4" />
                             Agregar
                           </Button>
                         )}
+                        
                       </div>
                       
                       {hasContributionForType && (
@@ -360,6 +383,15 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           </Card>
         </TabsContent>
       </Tabs>
+
+    {/* Diálogo para agregar contribución de seguridad social */}
+      <SocialSecurityFormDialog
+        open={socialSecurityDialog.open}
+        onOpenChange={(open) => setSocialSecurityDialog({ ...socialSecurityDialog, open })}
+        type={socialSecurityDialog.type}
+        onSave={handleSaveContribution}
+        employeeId={employee.id}
+      />
     </div>
   )
 }

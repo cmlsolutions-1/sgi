@@ -1,8 +1,10 @@
 // Datos mock para el sistema de gestión de calidad
 
+//Roles
 export type Role = "admin" | "auditor" | "supervisor" | "empleado";
 
 // Tipos de estado para capacitaciones
+//Estado de capacitaciones
 export type TrainingStatus = "completed" | "in-progress" | "pending";
 
 export interface User {
@@ -16,6 +18,7 @@ export interface User {
   createdAt: string;
 }
 
+// Capacitaciones
 export interface Training extends BaseEntity {
   companyId: string;
   topicId: string;
@@ -24,22 +27,25 @@ export interface Training extends BaseEntity {
   status: boolean | TrainingStatus;
 }
 
+//Tema de capacitacion
 export interface TopicTraining extends BaseEntity {
   companyId: string;
   name: string;
   description: string;
   isActive: boolean;
-  status: boolean; 
+  status: boolean;
 }
 
+//Formacion de empleados
 export interface EmployeeTraining extends BaseEntity {
   topicId: string;
   employeeId: string;
   isAttended: boolean;
   urlCertificate: string | null;
-  status: boolean; 
+  status: boolean;
 }
 
+//Contribución a la Seguridad Social
 export interface SocialSecurityContribution {
   id: string;
   employeeId: string;
@@ -50,6 +56,7 @@ export interface SocialSecurityContribution {
   status: boolean;
 }
 
+//Evaluacion
 export interface Evaluation {
   id: string;
   period: string;
@@ -58,6 +65,7 @@ export interface Evaluation {
   comments: string;
 }
 
+//Documentos
 export interface Document {
   id: string;
   name: string;
@@ -71,6 +79,7 @@ export interface Document {
   size: string;
 }
 
+//Hallazgo de auditoria
 export interface AuditFinding {
   id: string;
   type: "major" | "minor" | "observation" | "opportunity";
@@ -80,6 +89,7 @@ export interface AuditFinding {
   dueDate: string;
 }
 
+//Indicador de calidad
 export interface QualityIndicator {
   id: string;
   name: string;
@@ -90,54 +100,53 @@ export interface QualityIndicator {
   period: string;
 }
 
+//Entidad Base
 export interface BaseEntity {
   id: string;
 }
 
+//Compañia
 export interface Company extends BaseEntity {
   name: string;
   nit: string;
   address: string;
   phone: string;
   email: string;
-  registrationDate: string; 
+  registrationDate: string;
 }
 
-//aportes seguridad social
+//Seguridad social
 export interface SocialSecurity extends BaseEntity {
-  employeeId: string;            
+  employeeId: string;
   epsId: string;
   arlId: string;
   pensionId: string;
   compensationBoxId: string;
   startDate: string;
-  endDate?: string;              
+  endDate?: string;
 }
 
-//tipos de entidades seguridad social
+//entidades seguridad social
 export type SocialSecurityType =
   | "EPS"
   | "ARL"
   | "PENSION"
   | "CAJA_COMPENSACION";
 
+//tipos de entidades seguridad social
 export interface TypeSocialSecurity extends BaseEntity {
   name: string;
   type: SocialSecurityType;
 }
 
-// =====================================
-// WorkArea
-// =====================================
+// Area de trabajo
 export interface WorkArea extends BaseEntity {
   companyId: string;
   name: string;
   description: string;
 }
 
-// =====================================
-// Job
-// =====================================
+// Trabajo
 export interface Job extends BaseEntity {
   companyId: string;
   name: string;
@@ -145,29 +154,27 @@ export interface Job extends BaseEntity {
   workAreId: string;
 }
 
-// =====================================
-// Employee
-// =====================================
+// Empleado
 export interface Employee extends BaseEntity {
-  id: string; 
-  name: string; 
-  position?: string; 
-  department?: string; 
-  typeContract?: string; 
-  phone?: string; 
+  id: string;
+  name: string;
+  position?: string;
+  department?: string;
+  typeContract?: string;
+  phone?: string;
   hireDate?: string;
-  birthDate?: string; 
-  address?: string; 
-  education?: string; 
-  certifications?: string[]; 
+  birthDate?: string;
+  address?: string;
+  education?: string;
+  certifications?: string[];
   trainings?: {
     id: string;
     name: string;
     date: string;
     duration: string;
     status: TrainingStatus;
-  }[]; 
-  evaluations?: Evaluation[]; 
+  }[];
+  evaluations?: Evaluation[];
   status: boolean | "active" | "inactive";
   companyId: string;
   userId: string;
@@ -175,10 +182,11 @@ export interface Employee extends BaseEntity {
   lastName: string;
   jobId: string;
   workAreId: string;
-  entryDate: string; 
+  entryDate: string;
   socialSecurity?: SocialSecurityContribution[];
 }
 
+//Datos quemados Tema de capacitacion
 export const mockTopicTrainings: TopicTraining[] = [
   {
     id: "topic-001",
@@ -207,6 +215,7 @@ export const mockTopicTrainings: TopicTraining[] = [
   },
 ];
 
+//Datos quemados Capacitaciones
 export const mockTrainings: Training[] = [
   {
     id: "train-001",
@@ -234,6 +243,7 @@ export const mockTrainings: Training[] = [
   },
 ];
 
+//Datos quemados formacion de empleados
 export const mockEmployeeTrainings: EmployeeTraining[] = [
   {
     id: "empTrain-001",
@@ -261,7 +271,7 @@ export const mockEmployeeTrainings: EmployeeTraining[] = [
   },
 ];
 
-// Mock Users
+//Datos quemados usuarios
 export const mockUsers: User[] = [
   {
     id: "1",
@@ -337,7 +347,7 @@ export const mockUsers: User[] = [
   },
 ];
 
-// Mock Employees
+//Datos quemados empleados
 export const mockEmployees: Employee[] = [
   {
     id: "emp-001",
@@ -391,7 +401,7 @@ export const mockEmployees: Employee[] = [
         type: "EPS",
         entityName: "Salud Total",
         startDate: "2025-01-01",
-        status: true
+        status: true,
       },
       {
         id: "ss-002",
@@ -399,9 +409,9 @@ export const mockEmployees: Employee[] = [
         type: "PENSION",
         entityName: "Porvenir",
         startDate: "2025-01-01",
-        status: true
-      }
-    ]
+        status: true,
+      },
+    ],
   },
   {
     id: "emp-002",
@@ -441,11 +451,11 @@ export const mockEmployees: Employee[] = [
         comments: "Buen desempeño",
       },
     ],
-    socialSecurity: [] // Sin registros
+    socialSecurity: [], // Sin registros
   },
 ];
 
-// Mock Documents
+//Datos quemados documentos
 export const mockDocuments: Document[] = [
   {
     id: "1",
@@ -545,7 +555,7 @@ export const mockDocuments: Document[] = [
   },
 ];
 
-// Mock Audit Findings
+//Datos quemados Hallazgo de auditoría
 export const mockFindings: AuditFinding[] = [
   {
     id: "1",
@@ -589,7 +599,7 @@ export const mockFindings: AuditFinding[] = [
   },
 ];
 
-// Mock Quality Indicators
+//Datos quemados Indicadores
 export const mockIndicators: QualityIndicator[] = [
   {
     id: "1",
@@ -647,6 +657,7 @@ export const mockIndicators: QualityIndicator[] = [
   },
 ];
 
+//Datos quemados Compañia
 export const mockCompany = {
   id: "comp-001",
   name: "Tech Solutions S.A.S",
@@ -658,6 +669,7 @@ export const mockCompany = {
   status: true,
 };
 
+//Datos quemados areas de trabajo
 export const mockWorkArea = {
   id: "area-001",
   companyId: "comp-001",
@@ -667,6 +679,7 @@ export const mockWorkArea = {
   status: true,
 };
 
+//Datos quemados trabajo
 export const mockJob = {
   id: "job-001",
   companyId: "comp-001",
@@ -676,7 +689,7 @@ export const mockJob = {
   status: true,
 };
 
-// Monthly data for charts
+// Datos mensuales para gráficos
 export const monthlyData = [
   {
     month: "Ene",
@@ -764,7 +777,7 @@ export const monthlyData = [
   },
 ];
 
-// Department distribution
+// Distribucion de departamentos
 export const departmentData = [
   { name: "Producción", empleados: 45, documentos: 28 },
   { name: "Calidad", empleados: 12, documentos: 45 },
@@ -773,6 +786,7 @@ export const departmentData = [
   { name: "Ventas", empleados: 15, documentos: 18 },
 ];
 
+//datos quemados roles
 export const roles: { value: Role; label: string }[] = [
   { value: "admin", label: "Administrador" },
   { value: "auditor", label: "Auditor" },
@@ -780,6 +794,7 @@ export const roles: { value: Role; label: string }[] = [
   { value: "empleado", label: "Empleado" },
 ];
 
+//datos quemados departamentos
 export const departments = [
   "Dirección",
   "Calidad",
@@ -789,6 +804,7 @@ export const departments = [
   "Ventas",
 ];
 
+//Tipo de contratos
 export const typeContract = [
   "Término Fijo",
   "Término Indefinido",

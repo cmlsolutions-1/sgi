@@ -123,6 +123,7 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "use strict";
 
 // Datos mock para el sistema de gestión de calidad
+//Roles
 __turbopack_context__.s([
     "departmentData",
     ()=>departmentData,
@@ -418,7 +419,7 @@ const mockEmployees = [
                 comments: "Buen desempeño"
             }
         ],
-        socialSecurity: [] // Sin registros
+        socialSecurity: []
     }
 ];
 const mockDocuments = [

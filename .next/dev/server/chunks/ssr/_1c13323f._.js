@@ -593,6 +593,7 @@ function Label({ className, ...props }) {
 "use strict";
 
 // Datos mock para el sistema de gestión de calidad
+//Roles
 __turbopack_context__.s([
     "departmentData",
     ()=>departmentData,
@@ -827,6 +828,24 @@ const mockEmployees = [
                 evaluator: "Supervisor",
                 comments: "Excelente desempeño"
             }
+        ],
+        socialSecurity: [
+            {
+                id: "ss-001",
+                employeeId: "emp-001",
+                type: "EPS",
+                entityName: "Salud Total",
+                startDate: "2025-01-01",
+                status: true
+            },
+            {
+                id: "ss-002",
+                employeeId: "emp-001",
+                type: "PENSION",
+                entityName: "Porvenir",
+                startDate: "2025-01-01",
+                status: true
+            }
         ]
     },
     {
@@ -869,7 +888,8 @@ const mockEmployees = [
                 evaluator: "Supervisor",
                 comments: "Buen desempeño"
             }
-        ]
+        ],
+        socialSecurity: []
     }
 ];
 const mockDocuments = [
