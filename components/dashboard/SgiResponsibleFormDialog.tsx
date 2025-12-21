@@ -184,7 +184,7 @@ export function SgiResponsibleFormDialog({
                 setFormData({ ...formData, certifications: e.target.value })
               }
               placeholder="Lista de certificaciones requeridas, separadas por coma"
-              className="bg-secondary border-border min-h-[80px]"
+              className="bg-secondary border-border min-h-20"
               required
             />
             <div className="flex flex-wrap gap-1 mt-1">
