@@ -58,6 +58,7 @@ const navigation: NavigationItem[] = [
   { name: "Cargar Archivos", href: "/dashboard/upload", icon: Upload },
   //{ name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle },
   { name: "Auditorías", href: "/dashboard/audits", icon: ClipboardCheck },
+  { name: "Plan de Capacitaciones", href: "/dashboard/trainingPlan", icon: ClipboardCheck },
 ];
 
 export function Sidebar() {
