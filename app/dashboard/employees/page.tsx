@@ -8,16 +8,26 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { mockEmployees, departments, Employee,typeContract } from "@/lib/mock-data"
-import { Search, Filter, Eye, Users, Award, GraduationCap } from "lucide-react"
+import { Search, Filter, Eye, Users, Award, GraduationCap,UserCheck, Download } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { EmployeeFormDialog } from "@/components/dashboard/employee-form-dialog"
+import { SgiResponsibleFormDialog, SgiResponsibleData } from "@/components/dashboard/SgiResponsibleFormDialog"
 
 export default function EmployeesPage() {
   const [search, setSearch] = useState("")
   const [departmentFilter, setDepartmentFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [employees] = useState<Employee[]>(mockEmployees) 
+
+  // Estado para el diálogo del responsable del SGI
+  const [sgiResponsibleDialog, setSgiResponsibleDialog] = useState({
+    open: false,
+    employee: null as Employee | null,
+  });
+
+  // Buscar el empleado que es responsable del SGI
+  const sgiResponsibleEmployee = employees.find(emp => emp.sgiResponsible) || null;
 
   const filteredEmployees = employees.filter((emp) => {
     const matchesSearch =
@@ -38,6 +48,16 @@ export default function EmployeesPage() {
     // Implementa la lógica de guardado si es necesario
     console.log("Guardar empleado:", employeeData)
   }
+
+  // Función para guardar el responsable del SGI
+  const handleSaveSgiResponsible = (data: SgiResponsibleData) => {
+    // Aquí puedes implementar la lógica para guardar el responsable
+    // Por ejemplo, actualizar el estado global o enviar a la API
+    console.log("Responsable del SGI guardado:", data);
+    
+    // Cerrar el diálogo
+    setSgiResponsibleDialog({ open: false, employee: null });
+  };
 
   // Stats - adaptado para manejar el nuevo tipo de status
   const stats = {
@@ -61,8 +81,76 @@ export default function EmployeesPage() {
           <h1 className="text-2xl font-bold text-foreground">Hoja de Vida de Funcionarios</h1>
           <p className="text-muted-foreground">Gestión del talento humano</p>
         </div>
-        <EmployeeFormDialog onSave={handleSaveUser} />
+        
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setSgiResponsibleDialog({ open: true, employee: employees[0] })} // Ejemplo con el primer empleado
+            className="gap-2"
+          >
+            <UserCheck className="h-4 w-4" />
+            Asignar Responsable SGI
+          </Button>
+          <EmployeeFormDialog onSave={handleSaveUser} />
+        </div>
       </div>
+
+      {/* Card del Responsable del SGI */}
+      {sgiResponsibleEmployee && sgiResponsibleEmployee.sgiResponsible && (
+        <Card className="bg-card border-border">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-16 w-16">
+                  <AvatarFallback className="bg-primary/10 text-primary text-xl">
+                    {sgiResponsibleEmployee.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="font-medium text-lg">{sgiResponsibleEmployee.sgiResponsible.responsibleName}</h3>
+                  <p className="text-sm text-muted-foreground">Responsable del Sistema de Gestión Integrado</p>
+                  <div className="flex gap-4 mt-1">
+                    <div className="text-xs">
+                      <span className="text-muted-foreground">Cédula:</span> {sgiResponsibleEmployee.sgiResponsible.responsibleId}
+                    </div>
+                    <div className="text-xs">
+                      <span className="text-muted-foreground">Firma:</span> {sgiResponsibleEmployee.sgiResponsible.signatureDate}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                {sgiResponsibleEmployee.sgiResponsible.signedDocument && (
+                  <Button variant="outline" size="sm" className="gap-1">
+                    <Download className="h-4 w-4" />
+                    Descargar Acta
+                  </Button>
+                )}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setSgiResponsibleDialog({ open: true, employee: sgiResponsibleEmployee })}
+                  className="gap-1"
+                >
+                  <UserCheck className="h-4 w-4" />
+                  Editar
+                </Button>
+              </div>
+            </div>
+            
+            <div className="mt-4 flex flex-wrap gap-2">
+              {sgiResponsibleEmployee.sgiResponsible.certifications.map((cert, index) => (
+                <Badge key={index} variant="secondary" className="text-xs">
+                  {cert}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -212,7 +300,7 @@ export default function EmployeesPage() {
 
               <div className="mt-4 pt-4 border-t border-border">
                 <Link href={`/dashboard/employees/${employee.id}`}>
-                  <Button variant="outline" size="sm" className="w-full gap-2 bg-transparent">
+                  <Button className="w-full gap-2">
                     <Eye className="h-4 w-4" />
                     Ver Hoja de Vida
                   </Button>
@@ -222,6 +310,15 @@ export default function EmployeesPage() {
           </Card>
         )})}
       </div>
+  {/* Diálogo para asignar responsable del SGI */}
+    {sgiResponsibleDialog.employee && (
+        <SgiResponsibleFormDialog
+          open={sgiResponsibleDialog.open}
+          onOpenChange={(open) => setSgiResponsibleDialog({ ...sgiResponsibleDialog, open })}
+          employee={sgiResponsibleDialog.employee}
+          onSave={handleSaveSgiResponsible}
+        />
+      )}
     </div>
   )
 }

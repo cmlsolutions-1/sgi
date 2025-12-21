@@ -318,6 +318,23 @@ const mockEmployees = [
         companyId: "comp-001",
         userId: "usr-123",
         document: "1025487965",
+        sgiResponsible: {
+            employeeId: "emp-001",
+            responsibleName: "Cristian Camilo Cortés Baquero",
+            responsibleId: "1025487965",
+            company: "Tech Solutions S.A.S",
+            certifications: [
+                "Seguridad Industrial",
+                "Primeros Auxilios"
+            ],
+            signatureDate: "2025-01-15",
+            signedDocument: {
+                name: "acta_responsable_sgi.pdf",
+                url: "https://example.com/acta_responsable_sgi.pdf",
+                size: 1024000,
+                type: "application/pdf"
+            }
+        },
         jobId: "job-001",
         workAreId: "area-001",
         entryDate: "9 de septiembre del 2025",

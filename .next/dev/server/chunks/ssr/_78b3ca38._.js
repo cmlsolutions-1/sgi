@@ -384,21 +384,34 @@ function SelectScrollDownButton({ className, ...props }) {
 "use strict";
 
 // Datos mock para el sistema de gestión de calidad
+//Roles
 __turbopack_context__.s([
     "departmentData",
     ()=>departmentData,
     "departments",
     ()=>departments,
+    "mockCompany",
+    ()=>mockCompany,
     "mockDocuments",
     ()=>mockDocuments,
+    "mockEmployeeTrainings",
+    ()=>mockEmployeeTrainings,
     "mockEmployees",
     ()=>mockEmployees,
     "mockFindings",
     ()=>mockFindings,
     "mockIndicators",
     ()=>mockIndicators,
+    "mockJob",
+    ()=>mockJob,
+    "mockTopicTrainings",
+    ()=>mockTopicTrainings,
+    "mockTrainings",
+    ()=>mockTrainings,
     "mockUsers",
     ()=>mockUsers,
+    "mockWorkArea",
+    ()=>mockWorkArea,
     "monthlyData",
     ()=>monthlyData,
     "roles",
@@ -406,6 +419,84 @@ __turbopack_context__.s([
     "typeContract",
     ()=>typeContract
 ]);
+const mockTopicTrainings = [
+    {
+        id: "topic-001",
+        companyId: "comp-001",
+        name: "Seguridad Industrial",
+        description: "Capacitación básica en seguridad laboral y riesgos",
+        isActive: true,
+        status: true
+    },
+    {
+        id: "topic-002",
+        companyId: "comp-001",
+        name: "Primeros Auxilios",
+        description: "Curso introductorio de atención en emergencias",
+        isActive: true,
+        status: true
+    },
+    {
+        id: "topic-003",
+        companyId: "comp-001",
+        name: "Trabajo en Alturas",
+        description: "Certificación obligatoria para trabajos superiores a 2 metros",
+        isActive: true,
+        status: true
+    }
+];
+const mockTrainings = [
+    {
+        id: "train-001",
+        companyId: "comp-001",
+        topicId: "topic-001",
+        date: "2025-01-12",
+        durationInHours: 4,
+        status: true
+    },
+    {
+        id: "train-002",
+        companyId: "comp-001",
+        topicId: "topic-002",
+        date: "2025-02-05",
+        durationInHours: 3,
+        status: true
+    },
+    {
+        id: "train-003",
+        companyId: "comp-001",
+        topicId: "topic-003",
+        date: "2025-02-20",
+        durationInHours: 8,
+        status: true
+    }
+];
+const mockEmployeeTrainings = [
+    {
+        id: "empTrain-001",
+        topicId: "topic-001",
+        employeeId: "emp-001",
+        isAttended: true,
+        urlCertificate: "https://example.com/certificates/seguridad-emp001.pdf  ",
+        status: true
+    },
+    {
+        id: "empTrain-002",
+        topicId: "topic-002",
+        employeeId: "emp-001",
+        isAttended: false,
+        urlCertificate: null,
+        status: true
+    },
+    {
+        id: "empTrain-003",
+        topicId: "topic-003",
+        employeeId: "emp-002",
+        isAttended: true,
+        urlCertificate: "https://example.com/certificates/alturas-emp002.pdf  ",
+        status: true
+    }
+];
 const mockUsers = [
     {
         id: "1",
@@ -482,211 +573,114 @@ const mockUsers = [
 ];
 const mockEmployees = [
     {
-        id: "1",
-        name: "Carlos Rodríguez",
-        email: "carlos@sgc.com",
-        position: "Director de Calidad",
-        department: "Dirección",
-        typeContract: "Ocasional",
+        id: "emp-001",
+        name: "Cristian Camilo",
+        lastName: "Cortés Baquero",
+        companyId: "comp-001",
+        userId: "usr-123",
+        document: "1025487965",
+        jobId: "job-001",
+        workAreId: "area-001",
+        entryDate: "9 de septiembre del 2025",
+        typeContract: "Término indefinido",
+        status: true,
+        position: "Desarrollador Full Stack",
+        department: "Desarrollo de Software",
         phone: "+57 300 123 4567",
-        hireDate: "2020-03-15",
-        birthDate: "1985-06-20",
-        address: "Calle 45 #12-30, Bogotá",
-        education: "Ingeniería Industrial - Universidad Nacional",
+        hireDate: "2025-09-09",
+        birthDate: "1990-01-01",
+        address: "Calle 123 #45-67",
+        education: "Ingeniería de Sistemas",
         certifications: [
-            "ISO 9001 Lead Auditor",
-            "Six Sigma Black Belt",
-            "PMP"
+            "Certificado React",
+            "Certificado TypeScript"
         ],
         trainings: [
             {
                 id: "t1",
-                name: "Auditoría Interna ISO 9001:2015",
-                date: "2024-03-15",
-                duration: "40 horas",
+                name: "Seguridad Industrial",
+                date: "2025-01-12",
+                duration: "4 horas",
                 status: "completed"
             },
             {
                 id: "t2",
-                name: "Gestión de Riesgos",
-                date: "2024-06-20",
-                duration: "24 horas",
-                status: "completed"
-            },
-            {
-                id: "t3",
-                name: "Liderazgo y Gestión de Equipos",
-                date: "2024-11-10",
-                duration: "16 horas",
-                status: "in-progress"
-            }
-        ],
-        evaluations: [
-            {
-                id: "e1",
-                period: "2024-S1",
-                score: 95,
-                evaluator: "Gerente General",
-                comments: "Excelente desempeño en implementación del SGC"
-            },
-            {
-                id: "e2",
-                period: "2023-S2",
-                score: 92,
-                evaluator: "Gerente General",
-                comments: "Muy buen trabajo en auditorías internas"
-            }
-        ],
-        status: "active"
-    },
-    {
-        id: "2",
-        name: "María García",
-        email: "maria@sgc.com",
-        position: "Auditora de Calidad",
-        department: "Calidad",
-        typeContract: "Ocasional",
-        phone: "+57 301 234 5678",
-        hireDate: "2021-07-01",
-        birthDate: "1990-02-14",
-        address: "Carrera 30 #45-12, Bogotá",
-        education: "Ingeniería Química - Universidad de los Andes",
-        certifications: [
-            "ISO 9001 Internal Auditor",
-            "ISO 14001 Awareness"
-        ],
-        trainings: [
-            {
-                id: "t1",
-                name: "Técnicas de Auditoría",
-                date: "2024-02-10",
-                duration: "32 horas",
-                status: "completed"
-            },
-            {
-                id: "t2",
-                name: "ISO 45001",
-                date: "2024-12-05",
-                duration: "24 horas",
+                name: "Primeros Auxilios",
+                date: "2025-02-05",
+                duration: "3 horas",
                 status: "pending"
             }
         ],
         evaluations: [
             {
                 id: "e1",
-                period: "2024-S1",
-                score: 88,
-                evaluator: "Carlos Rodríguez",
-                comments: "Buen desempeño, mejorar documentación"
+                period: "2025-S1",
+                score: 95,
+                evaluator: "Supervisor",
+                comments: "Excelente desempeño"
             }
         ],
-        status: "active"
+        socialSecurity: [
+            {
+                id: "ss-001",
+                employeeId: "emp-001",
+                type: "EPS",
+                entityName: "Salud Total",
+                startDate: "2025-01-01",
+                status: true
+            },
+            {
+                id: "ss-002",
+                employeeId: "emp-001",
+                type: "PENSION",
+                entityName: "Porvenir",
+                startDate: "2025-01-01",
+                status: true
+            }
+        ]
     },
     {
-        id: "3",
-        name: "Juan Pérez",
-        email: "juan@sgc.com",
-        position: "Supervisor de Producción",
-        department: "Producción",
-        typeContract: "Ocasional",
-        phone: "+57 302 345 6789",
-        hireDate: "2019-11-20",
-        birthDate: "1988-09-05",
-        address: "Avenida 68 #23-45, Bogotá",
-        education: "Tecnología en Producción Industrial - SENA",
+        id: "emp-002",
+        name: "Jesus Camilo",
+        lastName: "Berra Baque",
+        companyId: "comp-001",
+        userId: "usr-124",
+        document: "1025487966",
+        jobId: "job-001",
+        workAreId: "area-001",
+        entryDate: "9 de septiembre del 2025",
+        typeContract: "Término indefinido",
+        status: true,
+        position: "Desarrollador Full Stack",
+        department: "Desarrollo de Software",
+        phone: "+57 300 123 4568",
+        hireDate: "2025-09-09",
+        birthDate: "1991-01-01",
+        address: "Calle 124 #45-68",
+        education: "Ingeniería de Sistemas",
         certifications: [
-            "Lean Manufacturing",
-            "Control de Calidad"
-        ],
-        trainings: [
-            {
-                id: "t1",
-                name: "Control Estadístico de Procesos",
-                date: "2024-04-15",
-                duration: "20 horas",
-                status: "completed"
-            }
-        ],
-        evaluations: [
-            {
-                id: "e1",
-                period: "2024-S1",
-                score: 85,
-                evaluator: "Director de Operaciones",
-                comments: "Cumple con objetivos de producción"
-            }
-        ],
-        status: "active"
-    },
-    {
-        id: "4",
-        name: "Ana Martínez",
-        email: "ana@sgc.com",
-        position: "Analista de RRHH",
-        department: "Recursos Humanos",
-        typeContract: "Ocasional",
-        phone: "+57 303 456 7890",
-        hireDate: "2022-01-10",
-        birthDate: "1992-12-01",
-        address: "Calle 100 #15-20, Bogotá",
-        education: "Psicología Organizacional - Universidad Javeriana",
-        certifications: [
-            "Gestión del Talento Humano"
-        ],
-        trainings: [
-            {
-                id: "t1",
-                name: "Bienestar Laboral",
-                date: "2024-05-20",
-                duration: "16 horas",
-                status: "completed"
-            }
-        ],
-        evaluations: [
-            {
-                id: "e1",
-                period: "2024-S1",
-                score: 90,
-                evaluator: "Directora de RRHH",
-                comments: "Excelente gestión de procesos de selección"
-            }
-        ],
-        status: "active"
-    },
-    {
-        id: "5",
-        name: "Luis Hernández",
-        email: "luis@sgc.com",
-        position: "Operario de Producción",
-        department: "Producción",
-        phone: "+57 304 567 8901",
-        typeContract: "Ocasional",
-        hireDate: "2023-03-05",
-        birthDate: "1995-07-18",
-        address: "Carrera 50 #30-15, Bogotá",
-        education: "Bachiller Técnico Industrial",
-        certifications: [
-            "Operación de Maquinaria"
+            "Certificado Angular",
+            "Certificado Node.js"
         ],
         trainings: [
             {
                 id: "t1",
                 name: "Seguridad Industrial",
-                date: "2024-01-10",
-                duration: "8 horas",
+                date: "2025-01-12",
+                duration: "4 horas",
                 status: "completed"
             }
         ],
         evaluations: [
             {
                 id: "e1",
-                period: "2024-S1",
-                score: 78,
-                evaluator: "Juan Pérez",
-                comments: "Necesita mejorar puntualidad"
+                period: "2025-S1",
+                score: 90,
+                evaluator: "Supervisor",
+                comments: "Buen desempeño"
             }
         ],
-        status: "inactive"
+        socialSecurity: []
     }
 ];
 const mockDocuments = [
@@ -885,6 +879,31 @@ const mockIndicators = [
         period: "2024-Q4"
     }
 ];
+const mockCompany = {
+    id: "comp-001",
+    name: "Tech Solutions S.A.S",
+    nit: "900123456-7",
+    address: "Cra 12 # 45-67, Bogotá",
+    phone: "3205558899",
+    email: "contacto@techsolutions.com",
+    registrationDate: "2024-11-05",
+    status: true
+};
+const mockWorkArea = {
+    id: "area-001",
+    companyId: "comp-001",
+    name: "Desarrollo de Software",
+    description: "Área encargada del análisis, diseño y desarrollo de soluciones tecnológicas",
+    status: true
+};
+const mockJob = {
+    id: "job-001",
+    companyId: "comp-001",
+    name: "Desarrollador Full Stack",
+    description: "Encargado del desarrollo frontend y backend",
+    workAreId: "area-001",
+    status: true
+};
 const monthlyData = [
     {
         month: "Ene",
@@ -1054,6 +1073,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/users.js [app-ssr] (ecmascript) <export default as Users>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$award$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Award$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/award.js [app-ssr] (ecmascript) <export default as Award>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$graduation$2d$cap$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__GraduationCap$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/graduation-cap.js [app-ssr] (ecmascript) <export default as GraduationCap>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2d$check$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__UserCheck$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/user-check.js [app-ssr] (ecmascript) <export default as UserCheck>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/utils.ts [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-ssr] (ecmascript)");
 "use client";
@@ -1073,18 +1093,49 @@ function EmployeesPage() {
     const [search, setSearch] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
     const [departmentFilter, setDepartmentFilter] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("all");
     const [statusFilter, setStatusFilter] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("all");
-    const filteredEmployees = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["mockEmployees"].filter((emp)=>{
-        const matchesSearch = emp.name.toLowerCase().includes(search.toLowerCase()) || emp.position.toLowerCase().includes(search.toLowerCase());
-        const matchesDept = departmentFilter === "all" || emp.department === departmentFilter;
-        const matchesStatus = statusFilter === "all" || emp.status === statusFilter;
+    const [employees] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["mockEmployees"]);
+    // Estado para el diálogo del responsable del SGI
+    const [sgiResponsibleDialog, setSgiResponsibleDialog] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])({
+        open: false,
+        employee: null
+    });
+    const filteredEmployees = employees.filter((emp)=>{
+        const matchesSearch = emp.name.toLowerCase().includes(search.toLowerCase()) || emp.position && emp.position.toLowerCase().includes(search.toLowerCase());
+        const matchesDept = departmentFilter === "all" || emp.department && emp.department === departmentFilter;
+        // Convertir el estado booleano a string para la comparación
+        const empStatusString = typeof emp.status === 'boolean' ? emp.status ? 'active' : 'inactive' : emp.status;
+        const statusFilterString = statusFilter === 'all' ? 'all' : statusFilter;
+        const matchesStatus = statusFilterString === "all" || empStatusString === statusFilterString;
         return matchesSearch && matchesDept && matchesStatus;
     });
-    // Stats
+    const handleSaveUser = (employeeData)=>{
+        // Implementa la lógica de guardado si es necesario
+        console.log("Guardar empleado:", employeeData);
+    };
+    // Función para guardar el responsable del SGI
+    const handleSaveSgiResponsible = (data)=>{
+        // Aquí puedes implementar la lógica para guardar el responsable
+        // Por ejemplo, actualizar el estado global o enviar a la API
+        console.log("Responsable del SGI guardado:", data);
+        // Cerrar el diálogo
+        setSgiResponsibleDialog({
+            open: false,
+            employee: null
+        });
+    };
+    // Stats - adaptado para manejar el nuevo tipo de status
     const stats = {
-        total: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["mockEmployees"].length,
-        active: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["mockEmployees"].filter((e)=>e.status === "active").length,
-        certifications: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["mockEmployees"].reduce((acc, e)=>acc + e.certifications.length, 0),
-        trainings: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["mockEmployees"].reduce((acc, e)=>acc + e.trainings.filter((t)=>t.status === "completed").length, 0)
+        total: employees.length,
+        active: employees.filter((e)=>{
+            return typeof e.status === 'boolean' ? e.status : e.status === 'active';
+        }).length,
+        certifications: employees.reduce((acc, e)=>{
+            return acc + (e.certifications ? e.certifications.length : 0);
+        }, 0),
+        trainings: employees.reduce((acc, e)=>{
+            if (!e.trainings) return acc;
+            return acc + e.trainings.filter((t)=>t.status === "completed").length;
+        }, 0)
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "space-y-6",
@@ -1099,7 +1150,7 @@ function EmployeesPage() {
                                 children: "Hoja de Vida de Funcionarios"
                             }, void 0, false, {
                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                lineNumber: 40,
+                                lineNumber: 78,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1107,26 +1158,48 @@ function EmployeesPage() {
                                 children: "Gestión del talento humano"
                             }, void 0, false, {
                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                lineNumber: 41,
+                                lineNumber: 79,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                        lineNumber: 39,
+                        lineNumber: 77,
                         columnNumber: 9
                     }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(Emplo, {
-                        onSave: handleSaveUser
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex gap-2",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                            variant: "outline",
+                            onClick: ()=>setSgiResponsibleDialog({
+                                    open: true,
+                                    employee: employees[0]
+                                }),
+                            className: "gap-2",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2d$check$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__UserCheck$3e$__["UserCheck"], {
+                                    className: "h-4 w-4"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/dashboard/employees/page.tsx",
+                                    lineNumber: 88,
+                                    columnNumber: 13
+                                }, this),
+                                "Asignar Responsable SGI"
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/dashboard/employees/page.tsx",
+                            lineNumber: 83,
+                            columnNumber: 11
+                        }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                        lineNumber: 43,
+                        lineNumber: 82,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                lineNumber: 38,
+                lineNumber: 76,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1146,7 +1219,7 @@ function EmployeesPage() {
                                                 children: "Total Funcionarios"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                lineNumber: 52,
+                                                lineNumber: 100,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1154,36 +1227,36 @@ function EmployeesPage() {
                                                 children: stats.total
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                lineNumber: 53,
+                                                lineNumber: 101,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                        lineNumber: 51,
+                                        lineNumber: 99,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__["Users"], {
                                         className: "h-8 w-8 text-primary"
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                        lineNumber: 55,
+                                        lineNumber: 103,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                lineNumber: 50,
+                                lineNumber: 98,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/dashboard/employees/page.tsx",
-                            lineNumber: 49,
+                            lineNumber: 97,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                        lineNumber: 48,
+                        lineNumber: 96,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -1200,7 +1273,7 @@ function EmployeesPage() {
                                                 children: "Activos"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                lineNumber: 63,
+                                                lineNumber: 111,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1208,36 +1281,36 @@ function EmployeesPage() {
                                                 children: stats.active
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                lineNumber: 64,
+                                                lineNumber: 112,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                        lineNumber: 62,
+                                        lineNumber: 110,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__["Users"], {
                                         className: "h-8 w-8 text-accent"
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                        lineNumber: 66,
+                                        lineNumber: 114,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                lineNumber: 61,
+                                lineNumber: 109,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/dashboard/employees/page.tsx",
-                            lineNumber: 60,
+                            lineNumber: 108,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                        lineNumber: 59,
+                        lineNumber: 107,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -1254,7 +1327,7 @@ function EmployeesPage() {
                                                 children: "Certificaciones"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                lineNumber: 74,
+                                                lineNumber: 122,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1262,36 +1335,36 @@ function EmployeesPage() {
                                                 children: stats.certifications
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                lineNumber: 75,
+                                                lineNumber: 123,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                        lineNumber: 73,
+                                        lineNumber: 121,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$award$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Award$3e$__["Award"], {
                                         className: "h-8 w-8 text-primary"
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                        lineNumber: 77,
+                                        lineNumber: 125,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                lineNumber: 72,
+                                lineNumber: 120,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/dashboard/employees/page.tsx",
-                            lineNumber: 71,
+                            lineNumber: 119,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                        lineNumber: 70,
+                        lineNumber: 118,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -1308,7 +1381,7 @@ function EmployeesPage() {
                                                 children: "Capacitaciones"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                lineNumber: 85,
+                                                lineNumber: 133,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1316,42 +1389,42 @@ function EmployeesPage() {
                                                 children: stats.trainings
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                lineNumber: 86,
+                                                lineNumber: 134,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                        lineNumber: 84,
+                                        lineNumber: 132,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$graduation$2d$cap$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__GraduationCap$3e$__["GraduationCap"], {
                                         className: "h-8 w-8 text-warning"
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                        lineNumber: 88,
+                                        lineNumber: 136,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                lineNumber: 83,
+                                lineNumber: 131,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/dashboard/employees/page.tsx",
-                            lineNumber: 82,
+                            lineNumber: 130,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                        lineNumber: 81,
+                        lineNumber: 129,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                lineNumber: 47,
+                lineNumber: 95,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -1368,7 +1441,7 @@ function EmployeesPage() {
                                         className: "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                        lineNumber: 99,
+                                        lineNumber: 147,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -1378,13 +1451,13 @@ function EmployeesPage() {
                                         className: "pl-10 bg-secondary border-0"
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                        lineNumber: 100,
+                                        lineNumber: 148,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                lineNumber: 98,
+                                lineNumber: 146,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1401,20 +1474,20 @@ function EmployeesPage() {
                                                         className: "h-4 w-4 mr-2"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                        lineNumber: 110,
+                                                        lineNumber: 158,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectValue"], {
                                                         placeholder: "Departamento"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                        lineNumber: 111,
+                                                        lineNumber: 159,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                lineNumber: 109,
+                                                lineNumber: 157,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -1424,7 +1497,7 @@ function EmployeesPage() {
                                                         children: "Todos"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                        lineNumber: 114,
+                                                        lineNumber: 162,
                                                         columnNumber: 19
                                                     }, this),
                                                     __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["departments"].map((dept)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -1432,19 +1505,19 @@ function EmployeesPage() {
                                                             children: dept
                                                         }, dept, false, {
                                                             fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                            lineNumber: 116,
+                                                            lineNumber: 164,
                                                             columnNumber: 21
                                                         }, this))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                lineNumber: 113,
+                                                lineNumber: 161,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                        lineNumber: 108,
+                                        lineNumber: 156,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Select"], {
@@ -1457,12 +1530,12 @@ function EmployeesPage() {
                                                     placeholder: "Estado"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                    lineNumber: 124,
+                                                    lineNumber: 172,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                lineNumber: 123,
+                                                lineNumber: 171,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -1472,7 +1545,7 @@ function EmployeesPage() {
                                                         children: "Todos"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                        lineNumber: 127,
+                                                        lineNumber: 175,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -1480,7 +1553,7 @@ function EmployeesPage() {
                                                         children: "Activo"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                        lineNumber: 128,
+                                                        lineNumber: 176,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -1488,46 +1561,49 @@ function EmployeesPage() {
                                                         children: "Inactivo"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                        lineNumber: 129,
+                                                        lineNumber: 177,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                lineNumber: 126,
+                                                lineNumber: 174,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                        lineNumber: 122,
+                                        lineNumber: 170,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                lineNumber: 107,
+                                lineNumber: 155,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                        lineNumber: 97,
+                        lineNumber: 145,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/dashboard/employees/page.tsx",
-                    lineNumber: 96,
+                    lineNumber: 144,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                lineNumber: 95,
+                lineNumber: 143,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4",
-                children: filteredEmployees.map((employee)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
+                children: filteredEmployees.map((employee)=>{
+                    // Convertir el estado booleano a string para mostrar
+                    const displayStatus = typeof employee.status === 'boolean' ? employee.status ? 'active' : 'inactive' : employee.status;
+                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
                         className: "bg-card border-border hover:border-primary/50 transition-colors",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
                             className: "p-4",
@@ -1542,12 +1618,12 @@ function EmployeesPage() {
                                                 children: employee.name.split(" ").map((n)=>n[0]).join("")
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                lineNumber: 144,
+                                                lineNumber: 197,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/employees/page.tsx",
-                                            lineNumber: 143,
+                                            lineNumber: 196,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1559,10 +1635,14 @@ function EmployeesPage() {
                                                         children: [
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
                                                                 className: "font-medium",
-                                                                children: employee.name
-                                                            }, void 0, false, {
+                                                                children: [
+                                                                    employee.name,
+                                                                    " ",
+                                                                    employee.lastName
+                                                                ]
+                                                            }, void 0, true, {
                                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                                lineNumber: 154,
+                                                                lineNumber: 207,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1570,39 +1650,39 @@ function EmployeesPage() {
                                                                 children: employee.position
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                                lineNumber: 155,
+                                                                lineNumber: 208,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                        lineNumber: 153,
+                                                        lineNumber: 206,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
                                                         variant: "secondary",
-                                                        className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["cn"])("text-xs", employee.status === "active" ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground"),
-                                                        children: employee.status === "active" ? "Activo" : "Inactivo"
+                                                        className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["cn"])("text-xs", displayStatus === "active" ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground"),
+                                                        children: displayStatus === "active" ? "Activo" : "Inactivo"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                        lineNumber: 157,
+                                                        lineNumber: 210,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                lineNumber: 152,
+                                                lineNumber: 205,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/employees/page.tsx",
-                                            lineNumber: 151,
+                                            lineNumber: 204,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/employees/page.tsx",
-                                    lineNumber: 142,
+                                    lineNumber: 195,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1616,20 +1696,20 @@ function EmployeesPage() {
                                                     children: "Departamento"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                    lineNumber: 172,
+                                                    lineNumber: 225,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    children: employee.department
+                                                    children: employee.department || "N/A"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                    lineNumber: 173,
+                                                    lineNumber: 226,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/employees/page.tsx",
-                                            lineNumber: 171,
+                                            lineNumber: 224,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1640,20 +1720,20 @@ function EmployeesPage() {
                                                     children: "Ingreso"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                    lineNumber: 176,
+                                                    lineNumber: 229,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    children: employee.hireDate
+                                                    children: employee.hireDate || employee.entryDate || "N/A"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                    lineNumber: 177,
+                                                    lineNumber: 230,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/employees/page.tsx",
-                                            lineNumber: 175,
+                                            lineNumber: 228,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1664,28 +1744,28 @@ function EmployeesPage() {
                                                     children: "Certificaciones"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                    lineNumber: 180,
+                                                    lineNumber: 233,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
                                                     variant: "outline",
                                                     className: "text-xs",
-                                                    children: employee.certifications.length
+                                                    children: employee.certifications ? employee.certifications.length : 0
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                    lineNumber: 181,
+                                                    lineNumber: 234,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/employees/page.tsx",
-                                            lineNumber: 179,
+                                            lineNumber: 232,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/employees/page.tsx",
-                                    lineNumber: 170,
+                                    lineNumber: 223,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1693,54 +1773,53 @@ function EmployeesPage() {
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                                         href: `/dashboard/employees/${employee.id}`,
                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
-                                            variant: "outline",
-                                            size: "sm",
-                                            className: "w-full gap-2 bg-transparent",
+                                            className: "w-full gap-2",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$eye$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Eye$3e$__["Eye"], {
                                                     className: "h-4 w-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/employees/page.tsx",
-                                                    lineNumber: 190,
+                                                    lineNumber: 243,
                                                     columnNumber: 21
                                                 }, this),
                                                 "Ver Hoja de Vida"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/employees/page.tsx",
-                                            lineNumber: 189,
+                                            lineNumber: 242,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                                        lineNumber: 188,
+                                        lineNumber: 241,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/dashboard/employees/page.tsx",
-                                    lineNumber: 187,
+                                    lineNumber: 240,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/dashboard/employees/page.tsx",
-                            lineNumber: 141,
+                            lineNumber: 194,
                             columnNumber: 13
                         }, this)
                     }, employee.id, false, {
                         fileName: "[project]/app/dashboard/employees/page.tsx",
-                        lineNumber: 140,
+                        lineNumber: 193,
                         columnNumber: 11
-                    }, this))
+                    }, this);
+                })
             }, void 0, false, {
                 fileName: "[project]/app/dashboard/employees/page.tsx",
-                lineNumber: 138,
+                lineNumber: 186,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/dashboard/employees/page.tsx",
-        lineNumber: 37,
+        lineNumber: 75,
         columnNumber: 5
     }, this);
 }
