@@ -424,6 +424,18 @@ const mockEmployees = [
 const mockDocuments = [
     {
         id: "1",
+        name: "Acta asignacion SGSST",
+        type: "procedure",
+        version: "3.0",
+        status: "approved",
+        createdAt: "2024-01-10",
+        updatedAt: "2024-06-15",
+        author: "Carlos Rodríguez",
+        department: "Calidad",
+        size: "2.5 MB"
+    },
+    {
+        id: "2",
         name: "Manual de Calidad",
         type: "manual",
         version: "3.0",
@@ -435,7 +447,7 @@ const mockDocuments = [
         size: "2.5 MB"
     },
     {
-        id: "2",
+        id: "3",
         name: "Procedimiento de Auditorías Internas",
         type: "procedure",
         version: "2.1",
@@ -447,7 +459,7 @@ const mockDocuments = [
         size: "1.2 MB"
     },
     {
-        id: "3",
+        id: "4",
         name: "Política de Calidad",
         type: "policy",
         version: "1.5",
@@ -459,7 +471,7 @@ const mockDocuments = [
         size: "500 KB"
     },
     {
-        id: "4",
+        id: "5",
         name: "Instrucción de Control de Documentos",
         type: "instruction",
         version: "2.0",
@@ -471,7 +483,7 @@ const mockDocuments = [
         size: "800 KB"
     },
     {
-        id: "5",
+        id: "6",
         name: "Registro de No Conformidades",
         type: "record",
         version: "1.0",
@@ -483,7 +495,7 @@ const mockDocuments = [
         size: "350 KB"
     },
     {
-        id: "6",
+        id: "7",
         name: "Procedimiento de Acciones Correctivas",
         type: "procedure",
         version: "1.8",
@@ -495,7 +507,7 @@ const mockDocuments = [
         size: "1.5 MB"
     },
     {
-        id: "7",
+        id: "8",
         name: "Manual de Operaciones",
         type: "manual",
         version: "4.2",
@@ -507,7 +519,7 @@ const mockDocuments = [
         size: "5.2 MB"
     },
     {
-        id: "8",
+        id: "9",
         name: "Política de Seguridad y Salud",
         type: "policy",
         version: "2.0",

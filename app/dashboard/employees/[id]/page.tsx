@@ -178,6 +178,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           <TabsTrigger value="trainings">Capacitaciones</TabsTrigger>
           <TabsTrigger value="evaluations">Evaluaciones</TabsTrigger>
           <TabsTrigger value="socialSecurity">Seguridad Social</TabsTrigger>
+          <TabsTrigger value="socialSecurity">Evaluaciones médico-ocupacionales</TabsTrigger>
         </TabsList>
 
         <TabsContent value="info">
