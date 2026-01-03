@@ -65,6 +65,19 @@ export interface Evaluation {
   comments: string;
 }
 
+//evaluaciones medicas
+export interface MedicalEvaluation {
+  id: string;
+  type: 'preoccupational' | 'periodic' | 'postoccupational' | 'other';
+  date: string;
+  result: 'apt' | 'not_apt' | 'conditionally_apt';
+  observations: string;
+  phase?: string; // Para otros tipos de exámenes
+  nextEvaluationDate?: string;
+  medicalProfessional?: string;
+  entity?: string;
+}
+
 //Documentos
 export interface Document {
   id: string;
@@ -202,6 +215,7 @@ export interface Employee extends BaseEntity {
   entryDate: string;
   socialSecurity?: SocialSecurityContribution[];
   sgiResponsible?: SgiResponsible;
+  medicalEvaluations?: MedicalEvaluation[];
 }
 
 //Datos quemados Tema de capacitacion
@@ -444,6 +458,27 @@ export const mockEmployees: Employee[] = [
         status: true,
       },
     ],
+    medicalEvaluations: [
+      {
+        id: "med1",
+        type: "preoccupational",
+        date: "2024-01-15",
+        result: "apt",
+        observations: "Apto para el cargo, sin restricciones médicas",
+        medicalProfessional: "Dr. Ana Martínez",
+        entity: "Clínica Salud Total"
+      },
+      {
+        id: "med2",
+        type: "periodic",
+        date: "2024-06-20",
+        result: "conditionally_apt",
+        observations: "Apto con recomendaciones de uso de equipo de protección personal",
+        nextEvaluationDate: "2025-06-20",
+        medicalProfessional: "Dr. Carlos Rodríguez",
+        entity: "Centro Médico Ocupacional"
+      }
+    ]
   },
   {
     id: "emp-002",

@@ -28,6 +28,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SocialSecurityFormDialog } from "@/components/dashboard/SocialSecurityFormDialog"
+import { MedicalEvaluationTab } from "@/components/employee/MedicalEvaluationTab"
 
 type TrainingStatus = "completed" | "in-progress" | "pending";
 
@@ -53,8 +54,13 @@ const SOCIAL_SECURITY_TYPES = [
 
 export default function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
-  const employee = mockEmployees.find((e) => e.id === id)
-  const user = mockUsers.find((u) => u.id === employee?.userId) // Corregido: buscar por userId
+  const [employee, setEmployee] = useState(() => {
+    const emp = mockEmployees.find((e) => e.id === id)
+    if (!emp) notFound()
+    return emp
+  })
+  
+  const user = mockUsers.find((u) => u.id === employee?.userId)
 
   if (!employee) {
     notFound()
@@ -88,6 +94,16 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const handleSaveContribution = (contribution: SocialSecurityContribution) => {
     setSocialSecurityContributions(prev => [...prev, contribution]);
   };
+
+  // Función para agregar evaluación médico-ocupacional
+  const handleAddMedicalEvaluation = (evaluation: any) => {
+    setEmployee(prev => ({
+      ...prev,
+      medicalEvaluations: [...(prev.medicalEvaluations || []), evaluation]
+    }));
+  };
+
+  
 
   return (
     <div className="space-y-6">
@@ -144,6 +160,12 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                     <p className="text-2xl font-bold text-warning">{avgScore.toFixed(0)}%</p>
                     <p className="text-xs text-muted-foreground">Promedio Eval.</p>
                   </div>
+                  {employee.medicalEvaluations && employee.medicalEvaluations.length > 0 && (
+                    <div className="text-center p-3 rounded-lg bg-secondary">
+                      <p className="text-2xl font-bold text-primary">{employee.medicalEvaluations.length}</p>
+                      <p className="text-xs text-muted-foreground">Evaluaciones Médicas</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -178,7 +200,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           <TabsTrigger value="trainings">Capacitaciones</TabsTrigger>
           <TabsTrigger value="evaluations">Evaluaciones</TabsTrigger>
           <TabsTrigger value="socialSecurity">Seguridad Social</TabsTrigger>
-          <TabsTrigger value="socialSecurity">Evaluaciones médico-ocupacionales</TabsTrigger>
+          <TabsTrigger value="medical">Evaluaciones médico-ocupacionales</TabsTrigger>
         </TabsList>
 
         <TabsContent value="info">
@@ -313,6 +335,13 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           </Card>
         </TabsContent>
 
+        <TabsContent value="medical">
+          <MedicalEvaluationTab 
+            employee={employee} 
+            onAddEvaluation={handleAddMedicalEvaluation}
+          />
+        </TabsContent>
+
         <TabsContent value="socialSecurity">
           <Card className="bg-card border-border">
             <CardHeader>
@@ -382,6 +411,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               )}
             </CardContent>
           </Card>
+          
         </TabsContent>
       </Tabs>
 
@@ -393,6 +423,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         onSave={handleSaveContribution}
         employeeId={employee.id}
       />
+
     </div>
   )
 }
