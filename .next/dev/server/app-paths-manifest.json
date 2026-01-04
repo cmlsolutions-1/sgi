@@ -2,5 +2,7 @@
   "/dashboard/employees/[id]/page": "app/dashboard/employees/[id]/page.js",
   "/dashboard/employees/page": "app/dashboard/employees/page.js",
   "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/trainingPlan/[id]/page": "app/dashboard/trainingPlan/[id]/page.js",
+  "/dashboard/trainingPlan/page": "app/dashboard/trainingPlan/page.js",
   "/page": "app/page.js"
 }

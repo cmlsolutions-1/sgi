@@ -15,3 +15,5 @@ out/
 # Otros archivos temporales
 .DS_Store
 Thumbs.db
+
+.next
