@@ -1,175 +1,358 @@
 "use client"
 
-import { useState } from "react"
-import { useParams } from "next/navigation"
+import { useEffect, useRef, useState } from "react"
+import { useRouter, useParams } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { Badge } from "@/components/ui/badge"
 import {
-  FileText,
+  Trash2,
   Upload,
   Download,
-  Printer,
-  CalendarCheck,
-  User,
+  ArrowLeft,
+  Pencil,
 } from "lucide-react"
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
 
-/* =========================
-   MODELO DE CAPACITACIÓN
-========================= */
-type TrainingDetail = {
+/* =====================
+   TIPO
+===================== */
+interface Training {
   id: string
   title: string
   date: string
+  time: string
   responsible: string
   description: string
-  fileUrl?: string
+  status: "scheduled" | "completed"
+  actaFile?: string
 }
 
-/* =========================
-   MOCK DE DATOS
-========================= */
-const mockTraining: TrainingDetail = {
-  id: "1",
-  title: "Inducción en Seguridad y Salud en el Trabajo",
-  date: "2024-02-15",
-  responsible: "Juan Pérez",
-  description:
-    "Capacitación dirigida a todos los trabajadores sobre los conceptos básicos del SG-SST, deberes y derechos, políticas de seguridad y normas internas.",
-}
-
-/* =========================
-   COMPONENTE
-========================= */
 export default function TrainingDetailPage() {
   const { id } = useParams()
-  const [training, setTraining] = useState<TrainingDetail>(mockTraining)
+  const router = useRouter()
+  const uploadRef = useRef<HTMLInputElement>(null)
+
+  const [training, setTraining] = useState<Training | null>(null)
   const [file, setFile] = useState<File | null>(null)
-  const [preview, setPreview] = useState<string | null>(null)
+  const [canEdit, setCanEdit] = useState(false)
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0]
-    if (!selectedFile) return
+  /* =====================
+     CARGA INICIAL
+  ===================== */
+  useEffect(() => {
+    const stored = localStorage.getItem("trainings")
+    if (!stored) return
+    const list: Training[] = JSON.parse(stored)
+    const found = list.find(t => t.id === id)
+    if (found) setTraining(found)
+  }, [id])
 
-    setFile(selectedFile)
-    setPreview(URL.createObjectURL(selectedFile))
+  if (!training) return null
+
+  const now = new Date()
+  const trainingDate = new Date(`${training.date}T${training.time}`)
+  const tenDaysAfter = new Date(trainingDate)
+  tenDaysAfter.setDate(tenDaysAfter.getDate() + 10)
+
+  const canDelete =
+    training.status === "scheduled" &&
+    now < trainingDate
+
+  /* =====================
+     ACTUALIZAR CAMPOS
+  ===================== */
+  const updateField = (field: keyof Training, value: string) => {
+    const updated = { ...training, [field]: value }
+    setTraining(updated)
+
+    const stored = JSON.parse(localStorage.getItem("trainings") || "[]")
+    const updatedList = stored.map((t: Training) =>
+      t.id === updated.id ? updated : t
+    )
+    localStorage.setItem("trainings", JSON.stringify(updatedList))
   }
 
-  const handlePrint = () => {
-    if (!preview) return
-    const win = window.open(preview, "_blank")
-    win?.print()
+  const handleSaveEdit = () => {
+    setCanEdit(false)
+  }
+
+  const handleCancelEdit = () => {
+    const stored = localStorage.getItem("trainings")
+    if (!stored) return
+    const list: Training[] = JSON.parse(stored)
+    const original = list.find(t => t.id === training.id)
+    if (original) setTraining(original)
+    setCanEdit(false)
+  }
+
+  /* =====================
+     ELIMINAR
+  ===================== */
+  const handleDelete = () => {
+    const stored = JSON.parse(localStorage.getItem("trainings") || "[]")
+    const updated = stored.filter((t: Training) => t.id !== training.id)
+    localStorage.setItem("trainings", JSON.stringify(updated))
+    router.push("/dashboard/trainingPlan")
+  }
+
+  /* =====================
+     SUBIR ACTA FIRMADA
+  ===================== */
+  const handleUpload = () => {
+    if (!file) return
+
+    const stored = JSON.parse(localStorage.getItem("trainings") || "[]")
+    const updated = stored.map((t: Training) =>
+      t.id === training.id
+        ? { ...t, status: "completed", actaFile: file.name }
+        : t
+    )
+
+    localStorage.setItem("trainings", JSON.stringify(updated))
+    setTraining({ ...training, status: "completed", actaFile: file.name })
+    setCanEdit(false)
+  }
+
+  /* =====================
+     GENERAR ACTA SG-SST
+  ===================== */
+  const handleDownloadActa = () => {
+    const doc = new jsPDF("p", "mm", "a4")
+
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(14)
+    doc.text("ACTA DE CAPACITACIÓN SG-SST", 105, 15, { align: "center" })
+
+    let y = 30
+    doc.setFontSize(10)
+
+    const row = (label: string, value: string) => {
+      doc.setFont("helvetica", "bold")
+      doc.text(label, 14, y)
+      doc.setFont("helvetica", "normal")
+      doc.text(value, 45, y)
+      y += 6
+    }
+
+    row("Tema:", training.title)
+    row("Fecha:", training.date)
+    row("Hora inicio:", "________________")
+    row("Hora fin:", "________________")
+    row("Responsable:", training.responsible)
+
+    doc.setFont("helvetica", "bold")
+    doc.text("Descripción de la capacitación:", 14, y)
+    y += 5
+    doc.setFont("helvetica", "normal")
+    doc.text(training.description, 14, y, { maxWidth: 180 })
+
+    autoTable(doc, {
+      startY: y + 12,
+      theme: "grid",
+      head: [[
+        "No.",
+        "NOMBRE COMPLETO",
+        "DOCUMENTO",
+        "CARGO",
+        "TELÉFONO",
+        "FIRMA",
+      ]],
+      body: Array.from({ length: 20 }).map((_, i) => [
+        i + 1, "", "", "", "", ""
+      ]),
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+    })
+
+    const finalY = (doc as any).lastAutoTable.finalY + 10
+    doc.text("Firma del Responsable de la Capacitación:", 14, finalY)
+    doc.rect(14, finalY + 3, 80, 10)
+
+    doc.setFontSize(8)
+    doc.text(
+      "Este documento hace parte del Sistema de Gestión de la Seguridad y Salud en el Trabajo (SG-SST).",
+      105,
+      290,
+      { align: "center" }
+    )
+
+    doc.save(`Acta_Capacitacion_${training.date}.pdf`)
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <CalendarCheck className="h-6 w-6 text-green-600" />
-          Detalle de Capacitación Realizada
-        </h1>
-        <p className="text-muted-foreground">
-          Evidencia de capacitación – SG-SST
-        </p>
-      </div>
 
-      {/* Información general */}
+      {/* VOLVER */}
+      <Button
+        variant="ghost"
+        className="gap-2"
+        onClick={() => router.push("/dashboard/trainingPlan")}
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Volver al Plan de Capacitación
+      </Button>
+
+      {/* DETALLE */}
       <Card>
         <CardContent className="p-6 space-y-4">
-          <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-primary" />
-            <h2 className="font-semibold text-lg">{training.title}</h2>
-            <Badge className="bg-green-100 text-green-700 ml-2">
-              Realizada
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold">
+              Detalle de la Capacitación
+            </h1>
+
+            <Badge
+              className={
+                training.status === "completed"
+                  ? "bg-green-600"
+                  : "bg-red-600"
+              }
+            >
+              {training.status === "completed"
+                ? "Realizada"
+                : "No realizada"}
             </Badge>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center gap-2 text-sm">
-              <CalendarCheck className="h-4 w-4 text-muted-foreground" />
-              Fecha: {training.date}
+          {training.status === "scheduled" && !canEdit && (
+            <Button
+              variant="outline"
+              className="gap-2 w-fit"
+              onClick={() => setCanEdit(true)}
+            >
+              <Pencil className="h-4 w-4" />
+              Modificar
+            </Button>
+          )}
+
+          {canEdit && (
+            <div className="flex gap-2">
+              <Button
+                className="bg-green-600 hover:bg-green-700"
+                onClick={handleSaveEdit}
+              >
+                Guardar cambios
+              </Button>
+
+              <Button variant="outline" onClick={handleCancelEdit}>
+                Cancelar
+              </Button>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <User className="h-4 w-4 text-muted-foreground" />
-              Responsable: {training.responsible}
-            </div>
+          )}
+
+          <div>
+            <label className="font-semibold">Tema</label>
+            <Input
+              disabled={!canEdit}
+              value={training.title}
+              onChange={(e) => updateField("title", e.target.value)}
+            />
           </div>
 
           <div>
-            <label className="text-sm font-medium">Descripción</label>
+            <label className="font-semibold">Fecha</label>
+            <Input
+              disabled={!canEdit}
+              type="date"
+              value={training.date}
+              onChange={(e) => updateField("date", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="font-semibold">Hora de inicio</label>
+            <Input
+              disabled={!canEdit}
+              type="time"
+              value={training.time}
+              onChange={(e) => updateField("time", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="font-semibold">Responsable</label>
+            <Input
+              disabled={!canEdit}
+              value={training.responsible}
+              onChange={(e) =>
+                updateField("responsible", e.target.value)
+              }
+            />
+          </div>
+
+          <div>
+            <label className="font-semibold">Descripción</label>
             <Textarea
+              disabled={!canEdit}
               value={training.description}
-              readOnly
-              className="mt-1"
+              onChange={(e) =>
+                updateField("description", e.target.value)
+              }
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Evidencia */}
+      {/* ACTA */}
       <Card>
         <CardContent className="p-6 space-y-4">
-          <h3 className="font-semibold text-lg">
-            Evidencia de Asistencia (Firmas)
-          </h3>
 
-          <Input
-            type="file"
-            accept=".pdf,image/*"
-            onChange={handleFileChange}
-          />
+          {training.status === "completed" && training.actaFile ? (
+            <Button variant="outline" className="gap-2">
+              <Download className="h-4 w-4" />
+              Descargar acta firmada
+            </Button>
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                onClick={handleDownloadActa}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Descargar acta para firma
+              </Button>
 
-          {preview && (
-            <div className="space-y-4">
-              <div className="border rounded-lg overflow-hidden h-[500px]">
-                {file?.type === "application/pdf" ? (
-                  <iframe
-                    src={preview}
-                    className="w-full h-full"
-                  />
-                ) : (
-                  <img
-                    src={preview}
-                    alt="Vista previa"
-                    className="w-full h-full object-contain"
-                  />
-                )}
-              </div>
+              <input
+                ref={uploadRef}
+                type="file"
+                accept="application/pdf"
+                className="hidden"
+                onChange={(e) =>
+                  setFile(e.target.files?.[0] || null)
+                }
+              />
 
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  onClick={() => window.open(preview, "_blank")}
-                >
-                  <FileText className="h-4 w-4 mr-2" />
-                  Ver
+              <Button
+                onClick={() => uploadRef.current?.click()}
+                className="bg-blue-600 hover:bg-blue-700 gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                Subir acta firmada
+              </Button>
+
+              {file && (
+                <Button onClick={handleUpload}>
+                  Confirmar carga
                 </Button>
-
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    const link = document.createElement("a")
-                    link.href = preview
-                    link.download = file?.name || "asistencia"
-                    link.click()
-                  }}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Descargar
-                </Button>
-
-                <Button variant="outline" onClick={handlePrint}>
-                  <Printer className="h-4 w-4 mr-2" />
-                  Imprimir
-                </Button>
-              </div>
-            </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>
+
+      {canDelete && (
+        <Button
+          onClick={handleDelete}
+          className="bg-orange-700 hover:bg-orange-800 gap-2"
+        >
+          <Trash2 className="h-4 w-4" />
+          Eliminar capacitación
+        </Button>
+      )}
     </div>
   )
 }
