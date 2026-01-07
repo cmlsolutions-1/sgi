@@ -387,7 +387,6 @@ __turbopack_context__.n(__TURBOPACK__imported__module__$5b$project$5d2f$componen
 "use strict";
 
 // Datos mock para el sistema de gestión de calidad
-//Roles
 __turbopack_context__.s([
     "departmentData",
     ()=>departmentData,
@@ -832,6 +831,18 @@ const mockDocuments = [
         author: "Ana Martínez",
         department: "Recursos Humanos",
         size: "750 KB"
+    },
+    {
+        id: "10",
+        name: "Procedimiento - Medidas de Prevención (Estándar 7)",
+        type: "procedure",
+        version: "1.0",
+        status: "approved",
+        createdAt: "2026-01-07",
+        updatedAt: "2026-01-07",
+        author: "Carlos Rodríguez",
+        department: "Seguridad y Salud",
+        size: "—"
     }
 ];
 const mockFindings = [

@@ -198,9 +198,9 @@ export default function DocumentsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredDocuments.map((doc) => {
           const TypeIcon = typeIcons[doc.type]
-          const isSGSSTDocument = doc.name.toLowerCase().includes("sgsst") || 
-                                doc.name.toLowerCase().includes("asignacion") ||
-                                doc.name.toLowerCase().includes("responsable")
+          // const isSGSSTDocument = doc.name.toLowerCase().includes("sgsst") || 
+          //                       doc.name.toLowerCase().includes("asignacion") ||
+          //                       doc.name.toLowerCase().includes("responsable")
           return (
             <Card key={doc.id} className="bg-card border-border hover:border-primary/50 transition-colors">
               <CardContent className="p-4">
@@ -244,13 +244,25 @@ export default function DocumentsPage() {
                 </div>
 
                 {/* Botón para formulario si es el documento SGSST */}
-                {isSGSSTDocument && (
-                  <Link href={`/dashboard/documents/${doc.id}/form`} className="block mt-3">
-                    <Button className="w-full" >
-                      Diligenciar Acta
-                    </Button>
+                 {/* {isSGSSTDocument && ( 
+                   <Link href={`/dashboard/documents/${doc.id}/form`} className="block mt-3">
+                     <Button className="w-full" >
+                       Diligenciar Acta
+                     </Button>
+                   </Link>
+                 )} */}
+                {doc.id === "1" && (
+                  <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
+                    <Button className="w-full">Diligenciar Acta</Button>
                   </Link>
                 )}
+                
+                {doc.id === "10" && (
+                  <Link href={`/dashboard/documents/${doc.id}/preventive-procedure`} className="block mt-3">
+                    <Button className="w-full">Diligenciar Procedimiento</Button>
+                  </Link>
+                )}
+                
               </CardContent>
             </Card>
           )

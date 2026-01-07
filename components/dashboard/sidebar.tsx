@@ -1,3 +1,4 @@
+//src/components/dashboard/sidebar.tsx
 "use client";
 
 import { useState } from "react";
@@ -59,6 +60,7 @@ const navigation: NavigationItem[] = [
   //{ name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle },
   { name: "Auditorías", href: "/dashboard/audits", icon: ClipboardCheck },
   { name: "Plan de Capacitaciones", href: "/dashboard/trainingPlan", icon: ClipboardCheck },
+  { name: "Medidas de Prevención", href: "/dashboard/preventiveMeasures", icon: ClipboardCheck },
 ];
 
 export function Sidebar() {

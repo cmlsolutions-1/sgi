@@ -757,6 +757,27 @@ const mockEmployees = [
                 startDate: "2025-01-01",
                 status: true
             }
+        ],
+        medicalEvaluations: [
+            {
+                id: "med1",
+                type: "preoccupational",
+                date: "2024-01-15",
+                result: "apt",
+                observations: "Apto para el cargo, sin restricciones médicas",
+                medicalProfessional: "Dr. Ana Martínez",
+                entity: "Clínica Salud Total"
+            },
+            {
+                id: "med2",
+                type: "periodic",
+                date: "2024-06-20",
+                result: "conditionally_apt",
+                observations: "Apto con recomendaciones de uso de equipo de protección personal",
+                nextEvaluationDate: "2025-06-20",
+                medicalProfessional: "Dr. Carlos Rodríguez",
+                entity: "Centro Médico Ocupacional"
+            }
         ]
     },
     {

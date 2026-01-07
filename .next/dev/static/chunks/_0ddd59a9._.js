@@ -432,7 +432,6 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "use strict";
 
 // Datos mock para el sistema de gestión de calidad
-//Roles
 __turbopack_context__.s([
     "departmentData",
     ()=>departmentData,
@@ -702,6 +701,27 @@ const mockEmployees = [
                 startDate: "2025-01-01",
                 status: true
             }
+        ],
+        medicalEvaluations: [
+            {
+                id: "med1",
+                type: "preoccupational",
+                date: "2024-01-15",
+                result: "apt",
+                observations: "Apto para el cargo, sin restricciones médicas",
+                medicalProfessional: "Dr. Ana Martínez",
+                entity: "Clínica Salud Total"
+            },
+            {
+                id: "med2",
+                type: "periodic",
+                date: "2024-06-20",
+                result: "conditionally_apt",
+                observations: "Apto con recomendaciones de uso de equipo de protección personal",
+                nextEvaluationDate: "2025-06-20",
+                medicalProfessional: "Dr. Carlos Rodríguez",
+                entity: "Centro Médico Ocupacional"
+            }
         ]
     },
     {
@@ -856,6 +876,18 @@ const mockDocuments = [
         author: "Ana Martínez",
         department: "Recursos Humanos",
         size: "750 KB"
+    },
+    {
+        id: "10",
+        name: "Procedimiento - Medidas de Prevención (Estándar 7)",
+        type: "procedure",
+        version: "1.0",
+        status: "approved",
+        createdAt: "2026-01-07",
+        updatedAt: "2026-01-07",
+        author: "Carlos Rodríguez",
+        department: "Seguridad y Salud",
+        size: "—"
     }
 ];
 const mockFindings = [
@@ -1752,7 +1784,9 @@ function DocumentsPage() {
                 className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4",
                 children: filteredDocuments.map((doc)=>{
                     const TypeIcon = typeIcons[doc.type];
-                    const isSGSSTDocument = doc.name.toLowerCase().includes("sgsst") || doc.name.toLowerCase().includes("asignacion") || doc.name.toLowerCase().includes("responsable");
+                    // const isSGSSTDocument = doc.name.toLowerCase().includes("sgsst") || 
+                    //                       doc.name.toLowerCase().includes("asignacion") ||
+                    //                       doc.name.toLowerCase().includes("responsable")
                     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
                         className: "bg-card border-border hover:border-primary/50 transition-colors",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1931,20 +1965,36 @@ function DocumentsPage() {
                                     lineNumber: 239,
                                     columnNumber: 17
                                 }, this),
-                                isSGSSTDocument && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                    href: `/dashboard/documents/${doc.id}/form`,
+                                doc.id === "1" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                    href: `/dashboard/documents/${doc.id}/assignment`,
                                     className: "block mt-3",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
                                         className: "w-full",
                                         children: "Diligenciar Acta"
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/documents/page.tsx",
-                                        lineNumber: 249,
+                                        lineNumber: 256,
                                         columnNumber: 21
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/dashboard/documents/page.tsx",
-                                    lineNumber: 248,
+                                    lineNumber: 255,
+                                    columnNumber: 19
+                                }, this),
+                                doc.id === "10" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                    href: `/dashboard/documents/${doc.id}/preventive-procedure`,
+                                    className: "block mt-3",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
+                                        className: "w-full",
+                                        children: "Diligenciar Procedimiento"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/dashboard/documents/page.tsx",
+                                        lineNumber: 262,
+                                        columnNumber: 21
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/app/dashboard/documents/page.tsx",
+                                    lineNumber: 261,
                                     columnNumber: 19
                                 }, this)
                             ]

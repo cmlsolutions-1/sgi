@@ -968,6 +968,10 @@
     max-height: var(--radix-select-content-available-height);
   }
 
+  .max-h-28 {
+    max-height: calc(var(--spacing) * 28);
+  }
+
   .max-h-40 {
     max-height: calc(var(--spacing) * 40);
   }
@@ -1118,6 +1122,10 @@
 
   .w-\[180px\] {
     width: 180px;
+  }
+
+  .w-\[200px\] {
+    width: 200px;
   }
 
   .w-auto {
@@ -2131,6 +2139,10 @@
 
   .pt-0 {
     padding-top: calc(var(--spacing) * 0);
+  }
+
+  .pt-2 {
+    padding-top: calc(var(--spacing) * 2);
   }
 
   .pt-3 {

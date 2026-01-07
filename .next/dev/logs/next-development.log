@@ -1,68 +1,865 @@
-[00:00:11.591] Server  LOG      ✓ Ready in 10.1s
-[00:00:27.784] Server  LOG      ○ Compiling / ...
-[00:00:46.881] Server  LOG      ○ Compiling /dashboard ...
-[00:01:01.933] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:06.732] Server  LOG      ✓ Ready in 4.8s
+[00:00:12.088] Server  LOG      ○ Compiling / ...
+[00:00:24.476] Server  LOG      ○ Compiling /dashboard ...
+[00:00:40.119] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:01.976] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:40.127] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:01.991] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:40.133] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:02.011] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:40.143] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:04.269] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:01:06.213] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:42.576] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:06.213] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:06.213] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:06.213] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:06.213] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:06.213] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:06.213] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:06.213] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:06.692] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:01:06.692] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:01:06.692] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767550315026}
-[00:01:15.364] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767550323935}
-[00:01:20.757] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:01:20.757] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:01:38.811] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767550347505}
-[00:01:43.959] Server  LOG      ○ Compiling /dashboard/employees/[id] ...
-[00:01:48.524] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767550357214}
-[00:01:53.870] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:01:53.870] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:02:05.369] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767550373892}
-[00:02:16.372] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:02:16.372] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:02:34.172] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan/1767550397298 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan/[id]","o":"http://localhost:3000/dashboard/trainingPlan/1767550397298","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767550402847}
-[00:02:52.960] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767550421331}
+[00:00:50.324] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:50.325] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[00:00:50.325] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767762955746}
+[00:11:17.460] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763583232}
+[00:11:36.822] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/upload color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/upload","o":"http://localhost:3000/dashboard/upload","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763602514}
+[00:11:42.513] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763608172}
+[00:11:45.034] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763610678}
+[00:11:53.327] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/audits color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/audits","o":"http://localhost:3000/dashboard/audits","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763619089}
+[00:12:35.791] Server  LOG      ✓ Compiled in 863ms
+[00:12:45.722] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. Auditorías
+[00:12:49.532] Server  LOG      ✓ Compiled in 566ms
+[00:12:50.883] Server  LOG      ✓ Compiled in 628ms
+[00:13:21.648] Server  LOG      ✓ Compiled in 227ms
+[00:13:25.070] Server  LOG      ✓ Compiled in 374ms
+[00:13:32.704] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:13:32.937] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:13:32.937] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
+[00:13:32.937] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763718715}
+[00:15:54.262] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.307] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\node_modules_next_dist_f7a73748._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.364] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.393] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.396] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.398] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.401] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.404] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.406] Server  ERROR    ⨯ Error: The default export is not a React Component in "/dashboard/preventiveMeasures/page"
+[00:15:54.453] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.471] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\node_modules_next_dist_f7a73748._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.477] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.512] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.535] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.548] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.564] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.581] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:15:54.601] Server  ERROR    ⨯ Error: The default export is not a React Component in "/dashboard/preventiveMeasures/page"
+[00:15:57.659] Server  LOG      ○ Compiling /_error ...
+[00:16:00.067] Server  LOG      ✓ Compiled in 5.4s
+[00:16:15.366] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:17.422] Server  LOG      ✓ Compiled in 575ms
+[00:16:18.477] Browser ERROR   ./app/dashboard/preventiveMeasures/page.tsx:38:1
+Parsing ecmascript source code failed
+  36 |
+  37 | export default function preventiveMeasures
+> 38 | Page() {
+     | ^^^^
+  39 |   const [findings, setFindings] = useState<AuditFinding[]>(mockFindings)
+  40 |   const [search, setSearch] = useState("")
+  41 |   const [typeFilter, setTypeFilter] = useState<string>("all")
+
+Expected '(', got 'Page'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/preventiveMeasures/page.tsx [Client Component Browser]
+    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/preventiveMeasures/page.tsx [Client Component SSR]
+    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
+[00:16:18.477] Browser ERROR   ./app/dashboard/preventiveMeasures/page.tsx:38:1
+Parsing ecmascript source code failed
+  36 |
+  37 | export default function preventiveMeasures
+> 38 | Page() {
+     | ^^^^
+  39 |   const [findings, setFindings] = useState<AuditFinding[]>(mockFindings)
+  40 |   const [search, setSearch] = useState("")
+  41 |   const [typeFilter, setTypeFilter] = useState<string>("all")
+
+Expected '(', got 'Page'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/preventiveMeasures/page.tsx [Client Component Browser]
+    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/preventiveMeasures/page.tsx [Client Component SSR]
+    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
+[00:16:18.477] Browser ERROR   ./app/dashboard/preventiveMeasures/page.tsx:38:1
+Parsing ecmascript source code failed
+  36 |
+  37 | export default function preventiveMeasures
+> 38 | Page() {
+     | ^^^^
+  39 |   const [findings, setFindings] = useState<AuditFinding[]>(mockFindings)
+  40 |   const [search, setSearch] = useState("")
+  41 |   const [typeFilter, setTypeFilter] = useState<string>("all")
+
+Expected '(', got 'Page'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/preventiveMeasures/page.tsx [Client Component Browser]
+    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/preventiveMeasures/page.tsx [Client Component SSR]
+    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
+[00:16:18.477] Browser ERROR   Can't perform a React state update on a component that hasn't mounted yet. This indicates that you have a side-effect in your render function that asynchronously tries to update the component. Move this work to useEffect instead.
+[00:16:18.477] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/dashboard..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html lang="es" className="dark">
+                          <body
+                            className="font-sans antialiased"
+-                           style={{overflow-x:"hidden",overflow-y:"hidden"}}
+                          >
+                  ...
+
+[00:16:19.378] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:16:19.378] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
+[00:16:19.378] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763884485}
+[00:16:24.241] Server  LOG      ✓ Compiled in 825ms
+[00:16:25.294] Browser ERROR   ./app/dashboard/preventiveMeasures/page.tsx:38:1
+Parsing ecmascript source code failed
+  36 |
+  37 | export default function preventiveMeasures
+> 38 | Page() {
+     | ^^^^
+  39 |   const [findings, setFindings] = useState<AuditFinding[]>(mockFindings)
+  40 |   const [search, setSearch] = useState("")
+  41 |   const [typeFilter, setTypeFilter] = useState<string>("all")
+
+Expected '(', got 'Page'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/preventiveMeasures/page.tsx [Client Component Browser]
+    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/preventiveMeasures/page.tsx [Client Component SSR]
+    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
+[00:16:26.780] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./app/dashboard/preventiveMeasures/page.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:16:30.219] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:32.704] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:16:32.704] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
+[00:16:32.704] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763898481}
+[00:16:47.919] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./app/dashboard/preventiveMeasures/page.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:16:49.006] Server  LOG      ✓ Compiled in 195ms
+[00:16:50.778] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:53.543] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
+      <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
+        <LoadingBoundary name="preventive..." loading={null}>
+          <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
+            <RedirectBoundary>
+              <RedirectErrorBoundary router={{...}}>
+                <InnerLayoutRouter url="/dashboard..." tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
+                  <SegmentViewNode type="page" pagePath="dashboard/...">
+                    <SegmentTrieNode>
+                    <ClientPageRoot Component={function PreventiveMeasuresPage} serverProvidedParams={{...}}>
+                      <PreventiveMeasuresPage params={Promise} searchParams={Promise}>
+                        <div className="space-y-6">
+                          <div className="flex items...">
+                            <div>
+                              <h1 className="text-2xl font-bold text-foreground">
++                               Medidas de Prevención
+-                               Medidas de Prevenci
+                              ...
+                            ...
+                          ...
+                  ...
+                ...
+      ...
+
+[00:16:53.543] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:16:53.543] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
+[00:16:53.543] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
+[00:16:53.543] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763917889}
+[00:16:53.543] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763917889}
+[00:18:35.025] Server  LOG      ✓ Compiled in 180ms
+[00:18:38.541] Server  LOG      ✓ Compiled in 310ms
+[00:18:40.738] Server  LOG      ✓ Compiled in 206ms
+[00:18:43.010] Server  LOG      ✓ Compiled in 246ms
+[00:18:56.306] Server  LOG      ✓ Compiled in 353ms
+[00:19:00.665] Server  LOG      ✓ Compiled in 385ms
+[00:19:01.774] Server  LOG      ✓ Compiled in 222ms
+[00:19:41.296] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767764087066}
+[00:28:34.780] Server  LOG      ✓ Compiled in 332ms
+[00:29:13.807] Server  LOG      ✓ Compiled in 599ms
+[00:29:14.327] Browser ERROR   ./lib/mock-data.ts:543:14
+Ecmascript file had an error
+  541 |
+  542 | //Datos quemados documentos
+> 543 | export const mockDocuments: Document[] = [
+      |              ^^^^^^^^^^^^^
+  544 |   {
+  545 |     id: "1",
+  546 |     name: "Acta asignacion SGSST",
+
+the name `mockDocuments` is defined multiple times
+
+Import traces:
+  Server Component:
+    ./lib/mock-data.ts
+    ./app/dashboard/page.tsx
+
+  Client Component Browser:
+    ./lib/mock-data.ts [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Client Component Browser]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./lib/mock-data.ts [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Client Component SSR]
+    ./components/dashboard/findings-table.tsx [Server Component]
+    ./app/dashboard/page.tsx [Server Component]
+[00:36:40.901] Server  LOG      ✓ Compiled in 531ms
+[00:46:40.395] Server  LOG      ✓ Compiled in 702ms
+[00:48:16.026] Server  LOG      ○ Compiling /dashboard/documents/[id]/form ...
+[00:48:21.212] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/1/form color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]/form","o":"http://localhost:3000/dashboard/documents/1/form","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767765806985}
+[00:48:32.691] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767765818219}
+[00:50:02.838] Server  LOG      ✓ Compiled in 217ms
+[00:50:03.308] Browser ERROR   ./app/dashboard/documents/page.tsx:253:18
+Parsing ecmascript source code failed
+  251 |                   //   </Button>
+  252 |                   // </Link>
+> 253 |                 )}
+      |                  ^
+  254 |               </CardContent>
+  255 |             </Card>
+  256 |           )
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:50:20.633] Server  LOG      ✓ Compiled in 296ms
+[00:50:44.812] Server  LOG      ✓ Compiled in 676ms
+[00:50:45.293] Browser ERROR   ./app/dashboard/documents/page.tsx:254:15
+Parsing ecmascript source code failed
+  252 |                 //   </Link>
+  253 |                 // )}
+> 254 |               </CardContent>
+      |               ^
+  255 |             </Card>
+  256 |           )
+  257 |         })}
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:50:45.293] Browser ERROR   ./app/dashboard/documents/page.tsx:254:16
+Parsing ecmascript source code failed
+  252 |                 //   </Link>
+  253 |                 // )}
+> 254 |               </CardContent>
+      |                ^^^^^^^^^^^^^
+  255 |             </Card>
+  256 |           )
+  257 |         })}
+
+Unterminated regexp literal
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:50:47.669] Server  LOG      ✓ Compiled in 256ms
+[00:50:48.292] Browser ERROR   ./app/dashboard/documents/page.tsx:249:21
+Parsing ecmascript source code failed
+  247 |                 {isSGSSTDocument && (
+  248 |                 //   
+> 249 |                 {doc.id === "1" && (
+      |                     ^
+  250 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`}>
+  251 |                     <Button className="w-full">Diligenciar Acta</Button>
+  252 |                   </Link>
+
+Expected a semicolon
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:50:55.302] Browser ERROR   ./app/dashboard/documents/page.tsx:249:21
+Parsing ecmascript source code failed
+  247 |                 {isSGSSTDocument && (
+  248 |                 //   
+> 249 |                 {doc.id === "1" && (
+      |                     ^
+  250 |   <Link href={`/dashboard/documents/${doc.id}/assignment`}>
+  251 |     <Button className="w-full">Diligenciar Acta</Button>
+  252 |   </Link>
+
+Expected a semicolon
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:50:56.828] Server  LOG      ✓ Compiled in 227ms
+[00:50:57.293] Browser ERROR   ./app/dashboard/documents/page.tsx:250:15
+Parsing ecmascript source code failed
+  248 |                 //   
+  249 |                 
+> 250 |               </CardContent>
+      |               ^
+  251 |             </Card>
+  252 |           )
+  253 |         })}
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:50:57.293] Browser ERROR   ./app/dashboard/documents/page.tsx:250:16
+Parsing ecmascript source code failed
+  248 |                 //   
+  249 |                 
+> 250 |               </CardContent>
+      |                ^^^^^^^^^^^^^
+  251 |             </Card>
+  252 |           )
+  253 |         })}
+
+Unterminated regexp literal
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:51:04.291] Browser ERROR   ./app/dashboard/documents/page.tsx:254:15
+Parsing ecmascript source code failed
+  252 |                 //   </Link>
+  253 |                 // )}
+> 254 |               </CardContent>
+      |               ^
+  255 |             </Card>
+  256 |           )
+  257 |         })}
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:51:04.291] Browser ERROR   ./app/dashboard/documents/page.tsx:254:16
+Parsing ecmascript source code failed
+  252 |                 //   </Link>
+  253 |                 // )}
+> 254 |               </CardContent>
+      |                ^^^^^^^^^^^^^
+  255 |             </Card>
+  256 |           )
+  257 |         })}
+
+Unterminated regexp literal
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:51:10.294] Server  LOG      ✓ Compiled in 192ms
+[00:51:10.294] Browser ERROR   ./app/dashboard/documents/page.tsx:255:15
+Parsing ecmascript source code failed
+  253 |                 // )}
+  254 |                 
+> 255 |               </CardContent>
+      |               ^
+  256 |             </Card>
+  257 |           )
+  258 |         })}
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:51:10.294] Browser ERROR   ./app/dashboard/documents/page.tsx:255:16
+Parsing ecmascript source code failed
+  253 |                 // )}
+  254 |                 
+> 255 |               </CardContent>
+      |                ^^^^^^^^^^^^^
+  256 |             </Card>
+  257 |           )
+  258 |         })}
+
+Unterminated regexp literal
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:51:11.300] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+Parsing ecmascript source code failed
+  252 |                 //   </Link>
+  253 |                 // )}
+> 254 |                 {doc.id === "1" && (
+      |                     ^
+  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`}>
+  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+  257 |                   </Link>
+
+Expected a semicolon
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:53:21.309] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+Parsing ecmascript source code failed
+  252 |                 //   </Link>
+  253 |                 // )}
+> 254 |                 {doc.id === "1" && (
+      |                     ^
+  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`}>
+  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+  257 |                   </Link>
+
+Expected a semicolon
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:53:26.955] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+Parsing ecmascript source code failed
+  252 |                 //   </Link>
+  253 |                 // )}
+> 254 |                 {doc.id === "1" && (
+      |                     ^
+  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`}>
+  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+  257 |                   </Link>
+
+Expected a semicolon
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:53:29.309] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+Parsing ecmascript source code failed
+  252 |                 //   </Link>
+  253 |                 // )}
+> 254 |                 {doc.id === "1" && (
+      |                     ^
+  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`}>
+  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+  257 |                   </Link>
+
+Expected a semicolon
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:53:49.302] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+Parsing ecmascript source code failed
+  252 |                 //   </Link>
+  253 |                 // )}
+> 254 |                 {doc.id === "1" && (
+      |                     ^
+  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
+  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+  257 |                   </Link>
+
+Expected a semicolon
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:53:57.302] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+Parsing ecmascript source code failed
+  252 |                 //   </Link>
+  253 |                 // )}
+> 254 |                 {doc.id === "1" && (
+      |                     ^
+  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
+  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+  257 |                   </Link>
+
+Expected a semicolon
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:53:59.297] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+Parsing ecmascript source code failed
+  252 |                 //   </Link>
+  253 |                 // )}
+> 254 |                 {doc.id === "1" && (
+      |                     ^
+  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
+  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+  257 |                   </Link>
+
+Expected a semicolon
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:54:05.295] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+Parsing ecmascript source code failed
+  252 |                 //   </Link>
+  253 |                 // )}
+> 254 |                 {doc.id === "1" && (
+      |                     ^
+  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
+  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+  257 |                   </Link>
+
+Expected a semicolon
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:54:08.947] Server  LOG      ✓ Compiled in 326ms
+[00:54:09.315] Browser ERROR   ./app/dashboard/documents/page.tsx:253:21
+Parsing ecmascript source code failed
+  251 |                 //     </Button>
+  252 |                 //   </Link>
+> 253 |                 // )}
+      |                     ^
+  254 |                 {doc.id === "1" && (
+  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
+  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:54:29.302] Browser ERROR   ./app/dashboard/documents/page.tsx:253:19
+Parsing ecmascript source code failed
+  251 |                 //     </Button>
+  252 |                 //   </Link>
+> 253 |                  )}
+      |                   ^
+  254 |                 {doc.id === "1" && (
+  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
+  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:54:32.299] Browser ERROR   ./app/dashboard/documents/page.tsx:253:19
+Parsing ecmascript source code failed
+  251 |                      </Button>
+  252 |                    </Link>
+> 253 |                  )}
+      |                   ^
+  254 |                 {doc.id === "1" && (
+  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
+  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:54:35.527] Browser ERROR   ./app/dashboard/documents/page.tsx:253:19
+Parsing ecmascript source code failed
+  251 |                      </Button>
+  252 |                    </Link>
+> 253 |                  )}
+      |                   ^
+  254 |                 {doc.id === "1" && (
+  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
+  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:54:36.300] Browser ERROR   ./app/dashboard/documents/page.tsx:253:19
+Parsing ecmascript source code failed
+  251 |                      </Button>
+  252 |                    </Link>
+> 253 |                  )}
+      |                   ^
+  254 |                 {doc.id === "1" && (
+  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
+  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:54:42.352] Server  LOG      ✓ Compiled in 241ms
+[00:54:43.289] Browser ERROR   ./app/dashboard/documents/page.tsx:274:1
+Parsing ecmascript source code failed
+  272 |   )
+  273 | }
+> 274 | 
+      | ^
+
+Unterminated block comment
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:54:44.654] Server  LOG      ✓ Compiled in 477ms
+[00:54:45.362] Browser ERROR   uncaughtError: ReferenceError: isSGSSTDocument is not defined
+[00:54:49.883] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:54:50.937] Server  LOG      ✓ Compiled in 223ms
+[00:54:51.675] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:54:52.341] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:54:52.341] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/documents","route":"/dashboard/documents"}
+[00:54:52.341] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766197888}
+[00:55:12.005] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/1/assignment color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]/assignment","o":"http://localhost:3000/dashboard/documents/1/assignment","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766217775}
+[00:55:16.375] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766222051}
+[00:55:21.150] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/10/preventive-procedure color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]/preventive-procedure","o":"http://localhost:3000/dashboard/documents/10/preventive-procedure","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766226918}
+[00:55:44.376] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766249909}
+[00:55:50.912] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766256587}
+[00:56:37.733] Server  LOG      ✓ Compiled in 815ms
+[00:56:41.499] Server  LOG      ✓ Compiled in 349ms
+[01:01:52.799] Server  LOG      ✓ Compiled in 744ms
+[01:01:58.568] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:01:58.568] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:02:07.958] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766633652}
+[01:02:10.767] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/10/preventive-procedure color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]/preventive-procedure","o":"http://localhost:3000/dashboard/documents/10/preventive-procedure","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766636448}
+[01:03:29.916] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:03:30.349] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:03:30.349] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/documents/10/preventive-procedure","route":"/dashboard/documents/[id]/preventive-procedure"}
+[01:03:30.350] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/10/preventive-procedure color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]/preventive-procedure","o":"http://localhost:3000/dashboard/documents/10/preventive-procedure","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766716088}
+[01:03:37.026] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766722714}
+[01:03:40.448] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:03:40.787] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:03:40.787] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
+[01:03:40.787] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766726561}
+[01:03:41.415] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:03:41.415] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:04:03.225] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:04:03.385] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:04:03.385] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","route":"/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b"}
+[01:04:03.386] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","o":"http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766749159}
+[01:04:07.632] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:04:08.040] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:04:08.040] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
+[01:04:08.040] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766753818}
+[01:04:10.359] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:04:10.503] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:04:10.503] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","route":"/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b"}
+[01:04:10.503] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","o":"http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766756281}
+[01:04:13.019] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:04:13.366] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:04:13.366] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
+[01:04:13.366] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766759137}
+[01:05:44.695] Server  LOG      ✓ Compiled in 875ms
+[01:06:11.431] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures/[id]","o":"http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766877143}
+[01:06:20.179] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766885888}
+[01:06:22.697] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures/[id]","o":"http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766888394}
+[01:06:25.697] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766891437}
+[01:06:56.612] Server  LOG      ✓ Compiled in 184ms
+[01:06:58.703] Server  LOG      ✓ Compiled in 836ms
