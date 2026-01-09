@@ -9,7 +9,7 @@ import {
   LayoutDashboard,
   Users,
   FileText,
-  Upload,
+  TriangleAlert,
   UserCircle,
   Settings,
   ChevronLeft,
@@ -17,7 +17,15 @@ import {
   Shield,
   ClipboardCheck,
   ChevronDown,
+  ShieldCheck,
+  BrickWallIcon,
+  CalendarDays,
+  Brain,
+  IdCardIcon,
+  ShieldPlus,
+  UsersRound,
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 
 // Definir tipos para los subitems de navegación
@@ -46,21 +54,43 @@ const navigation: NavigationItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   {
     name: "Usuarios",
-    icon: Users,
+    icon: UsersRound,
     subItems: [
       { name: "Gestión de Usuarios", href: "/dashboard/users", icon: Users },
-      { name: "Roles", href: "/dashboard/roles", icon: Shield },
-      { name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle }, // Ahora 'icon' es válido aquí
-      // Puedes agregar más subitems aquí
+      { name: "Roles", href: "/dashboard/roles", icon: ShieldPlus},
     ],
   },
+  {
+    name: "Empleados",
+    icon: IdCardIcon,
+    subItems: [
+      { name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle }, 
+    ],
+  },
+
   // { name: "Roles", href: "/dashboard/roles", icon: Shield }, // Puedes mover esta línea a subItems si lo deseas
-  { name: "Documentos", href: "/dashboard/documents", icon: FileText },
-  { name: "Cargar Archivos", href: "/dashboard/upload", icon: Upload },
+  { name: "Gestión Documental", href: "/dashboard/documents", icon: FileText },
+  //{ name: "Cargar Archivos", href: "/dashboard/upload", icon: Upload },
   //{ name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle },
-  { name: "Auditorías", href: "/dashboard/audits", icon: ClipboardCheck },
-  { name: "Plan de Capacitaciones", href: "/dashboard/trainingPlan", icon: ClipboardCheck },
-  { name: "Medidas de Prevención", href: "/dashboard/preventiveMeasures", icon: ClipboardCheck },
+  //{ name: "Auditorías", href: "/dashboard/audits", icon: ClipboardCheck },
+  {
+    name: "Planificación",
+    icon: CalendarDays,
+    subItems: [
+      { name: "Capacitaciones", href: "/dashboard/trainingPlan", icon: Brain }, 
+      { name: "Plan de Trabajo", href: "/dashboard/workingPlan", icon: ClipboardCheck },
+    ],
+  },
+  {
+    name: "Riesgos",
+    icon: TriangleAlert,
+    subItems: [
+      { name: "Laborales", href: "/dashboard/ocupational", icon: BrickWallIcon },
+      { name: "Medidas de Prevención", href: "/dashboard/preventiveMeasures", icon: ShieldCheck },
+    ],
+  },
+
+  
 ];
 
 export function Sidebar() {

@@ -1,14 +1,8 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/dashboard/audits/page": "app/dashboard/audits/page.js",
-  "/dashboard/documents/[id]/assignment/page": "app/dashboard/documents/[id]/assignment/page.js",
-  "/dashboard/documents/[id]/form/page": "app/dashboard/documents/[id]/form/page.js",
-  "/dashboard/documents/[id]/preventive-procedure/page": "app/dashboard/documents/[id]/preventive-procedure/page.js",
   "/dashboard/documents/page": "app/dashboard/documents/page.js",
+  "/dashboard/employees/[id]/page": "app/dashboard/employees/[id]/page.js",
+  "/dashboard/employees/page": "app/dashboard/employees/page.js",
   "/dashboard/page": "app/dashboard/page.js",
-  "/dashboard/preventiveMeasures/[id]/page": "app/dashboard/preventiveMeasures/[id]/page.js",
-  "/dashboard/preventiveMeasures/page": "app/dashboard/preventiveMeasures/page.js",
   "/dashboard/trainingPlan/page": "app/dashboard/trainingPlan/page.js",
-  "/dashboard/upload/page": "app/dashboard/upload/page.js",
   "/page": "app/page.js"
 }

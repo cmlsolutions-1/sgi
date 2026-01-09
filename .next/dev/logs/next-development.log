@@ -1,865 +1,1398 @@
-[00:00:06.732] Server  LOG      ✓ Ready in 4.8s
-[00:00:12.088] Server  LOG      ○ Compiling / ...
-[00:00:24.476] Server  LOG      ○ Compiling /dashboard ...
-[00:00:40.119] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:06.050] Server  LOG      ✓ Ready in 3.9s
+[00:01:06.383] Server  LOG      ○ Compiling / ...
+[00:01:13.254] Server  LOG      ○ Compiling /dashboard ...
+[00:01:16.281] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:40.127] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:16.288] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:40.133] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:16.293] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:40.143] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:16.300] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:42.576] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:19.620] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:19.620] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:19.621] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:19.621] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:19.621] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:19.621] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:19.621] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:48.822] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:01:19.621] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:50.324] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:50.325] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:00:50.325] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767762955746}
-[00:11:17.460] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763583232}
-[00:11:36.822] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/upload color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/upload","o":"http://localhost:3000/dashboard/upload","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763602514}
-[00:11:42.513] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763608172}
-[00:11:45.034] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763610678}
-[00:11:53.327] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/audits color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/audits","o":"http://localhost:3000/dashboard/audits","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763619089}
-[00:12:35.791] Server  LOG      ✓ Compiled in 863ms
-[00:12:45.722] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. Auditorías
-[00:12:49.532] Server  LOG      ✓ Compiled in 566ms
-[00:12:50.883] Server  LOG      ✓ Compiled in 628ms
-[00:13:21.648] Server  LOG      ✓ Compiled in 227ms
-[00:13:25.070] Server  LOG      ✓ Compiled in 374ms
-[00:13:32.704] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:13:32.937] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:13:32.937] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
-[00:13:32.937] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763718715}
-[00:15:54.262] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.307] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\node_modules_next_dist_f7a73748._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.364] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.393] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.396] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.398] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.401] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.404] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.406] Server  ERROR    ⨯ Error: The default export is not a React Component in "/dashboard/preventiveMeasures/page"
-[00:15:54.453] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.471] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\node_modules_next_dist_f7a73748._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.477] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.512] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.535] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.548] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.564] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.581] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:15:54.601] Server  ERROR    ⨯ Error: The default export is not a React Component in "/dashboard/preventiveMeasures/page"
-[00:15:57.659] Server  LOG      ○ Compiling /_error ...
-[00:16:00.067] Server  LOG      ✓ Compiled in 5.4s
-[00:16:15.366] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:16:17.422] Server  LOG      ✓ Compiled in 575ms
-[00:16:18.477] Browser ERROR   ./app/dashboard/preventiveMeasures/page.tsx:38:1
+[00:01:19.839] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:01:19.839] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[00:01:19.839] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767969245263}
+[00:02:42.783] Server  LOG      ✓ Compiled in 252ms
+[00:02:48.289] Server  LOG      ✓ Compiled in 203ms
+[00:02:48.838] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. Usuarios
+[00:02:52.825] Server  LOG      ✓ Compiled in 170ms
+[00:03:13.164] Server  LOG      ✓ Compiled in 156ms
+[00:03:16.211] Server  LOG      ✓ Compiled in 242ms
+[00:03:21.593] Server  LOG      ✓ Compiled in 143ms
+[00:03:26.947] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767969372379}
+[00:03:32.535] Server  LOG      ○ Compiling /dashboard/employees/[id] ...
+[00:03:35.368] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767969380870}
+[00:03:58.108] Server  LOG      ✓ Compiled in 160ms
+[00:04:00.418] Server  LOG      ✓ Compiled in 124ms
+[00:04:04.113] Server  LOG      ✓ Compiled in 270ms
+[00:04:06.554] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767969411970}
+[00:04:29.938] Server  LOG      ✓ Compiled in 459ms
+[00:04:32.840] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:04:32.840] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/documents","route":"/dashboard/documents"}
+[00:04:32.841] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767969438220}
+[00:04:35.338] Server  LOG      ✓ Compiled in 131ms
+[00:04:51.642] Server  LOG      ✓ Compiled in 160ms
+[00:04:51.834] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. Empleados
+[00:04:56.355] Server  LOG      ✓ Compiled in 133ms
+[00:05:02.471] Server  LOG      ✓ Compiled in 203ms
+[00:05:09.232] Server  LOG      ✓ Compiled in 275ms
+[00:05:26.462] Server  LOG      ✓ Compiled in 186ms
+[00:05:29.674] Server  LOG      ✓ Compiled in 171ms
+[00:05:32.198] Server  LOG      ✓ Compiled in 156ms
+[00:05:34.288] Server  LOG      ✓ Compiled in 218ms
+[00:05:43.791] Server  LOG      ✓ Compiled in 140ms
+[00:05:47.720] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767969513160}
+[00:06:19.600] Server  LOG      ✓ Compiled in 143ms
+[00:06:24.951] Server  LOG      ✓ Compiled in 151ms
+[00:06:25.410] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. /dashboard/trainingPlan
+[00:06:45.547] Server  LOG      ✓ Compiled in 150ms
+[00:06:47.654] Server  LOG      ✓ Compiled in 157ms
+[00:06:49.357] Server  LOG      ✓ Compiled in 131ms
+[00:07:13.420] Server  LOG      ✓ Compiled in 146ms
+[00:07:17.636] Server  LOG      ✓ Compiled in 148ms
+[00:07:17.833] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. Planificación
+[00:07:23.895] Server  LOG      ✓ Compiled in 179ms
+[00:07:24.828] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. Planificación
+[00:07:26.606] Server  LOG      ✓ Compiled in 162ms
+[00:07:26.905] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. Planificación
+[00:07:32.383] Server  LOG      ✓ Compiled in 179ms
+[00:07:49.402] Server  LOG      ✓ Compiled in 153ms
+[00:07:49.830] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. /dashboard/preventiveMeasures
+[00:07:55.510] Server  LOG      ✓ Compiled in 138ms
+[00:07:55.828] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. /dashboard/preventiveMeasures
+[00:08:32.259] Server  LOG      ✓ Compiled in 215ms
+[00:08:32.835] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:80:34
 Parsing ecmascript source code failed
-  36 |
-  37 | export default function preventiveMeasures
-> 38 | Page() {
-     | ^^^^
-  39 |   const [findings, setFindings] = useState<AuditFinding[]>(mockFindings)
-  40 |   const [search, setSearch] = useState("")
-  41 |   const [typeFilter, setTypeFilter] = useState<string>("all")
+  78 |     icon: UserCircle,
+  79 |     subItems: [
+> 80 |       { name: "Laborales", href: "/dashboard/
+     |                                  ^^^^^^^^^^^^
+  81 | occupational", icon: ClipboardCheck },
+  82 |       { name: "Medidas de Prevención", href: "/dashboard/preventiveMeasures", icon: ClipboardCheck },
+  83 |     ],
 
-Expected '(', got 'Page'
+Unterminated string constant
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/preventiveMeasures/page.tsx [Client Component Browser]
-    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/preventiveMeasures/page.tsx [Client Component SSR]
-    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
-[00:16:18.477] Browser ERROR   ./app/dashboard/preventiveMeasures/page.tsx:38:1
-Parsing ecmascript source code failed
-  36 |
-  37 | export default function preventiveMeasures
-> 38 | Page() {
-     | ^^^^
-  39 |   const [findings, setFindings] = useState<AuditFinding[]>(mockFindings)
-  40 |   const [search, setSearch] = useState("")
-  41 |   const [typeFilter, setTypeFilter] = useState<string>("all")
-
-Expected '(', got 'Page'
-
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/preventiveMeasures/page.tsx [Client Component Browser]
-    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/preventiveMeasures/page.tsx [Client Component SSR]
-    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
-[00:16:18.477] Browser ERROR   ./app/dashboard/preventiveMeasures/page.tsx:38:1
-Parsing ecmascript source code failed
-  36 |
-  37 | export default function preventiveMeasures
-> 38 | Page() {
-     | ^^^^
-  39 |   const [findings, setFindings] = useState<AuditFinding[]>(mockFindings)
-  40 |   const [search, setSearch] = useState("")
-  41 |   const [typeFilter, setTypeFilter] = useState<string>("all")
-
-Expected '(', got 'Page'
-
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/preventiveMeasures/page.tsx [Client Component Browser]
-    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/preventiveMeasures/page.tsx [Client Component SSR]
-    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
-[00:16:18.477] Browser ERROR   Can't perform a React state update on a component that hasn't mounted yet. This indicates that you have a side-effect in your render function that asynchronously tries to update the component. Move this work to useEffect instead.
-[00:16:18.477] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-%s%s https://react.dev/link/hydration-mismatch 
-
-  ...
-    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
-      <AppDevOverlayErrorBoundary globalError={[...]}>
-        <ReplaySsrOnlyErrors>
-        <DevRootHTTPAccessFallbackBoundary>
-          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
-            <HTTPAccessFallbackErrorBoundary pathname="/dashboard..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
-              <RedirectBoundary>
-                <RedirectErrorBoundary router={{...}}>
-                  <Head>
-                  <__next_root_layout_boundary__>
-                    <SegmentViewNode type="layout" pagePath="layout.tsx">
-                      <SegmentTrieNode>
-                      <link>
-                      <script>
-                      <script>
-                      <RootLayout>
-                        <html lang="es" className="dark">
-                          <body
-                            className="font-sans antialiased"
--                           style={{overflow-x:"hidden",overflow-y:"hidden"}}
-                          >
-                  ...
-
-[00:16:19.378] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:16:19.378] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
-[00:16:19.378] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763884485}
-[00:16:24.241] Server  LOG      ✓ Compiled in 825ms
-[00:16:25.294] Browser ERROR   ./app/dashboard/preventiveMeasures/page.tsx:38:1
-Parsing ecmascript source code failed
-  36 |
-  37 | export default function preventiveMeasures
-> 38 | Page() {
-     | ^^^^
-  39 |   const [findings, setFindings] = useState<AuditFinding[]>(mockFindings)
-  40 |   const [search, setSearch] = useState("")
-  41 |   const [typeFilter, setTypeFilter] = useState<string>("all")
-
-Expected '(', got 'Page'
-
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/preventiveMeasures/page.tsx [Client Component Browser]
-    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/preventiveMeasures/page.tsx [Client Component SSR]
-    ./app/dashboard/preventiveMeasures/page.tsx [Server Component]
-[00:16:26.780] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./app/dashboard/preventiveMeasures/page.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[00:16:30.219] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:16:32.704] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:16:32.704] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
-[00:16:32.704] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763898481}
-[00:16:47.919] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./app/dashboard/preventiveMeasures/page.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[00:16:49.006] Server  LOG      ✓ Compiled in 195ms
-[00:16:50.778] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:16:53.543] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-https://react.dev/link/hydration-mismatch
-
-  ...
-    <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
-      <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
-        <LoadingBoundary name="preventive..." loading={null}>
-          <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-            <RedirectBoundary>
-              <RedirectErrorBoundary router={{...}}>
-                <InnerLayoutRouter url="/dashboard..." tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
-                  <SegmentViewNode type="page" pagePath="dashboard/...">
-                    <SegmentTrieNode>
-                    <ClientPageRoot Component={function PreventiveMeasuresPage} serverProvidedParams={{...}}>
-                      <PreventiveMeasuresPage params={Promise} searchParams={Promise}>
-                        <div className="space-y-6">
-                          <div className="flex items...">
-                            <div>
-                              <h1 className="text-2xl font-bold text-foreground">
-+                               Medidas de Prevención
--                               Medidas de Prevenci
-                              ...
-                            ...
-                          ...
-                  ...
-                ...
-      ...
-
-[00:16:53.543] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:16:53.543] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
-[00:16:53.543] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
-[00:16:53.543] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763917889}
-[00:16:53.543] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767763917889}
-[00:18:35.025] Server  LOG      ✓ Compiled in 180ms
-[00:18:38.541] Server  LOG      ✓ Compiled in 310ms
-[00:18:40.738] Server  LOG      ✓ Compiled in 206ms
-[00:18:43.010] Server  LOG      ✓ Compiled in 246ms
-[00:18:56.306] Server  LOG      ✓ Compiled in 353ms
-[00:19:00.665] Server  LOG      ✓ Compiled in 385ms
-[00:19:01.774] Server  LOG      ✓ Compiled in 222ms
-[00:19:41.296] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767764087066}
-[00:28:34.780] Server  LOG      ✓ Compiled in 332ms
-[00:29:13.807] Server  LOG      ✓ Compiled in 599ms
-[00:29:14.327] Browser ERROR   ./lib/mock-data.ts:543:14
-Ecmascript file had an error
-  541 |
-  542 | //Datos quemados documentos
-> 543 | export const mockDocuments: Document[] = [
-      |              ^^^^^^^^^^^^^
-  544 |   {
-  545 |     id: "1",
-  546 |     name: "Acta asignacion SGSST",
-
-the name `mockDocuments` is defined multiple times
-
-Import traces:
+Import trace:
   Server Component:
-    ./lib/mock-data.ts
-    ./app/dashboard/page.tsx
-
-  Client Component Browser:
-    ./lib/mock-data.ts [Client Component Browser]
-    ./components/dashboard/findings-table.tsx [Client Component Browser]
-    ./components/dashboard/findings-table.tsx [Server Component]
-    ./app/dashboard/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./lib/mock-data.ts [Client Component SSR]
-    ./components/dashboard/findings-table.tsx [Client Component SSR]
-    ./components/dashboard/findings-table.tsx [Server Component]
-    ./app/dashboard/page.tsx [Server Component]
-[00:36:40.901] Server  LOG      ✓ Compiled in 531ms
-[00:46:40.395] Server  LOG      ✓ Compiled in 702ms
-[00:48:16.026] Server  LOG      ○ Compiling /dashboard/documents/[id]/form ...
-[00:48:21.212] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/1/form color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]/form","o":"http://localhost:3000/dashboard/documents/1/form","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767765806985}
-[00:48:32.691] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767765818219}
-[00:50:02.838] Server  LOG      ✓ Compiled in 217ms
-[00:50:03.308] Browser ERROR   ./app/dashboard/documents/page.tsx:253:18
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:08:34.446] Server  LOG      ✓ Compiled in 211ms
+[00:08:34.858] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. /dashboard/preventiveMeasures
+[00:08:35.841] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. /dashboard/preventiveMeasures
+[00:08:43.449] Server  LOG      ✓ Compiled in 154ms
+[00:08:54.909] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:08:54.909] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/trainingPlan","route":"/dashboard/trainingPlan"}
+[00:08:54.909] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767969700433}
+[00:12:13.291] Server  LOG      ✓ Compiled in 198ms
+[00:12:13.834] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:12:3
 Parsing ecmascript source code failed
-  251 |                   //   </Button>
-  252 |                   // </Link>
-> 253 |                 )}
-      |                  ^
-  254 |               </CardContent>
-  255 |             </Card>
-  256 |           )
+  10 |   Users,
+  11 |   FileText,
+> 12 |   <TriangleAlert />,
+     |   ^
+  13 |   UserCircle,
+  14 |   Settings,
+  15 |   ChevronLeft,
 
-Expected '</', got '}'
+Unexpected token `<`. Expected identifier or string
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:50:20.633] Server  LOG      ✓ Compiled in 296ms
-[00:50:44.812] Server  LOG      ✓ Compiled in 676ms
-[00:50:45.293] Browser ERROR   ./app/dashboard/documents/page.tsx:254:15
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:13:20.807] Server  LOG      ✓ Compiled in 646ms
+[00:13:22.948] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:13:22.948] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/trainingPlan","route":"/dashboard/trainingPlan"}
+[00:13:22.948] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767969968470}
+[00:14:58.506] Server  LOG      ✓ Compiled in 236ms
+[00:14:58.839] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:20:3
 Parsing ecmascript source code failed
-  252 |                 //   </Link>
-  253 |                 // )}
-> 254 |               </CardContent>
-      |               ^
-  255 |             </Card>
-  256 |           )
-  257 |         })}
+  18 |   ClipboardCheck,
+  19 |   ChevronDown,
+> 20 |   <ShieldCheck />
+     |   ^
+  21 | } from "lucide-react";
+  22 | import { Button } from "@/components/ui/button";
+  23 |
+
+Unexpected token `<`. Expected identifier or string
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:15:00.839] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:20:3
+Parsing ecmascript source code failed
+  18 |   ClipboardCheck,
+  19 |   ChevronDown,
+> 20 |   <ShieldCheck
+     |   ^
+  21 | } from "lucide-react";
+  22 | import { Button } from "@/components/ui/button";
+  23 |
+
+Unexpected token `<`. Expected identifier or string
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:15:12.603] Server  LOG      ✓ Compiled in 525ms
+[00:15:14.475] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:15:14.475] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/trainingPlan","route":"/dashboard/trainingPlan"}
+[00:15:14.475] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767970079999}
+[00:16:06.406] Server  LOG      ✓ Compiled in 182ms
+[00:16:06.889] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:16:06.894] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:16:07.044] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:16:07.052] Server  ERROR    ⨯ ReferenceError: BrickWallShield is not defined
+[00:16:08.837] Browser ERROR   uncaughtError: ReferenceError: BrickWallShield is not defined
+[00:16:08.837] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:81:83
+Parsing ecmascript source code failed
+  79 |     icon: TriangleAlert,
+  80 |     subItems: [
+> 81 |       { name: "Laborales", href: "/dashboard/ocupational", icon: BrickWallShield /> },
+     |                                                                                   ^
+  82 |       { name: "Medidas de Prevención", href: "/dashboard/preventiveMeasures", icon: ShieldCheck },
+  83 |     ],
+  84 |   },
 
 Expression expected
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:16:10.104] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:16:10.105] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:16:10.106] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:16:10.531] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:16:10.533] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:16:10.549] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:16:10.551] Server  ERROR    ⨯ ReferenceError: BrickWallShield is not defined
+[00:16:10.675] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:16:10.676] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:16:10.679] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:16:10.681] Server  ERROR    ⨯ ReferenceError: BrickWallShield is not defined
+[00:16:11.833] Browser ERROR   uncaughtError: ReferenceError: BrickWallShield is not defined
+[00:16:30.175] Server  LOG      ✓ Compiled in 11.9s
+[00:16:30.835] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:8:1
+Export BrickWallShield doesn't exist in target module
+   6 | import { usePathname } from "next/navigation";
+   7 | import { cn } from "@/lib/utils";
+>  8 | import {
+     | ^^^^^^^^
+>  9 |   LayoutDashboard,
+     | ^^^^^^^^^^^^^^^^^^
+> 10 |   Users,
+     | ^^^^^^^^^^^^^^^^^^
+> 11 |   FileText,
+     | ^^^^^^^^^^^^^^^^^^
+> 12 |   TriangleAlert,
+     | ^^^^^^^^^^^^^^^^^^
+> 13 |   UserCircle,
+     | ^^^^^^^^^^^^^^^^^^
+> 14 |   Settings,
+     | ^^^^^^^^^^^^^^^^^^
+> 15 |   ChevronLeft,
+     | ^^^^^^^^^^^^^^^^^^
+> 16 |   ChevronRight,
+     | ^^^^^^^^^^^^^^^^^^
+> 17 |   Shield,
+     | ^^^^^^^^^^^^^^^^^^
+> 18 |   ClipboardCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 19 |   ChevronDown,
+     | ^^^^^^^^^^^^^^^^^^
+> 20 |   ShieldCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 21 |   BrickWallShield,
+     | ^^^^^^^^^^^^^^^^^^
+> 22 | } from "lucide-react";
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import { Button } from "@/components/ui/button";
+  24 |
+  25 | // Definir tipos para los subitems de navegación
 
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:50:45.293] Browser ERROR   ./app/dashboard/documents/page.tsx:254:16
+The export BrickWallShield was not found in module [project]/Desktop/react/sgi/node_modules/lucide-react/dist/esm/lucide-react.js [app-client] (ecmascript).
+Did you mean to import BrickWall?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:16:30.835] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:8:1
+Export BrickWallShield doesn't exist in target module
+   6 | import { usePathname } from "next/navigation";
+   7 | import { cn } from "@/lib/utils";
+>  8 | import {
+     | ^^^^^^^^
+>  9 |   LayoutDashboard,
+     | ^^^^^^^^^^^^^^^^^^
+> 10 |   Users,
+     | ^^^^^^^^^^^^^^^^^^
+> 11 |   FileText,
+     | ^^^^^^^^^^^^^^^^^^
+> 12 |   TriangleAlert,
+     | ^^^^^^^^^^^^^^^^^^
+> 13 |   UserCircle,
+     | ^^^^^^^^^^^^^^^^^^
+> 14 |   Settings,
+     | ^^^^^^^^^^^^^^^^^^
+> 15 |   ChevronLeft,
+     | ^^^^^^^^^^^^^^^^^^
+> 16 |   ChevronRight,
+     | ^^^^^^^^^^^^^^^^^^
+> 17 |   Shield,
+     | ^^^^^^^^^^^^^^^^^^
+> 18 |   ClipboardCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 19 |   ChevronDown,
+     | ^^^^^^^^^^^^^^^^^^
+> 20 |   ShieldCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 21 |   BrickWallShield,
+     | ^^^^^^^^^^^^^^^^^^
+> 22 | } from "lucide-react";
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import { Button } from "@/components/ui/button";
+  24 |
+  25 | // Definir tipos para los subitems de navegación
+
+The export BrickWallShield was not found in module [project]/Desktop/react/sgi/node_modules/lucide-react/dist/esm/lucide-react.js [app-ssr] (ecmascript).
+Did you mean to import BrickWall?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:16:58.620] Server  LOG      ✓ Compiled in 205ms
+[00:16:58.833] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:21:3
 Parsing ecmascript source code failed
-  252 |                 //   </Link>
-  253 |                 // )}
-> 254 |               </CardContent>
-      |                ^^^^^^^^^^^^^
-  255 |             </Card>
-  256 |           )
-  257 |         })}
+  19 |   ChevronDown,
+  20 |   ShieldCheck,
+> 21 |   ,
+     |   ^
+  22 | } from "lucide-react";
+  23 | import { Button } from "@/components/ui/button";
+  24 |
 
-Unterminated regexp literal
+Unexpected token `,`. Expected identifier or string
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:16:58.833] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:8:1
+Export BrickWallShield doesn't exist in target module
+   6 | import { usePathname } from "next/navigation";
+   7 | import { cn } from "@/lib/utils";
+>  8 | import {
+     | ^^^^^^^^
+>  9 |   LayoutDashboard,
+     | ^^^^^^^^^^^^^^^^^^
+> 10 |   Users,
+     | ^^^^^^^^^^^^^^^^^^
+> 11 |   FileText,
+     | ^^^^^^^^^^^^^^^^^^
+> 12 |   TriangleAlert,
+     | ^^^^^^^^^^^^^^^^^^
+> 13 |   UserCircle,
+     | ^^^^^^^^^^^^^^^^^^
+> 14 |   Settings,
+     | ^^^^^^^^^^^^^^^^^^
+> 15 |   ChevronLeft,
+     | ^^^^^^^^^^^^^^^^^^
+> 16 |   ChevronRight,
+     | ^^^^^^^^^^^^^^^^^^
+> 17 |   Shield,
+     | ^^^^^^^^^^^^^^^^^^
+> 18 |   ClipboardCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 19 |   ChevronDown,
+     | ^^^^^^^^^^^^^^^^^^
+> 20 |   ShieldCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 21 |   ,
+     | ^^^^^^^^^^^^^^^^^^
+> 22 | } from "lucide-react";
+     | ^^^^^^^^^^^^^^^^^^
+> 23 | import { Button } from "@/components/ui/button";
+     | ^^^^^^^^^^^^^^
+  24 |
+  25 | // Definir tipos para los subitems de navegación
+  26 | type SubNavigationItem = {
 
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:50:47.669] Server  LOG      ✓ Compiled in 256ms
-[00:50:48.292] Browser ERROR   ./app/dashboard/documents/page.tsx:249:21
+The export BrickWallShield was not found in module [project]/Desktop/react/sgi/node_modules/lucide-react/dist/esm/lucide-react.js [app-client] (ecmascript).
+Did you mean to import BrickWall?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:16:58.833] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:8:1
+Export BrickWallShield doesn't exist in target module
+   6 | import { usePathname } from "next/navigation";
+   7 | import { cn } from "@/lib/utils";
+>  8 | import {
+     | ^^^^^^^^
+>  9 |   LayoutDashboard,
+     | ^^^^^^^^^^^^^^^^^^
+> 10 |   Users,
+     | ^^^^^^^^^^^^^^^^^^
+> 11 |   FileText,
+     | ^^^^^^^^^^^^^^^^^^
+> 12 |   TriangleAlert,
+     | ^^^^^^^^^^^^^^^^^^
+> 13 |   UserCircle,
+     | ^^^^^^^^^^^^^^^^^^
+> 14 |   Settings,
+     | ^^^^^^^^^^^^^^^^^^
+> 15 |   ChevronLeft,
+     | ^^^^^^^^^^^^^^^^^^
+> 16 |   ChevronRight,
+     | ^^^^^^^^^^^^^^^^^^
+> 17 |   Shield,
+     | ^^^^^^^^^^^^^^^^^^
+> 18 |   ClipboardCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 19 |   ChevronDown,
+     | ^^^^^^^^^^^^^^^^^^
+> 20 |   ShieldCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 21 |   ,
+     | ^^^^^^^^^^^^^^^^^^
+> 22 | } from "lucide-react";
+     | ^^^^^^^^^^^^^^^^^^
+> 23 | import { Button } from "@/components/ui/button";
+     | ^^^^^^^^^^^^^^
+  24 |
+  25 | // Definir tipos para los subitems de navegación
+  26 | type SubNavigationItem = {
+
+The export BrickWallShield was not found in module [project]/Desktop/react/sgi/node_modules/lucide-react/dist/esm/lucide-react.js [app-ssr] (ecmascript).
+Did you mean to import BrickWall?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:17:00.108] Server  LOG      ✓ Compiled in 190ms
+[00:17:00.831] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:8:1
+Export BrickWallShield doesn't exist in target module
+   6 | import { usePathname } from "next/navigation";
+   7 | import { cn } from "@/lib/utils";
+>  8 | import {
+     | ^^^^^^^^
+>  9 |   LayoutDashboard,
+     | ^^^^^^^^^^^^^^^^^^
+> 10 |   Users,
+     | ^^^^^^^^^^^^^^^^^^
+> 11 |   FileText,
+     | ^^^^^^^^^^^^^^^^^^
+> 12 |   TriangleAlert,
+     | ^^^^^^^^^^^^^^^^^^
+> 13 |   UserCircle,
+     | ^^^^^^^^^^^^^^^^^^
+> 14 |   Settings,
+     | ^^^^^^^^^^^^^^^^^^
+> 15 |   ChevronLeft,
+     | ^^^^^^^^^^^^^^^^^^
+> 16 |   ChevronRight,
+     | ^^^^^^^^^^^^^^^^^^
+> 17 |   Shield,
+     | ^^^^^^^^^^^^^^^^^^
+> 18 |   ClipboardCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 19 |   ChevronDown,
+     | ^^^^^^^^^^^^^^^^^^
+> 20 |   ShieldCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 21 |   BrickWallShield,
+     | ^^^^^^^^^^^^^^^^^^
+> 22 | } from "lucide-react";
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import { Button } from "@/components/ui/button";
+  24 |
+  25 | // Definir tipos para los subitems de navegación
+
+The export BrickWallShield was not found in module [project]/Desktop/react/sgi/node_modules/lucide-react/dist/esm/lucide-react.js [app-client] (ecmascript).
+Did you mean to import BrickWall?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:17:00.831] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:8:1
+Export BrickWallShield doesn't exist in target module
+   6 | import { usePathname } from "next/navigation";
+   7 | import { cn } from "@/lib/utils";
+>  8 | import {
+     | ^^^^^^^^
+>  9 |   LayoutDashboard,
+     | ^^^^^^^^^^^^^^^^^^
+> 10 |   Users,
+     | ^^^^^^^^^^^^^^^^^^
+> 11 |   FileText,
+     | ^^^^^^^^^^^^^^^^^^
+> 12 |   TriangleAlert,
+     | ^^^^^^^^^^^^^^^^^^
+> 13 |   UserCircle,
+     | ^^^^^^^^^^^^^^^^^^
+> 14 |   Settings,
+     | ^^^^^^^^^^^^^^^^^^
+> 15 |   ChevronLeft,
+     | ^^^^^^^^^^^^^^^^^^
+> 16 |   ChevronRight,
+     | ^^^^^^^^^^^^^^^^^^
+> 17 |   Shield,
+     | ^^^^^^^^^^^^^^^^^^
+> 18 |   ClipboardCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 19 |   ChevronDown,
+     | ^^^^^^^^^^^^^^^^^^
+> 20 |   ShieldCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 21 |   BrickWallShield,
+     | ^^^^^^^^^^^^^^^^^^
+> 22 | } from "lucide-react";
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import { Button } from "@/components/ui/button";
+  24 |
+  25 | // Definir tipos para los subitems de navegación
+
+The export BrickWallShield was not found in module [project]/Desktop/react/sgi/node_modules/lucide-react/dist/esm/lucide-react.js [app-ssr] (ecmascript).
+Did you mean to import BrickWall?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:17:06.143] Server  LOG      ✓ Compiled in 852ms
+[00:17:06.828] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:06.833] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:06.840] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:06.845] Server  ERROR    ⨯ ReferenceError: BrickWallShield is not defined
+[00:17:06.901] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:17:06.902] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:17:06.902] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:17:07.011] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:07.012] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:07.015] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:07.017] Server  ERROR    ⨯ ReferenceError: BrickWallShield is not defined
+[00:17:07.838] Browser ERROR   uncaughtError: ReferenceError: BrickWallShield is not defined
+[00:17:15.649] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:17:15.662] Server  LOG      ✓ Compiled in 434ms
+[00:17:16.544] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:17:16.546] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:17:16.548] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:17:17.823] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:17:17.823] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/trainingPlan","route":"/dashboard/trainingPlan"}
+[00:17:17.823] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767970203337}
+[00:19:00.356] Server  LOG      ✓ Compiled in 387ms
+[00:19:01.011] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:19:01.013] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:19:01.017] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:19:01.019] Server  ERROR    ⨯ ReferenceError: CalendarDays is not defined
+[00:19:02.025] Server  LOG      ✓ Compiled in 214ms
+[00:19:02.839] Browser ERROR   uncaughtError: ReferenceError: CalendarDays is not defined
+[00:19:02.839] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:72:24
 Parsing ecmascript source code failed
-  247 |                 {isSGSSTDocument && (
-  248 |                 //   
-> 249 |                 {doc.id === "1" && (
-      |                     ^
-  250 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`}>
-  251 |                     <Button className="w-full">Diligenciar Acta</Button>
-  252 |                   </Link>
+  70 |   {
+  71 |     name: "Planificación",
+> 72 |     icon: <CalendarDays,
+     |                        ^
+  73 |     subItems: [
+  74 |       { name: "Capacitaciones", href: "/dashboard/trainingPlan", icon: ClipboardCheck }, 
+  75 |       { name: "Plan de Trabajo", href: "/dashboard/workingPlan", icon: ClipboardCheck },
 
-Expected a semicolon
+Unexpected token `,`. Expected jsx identifier
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:50:55.302] Browser ERROR   ./app/dashboard/documents/page.tsx:249:21
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:19:03.263] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:19:03.263] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:19:03.265] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:19:03.277] Server  LOG      ✓ Compiled in 139ms
+[00:19:03.635] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:19:03.638] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:19:03.641] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:19:03.642] Server  ERROR    ⨯ ReferenceError: CalendarDays is not defined
+[00:19:05.835] Browser ERROR   uncaughtError: ReferenceError: CalendarDays is not defined
+[00:19:16.615] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:19:17.300] Server  LOG      ✓ Compiled in 716ms
+[00:19:17.361] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:19:17.362] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:19:17.362] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:19:18.719] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:19:18.719] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/trainingPlan","route":"/dashboard/trainingPlan"}
+[00:19:18.719] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767970324244}
+[00:22:36.393] Server  LOG      ✓ Compiled in 162ms
+[00:22:36.827] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:23:3
 Parsing ecmascript source code failed
-  247 |                 {isSGSSTDocument && (
-  248 |                 //   
-> 249 |                 {doc.id === "1" && (
-      |                     ^
-  250 |   <Link href={`/dashboard/documents/${doc.id}/assignment`}>
-  251 |     <Button className="w-full">Diligenciar Acta</Button>
-  252 |   </Link>
+  21 |   BrickWallIcon,
+  22 |   CalendarDays,
+> 23 |   <Brain />,
+     |   ^
+  24 | } from "lucide-react";
+  25 | import { Button } from "@/components/ui/button";
+  26 |
 
-Expected a semicolon
+Unexpected token `<`. Expected identifier or string
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:50:56.828] Server  LOG      ✓ Compiled in 227ms
-[00:50:57.293] Browser ERROR   ./app/dashboard/documents/page.tsx:250:15
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:22:39.829] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:23:3
 Parsing ecmascript source code failed
-  248 |                 //   
-  249 |                 
-> 250 |               </CardContent>
-      |               ^
-  251 |             </Card>
-  252 |           )
-  253 |         })}
+  21 |   BrickWallIcon,
+  22 |   CalendarDays,
+> 23 |   <Brain ,
+     |   ^
+  24 | } from "lucide-react";
+  25 | import { Button } from "@/components/ui/button";
+  26 |
+
+Unexpected token `<`. Expected identifier or string
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:22:52.923] Server  LOG      ✓ Compiled in 337ms
+[00:22:54.758] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:22:54.758] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/trainingPlan","route":"/dashboard/trainingPlan"}
+[00:22:54.758] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767970540289}
+[00:23:58.767] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:23:58.772] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:23:58.776] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:23:58.781] Server  ERROR    ⨯ ReferenceError: IdCardLanyard is not defined
+[00:23:58.829] Server  LOG      ✓ Compiled in 173ms
+[00:24:00.606] Server  LOG      ✓ Compiled in 305ms
+[00:24:00.833] Browser ERROR   uncaughtError: ReferenceError: IdCardLanyard is not defined
+[00:24:00.833] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:61:26
+Parsing ecmascript source code failed
+  59 |   {
+  60 |     name: "Empleados",
+> 61 |     icon: IdCardLanyard />,
+     |                          ^
+  62 |     subItems: [
+  63 |       { name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle }, 
+  64 |     ],
 
 Expression expected
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:24:01.875] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:24:01.875] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:24:01.876] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:24:02.407] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:24:02.409] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:24:02.412] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:24:02.414] Server  ERROR    ⨯ ReferenceError: IdCardLanyard is not defined
+[00:24:02.595] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:24:02.597] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:24:02.601] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:24:02.603] Server  ERROR    ⨯ ReferenceError: IdCardLanyard is not defined
+[00:24:03.839] Browser ERROR   uncaughtError: ReferenceError: IdCardLanyard is not defined
+[00:24:08.368] Server  LOG      ✓ Compiled in 1648ms
+[00:24:08.830] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:8:1
+Export IdCardLanyard doesn't exist in target module
+   6 | import { usePathname } from "next/navigation";
+   7 | import { cn } from "@/lib/utils";
+>  8 | import {
+     | ^^^^^^^^
+>  9 |   LayoutDashboard,
+     | ^^^^^^^^^^^^^^^^^^
+> 10 |   Users,
+     | ^^^^^^^^^^^^^^^^^^
+> 11 |   FileText,
+     | ^^^^^^^^^^^^^^^^^^
+> 12 |   TriangleAlert,
+     | ^^^^^^^^^^^^^^^^^^
+> 13 |   UserCircle,
+     | ^^^^^^^^^^^^^^^^^^
+> 14 |   Settings,
+     | ^^^^^^^^^^^^^^^^^^
+> 15 |   ChevronLeft,
+     | ^^^^^^^^^^^^^^^^^^
+> 16 |   ChevronRight,
+     | ^^^^^^^^^^^^^^^^^^
+> 17 |   Shield,
+     | ^^^^^^^^^^^^^^^^^^
+> 18 |   ClipboardCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 19 |   ChevronDown,
+     | ^^^^^^^^^^^^^^^^^^
+> 20 |   ShieldCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 21 |   BrickWallIcon,
+     | ^^^^^^^^^^^^^^^^^^
+> 22 |   CalendarDays,
+     | ^^^^^^^^^^^^^^^^^^
+> 23 |   Brain,
+     | ^^^^^^^^^^^^^^^^^^
+> 24 |   IdCardLanyard,
+     | ^^^^^^^^^^^^^^^^^^
+> 25 | } from "lucide-react";
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+  26 | import { Button } from "@/components/ui/button";
+  27 |
+  28 | // Definir tipos para los subitems de navegación
 
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:50:57.293] Browser ERROR   ./app/dashboard/documents/page.tsx:250:16
+The export IdCardLanyard was not found in module [project]/Desktop/react/sgi/node_modules/lucide-react/dist/esm/lucide-react.js [app-client] (ecmascript).
+Did you mean to import IdCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:24:08.830] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:8:1
+Export IdCardLanyard doesn't exist in target module
+   6 | import { usePathname } from "next/navigation";
+   7 | import { cn } from "@/lib/utils";
+>  8 | import {
+     | ^^^^^^^^
+>  9 |   LayoutDashboard,
+     | ^^^^^^^^^^^^^^^^^^
+> 10 |   Users,
+     | ^^^^^^^^^^^^^^^^^^
+> 11 |   FileText,
+     | ^^^^^^^^^^^^^^^^^^
+> 12 |   TriangleAlert,
+     | ^^^^^^^^^^^^^^^^^^
+> 13 |   UserCircle,
+     | ^^^^^^^^^^^^^^^^^^
+> 14 |   Settings,
+     | ^^^^^^^^^^^^^^^^^^
+> 15 |   ChevronLeft,
+     | ^^^^^^^^^^^^^^^^^^
+> 16 |   ChevronRight,
+     | ^^^^^^^^^^^^^^^^^^
+> 17 |   Shield,
+     | ^^^^^^^^^^^^^^^^^^
+> 18 |   ClipboardCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 19 |   ChevronDown,
+     | ^^^^^^^^^^^^^^^^^^
+> 20 |   ShieldCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 21 |   BrickWallIcon,
+     | ^^^^^^^^^^^^^^^^^^
+> 22 |   CalendarDays,
+     | ^^^^^^^^^^^^^^^^^^
+> 23 |   Brain,
+     | ^^^^^^^^^^^^^^^^^^
+> 24 |   IdCardLanyard,
+     | ^^^^^^^^^^^^^^^^^^
+> 25 | } from "lucide-react";
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+  26 | import { Button } from "@/components/ui/button";
+  27 |
+  28 | // Definir tipos para los subitems de navegación
+
+The export IdCardLanyard was not found in module [project]/Desktop/react/sgi/node_modules/lucide-react/dist/esm/lucide-react.js [app-ssr] (ecmascript).
+Did you mean to import IdCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:24:19.768] Server  LOG      ✓ Compiled in 583ms
+[00:24:20.433] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:24:20.435] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:24:20.438] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:24:20.439] Server  ERROR    ⨯ ReferenceError: IdCardLanyard is not defined
+[00:24:20.480] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:24:20.481] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:24:20.482] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:24:20.563] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:24:20.565] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:24:20.567] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:24:20.569] Server  ERROR    ⨯ ReferenceError: IdCardLanyard is not defined
+[00:24:21.836] Browser ERROR   uncaughtError: ReferenceError: IdCardLanyard is not defined
+[00:24:31.534] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:24:32.262] Server  LOG      ✓ Compiled in 566ms
+[00:24:32.491] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:24:32.492] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:24:32.493] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:24:33.714] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:24:33.715] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/trainingPlan","route":"/dashboard/trainingPlan"}
+[00:24:33.715] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767970639246}
+[00:25:00.456] Server  LOG      ✓ Compiled in 442ms
+[00:25:00.790] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:00.795] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:00.801] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:00.803] Server  ERROR    ⨯ ReferenceError: ShieldUser is not defined
+[00:25:01.163] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:01.167] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:01.172] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:01.175] Server  ERROR    ⨯ ReferenceError: ShieldUser is not defined
+[00:25:02.831] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:57:68
 Parsing ecmascript source code failed
-  248 |                 //   
-  249 |                 
-> 250 |               </CardContent>
-      |                ^^^^^^^^^^^^^
-  251 |             </Card>
-  252 |           )
-  253 |         })}
-
-Unterminated regexp literal
-
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:51:04.291] Browser ERROR   ./app/dashboard/documents/page.tsx:254:15
-Parsing ecmascript source code failed
-  252 |                 //   </Link>
-  253 |                 // )}
-> 254 |               </CardContent>
-      |               ^
-  255 |             </Card>
-  256 |           )
-  257 |         })}
+  55 |     subItems: [
+  56 |       { name: "Gestión de Usuarios", href: "/dashboard/users", icon: Users },
+> 57 |       { name: "Roles", href: "/dashboard/roles", icon: ShieldUser /> },
+     |                                                                    ^
+  58 |     ],
+  59 |   },
+  60 |   {
 
 Expression expected
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:51:04.291] Browser ERROR   ./app/dashboard/documents/page.tsx:254:16
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:25:02.832] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:57:68
 Parsing ecmascript source code failed
-  252 |                 //   </Link>
-  253 |                 // )}
-> 254 |               </CardContent>
-      |                ^^^^^^^^^^^^^
-  255 |             </Card>
-  256 |           )
-  257 |         })}
-
-Unterminated regexp literal
-
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:51:10.294] Server  LOG      ✓ Compiled in 192ms
-[00:51:10.294] Browser ERROR   ./app/dashboard/documents/page.tsx:255:15
-Parsing ecmascript source code failed
-  253 |                 // )}
-  254 |                 
-> 255 |               </CardContent>
-      |               ^
-  256 |             </Card>
-  257 |           )
-  258 |         })}
+  55 |     subItems: [
+  56 |       { name: "Gestión de Usuarios", href: "/dashboard/users", icon: Users },
+> 57 |       { name: "Roles", href: "/dashboard/roles", icon: ShieldUser /> },
+     |                                                                    ^
+  58 |     ],
+  59 |   },
+  60 |   {
 
 Expression expected
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:51:10.294] Browser ERROR   ./app/dashboard/documents/page.tsx:255:16
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:25:02.832] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:57:68
 Parsing ecmascript source code failed
-  253 |                 // )}
-  254 |                 
-> 255 |               </CardContent>
-      |                ^^^^^^^^^^^^^
-  256 |             </Card>
-  257 |           )
-  258 |         })}
+  55 |     subItems: [
+  56 |       { name: "Gestión de Usuarios", href: "/dashboard/users", icon: Users },
+> 57 |       { name: "Roles", href: "/dashboard/roles", icon: ShieldUser /> },
+     |                                                                    ^
+  58 |     ],
+  59 |   },
+  60 |   {
 
-Unterminated regexp literal
+Expression expected
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:51:11.300] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:25:02.832] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:57:68
 Parsing ecmascript source code failed
-  252 |                 //   </Link>
-  253 |                 // )}
-> 254 |                 {doc.id === "1" && (
-      |                     ^
-  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`}>
-  256 |                     <Button className="w-full">Diligenciar Acta</Button>
-  257 |                   </Link>
+  55 |     subItems: [
+  56 |       { name: "Gestión de Usuarios", href: "/dashboard/users", icon: Users },
+> 57 |       { name: "Roles", href: "/dashboard/roles", icon: ShieldUser /> },
+     |                                                                    ^
+  58 |     ],
+  59 |   },
+  60 |   {
 
-Expected a semicolon
+Expression expected
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:53:21.309] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:25:02.832] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:57:68
 Parsing ecmascript source code failed
-  252 |                 //   </Link>
-  253 |                 // )}
-> 254 |                 {doc.id === "1" && (
-      |                     ^
-  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`}>
-  256 |                     <Button className="w-full">Diligenciar Acta</Button>
-  257 |                   </Link>
+  55 |     subItems: [
+  56 |       { name: "Gestión de Usuarios", href: "/dashboard/users", icon: Users },
+> 57 |       { name: "Roles", href: "/dashboard/roles", icon: ShieldUser /> },
+     |                                                                    ^
+  58 |     ],
+  59 |   },
+  60 |   {
 
-Expected a semicolon
+Expression expected
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:53:26.955] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:25:02.832] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:57:68
 Parsing ecmascript source code failed
-  252 |                 //   </Link>
-  253 |                 // )}
-> 254 |                 {doc.id === "1" && (
-      |                     ^
-  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`}>
-  256 |                     <Button className="w-full">Diligenciar Acta</Button>
-  257 |                   </Link>
+  55 |     subItems: [
+  56 |       { name: "Gestión de Usuarios", href: "/dashboard/users", icon: Users },
+> 57 |       { name: "Roles", href: "/dashboard/roles", icon: ShieldUser /> },
+     |                                                                    ^
+  58 |     ],
+  59 |   },
+  60 |   {
 
-Expected a semicolon
+Expression expected
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:53:29.309] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:25:02.832] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:57:68
 Parsing ecmascript source code failed
-  252 |                 //   </Link>
-  253 |                 // )}
-> 254 |                 {doc.id === "1" && (
-      |                     ^
-  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`}>
-  256 |                     <Button className="w-full">Diligenciar Acta</Button>
-  257 |                   </Link>
+  55 |     subItems: [
+  56 |       { name: "Gestión de Usuarios", href: "/dashboard/users", icon: Users },
+> 57 |       { name: "Roles", href: "/dashboard/roles", icon: ShieldUser /> },
+     |                                                                    ^
+  58 |     ],
+  59 |   },
+  60 |   {
 
-Expected a semicolon
+Expression expected
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:53:49.302] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:25:02.832] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:57:68
 Parsing ecmascript source code failed
-  252 |                 //   </Link>
-  253 |                 // )}
-> 254 |                 {doc.id === "1" && (
-      |                     ^
-  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
-  256 |                     <Button className="w-full">Diligenciar Acta</Button>
-  257 |                   </Link>
+  55 |     subItems: [
+  56 |       { name: "Gestión de Usuarios", href: "/dashboard/users", icon: Users },
+> 57 |       { name: "Roles", href: "/dashboard/roles", icon: ShieldUser /> },
+     |                                                                    ^
+  58 |     ],
+  59 |   },
+  60 |   {
 
-Expected a semicolon
+Expression expected
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:25:02.832] Browser ERROR   uncaughtError: Error: Could not parse module '[project]/Desktop/react/sgi/components/dashboard/sidebar.tsx'
 
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:53:57.302] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+Expression expected
+[00:25:02.832] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:57:68
 Parsing ecmascript source code failed
-  252 |                 //   </Link>
-  253 |                 // )}
-> 254 |                 {doc.id === "1" && (
-      |                     ^
-  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
-  256 |                     <Button className="w-full">Diligenciar Acta</Button>
-  257 |                   </Link>
+  55 |     subItems: [
+  56 |       { name: "Gestión de Usuarios", href: "/dashboard/users", icon: Users },
+> 57 |       { name: "Roles", href: "/dashboard/roles", icon: ShieldUser /> },
+     |                                                                    ^
+  58 |     ],
+  59 |   },
+  60 |   {
 
-Expected a semicolon
+Expression expected
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:25:03.633] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:25:03.634] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:25:03.634] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:25:04.048] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:04.050] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:04.053] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:04.055] Server  ERROR    ⨯ ReferenceError: ShieldUser is not defined
+[00:25:04.155] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:04.164] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:04.166] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:04.167] Server  ERROR    ⨯ ReferenceError: ShieldUser is not defined
+[00:25:04.842] Browser ERROR   uncaughtError: ReferenceError: ShieldUser is not defined
+[00:25:11.622] Server  LOG      ✓ Compiled in 2s
+[00:25:11.832] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:8:1
+Export ShieldUser doesn't exist in target module
+   6 | import { usePathname } from "next/navigation";
+   7 | import { cn } from "@/lib/utils";
+>  8 | import {
+     | ^^^^^^^^
+>  9 |   LayoutDashboard,
+     | ^^^^^^^^^^^^^^^^^^
+> 10 |   Users,
+     | ^^^^^^^^^^^^^^^^^^
+> 11 |   FileText,
+     | ^^^^^^^^^^^^^^^^^^
+> 12 |   TriangleAlert,
+     | ^^^^^^^^^^^^^^^^^^
+> 13 |   UserCircle,
+     | ^^^^^^^^^^^^^^^^^^
+> 14 |   Settings,
+     | ^^^^^^^^^^^^^^^^^^
+> 15 |   ChevronLeft,
+     | ^^^^^^^^^^^^^^^^^^
+> 16 |   ChevronRight,
+     | ^^^^^^^^^^^^^^^^^^
+> 17 |   Shield,
+     | ^^^^^^^^^^^^^^^^^^
+> 18 |   ClipboardCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 19 |   ChevronDown,
+     | ^^^^^^^^^^^^^^^^^^
+> 20 |   ShieldCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 21 |   BrickWallIcon,
+     | ^^^^^^^^^^^^^^^^^^
+> 22 |   CalendarDays,
+     | ^^^^^^^^^^^^^^^^^^
+> 23 |   Brain,
+     | ^^^^^^^^^^^^^^^^^^
+> 24 |   IdCardIcon,
+     | ^^^^^^^^^^^^^^^^^^
+> 25 |   ShieldUser,
+     | ^^^^^^^^^^^^^^^^^^
+> 26 | } from "lucide-react";
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+  27 | import { Button } from "@/components/ui/button";
+  28 |
+  29 | // Definir tipos para los subitems de navegación
 
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:53:59.297] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+The export ShieldUser was not found in module [project]/Desktop/react/sgi/node_modules/lucide-react/dist/esm/lucide-react.js [app-client] (ecmascript).
+Did you mean to import Shield?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:25:11.833] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:8:1
+Export ShieldUser doesn't exist in target module
+   6 | import { usePathname } from "next/navigation";
+   7 | import { cn } from "@/lib/utils";
+>  8 | import {
+     | ^^^^^^^^
+>  9 |   LayoutDashboard,
+     | ^^^^^^^^^^^^^^^^^^
+> 10 |   Users,
+     | ^^^^^^^^^^^^^^^^^^
+> 11 |   FileText,
+     | ^^^^^^^^^^^^^^^^^^
+> 12 |   TriangleAlert,
+     | ^^^^^^^^^^^^^^^^^^
+> 13 |   UserCircle,
+     | ^^^^^^^^^^^^^^^^^^
+> 14 |   Settings,
+     | ^^^^^^^^^^^^^^^^^^
+> 15 |   ChevronLeft,
+     | ^^^^^^^^^^^^^^^^^^
+> 16 |   ChevronRight,
+     | ^^^^^^^^^^^^^^^^^^
+> 17 |   Shield,
+     | ^^^^^^^^^^^^^^^^^^
+> 18 |   ClipboardCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 19 |   ChevronDown,
+     | ^^^^^^^^^^^^^^^^^^
+> 20 |   ShieldCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 21 |   BrickWallIcon,
+     | ^^^^^^^^^^^^^^^^^^
+> 22 |   CalendarDays,
+     | ^^^^^^^^^^^^^^^^^^
+> 23 |   Brain,
+     | ^^^^^^^^^^^^^^^^^^
+> 24 |   IdCardIcon,
+     | ^^^^^^^^^^^^^^^^^^
+> 25 |   ShieldUser,
+     | ^^^^^^^^^^^^^^^^^^
+> 26 | } from "lucide-react";
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+  27 | import { Button } from "@/components/ui/button";
+  28 |
+  29 | // Definir tipos para los subitems de navegación
+
+The export ShieldUser was not found in module [project]/Desktop/react/sgi/node_modules/lucide-react/dist/esm/lucide-react.js [app-ssr] (ecmascript).
+Did you mean to import Shield?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:25:19.780] Server  LOG      ✓ Compiled in 151ms
+[00:25:20.840] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:25:3
 Parsing ecmascript source code failed
-  252 |                 //   </Link>
-  253 |                 // )}
-> 254 |                 {doc.id === "1" && (
-      |                     ^
-  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
-  256 |                     <Button className="w-full">Diligenciar Acta</Button>
-  257 |                   </Link>
+  23 |   Brain,
+  24 |   IdCardIcon,
+> 25 |   ,
+     |   ^
+  26 | } from "lucide-react";
+  27 | import { Button } from "@/components/ui/button";
+  28 |
 
-Expected a semicolon
+Unexpected token `,`. Expected identifier or string
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:25:20.840] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:8:1
+Export ShieldUser doesn't exist in target module
+   6 | import { usePathname } from "next/navigation";
+   7 | import { cn } from "@/lib/utils";
+>  8 | import {
+     | ^^^^^^^^
+>  9 |   LayoutDashboard,
+     | ^^^^^^^^^^^^^^^^^^
+> 10 |   Users,
+     | ^^^^^^^^^^^^^^^^^^
+> 11 |   FileText,
+     | ^^^^^^^^^^^^^^^^^^
+> 12 |   TriangleAlert,
+     | ^^^^^^^^^^^^^^^^^^
+> 13 |   UserCircle,
+     | ^^^^^^^^^^^^^^^^^^
+> 14 |   Settings,
+     | ^^^^^^^^^^^^^^^^^^
+> 15 |   ChevronLeft,
+     | ^^^^^^^^^^^^^^^^^^
+> 16 |   ChevronRight,
+     | ^^^^^^^^^^^^^^^^^^
+> 17 |   Shield,
+     | ^^^^^^^^^^^^^^^^^^
+> 18 |   ClipboardCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 19 |   ChevronDown,
+     | ^^^^^^^^^^^^^^^^^^
+> 20 |   ShieldCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 21 |   BrickWallIcon,
+     | ^^^^^^^^^^^^^^^^^^
+> 22 |   CalendarDays,
+     | ^^^^^^^^^^^^^^^^^^
+> 23 |   Brain,
+     | ^^^^^^^^^^^^^^^^^^
+> 24 |   IdCardIcon,
+     | ^^^^^^^^^^^^^^^^^^
+> 25 |   ,
+     | ^^^^^^^^^^^^^^^^^^
+> 26 | } from "lucide-react";
+     | ^^^^^^^^^^^^^^^^^^
+> 27 | import { Button } from "@/components/ui/button";
+     | ^^^^^^^^^
+  28 |
+  29 | // Definir tipos para los subitems de navegación
+  30 | type SubNavigationItem = {
 
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:54:05.295] Browser ERROR   ./app/dashboard/documents/page.tsx:254:21
+The export ShieldUser was not found in module [project]/Desktop/react/sgi/node_modules/lucide-react/dist/esm/lucide-react.js [app-client] (ecmascript).
+Did you mean to import Shield?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:25:20.840] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:8:1
+Export ShieldUser doesn't exist in target module
+   6 | import { usePathname } from "next/navigation";
+   7 | import { cn } from "@/lib/utils";
+>  8 | import {
+     | ^^^^^^^^
+>  9 |   LayoutDashboard,
+     | ^^^^^^^^^^^^^^^^^^
+> 10 |   Users,
+     | ^^^^^^^^^^^^^^^^^^
+> 11 |   FileText,
+     | ^^^^^^^^^^^^^^^^^^
+> 12 |   TriangleAlert,
+     | ^^^^^^^^^^^^^^^^^^
+> 13 |   UserCircle,
+     | ^^^^^^^^^^^^^^^^^^
+> 14 |   Settings,
+     | ^^^^^^^^^^^^^^^^^^
+> 15 |   ChevronLeft,
+     | ^^^^^^^^^^^^^^^^^^
+> 16 |   ChevronRight,
+     | ^^^^^^^^^^^^^^^^^^
+> 17 |   Shield,
+     | ^^^^^^^^^^^^^^^^^^
+> 18 |   ClipboardCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 19 |   ChevronDown,
+     | ^^^^^^^^^^^^^^^^^^
+> 20 |   ShieldCheck,
+     | ^^^^^^^^^^^^^^^^^^
+> 21 |   BrickWallIcon,
+     | ^^^^^^^^^^^^^^^^^^
+> 22 |   CalendarDays,
+     | ^^^^^^^^^^^^^^^^^^
+> 23 |   Brain,
+     | ^^^^^^^^^^^^^^^^^^
+> 24 |   IdCardIcon,
+     | ^^^^^^^^^^^^^^^^^^
+> 25 |   ,
+     | ^^^^^^^^^^^^^^^^^^
+> 26 | } from "lucide-react";
+     | ^^^^^^^^^^^^^^^^^^
+> 27 | import { Button } from "@/components/ui/button";
+     | ^^^^^^^^^
+  28 |
+  29 | // Definir tipos para los subitems de navegación
+  30 | type SubNavigationItem = {
+
+The export ShieldUser was not found in module [project]/Desktop/react/sgi/node_modules/lucide-react/dist/esm/lucide-react.js [app-ssr] (ecmascript).
+Did you mean to import Shield?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:25:23.274] Server  LOG      ✓ Compiled in 760ms
+[00:25:23.812] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:23.814] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:23.816] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:23.818] Server  ERROR    ⨯ ReferenceError: ShieldUser is not defined
+[00:25:23.872] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:25:23.874] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:25:23.874] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:25:24.003] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:24.004] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:24.008] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:24.009] Server  ERROR    ⨯ ReferenceError: ShieldUser is not defined
+[00:25:25.835] Browser ERROR   uncaughtError: ReferenceError: ShieldUser is not defined
+[00:25:27.834] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:25:3
+Ecmascript file had an error
+  23 |   Brain,
+  24 |   IdCardIcon,
+> 25 |   Shield,
+     |   ^^^^^^
+  26 | } from "lucide-react";
+  27 | import { Button } from "@/components/ui/button";
+  28 |
+
+the name `Shield` is defined multiple times
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:25:38.433] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:38.434] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:38.441] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:25:38.443] Server  ERROR    ⨯ ReferenceError: ShieldUser is not defined
+[00:25:39.833] Browser ERROR   uncaughtError: ReferenceError: ShieldUser is not defined
+[00:25:44.528] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:25:44.532] Server  LOG      ✓ Compiled in 485ms
+[00:25:44.562] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:25:44.565] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:25:44.570] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:25:45.881] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:25:45.881] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/trainingPlan","route":"/dashboard/trainingPlan"}
+[00:25:45.881] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767970711407}
+[00:26:44.795] Server  LOG      ✓ Compiled in 626ms
+[00:26:45.828] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:25:3
+Ecmascript file had an error
+  23 |   Brain,
+  24 |   IdCardIcon,
+> 25 |   Shield,
+     |   ^^^^^^
+  26 | } from "lucide-react";
+  27 | import { Button } from "@/components/ui/button";
+  28 |
+
+the name `Shield` is defined multiple times
+
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:26:48.043] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:26:48.045] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:26:48.048] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:26:48.049] Server  ERROR    ⨯ ReferenceError: ShieldIcon is not defined
+[00:26:48.845] Browser ERROR   uncaughtError: ReferenceError: ShieldIcon is not defined
+[00:26:49.840] Server  LOG      ✓ Compiled in 150ms
+[00:26:50.838] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:25:3
 Parsing ecmascript source code failed
-  252 |                 //   </Link>
-  253 |                 // )}
-> 254 |                 {doc.id === "1" && (
-      |                     ^
-  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
-  256 |                     <Button className="w-full">Diligenciar Acta</Button>
-  257 |                   </Link>
+  23 |   Brain,
+  24 |   IdCardIcon,
+> 25 |   <ShieldUser></ShieldUser>,
+     |   ^
+  26 | } from "lucide-react";
+  27 | import { Button } from "@/components/ui/button";
+  28 |
 
-Expected a semicolon
+Unexpected token `<`. Expected identifier or string
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:54:08.947] Server  LOG      ✓ Compiled in 326ms
-[00:54:09.315] Browser ERROR   ./app/dashboard/documents/page.tsx:253:21
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:26:51.912] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:26:51.913] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:26:51.914] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:26:51.999] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:26:52.000] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:26:52.008] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:26:52.009] Server  ERROR    ⨯ ReferenceError: ShieldIcon is not defined
+[00:26:52.838] Browser ERROR   uncaughtError: ReferenceError: ShieldIcon is not defined
+[00:27:03.430] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:27:03.431] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:27:03.431] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:27:03.789] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:27:03.791] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:27:03.794] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:27:03.796] Server  ERROR    ⨯ ReferenceError: ShieldIcon is not defined
+[00:27:03.823] Server  LOG      ✓ Compiled in 154ms
+[00:27:04.838] Browser ERROR   uncaughtError: ReferenceError: ShieldIcon is not defined
+[00:27:18.004] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:27:18.005] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:27:18.006] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:27:18.029] Server  LOG      ✓ Compiled in 193ms
+[00:27:18.515] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:27:18.518] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:27:18.523] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:27:18.525] Server  ERROR    ⨯ ReferenceError: ShieldIcon is not defined
+[00:27:19.844] Browser ERROR   uncaughtError: ReferenceError: ShieldIcon is not defined
+[00:29:00.356] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:29:00.357] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:29:00.358] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:29:00.376] Server  LOG      ✓ Compiled in 144ms
+[00:29:00.733] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:00.735] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:00.738] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:00.739] Server  ERROR    ⨯ ReferenceError: ShieldUser is not defined
+[00:29:01.830] Browser ERROR   uncaughtError: ReferenceError: ShieldUser is not defined
+[00:29:03.313] Server  LOG      ✓ Compiled in 198ms
+[00:29:03.842] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:27:10
 Parsing ecmascript source code failed
-  251 |                 //     </Button>
-  252 |                 //   </Link>
-> 253 |                 // )}
-      |                     ^
-  254 |                 {doc.id === "1" && (
-  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
-  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+  25 | } from "lucide-react";
+  26 | <ShieldUser
+> 27 | import { Button } from "@/components/ui/button";
+     |          ^^^^^^
+  28 |
+  29 | // Definir tipos para los subitems de navegación
+  30 | type SubNavigationItem = {
 
-Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+Expected '...', got 'Button'
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:54:29.302] Browser ERROR   ./app/dashboard/documents/page.tsx:253:19
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:29:04.629] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:29:04.629] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:29:04.632] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:29:05.048] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:05.050] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:05.057] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:05.060] Server  ERROR    ⨯ ReferenceError: ShieldUser is not defined
+[00:29:05.218] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:05.220] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:05.223] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:05.224] Server  ERROR    ⨯ ReferenceError: ShieldUser is not defined
+[00:29:06.838] Browser ERROR   uncaughtError: ReferenceError: ShieldUser is not defined
+[00:29:07.174] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:29:07.174] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:29:07.176] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:29:07.512] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:07.514] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:07.517] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:07.518] Server  ERROR    ⨯ ReferenceError: ShieldIcon is not defined
+[00:29:07.552] Server  LOG      ✓ Compiled in 222ms
+[00:29:07.650] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:07.651] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:07.665] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:07.666] Server  ERROR    ⨯ ReferenceError: ShieldIcon is not defined
+[00:29:08.843] Browser ERROR   uncaughtError: ReferenceError: ShieldIcon is not defined
+[00:29:10.589] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:29:10.590] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:29:10.592] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:29:10.922] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:10.924] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:10.926] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:10.927] Server  ERROR    ⨯ ReferenceError: ShieldIcon is not defined
+[00:29:10.961] Server  LOG      ✓ Compiled in 144ms
+[00:29:11.033] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b97d237b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:11.035] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:11.038] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:29:11.039] Server  ERROR    ⨯ ReferenceError: ShieldIcon is not defined
+[00:29:11.835] Browser ERROR   uncaughtError: ReferenceError: ShieldIcon is not defined
+[00:29:27.732] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:29:28.554] Server  LOG      ✓ Compiled in 519ms
+[00:29:28.562] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:29:28.564] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/dashboard/sidebar.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:29:28.565] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:29:29.714] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:29:29.714] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/trainingPlan","route":"/dashboard/trainingPlan"}
+[00:29:29.714] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767970935247}
+[00:30:13.844] Server  LOG      ✓ Compiled in 201ms
+[00:30:14.841] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:26:3
 Parsing ecmascript source code failed
-  251 |                 //     </Button>
-  252 |                 //   </Link>
-> 253 |                  )}
-      |                   ^
-  254 |                 {doc.id === "1" && (
-  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
-  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+  24 |   IdCardIcon,
+  25 |   ShieldPlus,
+> 26 |   <UsersRound />
+     |   ^
+  27 | } from "lucide-react";
+  28 |
+  29 | import { Button } from "@/components/ui/button";
 
-Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+Unexpected token `<`. Expected identifier or string
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:54:32.299] Browser ERROR   ./app/dashboard/documents/page.tsx:253:19
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:30:16.828] Browser ERROR   ./Desktop/react/sgi/components/dashboard/sidebar.tsx:26:3
 Parsing ecmascript source code failed
-  251 |                      </Button>
-  252 |                    </Link>
-> 253 |                  )}
-      |                   ^
-  254 |                 {doc.id === "1" && (
-  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
-  256 |                     <Button className="w-full">Diligenciar Acta</Button>
+  24 |   IdCardIcon,
+  25 |   ShieldPlus,
+> 26 |   <UsersRound
+     |   ^
+  27 | } from "lucide-react";
+  28 |
+  29 | import { Button } from "@/components/ui/button";
 
-Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+Unexpected token `<`. Expected identifier or string
 
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:54:35.527] Browser ERROR   ./app/dashboard/documents/page.tsx:253:19
-Parsing ecmascript source code failed
-  251 |                      </Button>
-  252 |                    </Link>
-> 253 |                  )}
-      |                   ^
-  254 |                 {doc.id === "1" && (
-  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
-  256 |                     <Button className="w-full">Diligenciar Acta</Button>
-
-Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:54:36.300] Browser ERROR   ./app/dashboard/documents/page.tsx:253:19
-Parsing ecmascript source code failed
-  251 |                      </Button>
-  252 |                    </Link>
-> 253 |                  )}
-      |                   ^
-  254 |                 {doc.id === "1" && (
-  255 |                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
-  256 |                     <Button className="w-full">Diligenciar Acta</Button>
-
-Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:54:42.352] Server  LOG      ✓ Compiled in 241ms
-[00:54:43.289] Browser ERROR   ./app/dashboard/documents/page.tsx:274:1
-Parsing ecmascript source code failed
-  272 |   )
-  273 | }
-> 274 | 
-      | ^
-
-Unterminated block comment
-
-Import traces:
-  Client Component Browser:
-    ./app/dashboard/documents/page.tsx [Client Component Browser]
-    ./app/dashboard/documents/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/dashboard/documents/page.tsx [Client Component SSR]
-    ./app/dashboard/documents/page.tsx [Server Component]
-[00:54:44.654] Server  LOG      ✓ Compiled in 477ms
-[00:54:45.362] Browser ERROR   uncaughtError: ReferenceError: isSGSSTDocument is not defined
-[00:54:49.883] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:54:50.937] Server  LOG      ✓ Compiled in 223ms
-[00:54:51.675] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:54:52.341] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:54:52.341] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/documents","route":"/dashboard/documents"}
-[00:54:52.341] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766197888}
-[00:55:12.005] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/1/assignment color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]/assignment","o":"http://localhost:3000/dashboard/documents/1/assignment","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766217775}
-[00:55:16.375] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766222051}
-[00:55:21.150] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/10/preventive-procedure color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]/preventive-procedure","o":"http://localhost:3000/dashboard/documents/10/preventive-procedure","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766226918}
-[00:55:44.376] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766249909}
-[00:55:50.912] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766256587}
-[00:56:37.733] Server  LOG      ✓ Compiled in 815ms
-[00:56:41.499] Server  LOG      ✓ Compiled in 349ms
-[01:01:52.799] Server  LOG      ✓ Compiled in 744ms
-[01:01:58.568] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[01:01:58.568] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[01:02:07.958] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766633652}
-[01:02:10.767] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/10/preventive-procedure color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]/preventive-procedure","o":"http://localhost:3000/dashboard/documents/10/preventive-procedure","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766636448}
-[01:03:29.916] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[01:03:30.349] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[01:03:30.349] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/documents/10/preventive-procedure","route":"/dashboard/documents/[id]/preventive-procedure"}
-[01:03:30.350] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/10/preventive-procedure color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]/preventive-procedure","o":"http://localhost:3000/dashboard/documents/10/preventive-procedure","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766716088}
-[01:03:37.026] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766722714}
-[01:03:40.448] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[01:03:40.787] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[01:03:40.787] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
-[01:03:40.787] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766726561}
-[01:03:41.415] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[01:03:41.415] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[01:04:03.225] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[01:04:03.385] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[01:04:03.385] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","route":"/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b"}
-[01:04:03.386] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","o":"http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766749159}
-[01:04:07.632] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[01:04:08.040] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[01:04:08.040] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
-[01:04:08.040] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766753818}
-[01:04:10.359] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[01:04:10.503] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[01:04:10.503] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","route":"/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b"}
-[01:04:10.503] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","o":"http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766756281}
-[01:04:13.019] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[01:04:13.366] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[01:04:13.366] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/preventiveMeasures","route":"/dashboard/preventiveMeasures"}
-[01:04:13.366] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766759137}
-[01:05:44.695] Server  LOG      ✓ Compiled in 875ms
-[01:06:11.431] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures/[id]","o":"http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766877143}
-[01:06:20.179] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766885888}
-[01:06:22.697] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures/[id]","o":"http://localhost:3000/dashboard/preventiveMeasures/f0783b8e-3c55-4bbc-b709-d08db2b6949b","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766888394}
-[01:06:25.697] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767766891437}
-[01:06:56.612] Server  LOG      ✓ Compiled in 184ms
-[01:06:58.703] Server  LOG      ✓ Compiled in 836ms
+Import trace:
+  Server Component:
+    ./Desktop/react/sgi/components/dashboard/sidebar.tsx
+    ./Desktop/react/sgi/app/dashboard/layout.tsx
+[00:30:33.719] Server  LOG      ✓ Compiled in 457ms
+[00:30:35.456] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:30:35.456] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/trainingPlan","route":"/dashboard/trainingPlan"}
+[00:30:35.456] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1767971000987}
