@@ -14,7 +14,6 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Shield,
   ClipboardCheck,
   ChevronDown,
   ShieldCheck,
