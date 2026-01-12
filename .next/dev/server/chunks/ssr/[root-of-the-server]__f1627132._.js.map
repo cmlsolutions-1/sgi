@@ -2,5 +2,5 @@
   "version": 3,
   "sources": [],
   "sections": [
-    {"offset": {"line": 14, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Familia%20Cortes/Desktop/DASHBOARD%20REACT/SISTEMA%20DE%20GESTION/app/page.tsx"],"sourcesContent":["import { redirect } from \"next/navigation\"\n\nexport default function Home() {\n  redirect(\"/dashboard\")\n}\n"],"names":[],"mappings":";;;;AAAA;AAAA;;AAEe,SAAS;IACtB,IAAA,iMAAQ,EAAC;AACX"}}]
+    {"offset": {"line": 14, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Familia%20Cortes/Desktop/DASHBOARD%20REACT/SISTEMA%20DE%20GESTION/app/page.tsx"],"sourcesContent":["//app/page.tsx\n\nimport { redirect } from \"next/navigation\"\n\nexport default function Home() {\n  redirect(\"/dashboard\")\n}\n"],"names":[],"mappings":"AAAA,cAAc;;;;;AAEd;AAAA;;AAEe,SAAS;IACtB,IAAA,iMAAQ,EAAC;AACX"}}]
 }

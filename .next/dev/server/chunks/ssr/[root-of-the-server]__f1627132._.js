@@ -12,6 +12,7 @@ __turbopack_context__.n(__turbopack_context__.i("[project]/app/layout.tsx [app-r
 "[project]/app/page.tsx [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+//app/page.tsx
 __turbopack_context__.s([
     "default",
     ()=>Home

@@ -10,7 +10,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground">Sistema de Gestión de Calidad ISO 9001:2015</p>
+          <p className="text-muted-foreground">Sistema de Gestión</p>
         </div>
         <div className="text-sm text-muted-foreground">
           Última actualización: {new Date().toLocaleDateString("es-ES")}

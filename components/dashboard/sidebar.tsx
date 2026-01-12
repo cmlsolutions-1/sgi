@@ -1,4 +1,4 @@
-//src/components/dashboard/sidebar.tsx
+//components/dashboard/sidebar.tsx
 "use client";
 
 import { useState } from "react";

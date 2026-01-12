@@ -96,6 +96,8 @@
     --text-2xl--line-height: calc(2 / 1.5);
     --text-3xl: 1.875rem;
     --text-3xl--line-height: calc(2.25 / 1.875);
+    --text-4xl: 2.25rem;
+    --text-4xl--line-height: calc(2.5 / 2.25);
     --font-weight-normal: 400;
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
@@ -697,6 +699,10 @@
     margin-bottom: calc(var(--spacing) * 4);
   }
 
+  .mb-8 {
+    margin-bottom: calc(var(--spacing) * 8);
+  }
+
   .-ml-4 {
     margin-left: calc(var(--spacing) * -4);
   }
@@ -1014,6 +1020,10 @@
 
   .min-h-\[400px\] {
     min-height: 400px;
+  }
+
+  .min-h-screen {
+    min-height: 100vh;
   }
 
   .min-h-svh {
@@ -1785,6 +1795,16 @@
     border-color: var(--success);
   }
 
+  .border-success\/30 {
+    border-color: var(--success);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .border-success\/30 {
+      border-color: color-mix(in oklab, var(--success) 30%, transparent);
+    }
+  }
+
   .border-transparent {
     border-color: #0000;
   }
@@ -1992,6 +2012,16 @@
   @supports (color: color-mix(in lab, red, red)) {
     .bg-success\/5 {
       background-color: color-mix(in oklab, var(--success) 5%, transparent);
+    }
+  }
+
+  .bg-success\/20 {
+    background-color: var(--success);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .bg-success\/20 {
+      background-color: color-mix(in oklab, var(--success) 20%, transparent);
     }
   }
 
@@ -2245,6 +2275,11 @@
   .text-3xl {
     font-size: var(--text-3xl);
     line-height: var(--tw-leading, var(--text-3xl--line-height));
+  }
+
+  .text-4xl {
+    font-size: var(--text-4xl);
+    line-height: var(--tw-leading, var(--text-4xl--line-height));
   }
 
   .text-base {
