@@ -1,453 +1,163 @@
-[00:00:03.274] Server  LOG      ✓ Ready in 2.2s
-[00:00:14.247] Server  LOG      ○ Compiling /dashboard/trainingPlan ...
-[00:00:22.190] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:22.872] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:22.872] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/trainingPlan","route":"/dashboard/trainingPlan"}
-[00:00:22.872] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3001/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768239890344}
-[00:02:41.573] Server  LOG      ○ Compiling /dashboard ...
-[00:02:45.870] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:04.360] Server  LOG      ✓ Ready in 3.2s
+[00:01:57.728] Server  LOG      ○ Compiling / ...
+[00:02:07.534] Server  LOG      ○ Compiling /dashboard ...
+[00:02:11.654] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:45.870] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:02:11.663] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:45.870] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:02:11.670] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:45.870] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:02:11.679] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:45.870] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:02:13.017] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:45.870] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:45.870] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:45.870] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:45.870] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3001/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768240032628}
-[00:02:48.683] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:48.696] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:48.704] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:48.717] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:49.447] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:02:50.276] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:02:16.022] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:02:16.022] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[00:02:16.022] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768347904436}
+[00:02:27.641] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:02:27.790] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:02:27.790] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/ocupational","route":"/dashboard/ocupational"}
+[00:02:27.790] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/ocupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/ocupational","o":"http://localhost:3000/dashboard/ocupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768347916765}
+[00:03:01.326] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:50.277] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:03:01.330] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:50.277] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:03:01.333] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:50.277] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:03:01.337] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:50.277] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:03:02.430] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:03:03.129] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:50.277] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:03:03.129] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:50.277] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:03:03.129] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:50.277] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:03:03.129] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:50.415] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:02:50.415] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:02:50.415] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3001/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768240037874}
-[00:05:10.670] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/dashboard/roles color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/roles","o":"http://localhost:3001/dashboard/roles","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768240178164}
-[00:07:35.333] Server  LOG      ✓ Compiled in 252ms
-[00:07:36.699] Server  LOG      ✓ Compiled in 152ms
-[00:07:39.251] Server  LOG      ✓ Compiled in 524ms
-[00:07:49.847] Server  LOG      ✓ Compiled in 207ms
-[00:12:22.544] Server  LOG      ✓ Compiled in 1691ms
-[00:13:08.193] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:13:08.535] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:13:08.535] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/roles","route":"/dashboard/roles"}
-[00:13:08.535] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/dashboard/roles color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/roles","o":"http://localhost:3001/dashboard/roles","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768240656066}
-[00:13:15.847] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:03:03.130] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:13:15.852] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:03:03.130] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:13:15.859] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:03:03.130] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:13:15.869] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:03:03.130] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:13:16.728] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:13:17.678] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:13:17.678] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:13:17.678] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:13:17.678] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:13:17.678] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:13:17.678] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:13:17.678] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:13:17.678] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:13:17.826] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:13:17.826] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:13:17.826] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3001/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768240665330}
-[00:13:58.909] Server  ERROR    ⨯ ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:13:59.047] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:14:01.623] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:14:01.764] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:14:01.938] Server  LOG      ○ Compiling /_error ...
-[00:14:04.050] Browser ERROR   uncaughtError: Error: ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:14:04.218] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:14:04.343] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:15:17.685] Server  ERROR    ⨯ ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:15:18.169] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:15:20.819] Server  ERROR    ⨯ ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:15:21.173] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:15:22.487] Server  ERROR    ⨯ ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:15:23.175] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:15:37.168] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:15:41.161] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:15:44.212] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:15:46.165] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:16:43.331] Server  ERROR    ⨯ ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:16:43.836] Browser ERROR   uncaughtError: Error: ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:16:44.011] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:16:44.011] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:17:20.167] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:17:24.288] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:17:25.170] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve './globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:17:37.449] Server  LOG      ✓ Compiled in 1394ms
-[00:17:40.148] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:17:40.583] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[00:03:03.261] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:03:03.261] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[00:03:03.261] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768347952228}
+[00:03:08.646] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768347957523}
+[00:03:17.918] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:03:18.017] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:03:18.017] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/ocupational","route":"/dashboard/ocupational"}
+[00:03:18.017] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/ocupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/ocupational","o":"http://localhost:3000/dashboard/ocupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768347967007}
+[00:05:10.177] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:05:10.320] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:05:10.320] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/ocupational","route":"/dashboard/ocupational"}
+[00:05:10.320] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/ocupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/ocupational","o":"http://localhost:3000/dashboard/ocupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348079327}
+[00:05:13.341] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:05:13.808] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:05:13.808] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
+[00:05:13.808] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348082813}
+[00:05:16.451] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:05:16.597] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:05:16.597] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
+[00:05:16.597] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348085609}
+[00:05:18.821] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:05:19.175] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:05:19.175] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
+[00:05:19.175] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348088180}
+[00:05:21.127] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:05:21.279] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:05:21.279] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
+[00:05:21.279] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348090288}
+[00:05:59.871] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:06:00.213] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:06:00.213] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
+[00:06:00.213] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348129222}
+[00:06:03.637] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:06:03.791] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:06:03.792] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/workingPlan","route":"/dashboard/workingPlan"}
+[00:06:03.792] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/workingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/workingPlan","o":"http://localhost:3000/dashboard/workingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348132804}
+[00:06:06.321] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:06:06.630] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:06:06.630] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
+[00:06:06.630] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348135648}
+[00:06:09.493] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348138412}
+[00:07:58.461] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348247370}
+[00:08:55.975] Server  LOG      ✓ Compiled in 212ms
+[00:09:10.393] Server  LOG      ✓ Compiled in 248ms
+[00:09:12.364] Server  LOG      ✓ Compiled in 227ms
+[00:09:14.959] Server  LOG      ✓ Compiled in 749ms
+[00:09:18.745] Server  LOG      ✓ Compiled in 753ms
+[00:09:26.047] Server  LOG      ✓ Compiled in 217ms
+[00:09:37.186] Server  LOG      ✓ Compiled in 253ms
+[00:11:06.224] Server  LOG      ✓ Compiled in 853ms
+[00:11:15.157] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:11:16.775] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
 - A server/client branch `if (typeof window !== 'undefined')`.
 - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
@@ -457,40 +167,41 @@ https://nextjs.org/docs/messages/module-not-found
 
 It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
 
-%s%s https://react.dev/link/hydration-mismatch 
+https://react.dev/link/hydration-mismatch
 
   ...
-    <RenderFromTemplateContext>
-      <ScrollAndFocusHandler segmentPath={[...]}>
-        <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
-          <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
-            <LoadingBoundary name="/" loading={null}>
-              <HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
-                <HTTPAccessFallbackErrorBoundary pathname="/manager" notFound={<SegmentViewNode>} forbidden={undefined} ...>
-                  <RedirectBoundary>
-                    <RedirectErrorBoundary router={{...}}>
-                      <InnerLayoutRouter url="/manager" tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
-                        <SegmentViewNode type="layout" pagePath="manager/la...">
-                          <SegmentTrieNode>
-                          <link>
-                          <script>
-                          <RootLayout>
-                            <html
-+                             lang="en"
--                             lang="es"
--                             className="dark"
-                            >
-                      ...
-          ...
+    <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
+      <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
+        <LoadingBoundary name="occupational/" loading={null}>
+          <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
+            <RedirectBoundary>
+              <RedirectErrorBoundary router={{...}}>
+                <InnerLayoutRouter url="/dashboard..." tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
+                  <SegmentViewNode type="page" pagePath="dashboard/...">
+                    <SegmentTrieNode>
+                    <ClientPageRoot Component={function OcupationalPage} serverProvidedParams={{...}}>
+                      <OcupationalPage params={Promise} searchParams={Promise}>
+                        <div className="space-y-6">
+                          <div>
+                          <Card>
+                          <div className="space-y-4">
+                            <Card className="border-l-4...">
++                             <div
++                               data-slot="card"
++                               className="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 sha..."
++                             >
+                          ...
+                  ...
+                ...
+      ...
 
-[00:17:40.583] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:17:40.583] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:17:40.583] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:17:40.583] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768240928138}
-[00:17:40.583] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768240928138}
-[00:18:52.734] Server  LOG      ✓ Compiled in 533ms
-[00:18:57.778] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:18:59.174] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[00:11:16.775] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:11:16.775] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
+[00:11:16.775] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
+[00:11:16.775] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348445843}
+[00:11:16.775] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348445844}
+[00:11:22.033] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:11:22.465] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
 
 - A server/client branch `if (typeof window !== 'undefined')`.
 - Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
@@ -500,879 +211,61 @@ It can also happen if the client has a browser extension installed which messes 
 
 It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
 
-%s%s https://react.dev/link/hydration-mismatch 
+https://react.dev/link/hydration-mismatch
 
   ...
-    <RenderFromTemplateContext>
-      <ScrollAndFocusHandler segmentPath={[...]}>
-        <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
-          <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
-            <LoadingBoundary name="/" loading={null}>
-              <HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
-                <HTTPAccessFallbackErrorBoundary pathname="/manager" notFound={<SegmentViewNode>} forbidden={undefined} ...>
-                  <RedirectBoundary>
-                    <RedirectErrorBoundary router={{...}}>
-                      <InnerLayoutRouter url="/manager" tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
-                        <SegmentViewNode type="layout" pagePath="manager/la...">
-                          <SegmentTrieNode>
-                          <RootLayout>
-                            <html
-+                             lang="en"
--                             lang="es"
--                             className="dark"
-                            >
-                      ...
-          ...
-
-[00:18:59.174] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:18:59.174] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:18:59.174] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:18:59.174] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241005781}
-[00:18:59.174] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241005781}
-[00:19:08.104] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:19:08.318] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-%s%s https://react.dev/link/hydration-mismatch 
-
-  ...
-    <RenderFromTemplateContext>
-      <ScrollAndFocusHandler segmentPath={[...]}>
-        <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
-          <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
-            <LoadingBoundary name="/" loading={null}>
-              <HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
-                <HTTPAccessFallbackErrorBoundary pathname="/manager" notFound={<SegmentViewNode>} forbidden={undefined} ...>
-                  <RedirectBoundary>
-                    <RedirectErrorBoundary router={{...}}>
-                      <InnerLayoutRouter url="/manager" tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
-                        <SegmentViewNode type="layout" pagePath="manager/la...">
-                          <SegmentTrieNode>
-                          <RootLayout>
-                            <html
-+                             lang="en"
--                             lang="es"
--                             className="dark"
-                            >
-                      ...
-          ...
-
-[00:19:08.319] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:19:08.319] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:19:08.319] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:19:08.319] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241015890}
-[00:19:08.319] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241015890}
-[00:19:58.264] Server  LOG      ✓ Compiled in 530ms
-[00:19:59.541] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\app_manager_layout_tsx_f84e0b8a._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:19:59.682] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:19:59.766] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\[root-of-the-server]__3344e1e0._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:19:59.935] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\node_modules_next_dist_1c5dda47._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.320] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.381] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\trace\tracer.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.425] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.429] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.431] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.433] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.436] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.438] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.441] Server  ERROR    ⨯ ReferenceError: impor is not defined
-[00:20:00.446] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\app_manager_layout_tsx_f84e0b8a._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.448] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.449] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\[root-of-the-server]__3344e1e0._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.451] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\node_modules_next_dist_1c5dda47._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.457] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.460] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\trace\tracer.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.490] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.511] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.542] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.564] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.573] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.587] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:00.599] Server  ERROR    ⨯ ReferenceError: impor is not defined
-[00:20:02.767] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\app_manager_layout_tsx_f84e0b8a._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.768] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.777] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\[root-of-the-server]__3344e1e0._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.781] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\node_modules_next_dist_1c5dda47._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.798] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.802] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\trace\tracer.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.809] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.817] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.821] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.823] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.827] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.832] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.835] Server  ERROR    ⨯ ReferenceError: impor is not defined
-[00:20:02.841] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\app_manager_layout_tsx_f84e0b8a._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.842] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.843] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\[root-of-the-server]__3344e1e0._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.850] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\node_modules_next_dist_1c5dda47._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.857] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.858] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\trace\tracer.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.860] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.866] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.880] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.890] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.915] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.953] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:20:02.969] Server  ERROR    ⨯ ReferenceError: impor is not defined
-[00:20:04.870] Browser ERROR   uncaughtError: ReferenceError: impor is not defined
-[00:20:05.817] Browser ERROR   ./app/manager/layout.tsx:7:1
-Parsing ecmascript source code failed
-   5 | import 
-   6 |
->  7 | const _geist = Geist({ subsets: ["latin"] })
-     | ^^^^^
-   8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-   9 |
-  10 | export const metadata: Metadata = {
-
-Expected 'from', got 'const'
-[00:20:05.817] Browser ERROR   ./app/manager/layout.tsx:7:1
-Parsing ecmascript source code failed
-   5 | import 
-   6 |
->  7 | const _geist = Geist({ subsets: ["latin"] })
-     | ^^^^^
-   8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-   9 |
-  10 | export const metadata: Metadata = {
-
-Expected 'from', got 'const'
-[00:20:05.938] Server  ERROR    ⨯ ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve ''
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import ""
-    | ^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:20:06.788] Browser ERROR   ./app/manager/layout.tsx:7:1
-Parsing ecmascript source code failed
-   5 | import 
-   6 |
->  7 | const _geist = Geist({ subsets: ["latin"] })
-     | ^^^^^
-   8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-   9 |
-  10 | export const metadata: Metadata = {
-
-Expected 'from', got 'const'
-[00:20:06.788] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve ''
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import ""
-    | ^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:20:07.956] Server  ERROR    ⨯ ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve '-'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "-"
-    | ^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:20:09.417] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve '-'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import "-"
-    | ^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:20:10.510] Server  ERROR    ⨯ ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve '.g'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import ".g"
-    | ^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:20:11.159] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve '.g'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import ".g"
-    | ^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:20:12.013] Server  ERROR    ⨯ ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve '.glo'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import ".glo"
-    | ^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:20:12.168] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve '.glo'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import ".glo"
-    | ^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:20:24.936] Server  ERROR    ⨯ ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve '.glo'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import ".globals.class name {
-    | ^^^^^^^^^^^^^
-  6 |   constructor(parameters) {
-  7 |     
-  8 |   }
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:20:25.188] Browser ERROR   ./app/manager/layout.tsx:5:8
-Parsing ecmascript source code failed
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import ".globals.class name {
-    |        ^^^^^^^^^^^^^^^^^^^^^^
-  6 |   constructor(parameters) {
-  7 |     
-  8 |   }
-
-Unterminated string constant
-[00:20:25.188] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve '.glo'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import ".globals.class name {
-    | ^^^^^^^^^^^^^
-  6 |   constructor(parameters) {
-  7 |     
-  8 |   }
-
-https://nextjs.org/docs/messages/module-not-found
-[00:20:26.140] Server  ERROR    ⨯ ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve '.globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import ".globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:20:27.258] Browser ERROR   ./app/manager/layout.tsx:5:1
-Module not found: Can't resolve '.globals.css'
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import ".globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-https://nextjs.org/docs/messages/module-not-found
-[00:20:34.921] Server  LOG      ✓ Compiled in 194ms
-[00:20:37.127] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:20:38.170] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-%s%s https://react.dev/link/hydration-mismatch 
-
-  ...
-    <RenderFromTemplateContext>
-      <ScrollAndFocusHandler segmentPath={[...]}>
-        <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
-          <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
-            <LoadingBoundary name="/" loading={null}>
-              <HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
-                <HTTPAccessFallbackErrorBoundary pathname="/manager" notFound={<SegmentViewNode>} forbidden={undefined} ...>
-                  <RedirectBoundary>
-                    <RedirectErrorBoundary router={{...}}>
-                      <InnerLayoutRouter url="/manager" tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
-                        <SegmentViewNode type="layout" pagePath="manager/la...">
-                          <SegmentTrieNode>
-                          <RootLayout>
-                            <html
-+                             lang="en"
--                             lang="es"
--                             className="dark"
-                            >
-                      ...
-          ...
-
-[00:20:38.170] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:20:38.170] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:20:38.170] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:20:38.170] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241105106}
-[00:20:38.170] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241105106}
-[00:20:44.462] Browser ERROR   ./app/manager/layout.tsx:7:1
-Parsing ecmascript source code failed
-   5 | import 
-   6 |
->  7 | const _geist = Geist({ subsets: ["latin"] })
-     | ^^^^^
-   8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-   9 |
-  10 | export const metadata: Metadata = {
-
-Expected 'from', got 'const'
-[00:20:44.462] Browser ERROR   ./app/manager/layout.tsx:7:1
-Parsing ecmascript source code failed
-   5 | import {}
-   6 |
->  7 | const _geist = Geist({ subsets: ["latin"] })
-     | ^^^^^
-   8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-   9 |
-  10 | export const metadata: Metadata = {
-
-Expected 'from', got 'const'
-[00:20:59.164] Browser ERROR   ./app/manager/layout.tsx:5:25
-Parsing ecmascript source code failed
-  3 | import { Geist, Geist_Mono } from "next/font/google"
-  4 | import { Analytics } from "@vercel/analytics/next"
-> 5 | import { globals } from "
-    |                         ^
-  6 |
-  7 | const _geist = Geist({ subsets: ["latin"] })
-  8 | const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-Unterminated string constant
-[00:21:51.018] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:21:51.244] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-%s%s https://react.dev/link/hydration-mismatch 
-
-  ...
-    <RenderFromTemplateContext>
-      <ScrollAndFocusHandler segmentPath={[...]}>
-        <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
-          <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
-            <LoadingBoundary name="/" loading={null}>
-              <HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
-                <HTTPAccessFallbackErrorBoundary pathname="/manager" notFound={<SegmentViewNode>} forbidden={undefined} ...>
-                  <RedirectBoundary>
-                    <RedirectErrorBoundary router={{...}}>
-                      <InnerLayoutRouter url="/manager" tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
-                        <SegmentViewNode type="layout" pagePath="manager/la...">
-                          <SegmentTrieNode>
-                          <RootLayout>
-                            <html
-+                             lang="en"
--                             lang="es"
--                             className="dark"
-                            >
-                              ...
-                                <Slot type="button" aria-haspopup="dialog" aria-expanded={false} ...>
-                                  <SlotClone type="button" aria-haspopup="dialog" aria-expanded={false} ...>
-                                    <Button className="bg-primary..." type="button" aria-haspopup="dialog" ...>
-                                      <button
-                                        data-slot="dialog-trigger"
-                                        className={"inline-flex items-center justify-center gap-2 whitespace-nowrap r..."}
-                                        type="button"
-                                        aria-haspopup="dialog"
-                                        aria-expanded={false}
-+                                       aria-controls="radix-_R_2aqndkndlb_"
--                                       aria-controls="radix-_R_9bindkndlb_"
-                                        data-state="closed"
-                                        onClick={function handleEvent}
-                                        ref={function}
-                                      >
-                      ...
-          ...
-
-[00:21:51.244] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:21:51.244] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:21:51.244] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:21:51.244] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241178824}
-[00:21:51.244] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241178825}
-[00:21:53.749] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:21:53.977] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-%s%s https://react.dev/link/hydration-mismatch 
-
-  ...
-    <RenderFromTemplateContext>
-      <ScrollAndFocusHandler segmentPath={[...]}>
-        <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
-          <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
-            <LoadingBoundary name="/" loading={null}>
-              <HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
-                <HTTPAccessFallbackErrorBoundary pathname="/manager" notFound={<SegmentViewNode>} forbidden={undefined} ...>
-                  <RedirectBoundary>
-                    <RedirectErrorBoundary router={{...}}>
-                      <InnerLayoutRouter url="/manager" tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
-                        <SegmentViewNode type="layout" pagePath="manager/la...">
-                          <SegmentTrieNode>
-                          <RootLayout>
-                            <html
-+                             lang="en"
--                             lang="es"
--                             className="dark"
-                            >
-                      ...
-          ...
-
-[00:21:53.977] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:21:53.977] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:21:53.977] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:21:53.977] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241181549}
-[00:21:53.977] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241181549}
-[00:22:04.516] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:22:04.750] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-%s%s https://react.dev/link/hydration-mismatch 
-
-  ...
-    <RenderFromTemplateContext>
-      <ScrollAndFocusHandler segmentPath={[...]}>
-        <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
-          <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
-            <LoadingBoundary name="/" loading={null}>
-              <HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
-                <HTTPAccessFallbackErrorBoundary pathname="/manager" notFound={<SegmentViewNode>} forbidden={undefined} ...>
-                  <RedirectBoundary>
-                    <RedirectErrorBoundary router={{...}}>
-                      <InnerLayoutRouter url="/manager" tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
-                        <SegmentViewNode type="layout" pagePath="manager/la...">
-                          <SegmentTrieNode>
-                          <RootLayout>
-                            <html
-+                             lang="en"
--                             lang="es"
--                             className="dark"
-                            >
-                      ...
-          ...
-
-[00:22:04.750] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:22:04.750] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:22:04.750] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:22:04.750] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241192334}
-[00:22:04.750] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241192334}
-[00:32:57.407] Server  ERROR    ⨯ ./app/manager/layout.tsx:1:1
-Module not found: Can't resolve './globals.css'
-> 1 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  2 |
-  3 | import type React from "react"
-  4 | import type { Metadata } from "next"
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:32:57.410] Server  ERROR    ⨯ ./app/manager/layout.tsx:1:1
-Module not found: Can't resolve './globals.css'
-> 1 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  2 |
-  3 | import type React from "react"
-  4 | import type { Metadata } from "next"
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:32:58.786] Browser ERROR   ./app/manager/layout.tsx:1:1
-Module not found: Can't resolve './globals.css'
-> 1 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  2 |
-  3 | import type React from "react"
-  4 | import type { Metadata } from "next"
-
-https://nextjs.org/docs/messages/module-not-found
-[00:33:02.286] Server  ERROR    ⨯ ./app/manager/layout.tsx:1:1
-Module not found: Can't resolve './globals.css'
-> 1 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  2 |
-  3 | import type React from "react"
-  4 | import type { Metadata } from "next"
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:33:03.078] Browser ERROR   uncaughtError: Error: ./app/manager/layout.tsx:1:1
-Module not found: Can't resolve './globals.css'
-> 1 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  2 |
-  3 | import type React from "react"
-  4 | import type { Metadata } from "next"
-
-
-
-https://nextjs.org/docs/messages/module-not-found
-
-
-[00:33:03.244] Browser ERROR   ./app/manager/layout.tsx:1:1
-Module not found: Can't resolve './globals.css'
-> 1 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  2 |
-  3 | import type React from "react"
-  4 | import type { Metadata } from "next"
-
-https://nextjs.org/docs/messages/module-not-found
-[00:33:03.396] Browser ERROR   ./app/manager/layout.tsx:1:1
-Module not found: Can't resolve './globals.css'
-> 1 | import "./globals.css"
-    | ^^^^^^^^^^^^^^^^^^^^^^
-  2 |
-  3 | import type React from "react"
-  4 | import type { Metadata } from "next"
-
-https://nextjs.org/docs/messages/module-not-found
-[00:34:06.836] Server  LOG      ✓ Compiled in 220ms
-[00:34:10.001] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:34:10.329] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-%s%s https://react.dev/link/hydration-mismatch 
-
-  ...
-    <RenderFromTemplateContext>
-      <ScrollAndFocusHandler segmentPath={[...]}>
-        <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
-          <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
-            <LoadingBoundary name="/" loading={null}>
-              <HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
-                <HTTPAccessFallbackErrorBoundary pathname="/manager" notFound={<SegmentViewNode>} forbidden={undefined} ...>
-                  <RedirectBoundary>
-                    <RedirectErrorBoundary router={{...}}>
-                      <InnerLayoutRouter url="/manager" tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
-                        <SegmentViewNode type="layout" pagePath="manager/la...">
-                          <SegmentTrieNode>
-                          <RootLayout>
-                            <html
-+                             lang="en"
--                             lang="es"
--                             className="dark"
-                            >
-                      ...
-          ...
-
-[00:34:10.329] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:34:10.329] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:34:10.329] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:34:10.329] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241917953}
-[00:34:10.329] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241917953}
-[00:34:38.858] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:34:38.865] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:34:38.875] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:34:38.894] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:34:39.653] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:34:40.762] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:34:40.762] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:34:40.762] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:34:40.762] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:34:40.762] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:34:40.762] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:34:40.762] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:34:40.762] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:34:40.911] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:34:40.911] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:34:40.911] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3001/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241948500}
-[00:34:58.008] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:34:59.476] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-%s%s https://react.dev/link/hydration-mismatch 
-
-  ...
-    <RenderFromTemplateContext>
-      <ScrollAndFocusHandler segmentPath={[...]}>
-        <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
-          <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
-            <LoadingBoundary name="/" loading={null}>
-              <HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
-                <HTTPAccessFallbackErrorBoundary pathname="/manager" notFound={<SegmentViewNode>} forbidden={undefined} ...>
-                  <RedirectBoundary>
-                    <RedirectErrorBoundary router={{...}}>
-                      <InnerLayoutRouter url="/manager" tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
-                        <SegmentViewNode type="layout" pagePath="manager/la...">
-                          <SegmentTrieNode>
-                          <RootLayout>
-                            <html
-+                             lang="en"
--                             lang="es"
--                             className="dark"
-                            >
-                              ...
-                                <Slot type="button" aria-haspopup="dialog" aria-expanded={false} ...>
-                                  <SlotClone type="button" aria-haspopup="dialog" aria-expanded={false} ...>
-                                    <Button className="bg-primary..." type="button" aria-haspopup="dialog" ...>
-                                      <button
-                                        data-slot="dialog-trigger"
-                                        className={"inline-flex items-center justify-center gap-2 whitespace-nowrap r..."}
-                                        type="button"
-                                        aria-haspopup="dialog"
-                                        aria-expanded={false}
-+                                       aria-controls="radix-_R_2aqndkndlb_"
--                                       aria-controls="radix-_R_9bindkndlb_"
-                                        data-state="closed"
-                                        onClick={function handleEvent}
-                                        ref={function}
-                                      >
-                      ...
-          ...
-
-[00:34:59.476] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:34:59.476] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:34:59.476] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:34:59.476] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241965938}
-[00:34:59.476] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768241965938}
-[00:37:34.110] Server  LOG      ✓ Compiled in 294ms
-[00:40:02.580] Server  LOG      ✓ Compiled in 310ms
-[00:40:42.292] Server  LOG      ✓ Compiled in 244ms
-[00:40:47.872] Server  LOG      ✓ Compiled in 208ms
-[00:40:54.342] Server  LOG      ✓ Compiled in 381ms
-[00:41:00.583] Server  LOG      ✓ Compiled in 384ms
-[00:41:05.091] Server  LOG      ✓ Compiled in 380ms
-[00:41:39.864] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:39.871] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:39.876] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:39.885] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:40.964] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:41:41.971] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:41.971] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:41.971] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:41.971] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:41.971] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:41.971] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:41.972] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:41.972] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:42.979] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:41:42.979] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:41:42.979] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3001/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768242370627}
-[00:41:46.089] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:41:46.454] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:41:46.454] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:41:46.454] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3001/manager","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768242374104}
-[00:41:53.460] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:53.489] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:53.513] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:53.528] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:54.168] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:41:55.190] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:55.190] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:55.190] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:55.190] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:55.190] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:55.190] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:55.190] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:55.190] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:41:56.336] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:41:56.336] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:41:56.336] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3001/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768242383965}
+    <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
+      <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
+        <LoadingBoundary name="occupational/" loading={null}>
+          <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
+            <RedirectBoundary>
+              <RedirectErrorBoundary router={{...}}>
+                <InnerLayoutRouter url="/dashboard..." tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
+                  <SegmentViewNode type="page" pagePath="dashboard/...">
+                    <SegmentTrieNode>
+                    <ClientPageRoot Component={function OcupationalPage} serverProvidedParams={{...}}>
+                      <OcupationalPage params={Promise} searchParams={Promise}>
+                        <div className="space-y-6">
+                          <div>
+                          <Card>
+                          <div className="space-y-4">
+                            <Card className="border-l-4...">
++                             <div
++                               data-slot="card"
++                               className="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 sha..."
++                             >
+                          ...
+                  ...
+                ...
+      ...
+
+[00:11:22.465] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:11:22.465] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
+[00:11:22.465] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
+[00:11:22.465] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348451544}
+[00:11:22.465] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348451545}
+[00:12:38.714] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:12:38.714] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:13:09.115] Server  LOG      ✓ Compiled in 165ms
+[00:13:27.984] Server  LOG      ✓ Compiled in 268ms
+[00:13:29.912] Server  LOG      ✓ Compiled in 305ms
+[00:13:38.907] Server  LOG      ✓ Compiled in 389ms
+[00:13:41.261] Server  LOG      ✓ Compiled in 351ms
+[00:13:50.010] Server  LOG      ✓ Compiled in 224ms
+[00:13:59.016] Server  LOG      ✓ Compiled in 740ms
+[00:16:26.487] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:16:26.534] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:17:05.517] Server  LOG      ✓ Compiled in 534ms
+[00:17:06.809] Server  LOG      ✓ Compiled in 469ms
+[00:17:08.318] Server  LOG      ✓ Compiled in 262ms
+[00:17:10.748] Server  LOG      ✓ Compiled in 216ms
+[00:17:12.956] Server  LOG      ✓ Compiled in 559ms
+[00:38:21.810] Server  LOG      ✓ Compiled in 934ms
+[00:39:22.354] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:39:22.354] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:46:43.167] Server  LOG      ✓ Compiled in 1342ms
+[00:55:04.195] Server  LOG      ✓ Compiled in 2.7s
+[00:55:30.517] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:55:30.517] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:20:19.788] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:20:19.788] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.

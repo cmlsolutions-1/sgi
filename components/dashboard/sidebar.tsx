@@ -77,14 +77,14 @@ const navigation: NavigationItem[] = [
     icon: CalendarDays,
     subItems: [
       { name: "Capacitaciones", href: "/dashboard/trainingPlan", icon: Brain }, 
-      { name: "Plan de Trabajo", href: "/dashboard/workingPlan", icon: ClipboardCheck },
+      //{ name: "Plan de Trabajo", href: "/dashboard/workingPlan", icon: ClipboardCheck },
     ],
   },
   {
     name: "Riesgos",
     icon: TriangleAlert,
     subItems: [
-      { name: "Laborales", href: "/dashboard/ocupational", icon: BrickWallIcon },
+      { name: "Laborales", href: "/dashboard/occupational", icon: BrickWallIcon },
       { name: "Medidas de Prevención", href: "/dashboard/preventiveMeasures", icon: ShieldCheck },
     ],
   },
