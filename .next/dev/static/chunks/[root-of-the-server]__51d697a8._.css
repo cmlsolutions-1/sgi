@@ -1840,6 +1840,10 @@
     }
   }
 
+  .border-blue-700 {
+    border-color: var(--color-blue-700);
+  }
+
   .border-border {
     border-color: var(--border);
   }
@@ -2200,6 +2204,10 @@
 
   .fill-warning {
     fill: var(--warning);
+  }
+
+  .object-cover {
+    object-fit: cover;
   }
 
   .p-0 {
@@ -4665,6 +4673,12 @@
   @media (min-width: 40rem) {
     .sm\:max-w-xl {
       max-width: var(--container-xl);
+    }
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 

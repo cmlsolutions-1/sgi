@@ -1,7 +1,5 @@
 {
   "/dashboard/occupational/page": "app/dashboard/occupational/page.js",
   "/dashboard/page": "app/dashboard/page.js",
-  "/dashboard/preventiveMeasures/[id]/page": "app/dashboard/preventiveMeasures/[id]/page.js",
-  "/dashboard/preventiveMeasures/page": "app/dashboard/preventiveMeasures/page.js",
   "/page": "app/page.js"
 }

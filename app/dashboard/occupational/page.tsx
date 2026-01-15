@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Eye, ClipboardList } from "lucide-react"
+import { Plus, Eye, ClipboardList, Pencil, Trash2 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
@@ -26,8 +26,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-
-// ✅ Drawer lateral (Sheet en shadcn)
 import {
   Sheet,
   SheetContent,
@@ -37,7 +35,7 @@ import {
 } from "@/components/ui/sheet"
 
 /* =========================================================
-   1) CAPACITACIONES (lo que ya tenías)
+   1) CAPACITACIONES (original)
 ========================================================= */
 type TrainingStatus = "completed" | "scheduled"
 
@@ -77,33 +75,58 @@ const generateHalfHourTimes = () => {
 const timeOptions = generateHalfHourTimes()
 
 /* =========================================================
-   2) MATRIZ DE RIESGOS (catálogos + cálculos + colores)
-   - Hecho tipo app: Drawer lateral + wizard (pasos)
+   2) MATRIZ DE RIESGOS (drawer + wizard + evidencias)
 ========================================================= */
 
 type YesNo = "SI" | "NO"
 
+type ControlType = "DATE" | "PERMANENT"
+type ControlStatus = "PENDING" | "DONE"
+
+type Evidence = {
+  id: string
+  name: string
+  mime: string
+  size: number
+  dataUrl: string
+  createdAt: string
+}
+
+type MeasureKey =
+  | "ELIMINACION"
+  | "SUSTITUCION"
+  | "INGENIERIA"
+  | "ADMINISTRATIVOS"
+  | "EPP"
+
+type MeasureControl = {
+  id: string
+  key: MeasureKey
+  title: string
+  description: string
+  type: ControlType
+  dueDate?: string
+  status: ControlStatus
+  doneDate?: string
+}
+
 type RiskRow = {
   id: string
 
-  // Contexto
   proceso: string
   zonaLugar: string
   actividades: string
   tareas: string
   rutinario: YesNo
 
-  // Peligro
   peligroClasificacion: string
   peligroDescripcion: string
   efectosPosibles: string
 
-  // Controles existentes
   controlesFuente: string
   controlesMedio: string
   controlesPersona: string
 
-  // Evaluación
   ndKey: "MA" | "A" | "M" | "B"
   neKey: "EC" | "EF" | "EO" | "EE"
   ncKey: "M" | "MG" | "G" | "L"
@@ -116,22 +139,16 @@ type RiskRow = {
   nrInterpretacion: string
   aceptabilidad: string
 
-  // Criterios
   numeroExpuestos: string
   peorConsecuencia: string
   requisitoLegal: YesNo
 
-  // Medidas
-  eliminacion: string
-  sustitucion: string
-  controlesIngenieria: string
-  controlesAdministrativos: string
-  epp: string
+  measures: MeasureControl[]
+  evidences: Evidence[]
 }
 
 const LS_RISK_KEY = "risk_matrix_rows_v1"
 
-/** Catálogo (desde tu Excel) */
 const PELIGROS: Record<string, string[]> = {
   BIOLOGICOS: [
     "VIRUS",
@@ -197,7 +214,7 @@ const ND_OPTIONS = [
   { label: "Muy Alto (MA)", value: "MA" as const, nd: 10 },
   { label: "Alto (A)", value: "A" as const, nd: 6 },
   { label: "Medio (M)", value: "M" as const, nd: 2 },
-  { label: "Bajo (B)", value: "B" as const, nd: 0 }, // en Excel “sin valor” => aquí lo tratamos 0
+  { label: "Bajo (B)", value: "B" as const, nd: 0 },
 ]
 const NE_OPTIONS = [
   { label: "Continua (EC)", value: "EC" as const, ne: 4 },
@@ -226,7 +243,6 @@ function calcNR(np: number, nc: number) {
   return np * nc
 }
 function classifyNR(nr: number) {
-  // Ajustable si tu Excel tiene umbrales diferentes
   if (nr >= 400) return "I"
   if (nr >= 150) return "II"
   if (nr >= 40) return "III"
@@ -250,12 +266,11 @@ function interpretNR(level: string) {
 function aceptabilidad(level: string) {
   if (level === "I") return "No aceptable"
   if (level === "II") return "No aceptable o aceptable con control específico"
-  if (level === "III") return "Mejorable"
+  if (level === "III") return "Aceptable"
   if (level === "IV") return "Aceptable"
   return ""
 }
 
-/** Colores (Tailwind) para chips/semáforo */
 function nrLevelColor(level: string) {
   switch (level) {
     case "I":
@@ -274,7 +289,6 @@ function aceptabilidadColor(a: string) {
   const val = (a || "").toLowerCase()
   if (val.includes("no aceptable")) return "bg-red-600 text-white border-red-700"
   if (val.includes("control")) return "bg-orange-500 text-white border-orange-600"
-  if (val.includes("mejorable")) return "bg-yellow-400 text-black border-yellow-500"
   if (val.includes("aceptable")) return "bg-green-600 text-white border-green-700"
   return "bg-muted text-foreground border-border"
 }
@@ -286,15 +300,109 @@ function npColor(np: number) {
   return "bg-muted text-foreground border-border"
 }
 
+type RiskProgressState = "CUMPLIDO" | "ACTIVO" | "VENCIDO"
+
+function getRiskProgress(measures?: MeasureControl[]): {
+  total: number
+  done: number
+  pct: number
+  state: RiskProgressState
+} {
+  const safe = Array.isArray(measures) ? measures : []
+  const total = safe.length
+  const done = safe.filter((m) => m.status === "DONE").length
+  const pct = total === 0 ? 0 : Math.round((done / total) * 100)
+
+  const today = new Date()
+  const overdue = safe.some((m) => {
+    if (m.status !== "PENDING") return false
+    if (m.type !== "DATE") return false
+    if (!m.dueDate) return false
+    const d = new Date(`${m.dueDate}T00:00:00`)
+    return d < today
+  })
+
+  const state: RiskProgressState =
+    pct === 100 ? "CUMPLIDO" : overdue ? "VENCIDO" : "ACTIVO"
+
+  return { total, done, pct, state }
+}
+
+function progressChipColor(state: RiskProgressState) {
+  switch (state) {
+    case "CUMPLIDO":
+      return "bg-green-600 text-white border-green-700"
+    case "VENCIDO":
+      return "bg-red-600 text-white border-red-700"
+    case "ACTIVO":
+    default:
+      return "bg-blue-600 text-white border-blue-700"
+  }
+}
+
 const steps = ["Contexto", "Peligro", "Controles", "Evaluación", "Medidas"]
 
+const defaultMeasuresBase: Omit<MeasureControl, "id">[] = [
+  {
+    key: "ELIMINACION",
+    title: "Eliminación",
+    description: "",
+    type: "PERMANENT",
+    status: "PENDING",
+  },
+  {
+    key: "SUSTITUCION",
+    title: "Sustitución",
+    description: "",
+    type: "PERMANENT",
+    status: "PENDING",
+  },
+  {
+    key: "INGENIERIA",
+    title: "Controles de ingeniería",
+    description: "",
+    type: "PERMANENT",
+    status: "PENDING",
+  },
+  {
+    key: "ADMINISTRATIVOS",
+    title: "Controles administrativos / señalización / advertencia",
+    description: "",
+    type: "PERMANENT",
+    status: "PENDING",
+  },
+  {
+    key: "EPP",
+    title: "Equipos y elementos de protección personal (EPP)",
+    description: "",
+    type: "PERMANENT",
+    status: "PENDING",
+  },
+]
+
+function makeDefaultMeasures(): MeasureControl[] {
+  return defaultMeasuresBase.map((m) => ({
+    id: crypto.randomUUID?.() ?? `${Date.now()}-${m.key}`,
+    ...m,
+  }))
+}
+
+function formatDateTime(iso: string) {
+  try {
+    const d = new Date(iso)
+    return d.toLocaleString()
+  } catch {
+    return iso
+  }
+}
+
 /* =========================================================
-   COMPONENTE PRINCIPAL
+   COMPONENTE
 ========================================================= */
 export default function OcupationalPage() {
   const router = useRouter()
 
-  /* ============  CAPACITACIONES  ============ */
+  /* ===== CAPACITACIONES ===== */
   const [trainings, setTrainings] = useState<Training[]>(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("trainings")
@@ -302,6 +410,7 @@ export default function OcupationalPage() {
     }
     return []
   })
+
   useEffect(() => {
     localStorage.setItem("trainings", JSON.stringify(trainings))
   }, [trainings])
@@ -342,18 +451,32 @@ export default function OcupationalPage() {
     return selected < new Date()
   }
 
-  /* ============  MATRIZ DE RIESGOS  ============ */
+  /* ===== MATRIZ DE RIESGOS ===== */
   const [riskRows, setRiskRows] = useState<RiskRow[]>(() => {
     if (typeof window === "undefined") return []
     const stored = localStorage.getItem(LS_RISK_KEY)
-    return stored ? JSON.parse(stored) : []
+const raw = stored ? (JSON.parse(stored) as any[]) : []
+
+return Array.isArray(raw)
+  ? raw.map((r) => ({
+      ...r,
+      measures: Array.isArray(r.measures) ? r.measures : makeDefaultMeasures(),
+      evidences: Array.isArray(r.evidences) ? r.evidences : [],
+    }))
+  : []
   })
+
   useEffect(() => {
     localStorage.setItem(LS_RISK_KEY, JSON.stringify(riskRows))
   }, [riskRows])
 
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [detailOpen, setDetailOpen] = useState(false)
+
   const [step, setStep] = useState(1)
+  const [editingId, setEditingId] = useState<string | null>(null)
+
+  const [detailRow, setDetailRow] = useState<RiskRow | null>(null)
 
   const emptyForm: Omit<RiskRow, "id"> = {
     proceso: "",
@@ -385,11 +508,8 @@ export default function OcupationalPage() {
     peorConsecuencia: "",
     requisitoLegal: "NO",
 
-    eliminacion: "",
-    sustitucion: "",
-    controlesIngenieria: "",
-    controlesAdministrativos: "",
-    epp: "",
+    measures: makeDefaultMeasures(),
+    evidences: [],
   }
 
   const [riskForm, setRiskForm] = useState<Omit<RiskRow, "id">>(emptyForm)
@@ -399,7 +519,6 @@ export default function OcupationalPage() {
     return PELIGROS[riskForm.peligroClasificacion] ?? []
   }, [riskForm.peligroClasificacion])
 
-  // Recalcular automáticamente NP/NR al cambiar ND/NE/NC
   useEffect(() => {
     const nd = ND_OPTIONS.find((x) => x.value === riskForm.ndKey)?.nd ?? 0
     const ne = NE_OPTIONS.find((x) => x.value === riskForm.neKey)?.ne ?? 0
@@ -425,7 +544,6 @@ export default function OcupationalPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [riskForm.ndKey, riskForm.neKey, riskForm.ncKey])
 
-  // Validación por pasos (para que el wizard sea fluido)
   const stepValid = useMemo(() => {
     if (step === 1) {
       return (
@@ -438,18 +556,7 @@ export default function OcupationalPage() {
     if (step === 2) {
       return riskForm.peligroClasificacion && riskForm.peligroDescripcion
     }
-    if (step === 3) {
-      // Controles: no obligatorios en todos los formatos, lo dejamos libre
-      return true
-    }
-    if (step === 4) {
-      // Evaluación siempre tendrá algo; ND/NE/NC tienen defaults
-      return true
-    }
-    if (step === 5) {
-      return true
-    }
-    return false
+    return true
   }, [step, riskForm])
 
   const canSaveRisk = useMemo(() => {
@@ -464,30 +571,129 @@ export default function OcupationalPage() {
   }, [riskForm])
 
   function openNewRiskDrawer() {
-    setRiskForm(emptyForm)
+    setEditingId(null)
+    setRiskForm({
+      ...emptyForm,
+      measures: makeDefaultMeasures(),
+      evidences: [],
+    })
+    setStep(1)
+    setDrawerOpen(true)
+  }
+
+  function openEditRiskDrawer(row: RiskRow) {
+    setEditingId(row.id)
+    const { id, ...rest } = row
+    setRiskForm(rest)
     setStep(1)
     setDrawerOpen(true)
   }
 
   function saveRiskRow() {
     if (!canSaveRisk) return
-    setRiskRows((prev) => [
-      ...prev,
-      { id: Date.now().toString(), ...riskForm },
-    ])
+
+    if (editingId) {
+      setRiskRows((prev) =>
+        prev.map((r) => (r.id === editingId ? { id: editingId, ...riskForm } : r))
+      )
+    } else {
+      setRiskRows((prev) => [...prev, { id: Date.now().toString(), ...riskForm }])
+    }
+
     setDrawerOpen(false)
+    setEditingId(null)
   }
+
+  function deleteRiskRow(id: string) {
+    setRiskRows((prev) => prev.filter((r) => r.id !== id))
+  }
+
+  function openDetail(row: RiskRow) {
+    setDetailRow(row)
+    setDetailOpen(true)
+  }
+
+  useEffect(() => {
+    if (!detailOpen || !detailRow) return
+    const updated = riskRows.find((r) => r.id === detailRow.id)
+    if (updated) setDetailRow(updated)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [riskRows])
+
+  function updateMeasure(id: string, patch: Partial<MeasureControl>) {
+    setRiskForm((p) => ({
+      ...p,
+      measures: p.measures.map((m) => (m.id === id ? { ...m, ...patch } : m)),
+    }))
+  }
+
+  function readFileAsDataURL(file: File) {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(String(reader.result))
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+  }
+
+  async function addEvidences(files: FileList | null) {
+    if (!files || files.length === 0) return
+
+    const allowed = ["application/pdf"]
+    const isImage = (m: string) => m.startsWith("image/")
+
+    const list: Evidence[] = []
+    for (const file of Array.from(files)) {
+      if (!isImage(file.type) && !allowed.includes(file.type)) continue
+
+      const dataUrl = await readFileAsDataURL(file)
+      list.push({
+        id: crypto.randomUUID?.() ?? `${Date.now()}-${file.name}`,
+        name: file.name,
+        mime: file.type,
+        size: file.size,
+        dataUrl,
+        createdAt: new Date().toISOString(),
+      })
+    }
+
+    setRiskForm((p) => ({ ...p, evidences: [...p.evidences, ...list] }))
+  }
+
+  function removeEvidence(id: string) {
+    setRiskForm((p) => ({ ...p, evidences: p.evidences.filter((e) => e.id !== id) }))
+  }
+
+  const dashboard = useMemo(() => {
+    const byLevel = { I: 0, II: 0, III: 0, IV: 0, NA: 0 }
+    type RiskProgressState = "CUMPLIDO" | "ACTIVO" | "VENCIDO"
+
+      const byState: Record<RiskProgressState, number> = {
+        CUMPLIDO: 0,
+        ACTIVO: 0,
+        VENCIDO: 0,
+      }
+    for (const r of riskRows) {
+      if (r.nrNivel === "I") byLevel.I++
+      else if (r.nrNivel === "II") byLevel.II++
+      else if (r.nrNivel === "III") byLevel.III++
+      else if (r.nrNivel === "IV") byLevel.IV++
+      else byLevel.NA++
+
+      const pr = getRiskProgress(r.measures)
+        byState[pr.state]++
+    }
+
+    return { byLevel, byState, total: riskRows.length }
+  }, [riskRows])
 
   return (
     <div className="space-y-6">
-      {/* HEADER */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold">
-            Diagnóstico de Condiciones de Trabajo
-          </h1>
+          <h1 className="text-2xl font-bold">Diagnóstico de Condiciones de Trabajo</h1>
           <p className="text-muted-foreground">
-            SG-SST · Capacitaciones y Matriz de Peligros
+            SG-SST · Matriz de Peligros (Drawer) y Capacitaciones
           </p>
         </div>
       </div>
@@ -501,15 +707,62 @@ export default function OcupationalPage() {
           <TabsTrigger value="trainings">Capacitaciones</TabsTrigger>
         </TabsList>
 
-        {/* =========================================================
-            TAB: MATRIZ DE PELIGROS
-        ========================================================= */}
+        {/* ================= MATRIZ ================= */}
         <TabsContent value="risk" className="space-y-4">
+          {/* Dashboard */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <Card>
+              <CardContent className="p-4 space-y-3">
+                <p className="font-semibold">Niveles de intervención</p>
+                <div className="flex flex-wrap gap-2">
+                  <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", nrLevelColor("I"))}>
+                    I: {dashboard.byLevel.I}
+                  </span>
+                  <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", nrLevelColor("II"))}>
+                    II: {dashboard.byLevel.II}
+                  </span>
+                  <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", nrLevelColor("III"))}>
+                    III: {dashboard.byLevel.III}
+                  </span>
+                  <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", nrLevelColor("IV"))}>
+                    IV: {dashboard.byLevel.IV}
+                  </span>
+                  {dashboard.byLevel.NA ? (
+                    <span className="rounded-full border px-3 py-1 text-xs font-semibold bg-muted">
+                      Sin nivel: {dashboard.byLevel.NA}
+                    </span>
+                  ) : null}
+                </div>
+                <p className="text-xs text-muted-foreground">Total riesgos: {dashboard.total}</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4 space-y-3">
+                <p className="font-semibold">Estado del proceso</p>
+                <div className="flex flex-wrap gap-2">
+                  <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", progressChipColor("ACTIVO"))}>
+                    Activos: {dashboard.byState.ACTIVO}
+                  </span>
+                  <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", progressChipColor("VENCIDO"))}>
+                    Vencidos: {dashboard.byState.VENCIDO}
+                  </span>
+                  <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", progressChipColor("CUMPLIDO"))}>
+                    Cumplidos: {dashboard.byState.CUMPLIDO}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Se calcula según avance de medidas (cumplido/pendiente) y fechas.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <h2 className="text-lg font-semibold">Cuadro de riesgos</h2>
               <p className="text-sm text-muted-foreground">
-                Semáforo de resultados.
+                Crea filas, adjunta evidencias y haz seguimiento del avance.
               </p>
             </div>
 
@@ -522,88 +775,90 @@ export default function OcupationalPage() {
           <Card>
             <CardContent className="p-4 space-y-3">
               {riskRows.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  Aún no hay filas registradas.
-                </p>
+                <p className="text-sm text-muted-foreground">Aún no hay filas registradas.</p>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                  {riskRows.map((r) => (
-                    <Card key={r.id} className="border">
-                      <CardContent className="p-4 space-y-2">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="space-y-1">
-                            <p className="font-semibold">
-                              {r.proceso} · {r.zonaLugar}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {r.actividades} / {r.tareas}
-                            </p>
+                  {riskRows.map((r) => {
+                    const pr = getRiskProgress(r.measures)
+                    return (
+                      <Card key={r.id} className="border">
+                        <CardContent className="p-4 space-y-2">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="space-y-1">
+                              <p className="font-semibold">
+                                {r.proceso} · {r.zonaLugar}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {r.actividades} / {r.tareas}
+                              </p>
+                            </div>
+
+                            <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", nrLevelColor(r.nrNivel))}>
+                              Nivel {r.nrNivel || "—"}
+                            </span>
                           </div>
 
-                          <span
-                            className={cn(
-                              "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
-                              nrLevelColor(r.nrNivel)
-                            )}
-                          >
-                            Nivel {r.nrNivel || "—"}
-                          </span>
-                        </div>
-
-                        <p className="text-sm">
-                          <span className="font-medium">Peligro:</span>{" "}
-                          {r.peligroClasificacion} — {r.peligroDescripcion}
-                        </p>
-
-                        <div className="flex flex-wrap gap-2">
-                          <span
-                            className={cn(
-                              "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
-                              npColor(r.np)
-                            )}
-                          >
-                            NP: {r.np} · {r.npInterpretacion || "—"}
-                          </span>
-
-                          <span
-                            className={cn(
-                              "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
-                              nrLevelColor(r.nrNivel)
-                            )}
-                          >
-                            NR: {r.nr || 0}
-                          </span>
-
-                          <span
-                            className={cn(
-                              "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
-                              aceptabilidadColor(r.aceptabilidad)
-                            )}
-                          >
-                            {r.aceptabilidad || "Aceptabilidad —"}
-                          </span>
-                        </div>
-
-                        {r.nrInterpretacion ? (
-                          <p className="text-xs text-muted-foreground">
-                            {r.nrInterpretacion}
+                          <p className="text-sm">
+                            <span className="font-medium">Peligro:</span>{" "}
+                            {r.peligroClasificacion} — {r.peligroDescripcion}
                           </p>
-                        ) : null}
-                      </CardContent>
-                    </Card>
-                  ))}
+
+                          <div className="flex flex-wrap gap-2">
+                            <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", npColor(r.np))}>
+                              NP: {r.np} · {r.npInterpretacion || "—"}
+                            </span>
+
+                            <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", nrLevelColor(r.nrNivel))}>
+                              NR: {r.nr || 0}
+                            </span>
+
+                            <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", aceptabilidadColor(r.aceptabilidad))}>
+                              {r.aceptabilidad || "Aceptabilidad —"}
+                            </span>
+
+                            <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", progressChipColor(pr.state))}>
+                              {pr.state === "CUMPLIDO" ? "Cumplido" : pr.state === "VENCIDO" ? "Vencido" : "Activo"} ·{" "}
+                              {pr.pct}%
+                            </span>
+
+                            <span className="rounded-full border px-3 py-1 text-xs font-semibold bg-muted">
+                              Evidencias: {r.evidences.length}
+                            </span>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2 pt-2">
+                            <Button size="sm" variant="secondary" onClick={() => openDetail(r)} className="gap-2">
+                              <Eye className="h-4 w-4" />
+                              Ver detalle
+                            </Button>
+
+                            <Button size="sm" variant="secondary" onClick={() => openEditRiskDrawer(r)} className="gap-2">
+                              <Pencil className="h-4 w-4" />
+                              Editar
+                            </Button>
+
+                            <Button size="sm" variant="destructive" onClick={() => deleteRiskRow(r.id)} className="gap-2">
+                              <Trash2 className="h-4 w-4" />
+                              Eliminar
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
                 </div>
               )}
             </CardContent>
           </Card>
 
-          {/* Drawer lateral (Sheet) */}
+          {/* Drawer Crear/Editar */}
           <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
             <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
               <SheetHeader className="space-y-2">
-                <SheetTitle>Nueva fila · Matriz de Peligros</SheetTitle>
+                <SheetTitle>
+                  {editingId ? "Editar fila · Matriz de Peligros" : "Nueva fila · Matriz de Peligros"}
+                </SheetTitle>
 
-                {/* Steps */}
                 <div className="flex flex-wrap gap-2">
                   {steps.map((s, i) => {
                     const idx = i + 1
@@ -624,89 +879,56 @@ export default function OcupationalPage() {
                   })}
                 </div>
 
-                {/* Resultado (siempre visible) */}
                 <Card>
                   <CardContent className="p-4 space-y-2">
                     <div className="flex flex-wrap gap-2">
-                      <span
-                        className={cn(
-                          "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
-                          nrLevelColor(riskForm.nrNivel)
-                        )}
-                      >
+                      <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", nrLevelColor(riskForm.nrNivel))}>
                         NR: {riskForm.nr} · Nivel {riskForm.nrNivel || "—"}
                       </span>
-
-                      <span
-                        className={cn(
-                          "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
-                          npColor(riskForm.np)
-                        )}
-                      >
+                      <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", npColor(riskForm.np))}>
                         NP: {riskForm.np} · {riskForm.npInterpretacion || "—"}
                       </span>
-
-                      <span
-                        className={cn(
-                          "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
-                          aceptabilidadColor(riskForm.aceptabilidad)
-                        )}
-                      >
+                      <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", aceptabilidadColor(riskForm.aceptabilidad))}>
                         {riskForm.aceptabilidad || "Aceptabilidad —"}
                       </span>
                     </div>
 
                     {riskForm.nrInterpretacion ? (
-                      <p className="text-xs text-muted-foreground">
-                        {riskForm.nrInterpretacion}
-                      </p>
+                      <p className="text-xs text-muted-foreground">{riskForm.nrInterpretacion}</p>
                     ) : null}
                   </CardContent>
                 </Card>
               </SheetHeader>
 
               <div className="py-4 space-y-4">
-                {/* ======================
-                    STEP 1 — CONTEXTO
-                ====================== */}
+                {/* STEP 1 */}
                 {step === 1 && (
                   <div className="space-y-3">
                     <Input
                       placeholder="Proceso"
                       value={riskForm.proceso}
-                      onChange={(e) =>
-                        setRiskForm((p) => ({ ...p, proceso: e.target.value }))
-                      }
+                      onChange={(e) => setRiskForm((p) => ({ ...p, proceso: e.target.value }))}
                     />
                     <Input
                       placeholder="Zona / Lugar"
                       value={riskForm.zonaLugar}
-                      onChange={(e) =>
-                        setRiskForm((p) => ({ ...p, zonaLugar: e.target.value }))
-                      }
+                      onChange={(e) => setRiskForm((p) => ({ ...p, zonaLugar: e.target.value }))}
                     />
                     <Input
                       placeholder="Actividades"
                       value={riskForm.actividades}
-                      onChange={(e) =>
-                        setRiskForm((p) => ({ ...p, actividades: e.target.value }))
-                      }
+                      onChange={(e) => setRiskForm((p) => ({ ...p, actividades: e.target.value }))}
                     />
                     <Input
                       placeholder="Tareas"
                       value={riskForm.tareas}
-                      onChange={(e) =>
-                        setRiskForm((p) => ({ ...p, tareas: e.target.value }))
-                      }
+                      onChange={(e) => setRiskForm((p) => ({ ...p, tareas: e.target.value }))}
                     />
-
                     <div>
                       <p className="text-sm mb-1">¿Rutinario?</p>
                       <Select
                         value={riskForm.rutinario}
-                        onValueChange={(v) =>
-                          setRiskForm((p) => ({ ...p, rutinario: v as YesNo }))
-                        }
+                        onValueChange={(v) => setRiskForm((p) => ({ ...p, rutinario: v as YesNo }))}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Rutinario" />
@@ -720,9 +942,7 @@ export default function OcupationalPage() {
                   </div>
                 )}
 
-                {/* ======================
-                    STEP 2 — PELIGRO
-                ====================== */}
+                {/* STEP 2 */}
                 {step === 2 && (
                   <div className="space-y-3">
                     <div>
@@ -730,11 +950,7 @@ export default function OcupationalPage() {
                       <Select
                         value={riskForm.peligroClasificacion}
                         onValueChange={(v) =>
-                          setRiskForm((p) => ({
-                            ...p,
-                            peligroClasificacion: v,
-                            peligroDescripcion: "",
-                          }))
+                          setRiskForm((p) => ({ ...p, peligroClasificacion: v, peligroDescripcion: "" }))
                         }
                       >
                         <SelectTrigger>
@@ -754,9 +970,7 @@ export default function OcupationalPage() {
                       <p className="text-sm mb-1">Descripción del peligro</p>
                       <Select
                         value={riskForm.peligroDescripcion}
-                        onValueChange={(v) =>
-                          setRiskForm((p) => ({ ...p, peligroDescripcion: v }))
-                        }
+                        onValueChange={(v) => setRiskForm((p) => ({ ...p, peligroDescripcion: v }))}
                         disabled={!riskForm.peligroClasificacion}
                       >
                         <SelectTrigger>
@@ -775,55 +989,41 @@ export default function OcupationalPage() {
                     <Textarea
                       placeholder="Efectos posibles"
                       value={riskForm.efectosPosibles}
-                      onChange={(e) =>
-                        setRiskForm((p) => ({ ...p, efectosPosibles: e.target.value }))
-                      }
+                      onChange={(e) => setRiskForm((p) => ({ ...p, efectosPosibles: e.target.value }))}
                       className="resize-none min-h-28"
                     />
                   </div>
                 )}
 
-                {/* ======================
-                    STEP 3 — CONTROLES
-                ====================== */}
+                {/* STEP 3 */}
                 {step === 3 && (
                   <div className="space-y-3">
                     <Input
                       placeholder="Controles existentes - Fuente"
                       value={riskForm.controlesFuente}
-                      onChange={(e) =>
-                        setRiskForm((p) => ({ ...p, controlesFuente: e.target.value }))
-                      }
+                      onChange={(e) => setRiskForm((p) => ({ ...p, controlesFuente: e.target.value }))}
                     />
                     <Input
                       placeholder="Controles existentes - Medio"
                       value={riskForm.controlesMedio}
-                      onChange={(e) =>
-                        setRiskForm((p) => ({ ...p, controlesMedio: e.target.value }))
-                      }
+                      onChange={(e) => setRiskForm((p) => ({ ...p, controlesMedio: e.target.value }))}
                     />
                     <Input
                       placeholder="Controles existentes - Persona"
                       value={riskForm.controlesPersona}
-                      onChange={(e) =>
-                        setRiskForm((p) => ({ ...p, controlesPersona: e.target.value }))
-                      }
+                      onChange={(e) => setRiskForm((p) => ({ ...p, controlesPersona: e.target.value }))}
                     />
                   </div>
                 )}
 
-                {/* ======================
-                    STEP 4 — EVALUACIÓN
-                ====================== */}
+                {/* STEP 4 */}
                 {step === 4 && (
                   <div className="space-y-3">
                     <div>
                       <p className="text-sm mb-1">ND (Deficiencia)</p>
                       <Select
                         value={riskForm.ndKey}
-                        onValueChange={(v) =>
-                          setRiskForm((p) => ({ ...p, ndKey: v as RiskRow["ndKey"] }))
-                        }
+                        onValueChange={(v) => setRiskForm((p) => ({ ...p, ndKey: v as RiskRow["ndKey"] }))}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="ND" />
@@ -842,9 +1042,7 @@ export default function OcupationalPage() {
                       <p className="text-sm mb-1">NE (Exposición)</p>
                       <Select
                         value={riskForm.neKey}
-                        onValueChange={(v) =>
-                          setRiskForm((p) => ({ ...p, neKey: v as RiskRow["neKey"] }))
-                        }
+                        onValueChange={(v) => setRiskForm((p) => ({ ...p, neKey: v as RiskRow["neKey"] }))}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="NE" />
@@ -863,9 +1061,7 @@ export default function OcupationalPage() {
                       <p className="text-sm mb-1">NC (Consecuencia)</p>
                       <Select
                         value={riskForm.ncKey}
-                        onValueChange={(v) =>
-                          setRiskForm((p) => ({ ...p, ncKey: v as RiskRow["ncKey"] }))
-                        }
+                        onValueChange={(v) => setRiskForm((p) => ({ ...p, ncKey: v as RiskRow["ncKey"] }))}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="NC" />
@@ -882,24 +1078,12 @@ export default function OcupationalPage() {
 
                     <Card>
                       <CardContent className="p-4 space-y-2">
-                        <p className="text-xs text-muted-foreground">
-                          Cálculo automático (Excel): NP = ND×NE · NR = NP×NC
-                        </p>
+                        <p className="text-xs text-muted-foreground">NP = ND×NE · NR = NP×NC</p>
                         <div className="flex flex-wrap gap-2">
-                          <span
-                            className={cn(
-                              "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
-                              npColor(riskForm.np)
-                            )}
-                          >
+                          <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", npColor(riskForm.np))}>
                             NP {riskForm.np} · {riskForm.npInterpretacion || "—"}
                           </span>
-                          <span
-                            className={cn(
-                              "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
-                              nrLevelColor(riskForm.nrNivel)
-                            )}
-                          >
+                          <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", nrLevelColor(riskForm.nrNivel))}>
                             NR {riskForm.nr} · Nivel {riskForm.nrNivel || "—"}
                           </span>
                         </div>
@@ -908,37 +1092,27 @@ export default function OcupationalPage() {
                   </div>
                 )}
 
-                {/* ======================
-                    STEP 5 — MEDIDAS + CRITERIOS
-                ====================== */}
+                {/* STEP 5 */}
                 {step === 5 && (
                   <div className="space-y-3">
                     <Card>
                       <CardContent className="p-4 space-y-3">
                         <p className="font-semibold text-sm">Criterios</p>
-
                         <Input
                           placeholder="Número de expuestos"
                           value={riskForm.numeroExpuestos}
-                          onChange={(e) =>
-                            setRiskForm((p) => ({ ...p, numeroExpuestos: e.target.value }))
-                          }
+                          onChange={(e) => setRiskForm((p) => ({ ...p, numeroExpuestos: e.target.value }))}
                         />
                         <Input
                           placeholder="Peor consecuencia"
                           value={riskForm.peorConsecuencia}
-                          onChange={(e) =>
-                            setRiskForm((p) => ({ ...p, peorConsecuencia: e.target.value }))
-                          }
+                          onChange={(e) => setRiskForm((p) => ({ ...p, peorConsecuencia: e.target.value }))}
                         />
-
                         <div>
                           <p className="text-sm mb-1">Requisito legal específico</p>
                           <Select
                             value={riskForm.requisitoLegal}
-                            onValueChange={(v) =>
-                              setRiskForm((p) => ({ ...p, requisitoLegal: v as YesNo }))
-                            }
+                            onValueChange={(v) => setRiskForm((p) => ({ ...p, requisitoLegal: v as YesNo }))}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Requisito legal" />
@@ -956,52 +1130,115 @@ export default function OcupationalPage() {
                       <CardContent className="p-4 space-y-3">
                         <p className="font-semibold text-sm">Medidas de intervención</p>
 
-                        <Textarea
-                          placeholder="Eliminación"
-                          value={riskForm.eliminacion}
-                          onChange={(e) =>
-                            setRiskForm((p) => ({ ...p, eliminacion: e.target.value }))
-                          }
-                          className="resize-none min-h-20"
-                        />
-                        <Textarea
-                          placeholder="Sustitución"
-                          value={riskForm.sustitucion}
-                          onChange={(e) =>
-                            setRiskForm((p) => ({ ...p, sustitucion: e.target.value }))
-                          }
-                          className="resize-none min-h-20"
-                        />
-                        <Textarea
-                          placeholder="Controles de ingeniería"
-                          value={riskForm.controlesIngenieria}
-                          onChange={(e) =>
-                            setRiskForm((p) => ({
-                              ...p,
-                              controlesIngenieria: e.target.value,
-                            }))
-                          }
-                          className="resize-none min-h-20"
-                        />
-                        <Textarea
-                          placeholder="Controles administrativos / señalización / advertencia"
-                          value={riskForm.controlesAdministrativos}
-                          onChange={(e) =>
-                            setRiskForm((p) => ({
-                              ...p,
-                              controlesAdministrativos: e.target.value,
-                            }))
-                          }
-                          className="resize-none min-h-20"
-                        />
-                        <Textarea
-                          placeholder="EPP"
-                          value={riskForm.epp}
-                          onChange={(e) =>
-                            setRiskForm((p) => ({ ...p, epp: e.target.value }))
-                          }
-                          className="resize-none min-h-20"
-                        />
+                        <div className="space-y-3">
+                          {riskForm.measures.map((m) => (
+                            <div key={m.id} className="rounded-md border p-3 space-y-3">
+                              <p className="text-sm font-medium">{m.title}</p>
+
+                              <Textarea
+                                placeholder={`Describe la medida (${m.title})`}
+                                value={m.description}
+                                onChange={(e) => updateMeasure(m.id, { description: e.target.value })}
+                                className="resize-none min-h-20"
+                              />
+
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                  <p className="text-xs text-muted-foreground mb-1">Tipo</p>
+                                  <Select
+                                    value={m.type}
+                                    onValueChange={(v) => {
+                                      if (v === "PERMANENT") {
+                                        updateMeasure(m.id, { type: "PERMANENT", dueDate: undefined })
+                                      } else {
+                                        updateMeasure(m.id, { type: "DATE" })
+                                      }
+                                    }}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Tipo" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="DATE">Por fecha</SelectItem>
+                                      <SelectItem value="PERMANENT">Permanente</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+
+                                <div>
+                                  <p className="text-xs text-muted-foreground mb-1">Fecha (si aplica)</p>
+                                  <Input
+                                    type="date"
+                                    disabled={m.type !== "DATE"}
+                                    value={m.dueDate ?? ""}
+                                    onChange={(e) => updateMeasure(m.id, { dueDate: e.target.value })}
+                                  />
+                                </div>
+
+                                <div>
+                                  <p className="text-xs text-muted-foreground mb-1">Estado</p>
+                                  <Select
+                                    value={m.status}
+                                    onValueChange={(v) => {
+                                      if (v === "DONE") {
+                                        updateMeasure(m.id, {
+                                          status: "DONE",
+                                          doneDate: new Date().toISOString().slice(0, 10),
+                                        })
+                                      } else {
+                                        updateMeasure(m.id, { status: "PENDING", doneDate: undefined })
+                                      }
+                                    }}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Estado" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="PENDING">Pendiente</SelectItem>
+                                      <SelectItem value="DONE">Cumplido</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+
+                              {m.status === "DONE" && m.doneDate ? (
+                                <p className="text-xs text-muted-foreground">Marcado como cumplido el {m.doneDate}</p>
+                              ) : null}
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-4 space-y-3">
+                        <p className="font-semibold text-sm">Evidencias (fotos / PDF)</p>
+                        <Input type="file" multiple accept="image/*,application/pdf" onChange={(e) => addEvidences(e.target.files)} />
+
+                        {riskForm.evidences.length === 0 ? (
+                          <p className="text-xs text-muted-foreground">Aún no hay evidencias.</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {riskForm.evidences.map((ev) => (
+                              <div key={ev.id} className="flex items-center justify-between gap-2 rounded-md border p-2">
+                                <div className="min-w-0">
+                                  <p className="text-sm font-medium truncate">{ev.name}</p>
+                                  <p className="text-xs text-muted-foreground truncate">
+                                    {ev.mime} · {(ev.size / 1024).toFixed(0)} KB · {formatDateTime(ev.createdAt)}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Button size="sm" variant="secondary" onClick={() => window.open(ev.dataUrl, "_blank")}>
+                                    Ver
+                                  </Button>
+                                  <Button size="sm" variant="destructive" onClick={() => removeEvidence(ev.id)}>
+                                    Quitar
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   </div>
@@ -1010,25 +1247,18 @@ export default function OcupationalPage() {
 
               <SheetFooter className="gap-2 sm:gap-2">
                 <div className="flex w-full items-center justify-between gap-2">
-                  <Button
-                    variant="secondary"
-                    disabled={step === 1}
-                    onClick={() => setStep((s) => Math.max(1, s - 1))}
-                  >
+                  <Button variant="secondary" disabled={step === 1} onClick={() => setStep((s) => Math.max(1, s - 1))}>
                     Atrás
                   </Button>
 
                   <div className="flex gap-2">
                     {step < 5 ? (
-                      <Button
-                        disabled={!stepValid}
-                        onClick={() => setStep((s) => Math.min(5, s + 1))}
-                      >
+                      <Button disabled={!stepValid} onClick={() => setStep((s) => Math.min(5, s + 1))}>
                         Siguiente
                       </Button>
                     ) : (
                       <Button disabled={!canSaveRisk} onClick={saveRiskRow}>
-                        Guardar fila
+                        {editingId ? "Guardar cambios" : "Guardar fila"}
                       </Button>
                     )}
                   </div>
@@ -1036,18 +1266,196 @@ export default function OcupationalPage() {
               </SheetFooter>
             </SheetContent>
           </Sheet>
+
+          {/* Drawer Detalle solo lectura + timeline evidencias */}
+          <Sheet open={detailOpen} onOpenChange={setDetailOpen}>
+            <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
+              <SheetHeader className="space-y-2">
+                <SheetTitle>Detalle del riesgo</SheetTitle>
+
+                {detailRow ? (
+                  <Card>
+                    <CardContent className="p-4 space-y-2">
+                      <div className="flex flex-wrap gap-2">
+                        <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", nrLevelColor(detailRow.nrNivel))}>
+                          NR: {detailRow.nr} · Nivel {detailRow.nrNivel || "—"}
+                        </span>
+                        <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", npColor(detailRow.np))}>
+                          NP: {detailRow.np} · {detailRow.npInterpretacion || "—"}
+                        </span>
+                        <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", aceptabilidadColor(detailRow.aceptabilidad))}>
+                          {detailRow.aceptabilidad || "Aceptabilidad —"}
+                        </span>
+                        {(() => {
+                          const pr = getRiskProgress(detailRow.measures)
+                          return (
+                            <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", progressChipColor(pr.state))}>
+                              {pr.state === "CUMPLIDO" ? "Cumplido" : pr.state === "VENCIDO" ? "Vencido" : "Activo"} ·{" "}
+                              {pr.pct}%
+                            </span>
+                          )
+                        })()}
+                      </div>
+
+                      {detailRow.nrInterpretacion ? (
+                        <p className="text-xs text-muted-foreground">{detailRow.nrInterpretacion}</p>
+                      ) : null}
+                    </CardContent>
+                  </Card>
+                ) : null}
+              </SheetHeader>
+
+              <div className="py-4 space-y-4">
+                {detailRow ? (
+                  <>
+                    <Card>
+                      <CardContent className="p-4 space-y-2">
+                        <p className="font-semibold">Contexto</p>
+                        <p className="text-sm">
+                          <span className="font-medium">Proceso:</span> {detailRow.proceso}
+                        </p>
+                        <p className="text-sm">
+                          <span className="font-medium">Zona/Lugar:</span> {detailRow.zonaLugar}
+                        </p>
+                        <p className="text-sm">
+                          <span className="font-medium">Actividad/Tarea:</span> {detailRow.actividades} / {detailRow.tareas}
+                        </p>
+                        <p className="text-sm">
+                          <span className="font-medium">Rutinario:</span> {detailRow.rutinario}
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-4 space-y-2">
+                        <p className="font-semibold">Peligro</p>
+                        <p className="text-sm">
+                          <span className="font-medium">Clasificación:</span> {detailRow.peligroClasificacion}
+                        </p>
+                        <p className="text-sm">
+                          <span className="font-medium">Descripción:</span> {detailRow.peligroDescripcion}
+                        </p>
+                        {detailRow.efectosPosibles ? (
+                          <p className="text-sm">
+                            <span className="font-medium">Efectos posibles:</span> {detailRow.efectosPosibles}
+                          </p>
+                        ) : null}
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-4 space-y-2">
+                        <p className="font-semibold">Medidas de intervención</p>
+                        <div className="space-y-2">
+                          {detailRow.measures.map((m) => (
+                            <div key={m.id} className="rounded-md border p-3 space-y-2">
+                              <div className="flex items-start justify-between gap-2">
+                                <p className="text-sm font-medium">{m.title}</p>
+                                <Badge variant="outline">{m.status === "DONE" ? "Cumplido" : "Pendiente"}</Badge>
+                              </div>
+
+                              <p className="text-sm text-muted-foreground">{m.description || "—"}</p>
+
+                              <div className="flex flex-wrap gap-2">
+                                <span className="rounded-full border px-3 py-1 text-xs bg-muted">
+                                  Tipo: {m.type === "PERMANENT" ? "Permanente" : "Por fecha"}
+                                </span>
+                                {m.type === "DATE" ? (
+                                  <span className="rounded-full border px-3 py-1 text-xs bg-muted">
+                                    Fecha: {m.dueDate || "—"}
+                                  </span>
+                                ) : null}
+                                {m.status === "DONE" && m.doneDate ? (
+                                  <span className="rounded-full border px-3 py-1 text-xs bg-muted">
+                                    Cumplido: {m.doneDate}
+                                  </span>
+                                ) : null}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-4 space-y-3">
+                        <p className="font-semibold">Evidencias (timeline)</p>
+
+                        {detailRow.evidences.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">Sin evidencias.</p>
+                        ) : (
+                          <div className="space-y-3">
+                            {[...detailRow.evidences]
+                              .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+                              .map((ev) => (
+                                <div key={ev.id} className="flex gap-3">
+                                  <div className="flex flex-col items-center">
+                                    <div className="h-2 w-2 rounded-full bg-primary mt-2" />
+                                    <div className="w-px flex-1 bg-border" />
+                                  </div>
+
+                                  <div className="flex-1 rounded-md border p-3">
+                                    <p className="text-xs text-muted-foreground">{formatDateTime(ev.createdAt)}</p>
+                                    <p className="text-sm font-medium">{ev.name}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {ev.mime} · {(ev.size / 1024).toFixed(0)} KB
+                                    </p>
+
+                                    <div className="pt-2">
+                                      <Button size="sm" variant="secondary" onClick={() => window.open(ev.dataUrl, "_blank")}>
+                                        Ver evidencia
+                                      </Button>
+                                    </div>
+
+                                    {ev.mime.startsWith("image/") ? (
+                                      <div className="pt-3">
+                                        <img src={ev.dataUrl} alt={ev.name} className="w-full rounded-md border object-cover" />
+                                      </div>
+                                    ) : null}
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No hay detalle para mostrar.</p>
+                )}
+              </div>
+
+              <SheetFooter className="gap-2 sm:gap-2">
+                <div className="flex w-full items-center justify-between gap-2">
+                  <Button variant="secondary" onClick={() => setDetailOpen(false)}>
+                    Cerrar
+                  </Button>
+
+                  {detailRow ? (
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        setDetailOpen(false)
+                        openEditRiskDrawer(detailRow)
+                      }}
+                      className="gap-2"
+                    >
+                      <Pencil className="h-4 w-4" />
+                      Editar
+                    </Button>
+                  ) : null}
+                </div>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
         </TabsContent>
 
-        {/* =========================================================
-            TAB: CAPACITACIONES (tu código original)
-        ========================================================= */}
+        {/* ================= CAPACITACIONES ================= */}
         <TabsContent value="trainings" className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold">Capacitaciones</h2>
-              <p className="text-sm text-muted-foreground">
-                Gestión de capacitaciones (mock/localStorage)
-              </p>
+              <p className="text-sm text-muted-foreground">Gestión de capacitaciones (mock/localStorage)</p>
             </div>
 
             <Button onClick={() => setTrainingOpen(true)} className="gap-2">
@@ -1056,13 +1464,11 @@ export default function OcupationalPage() {
             </Button>
           </div>
 
-          {/* FILTROS */}
           <Card>
             <CardContent className="p-4 space-y-3">
               <h3 className="font-semibold">Filtrar por</h3>
 
               <div className="flex gap-4 flex-wrap">
-                {/* AÑO */}
                 <div>
                   <p className="text-sm mb-1">Año</p>
                   <Select value={yearFilter} onValueChange={setYearFilter}>
@@ -1080,11 +1486,10 @@ export default function OcupationalPage() {
                   </Select>
                 </div>
 
-                {/* MES */}
                 <div>
                   <p className="text-sm mb-1">Mes</p>
                   <Select value={monthFilter} onValueChange={setMonthFilter}>
-                    <SelectTrigger className="w-40">
+                    <SelectTrigger className="w-[160px]">
                       <SelectValue placeholder="Mes" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1098,7 +1503,6 @@ export default function OcupationalPage() {
                   </Select>
                 </div>
 
-                {/* ESTADO */}
                 <div>
                   <p className="text-sm mb-1">Estado</p>
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -1116,7 +1520,6 @@ export default function OcupationalPage() {
             </CardContent>
           </Card>
 
-          {/* LISTA */}
           <div className="space-y-4">
             {filteredTrainings.map((t) => (
               <Card
@@ -1132,9 +1535,7 @@ export default function OcupationalPage() {
                     <p className="text-sm text-muted-foreground">
                       {t.date} – {t.time}
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      Responsable: {t.responsible}
-                    </p>
+                    <p className="text-sm text-muted-foreground">Responsable: {t.responsible}</p>
                   </div>
 
                   <div className="flex items-center gap-3">
@@ -1149,11 +1550,7 @@ export default function OcupationalPage() {
                       {t.status === "completed" ? "Realizada" : "No realizada"}
                     </Badge>
 
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => router.push(`/dashboard/trainingPlan/${t.id}`)}
-                    >
+                    <Button size="sm" variant="secondary" onClick={() => router.push(`/dashboard/trainingPlan/${t.id}`)}>
                       <Eye className="h-4 w-4 mr-1" />
                       Ver detalle
                     </Button>
@@ -1163,7 +1560,6 @@ export default function OcupationalPage() {
             ))}
           </div>
 
-          {/* MODAL NUEVA CAPACITACIÓN */}
           <Dialog open={trainingOpen} onOpenChange={setTrainingOpen}>
             <DialogContent>
               <DialogHeader>
@@ -1174,25 +1570,16 @@ export default function OcupationalPage() {
                 <Input
                   placeholder="Tema"
                   value={newTraining.title}
-                  onChange={(e) =>
-                    setNewTraining({ ...newTraining, title: e.target.value })
-                  }
+                  onChange={(e) => setNewTraining({ ...newTraining, title: e.target.value })}
                 />
 
                 <Input
                   type="date"
                   value={newTraining.date}
-                  onChange={(e) =>
-                    setNewTraining({ ...newTraining, date: e.target.value })
-                  }
+                  onChange={(e) => setNewTraining({ ...newTraining, date: e.target.value })}
                 />
 
-                <Select
-                  value={newTraining.time}
-                  onValueChange={(value) =>
-                    setNewTraining({ ...newTraining, time: value })
-                  }
-                >
+                <Select value={newTraining.time} onValueChange={(value) => setNewTraining({ ...newTraining, time: value })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Hora de la capacitación" />
                   </SelectTrigger>
@@ -1208,32 +1595,20 @@ export default function OcupationalPage() {
                 <Input
                   placeholder="Responsable"
                   value={newTraining.responsible}
-                  onChange={(e) =>
-                    setNewTraining({ ...newTraining, responsible: e.target.value })
-                  }
+                  onChange={(e) => setNewTraining({ ...newTraining, responsible: e.target.value })}
                 />
 
                 <Textarea
                   placeholder="Descripción de la capacitación"
                   value={newTraining.description}
-                  onChange={(e) =>
-                    setNewTraining({
-                      ...newTraining,
-                      description: e.target.value,
-                    })
-                  }
+                  onChange={(e) => setNewTraining({ ...newTraining, description: e.target.value })}
                   className="resize-none h-28 max-h-40 overflow-y-auto"
                 />
               </div>
 
               <DialogFooter>
                 <Button
-                  disabled={
-                    !newTraining.title ||
-                    !newTraining.date ||
-                    !newTraining.time ||
-                    isPastDateTime()
-                  }
+                  disabled={!newTraining.title || !newTraining.date || !newTraining.time || isPastDateTime()}
                   onClick={() => {
                     setTrainings([
                       ...trainings,

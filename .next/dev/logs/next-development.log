@@ -1,73 +1,352 @@
-[00:00:06.513] Server  LOG      ✓ Ready in 4.6s
-[00:00:17.769] Server  LOG      ○ Compiling / ...
-[00:00:35.104] Server  LOG      ○ Compiling /dashboard ...
-[00:00:44.590] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:05.196] Server  LOG      ✓ Ready in 3.8s
+[00:00:11.117] Server  LOG      ○ Compiling / ...
+[00:00:20.744] Server  LOG      ○ Compiling /dashboard ...
+[00:00:29.621] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:44.630] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:29.627] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:44.704] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:29.633] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:44.909] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:29.645] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:52.996] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:31.208] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:34.358] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:34.358] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:34.358] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:34.358] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:34.358] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:34.358] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:34.358] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:34.358] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:56.087] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:56.087] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:00:56.087] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768432984646}
-[00:01:02.995] Server  LOG      ○ Compiling /dashboard/occupational ...
-[00:01:07.171] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768432995696}
-[00:01:12.785] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:01:12.786] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:29:32.642] Server  LOG      ✓ Compiled in 1240ms
-[00:30:16.791] Server  LOG      ✓ Compiled in 700ms
-[00:30:20.581] Server  LOG      ✓ Compiled in 1344ms
-[00:31:07.215] Server  LOG      ✓ Compiled in 605ms
-[00:31:26.615] Server  LOG      ✓ Compiled in 838ms
-[00:38:13.316] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768435221818}
-[00:38:34.609] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768435243143}
-[00:42:00.780] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768435449285}
-[00:42:07.076] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures/5bb2270b-bdf0-45a4-bd46-1fce0d09a5b3 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures/[id]","o":"http://localhost:3000/dashboard/preventiveMeasures/5bb2270b-bdf0-45a4-bd46-1fce0d09a5b3","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768435455597}
-[00:42:16.771] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768435465269}
-[00:42:18.614] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768435467150}
-[00:44:00.704] Server  LOG      ✓ Compiled in 1308ms
-[00:44:30.957] Server  LOG      ✓ Compiled in 1930ms
-[00:44:33.189] Server  LOG      ✓ Compiled in 822ms
+[00:00:34.517] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:34.517] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[00:00:34.517] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768452871460}
+[00:03:55.515] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768453071526}
+[00:05:34.013] Server  LOG      ✓ Compiled in 715ms
+[00:06:37.836] Server  LOG      ✓ Compiled in 526ms
+[00:07:52.707] Server  LOG      ✓ Compiled in 555ms
+[00:07:54.545] Server  LOG      ✓ Compiled in 990ms
+[00:08:14.472] Server  LOG      ✓ Compiled in 463ms
+[00:09:32.469] Server  LOG      ✓ Compiled in 934ms
+[00:10:04.949] Server  LOG      ✓ Compiled in 1345ms
+[00:10:34.092] Server  LOG      ✓ Compiled in 327ms
+[00:10:52.591] Server  LOG      ✓ Compiled in 829ms
+[00:11:17.432] Server  LOG      ✓ Compiled in 354ms
+[00:13:32.956] Server  LOG      ✓ Compiled in 787ms
+[00:13:38.634] Server  LOG      ✓ Compiled in 1344ms
+[00:13:47.319] Server  LOG      ✓ Compiled in 2.1s
+[00:13:55.146] Browser ERROR   ./app/dashboard/occupational/page.tsx:674:27
+Parsing ecmascript source code failed
+  672 |                   </Button>
+  673 |                   
+> 674 |                     <Card key={r.id} className="border">
+      |                           ^^^
+  675 |                       <CardContent className="p-4 space-y-2">
+  676 |                         <div className="flex items-start justify-between gap-3">
+  677 |                           <div className="space-y-1">
+
+Expected '</', got 'key'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/occupational/page.tsx [Client Component Browser]
+    ./app/dashboard/occupational/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/occupational/page.tsx [Client Component SSR]
+    ./app/dashboard/occupational/page.tsx [Server Component]
+[00:13:56.811] Browser ERROR   uncaughtError: ReferenceError: setEditingId is not defined
+[00:14:27.264] Server  LOG      ✓ Compiled in 349ms
+[00:14:30.680] Server  LOG      ✓ Compiled in 336ms
+[00:14:39.253] Server  LOG      ✓ Compiled in 2.7s
+[00:14:44.365] Server  LOG      ✓ Compiled in 369ms
+[00:14:52.145] Server  LOG      ✓ Compiled in 485ms
+[00:23:59.306] Server  LOG      ✓ Compiled in 2.5s
+[00:24:07.302] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:26:01.383] Server  LOG      ✓ Compiled in 704ms
+[00:26:06.411] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:26:10.116] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:26:12.792] Server  LOG      ✓ Compiled in 342ms
+[00:26:24.181] Server  LOG      ✓ Compiled in 2.8s
+[00:26:26.918] Server  LOG      ✓ Compiled in 2.7s
+[00:26:32.903] Server  LOG      ✓ Compiled in 3.7s
+[00:26:36.920] Server  LOG      ✓ Compiled in 817ms
+[00:26:41.017] Server  LOG      ✓ Compiled in 830ms
+[00:26:45.928] Server  LOG      ✓ Compiled in 1069ms
+[00:26:47.407] Server  LOG      ✓ Compiled in 782ms
+[00:26:48.252] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <Tabs defaultValue="risk" className="space-y-4">
+      <Tabs data-slot="tabs" className="flex flex-..." defaultValue="risk">
+        <TabsProvider scope={undefined} baseId="radix-_R_k..." value="risk" ...>
+          <Primitive.div dir="ltr" data-orientation="horizontal" data-slot="tabs" className="flex flex-..." ref={null}>
+            <div dir="ltr" data-orientation="horizontal" data-slot="tabs" className="flex flex-..." ref={null}>
+              <TabsList>
+              <TabsContent value="risk" className="space-y-4">
+                <TabsContent data-slot="tabs-content" className="flex-1 out..." value="risk">
+                  <Presence present={true}>
+                    <Primitive.div data-state="active" data-orientation="horizontal" role="tabpanel" ...>
+                      <div data-state="active" data-orientation="horizontal" role="tabpanel" ...>
+                        <div>
+                        <Card>
+                          <div data-slot="card" className="bg-card te...">
+                            <CardContent className="p-4 space-y-3">
+                              <div data-slot="card-content" className="p-4 space-y-3">
++                               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+-                               <p className="text-sm text-muted-foreground">
+                        ...
+              ...
+
+[00:26:48.253] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:26:48.253] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
+[00:26:48.253] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
+[00:26:48.253] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768454435295}
+[00:26:48.253] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768454435296}
+[00:26:51.776] Server  LOG      ✓ Compiled in 878ms
+[00:26:57.526] Server  LOG      ✓ Compiled in 1068ms
+[00:27:01.050] Server  LOG      ✓ Compiled in 588ms
+[00:27:05.465] Server  LOG      ✓ Compiled in 636ms
+[00:27:08.716] Server  LOG      ✓ Compiled in 1823ms
+[00:27:23.990] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:27:25.566] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <Tabs defaultValue="risk" className="space-y-4">
+      <Tabs data-slot="tabs" className="flex flex-..." defaultValue="risk">
+        <TabsProvider scope={undefined} baseId="radix-_R_k..." value="risk" ...>
+          <Primitive.div dir="ltr" data-orientation="horizontal" data-slot="tabs" className="flex flex-..." ref={null}>
+            <div dir="ltr" data-orientation="horizontal" data-slot="tabs" className="flex flex-..." ref={null}>
+              <TabsList>
+              <TabsContent value="risk" className="space-y-4">
+                <TabsContent data-slot="tabs-content" className="flex-1 out..." value="risk">
+                  <Presence present={true}>
+                    <Primitive.div data-state="active" data-orientation="horizontal" role="tabpanel" ...>
+                      <div data-state="active" data-orientation="horizontal" role="tabpanel" ...>
+                        <div>
+                        <Card>
+                          <div data-slot="card" className="bg-card te...">
+                            <CardContent className="p-4 space-y-3">
+                              <div data-slot="card-content" className="p-4 space-y-3">
++                               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+-                               <p className="text-sm text-muted-foreground">
+                        ...
+              ...
+
+[00:27:26.540] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:27:26.540] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
+[00:27:26.540] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
+[00:27:26.540] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768454482665}
+[00:27:26.540] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768454482665}
+[00:31:30.653] Server  LOG      ✓ Compiled in 1092ms
+[00:31:34.482] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:37:21.489] Server  LOG      ✓ Compiled in 832ms
+[00:37:27.308] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:37:28.584] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:37:29.522] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:38:07.529] Server  LOG      ✓ Compiled in 449ms
+[00:38:12.522] Browser ERROR   ./app/dashboard/occupational/page.tsx:325:3
+Parsing ecmascript source code failed
+  323 |
+  324 |   const state = pct === 100 ? "CUMPLIDO" : overdue ? "VENCIDO" : "ACTIVO"
+> 325 |   return { total, done, pct, state }
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  326 | }
+  327 |
+  328 | function progressChipColor(state: "CUMPLIDO" | "ACTIVO" | "VENCIDO") {
+
+Return statement is not allowed here
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/occupational/page.tsx [Client Component Browser]
+    ./app/dashboard/occupational/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/occupational/page.tsx [Client Component SSR]
+    ./app/dashboard/occupational/page.tsx [Server Component]
+[00:38:35.505] Server  LOG      ✓ Compiled in 461ms
+[00:38:37.223] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:38:40.567] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:38:43.528] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:38:50.089] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:38:50.464] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:38:52.653] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:38:52.907] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:39:29.841] Server  LOG      ✓ Compiled in 724ms
+[00:39:30.793] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:39:38.218] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:39:39.524] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:40:17.273] Server  LOG      ✓ Compiled in 506ms
+[00:40:18.433] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:40:27.750] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:40:29.515] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:40:40.431] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:40:40.694] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:40:44.010] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:40:44.253] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:40:54.670] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:40:54.937] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:40:57.247] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:40:57.506] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:40:59.972] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:41:00.250] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:41:02.834] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:41:03.103] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:42:43.095] Server  LOG      ✓ Compiled in 694ms
+[00:42:46.278] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:42:50.921] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:42:52.512] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:43:14.314] Server  LOG      ✓ Compiled in 1026ms
+[00:43:23.899] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:43:26.465] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:43:27.575] Browser ERROR   uncaughtError: TypeError: Cannot read properties of undefined (reading 'length')
+[00:44:19.830] Server  LOG      ✓ Compiled in 503ms
+[00:44:20.656] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:44:26.912] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:44:27.663] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <Primitive.div dir="ltr" data-orientation="horizontal" data-slot="tabs" className="flex flex-..." ref={null}>
+      <div dir="ltr" data-orientation="horizontal" data-slot="tabs" className="flex flex-..." ref={null}>
+        <TabsList>
+        <TabsContent value="risk" className="space-y-4">
+          <TabsContent data-slot="tabs-content" className="flex-1 out..." value="risk">
+            <Presence present={true}>
+              <Primitive.div data-state="active" data-orientation="horizontal" role="tabpanel" ...>
+                <div data-state="active" data-orientation="horizontal" role="tabpanel" aria-labelledby="radix-_R_k..." ...>
+                  <div className="grid grid-...">
+                    <Card>
+                      <div data-slot="card" className="bg-card te...">
+                        <CardContent className="p-4 space-y-3">
+                          <div data-slot="card-content" className="p-4 space-y-3">
+                            <p>
+                            <div className="flex flex-...">
+                              <span>
+                              <span className="rounded-fu...">
++                               1
+-                               0
+                              ...
+                            ...
+                    ...
+                  ...
+        ...
+
+[00:44:27.663] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:44:27.663] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
+[00:44:27.663] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
+[00:44:27.664] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768455504549}
+[00:44:27.664] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768455504549}
+[00:44:44.411] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:44:44.847] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <Primitive.div dir="ltr" data-orientation="horizontal" data-slot="tabs" className="flex flex-..." ref={null}>
+      <div dir="ltr" data-orientation="horizontal" data-slot="tabs" className="flex flex-..." ref={null}>
+        <TabsList>
+        <TabsContent value="risk" className="space-y-4">
+          <TabsContent data-slot="tabs-content" className="flex-1 out..." value="risk">
+            <Presence present={true}>
+              <Primitive.div data-state="active" data-orientation="horizontal" role="tabpanel" ...>
+                <div data-state="active" data-orientation="horizontal" role="tabpanel" aria-labelledby="radix-_R_k..." ...>
+                  <div className="grid grid-...">
+                    <Card>
+                      <div data-slot="card" className="bg-card te...">
+                        <CardContent className="p-4 space-y-3">
+                          <div data-slot="card-content" className="p-4 space-y-3">
+                            <p>
+                            <div className="flex flex-...">
+                              <span>
+                              <span className="rounded-fu...">
++                               1
+-                               0
+                              ...
+                            ...
+                    ...
+                  ...
+        ...
+
+[00:44:44.847] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:44:44.847] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
+[00:44:44.847] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
+[00:44:44.847] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768455521834}
+[00:44:44.847] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768455521834}
+[00:45:27.737] Server  LOG      ✓ Compiled in 518ms
+[00:46:13.911] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:46:13.911] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:46:31.524] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:46:31.524] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:46:39.206] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:46:39.206] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
