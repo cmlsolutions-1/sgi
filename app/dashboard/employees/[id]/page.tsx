@@ -29,6 +29,8 @@ import {
 import { cn } from "@/lib/utils"
 import { SocialSecurityFormDialog } from "@/components/dashboard/SocialSecurityFormDialog"
 import { MedicalEvaluationTab } from "@/components/employee/MedicalEvaluationTab"
+import { AbsenteeismTab } from "@/components/employee/AbsenteeismTab"
+
 
 type TrainingStatus = "completed" | "in-progress" | "pending";
 
@@ -201,6 +203,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           <TabsTrigger value="evaluations">Evaluaciones</TabsTrigger>
           <TabsTrigger value="socialSecurity">Seguridad Social</TabsTrigger>
           <TabsTrigger value="medical">Evaluaciones médico-ocupacionales</TabsTrigger>
+          <TabsTrigger value="absenteeism">Ausentismo Laboral</TabsTrigger>
         </TabsList>
 
         <TabsContent value="info">
@@ -340,6 +343,10 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
             employee={employee} 
             onAddEvaluation={handleAddMedicalEvaluation}
           />
+        </TabsContent>
+
+        <TabsContent value="absenteeism">
+          <AbsenteeismTab employee={employee} />
         </TabsContent>
 
         <TabsContent value="socialSecurity">

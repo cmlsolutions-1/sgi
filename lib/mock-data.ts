@@ -140,6 +140,32 @@ export interface SocialSecurity extends BaseEntity {
   endDate?: string;
 }
 
+//Tipos de ausentismo
+export type AbsenteeismType = "permiso" | "incapacidad" | "licencia"
+export type PermissionKind = "remunerado" | "no_remunerado"
+export type DisabilityKind = "general" | "laboral" | "maternidad" | "paternidad"
+export type LeaveKind = "luto"
+
+//Soporte de ausentismo
+export interface AbsenteeismSupport {
+  name: string
+  url: string // en demo: dataURL/base64 o un link
+  size: number
+  type: string
+}
+
+//Registro de ausentismo laboral
+export interface AbsenteeismRecord extends BaseEntity {
+  employeeId: string
+  type: AbsenteeismType
+  subType: PermissionKind | DisabilityKind | LeaveKind
+  startDate: string // YYYY-MM-DD
+  endDate: string // YYYY-MM-DD
+  notes?: string
+  support: AbsenteeismSupport | null
+  createdAtISO: string
+}
+
 // Responsable del SGI
 export interface SgiResponsible {
   employeeId: string;
@@ -217,6 +243,7 @@ export interface Employee extends BaseEntity {
   socialSecurity?: SocialSecurityContribution[];
   sgiResponsible?: SgiResponsible;
   medicalEvaluations?: MedicalEvaluation[];
+  absenteeism?: AbsenteeismRecord[];
 }
 
 //Datos quemados Tema de capacitacion

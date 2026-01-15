@@ -1,4 +1,6 @@
 {
+  "/dashboard/employees/[id]/page": "app/dashboard/employees/[id]/page.js",
+  "/dashboard/employees/page": "app/dashboard/employees/page.js",
   "/dashboard/occupational/page": "app/dashboard/occupational/page.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/page": "app/page.js"
