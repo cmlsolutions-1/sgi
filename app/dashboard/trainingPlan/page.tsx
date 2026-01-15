@@ -170,7 +170,7 @@ export default function TrainingPlanPage() {
             <div>
               <p className="text-sm mb-1">Año</p>
               <Select value={yearFilter} onValueChange={setYearFilter}>
-                <SelectTrigger className="w-[160px]">
+                <SelectTrigger className="w-40">
                   <SelectValue placeholder="Año" />
                 </SelectTrigger>
                 <SelectContent>

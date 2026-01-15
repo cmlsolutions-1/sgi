@@ -1,271 +1,73 @@
-[00:00:04.360] Server  LOG      ✓ Ready in 3.2s
-[00:01:57.728] Server  LOG      ○ Compiling / ...
-[00:02:07.534] Server  LOG      ○ Compiling /dashboard ...
-[00:02:11.654] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:06.513] Server  LOG      ✓ Ready in 4.6s
+[00:00:17.769] Server  LOG      ○ Compiling / ...
+[00:00:35.104] Server  LOG      ○ Compiling /dashboard ...
+[00:00:44.590] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:11.663] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:44.630] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:11.670] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:44.704] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:11.679] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:44.909] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:13.017] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:52.996] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:15.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:55.909] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:02:16.022] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:02:16.022] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:02:16.022] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768347904436}
-[00:02:27.641] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:02:27.790] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:02:27.790] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/ocupational","route":"/dashboard/ocupational"}
-[00:02:27.790] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/ocupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/ocupational","o":"http://localhost:3000/dashboard/ocupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768347916765}
-[00:03:01.326] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:03:01.330] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:03:01.333] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:03:01.337] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:03:02.430] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:03:03.129] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:03:03.129] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:03:03.129] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:03:03.129] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:03:03.130] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:03:03.130] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:03:03.130] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:03:03.130] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:03:03.261] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:03:03.261] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:03:03.261] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768347952228}
-[00:03:08.646] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768347957523}
-[00:03:17.918] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:03:18.017] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:03:18.017] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/ocupational","route":"/dashboard/ocupational"}
-[00:03:18.017] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/ocupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/ocupational","o":"http://localhost:3000/dashboard/ocupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768347967007}
-[00:05:10.177] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:05:10.320] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:05:10.320] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/ocupational","route":"/dashboard/ocupational"}
-[00:05:10.320] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/ocupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/ocupational","o":"http://localhost:3000/dashboard/ocupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348079327}
-[00:05:13.341] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:05:13.808] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:05:13.808] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
-[00:05:13.808] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348082813}
-[00:05:16.451] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:05:16.597] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:05:16.597] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
-[00:05:16.597] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348085609}
-[00:05:18.821] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:05:19.175] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:05:19.175] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
-[00:05:19.175] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348088180}
-[00:05:21.127] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:05:21.279] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:05:21.279] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
-[00:05:21.279] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348090288}
-[00:05:59.871] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:06:00.213] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:06:00.213] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
-[00:06:00.213] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348129222}
-[00:06:03.637] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:06:03.791] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:06:03.792] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/workingPlan","route":"/dashboard/workingPlan"}
-[00:06:03.792] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/workingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/workingPlan","o":"http://localhost:3000/dashboard/workingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348132804}
-[00:06:06.321] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:06:06.630] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:06:06.630] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/employees","route":"/dashboard/employees"}
-[00:06:06.630] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348135648}
-[00:06:09.493] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348138412}
-[00:07:58.461] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348247370}
-[00:08:55.975] Server  LOG      ✓ Compiled in 212ms
-[00:09:10.393] Server  LOG      ✓ Compiled in 248ms
-[00:09:12.364] Server  LOG      ✓ Compiled in 227ms
-[00:09:14.959] Server  LOG      ✓ Compiled in 749ms
-[00:09:18.745] Server  LOG      ✓ Compiled in 753ms
-[00:09:26.047] Server  LOG      ✓ Compiled in 217ms
-[00:09:37.186] Server  LOG      ✓ Compiled in 253ms
-[00:11:06.224] Server  LOG      ✓ Compiled in 853ms
-[00:11:15.157] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:11:16.775] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-https://react.dev/link/hydration-mismatch
-
-  ...
-    <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
-      <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
-        <LoadingBoundary name="occupational/" loading={null}>
-          <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-            <RedirectBoundary>
-              <RedirectErrorBoundary router={{...}}>
-                <InnerLayoutRouter url="/dashboard..." tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
-                  <SegmentViewNode type="page" pagePath="dashboard/...">
-                    <SegmentTrieNode>
-                    <ClientPageRoot Component={function OcupationalPage} serverProvidedParams={{...}}>
-                      <OcupationalPage params={Promise} searchParams={Promise}>
-                        <div className="space-y-6">
-                          <div>
-                          <Card>
-                          <div className="space-y-4">
-                            <Card className="border-l-4...">
-+                             <div
-+                               data-slot="card"
-+                               className="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 sha..."
-+                             >
-                          ...
-                  ...
-                ...
-      ...
-
-[00:11:16.775] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:11:16.775] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
-[00:11:16.775] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
-[00:11:16.775] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348445843}
-[00:11:16.775] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348445844}
-[00:11:22.033] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:11:22.465] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-https://react.dev/link/hydration-mismatch
-
-  ...
-    <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
-      <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
-        <LoadingBoundary name="occupational/" loading={null}>
-          <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-            <RedirectBoundary>
-              <RedirectErrorBoundary router={{...}}>
-                <InnerLayoutRouter url="/dashboard..." tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} ...>
-                  <SegmentViewNode type="page" pagePath="dashboard/...">
-                    <SegmentTrieNode>
-                    <ClientPageRoot Component={function OcupationalPage} serverProvidedParams={{...}}>
-                      <OcupationalPage params={Promise} searchParams={Promise}>
-                        <div className="space-y-6">
-                          <div>
-                          <Card>
-                          <div className="space-y-4">
-                            <Card className="border-l-4...">
-+                             <div
-+                               data-slot="card"
-+                               className="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 sha..."
-+                             >
-                          ...
-                  ...
-                ...
-      ...
-
-[00:11:22.465] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:11:22.465] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
-[00:11:22.465] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
-[00:11:22.465] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348451544}
-[00:11:22.465] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768348451545}
-[00:12:38.714] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:12:38.714] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:13:09.115] Server  LOG      ✓ Compiled in 165ms
-[00:13:27.984] Server  LOG      ✓ Compiled in 268ms
-[00:13:29.912] Server  LOG      ✓ Compiled in 305ms
-[00:13:38.907] Server  LOG      ✓ Compiled in 389ms
-[00:13:41.261] Server  LOG      ✓ Compiled in 351ms
-[00:13:50.010] Server  LOG      ✓ Compiled in 224ms
-[00:13:59.016] Server  LOG      ✓ Compiled in 740ms
-[00:16:26.487] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:16:26.534] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:17:05.517] Server  LOG      ✓ Compiled in 534ms
-[00:17:06.809] Server  LOG      ✓ Compiled in 469ms
-[00:17:08.318] Server  LOG      ✓ Compiled in 262ms
-[00:17:10.748] Server  LOG      ✓ Compiled in 216ms
-[00:17:12.956] Server  LOG      ✓ Compiled in 559ms
-[00:38:21.810] Server  LOG      ✓ Compiled in 934ms
-[00:39:22.354] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:39:22.354] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:46:43.167] Server  LOG      ✓ Compiled in 1342ms
-[00:55:04.195] Server  LOG      ✓ Compiled in 2.7s
-[00:55:30.517] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:55:30.517] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[01:20:19.788] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[01:20:19.788] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:00:56.087] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:56.087] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[00:00:56.087] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768432984646}
+[00:01:02.995] Server  LOG      ○ Compiling /dashboard/occupational ...
+[00:01:07.171] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768432995696}
+[00:01:12.785] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:01:12.786] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:29:32.642] Server  LOG      ✓ Compiled in 1240ms
+[00:30:16.791] Server  LOG      ✓ Compiled in 700ms
+[00:30:20.581] Server  LOG      ✓ Compiled in 1344ms
+[00:31:07.215] Server  LOG      ✓ Compiled in 605ms
+[00:31:26.615] Server  LOG      ✓ Compiled in 838ms
+[00:38:13.316] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768435221818}
+[00:38:34.609] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768435243143}
+[00:42:00.780] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768435449285}
+[00:42:07.076] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures/5bb2270b-bdf0-45a4-bd46-1fce0d09a5b3 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures/[id]","o":"http://localhost:3000/dashboard/preventiveMeasures/5bb2270b-bdf0-45a4-bd46-1fce0d09a5b3","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768435455597}
+[00:42:16.771] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768435465269}
+[00:42:18.614] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768435467150}
+[00:44:00.704] Server  LOG      ✓ Compiled in 1308ms
+[00:44:30.957] Server  LOG      ✓ Compiled in 1930ms
+[00:44:33.189] Server  LOG      ✓ Compiled in 822ms

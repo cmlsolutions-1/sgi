@@ -17,6 +17,7 @@ export function nrLevelColor(level: string) {
     const val = (a || "").toLowerCase()
     if (val.includes("no aceptable")) return "bg-red-600 text-white border-red-700"
     if (val.includes("control")) return "bg-orange-500 text-white border-orange-600"
+    if (val.includes("mejorable")) return "bg-yellow-600 text-white border-yellow-700"
     if (val.includes("aceptable")) return "bg-green-600 text-white border-green-700"
     return "bg-muted text-foreground border-border"
   }

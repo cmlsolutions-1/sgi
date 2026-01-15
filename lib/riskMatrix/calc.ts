@@ -47,7 +47,7 @@ export function calcNP(nd: number, ne: number) {
     // Tabla 8 (en tu Excel):
     if (level === "I") return "No aceptable"
     if (level === "II") return "No aceptable o aceptable con control específico"
-    if (level === "III") return "Aceptable"
+    if (level === "III") return "Mejorable"
     if (level === "IV") return "Aceptable"
     return ""
   }

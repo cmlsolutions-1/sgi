@@ -250,7 +250,7 @@ function interpretNR(level: string) {
 function aceptabilidad(level: string) {
   if (level === "I") return "No aceptable"
   if (level === "II") return "No aceptable o aceptable con control específico"
-  if (level === "III") return "Aceptable"
+  if (level === "III") return "Mejorable"
   if (level === "IV") return "Aceptable"
   return ""
 }
@@ -274,6 +274,7 @@ function aceptabilidadColor(a: string) {
   const val = (a || "").toLowerCase()
   if (val.includes("no aceptable")) return "bg-red-600 text-white border-red-700"
   if (val.includes("control")) return "bg-orange-500 text-white border-orange-600"
+  if (val.includes("mejorable")) return "bg-yellow-400 text-black border-yellow-500"
   if (val.includes("aceptable")) return "bg-green-600 text-white border-green-700"
   return "bg-muted text-foreground border-border"
 }
@@ -486,7 +487,7 @@ export default function OcupationalPage() {
             Diagnóstico de Condiciones de Trabajo
           </h1>
           <p className="text-muted-foreground">
-            SG-SST · Capacitaciones y Matriz de Peligros (UI tipo app)
+            SG-SST · Capacitaciones y Matriz de Peligros
           </p>
         </div>
       </div>
@@ -508,7 +509,7 @@ export default function OcupationalPage() {
             <div>
               <h2 className="text-lg font-semibold">Cuadro de riesgos</h2>
               <p className="text-sm text-muted-foreground">
-                Crear filas con Drawer lateral (wizard) y semáforo de resultados.
+                Semáforo de resultados.
               </p>
             </div>
 
@@ -1083,7 +1084,7 @@ export default function OcupationalPage() {
                 <div>
                   <p className="text-sm mb-1">Mes</p>
                   <Select value={monthFilter} onValueChange={setMonthFilter}>
-                    <SelectTrigger className="w-[160px]">
+                    <SelectTrigger className="w-40">
                       <SelectValue placeholder="Mes" />
                     </SelectTrigger>
                     <SelectContent>
