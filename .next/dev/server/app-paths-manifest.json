@@ -1,7 +1,12 @@
 {
-  "/dashboard/employees/[id]/page": "app/dashboard/employees/[id]/page.js",
-  "/dashboard/employees/page": "app/dashboard/employees/page.js",
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/auth/login/route": "app/api/auth/login/route.js",
+  "/api/auth/lookup/route": "app/api/auth/lookup/route.js",
   "/dashboard/occupational/page": "app/dashboard/occupational/page.js",
   "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/trainingPlan/page": "app/dashboard/trainingPlan/page.js",
+  "/dashboard/users/page": "app/dashboard/users/page.js",
+  "/manager/page": "app/manager/page.js",
   "/page": "app/page.js"
 }
