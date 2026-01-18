@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Eye, ClipboardList, Pencil, Trash2 } from "lucide-react"
+import { Plus, Eye, ClipboardList, Pencil, Trash2, UploadCloud } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
@@ -89,7 +89,9 @@ type Evidence = {
   mime: string
   size: number
   dataUrl: string
-  createdAt: string
+  //createdAt: string
+  performedAt: string // fecha de realización (YYYY-MM-DD)
+  uploadedAt: string  // fecha/hora subida (ISO)
 }
 
 type MeasureKey =
@@ -274,13 +276,13 @@ function aceptabilidad(level: string) {
 function nrLevelColor(level: string) {
   switch (level) {
     case "I":
-      return "bg-red-600 text-white border-red-700"
-    case "II":
-      return "bg-orange-500 text-white border-orange-600"
-    case "III":
-      return "bg-yellow-400 text-black border-yellow-500"
-    case "IV":
       return "bg-green-600 text-white border-green-700"
+    case "II":
+      return "bg-yellow-400 text-white border-yellow-600"
+    case "III":
+      return "bg-orange-500 text-black border-orange-600"
+    case "IV":
+      return "bg-red-600 text-white border-red-700"
     default:
       return "bg-muted text-foreground border-border"
   }
@@ -396,6 +398,22 @@ function formatDateTime(iso: string) {
   }
 }
 
+function formatDate(yyyyMMdd: string) {
+  try {
+    const d = new Date(`${yyyyMMdd}T00:00:00`)
+    return d.toLocaleDateString()
+  } catch {
+    return yyyyMMdd
+  }
+}
+
+function todayYYYYMMDD() {
+  const d = new Date()
+  const mm = String(d.getMonth() + 1).padStart(2, "0")
+  const dd = String(d.getDate()).padStart(2, "0")
+  return `${d.getFullYear()}-${mm}-${dd}`
+}
+
 /* =========================================================
    COMPONENTE
 ========================================================= */
@@ -457,11 +475,24 @@ export default function OcupationalPage() {
     const stored = localStorage.getItem(LS_RISK_KEY)
 const raw = stored ? (JSON.parse(stored) as any[]) : []
 
+// Migración: si venían evidencias viejas sin performedAt/uploadedAt, las normalizamos.
+    const normalizeEvidence = (e: any): Evidence => ({
+      id: String(e?.id ?? crypto.randomUUID?.() ?? Date.now()),
+      name: String(e?.name ?? "archivo"),
+      mime: String(e?.mime ?? "application/octet-stream"),
+      size: Number(e?.size ?? 0),
+      dataUrl: String(e?.dataUrl ?? ""),
+      performedAt: String(e?.performedAt ?? todayYYYYMMDD()),
+      uploadedAt: String(e?.uploadedAt ?? e?.createdAt ?? new Date().toISOString()),
+    })
+
+
+
 return Array.isArray(raw)
   ? raw.map((r) => ({
       ...r,
       measures: Array.isArray(r.measures) ? r.measures : makeDefaultMeasures(),
-      evidences: Array.isArray(r.evidences) ? r.evidences : [],
+      evidences: Array.isArray(r.evidences) ? r.evidences.map(normalizeEvidence) : [],
     }))
   : []
   })
@@ -477,6 +508,12 @@ return Array.isArray(raw)
   const [editingId, setEditingId] = useState<string | null>(null)
 
   const [detailRow, setDetailRow] = useState<RiskRow | null>(null)
+
+  // ===== Modal: Subir evidencia a un riesgo existente
+  const [uploadOpen, setUploadOpen] = useState(false)
+  const [uploadRiskId, setUploadRiskId] = useState<string | null>(null)
+  const [evidencePerformedAt, setEvidencePerformedAt] = useState<string>(todayYYYYMMDD())
+  const [evidenceFiles, setEvidenceFiles] = useState<FileList | null>(null)
 
   const emptyForm: Omit<RiskRow, "id"> = {
     proceso: "",
@@ -636,7 +673,8 @@ return Array.isArray(raw)
     })
   }
 
-  async function addEvidences(files: FileList | null) {
+  // Evidencias dentro del wizard (cuando creas/edita)
+  async function addEvidencesToForm(files: FileList | null, performedAt: string) {
     if (!files || files.length === 0) return
 
     const allowed = ["application/pdf"]
@@ -653,15 +691,67 @@ return Array.isArray(raw)
         mime: file.type,
         size: file.size,
         dataUrl,
-        createdAt: new Date().toISOString(),
+        performedAt,
+        uploadedAt: new Date().toISOString(),
       })
     }
 
     setRiskForm((p) => ({ ...p, evidences: [...p.evidences, ...list] }))
   }
 
-  function removeEvidence(id: string) {
+
+  function removeEvidenceFromForm(id: string) {
     setRiskForm((p) => ({ ...p, evidences: p.evidences.filter((e) => e.id !== id) }))
+  }
+
+  // NUEVO: abrir modal “Subir evidencia” desde una card
+  function openUploadEvidence(riskId: string) {
+    setUploadRiskId(riskId)
+    setEvidencePerformedAt(todayYYYYMMDD())
+    setEvidenceFiles(null)
+    setUploadOpen(true)
+  }
+
+  // NUEVO: guardar evidencias al riskRow existente
+  async function commitUploadEvidence() {
+    if (!uploadRiskId) return
+    if (!evidenceFiles || evidenceFiles.length === 0) return
+    if (!evidencePerformedAt) return
+
+    const allowed = ["application/pdf"]
+    const isImage = (m: string) => m.startsWith("image/")
+
+    const list: Evidence[] = []
+    for (const file of Array.from(evidenceFiles)) {
+      if (!isImage(file.type) && !allowed.includes(file.type)) continue
+
+      const dataUrl = await readFileAsDataURL(file)
+      list.push({
+        id: crypto.randomUUID?.() ?? `${Date.now()}-${file.name}`,
+        name: file.name,
+        mime: file.type,
+        size: file.size,
+        dataUrl,
+        performedAt: evidencePerformedAt,
+        uploadedAt: new Date().toISOString(),
+      })
+    }
+
+    setRiskRows((prev) =>
+      prev.map((r) =>
+        r.id === uploadRiskId
+          ? { ...r, evidences: [...(Array.isArray(r.evidences) ? r.evidences : []), ...list] }
+          : r
+      )
+    )
+
+    setUploadOpen(false)
+
+    // Si el detalle está abierto en ese mismo riesgo, refrescamos visualmente
+    if (detailOpen && detailRow?.id === uploadRiskId) {
+      const updated = riskRows.find((rr) => rr.id === uploadRiskId)
+      if (updated) setDetailRow(updated)
+    }
   }
 
   const dashboard = useMemo(() => {
@@ -704,7 +794,7 @@ return Array.isArray(raw)
             <ClipboardList className="h-4 w-4" />
             Matriz de Peligros
           </TabsTrigger>
-          <TabsTrigger value="trainings">Capacitaciones</TabsTrigger>
+          {/* <TabsTrigger value="trainings">Capacitaciones</TabsTrigger> */}
         </TabsList>
 
         {/* ================= MATRIZ ================= */}
@@ -836,6 +926,10 @@ return Array.isArray(raw)
                               <Pencil className="h-4 w-4" />
                               Editar
                             </Button>
+                            <Button size="sm" variant="secondary" onClick={() => openUploadEvidence(r.id)} className="gap-2">
+                              <UploadCloud className="h-4 w-4" />
+                              Subir evidencia
+                            </Button>
 
                             <Button size="sm" variant="destructive" onClick={() => deleteRiskRow(r.id)} className="gap-2">
                               <Trash2 className="h-4 w-4" />
@@ -844,12 +938,62 @@ return Array.isArray(raw)
                           </div>
                         </CardContent>
                       </Card>
-                    )
+                   )
                   })}
                 </div>
               )}
             </CardContent>
           </Card>
+          {/* =========================================
+              MODAL SUBIR EVIDENCIA (por riesgo)
+          ========================================== */}
+          <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Subir evidencia</DialogTitle>
+              </DialogHeader>
+
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm mb-1">Fecha de realización</p>
+                  <Input
+                    type="date"
+                    value={evidencePerformedAt}
+                    onChange={(e) => setEvidencePerformedAt(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Esta es la fecha en que se ejecutó la actividad / se generó la evidencia.
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm mb-1">Archivos (fotos / PDF)</p>
+                  <Input
+                    type="file"
+                    multiple
+                    accept="image/*,application/pdf"
+                    onChange={(e) => setEvidenceFiles(e.target.files)}
+                  />
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button
+                  variant="secondary"
+                  onClick={() => setUploadOpen(false)}
+                >
+                  Cancelar
+                </Button>
+
+                <Button
+                  disabled={!uploadRiskId || !evidencePerformedAt || !evidenceFiles || evidenceFiles.length === 0}
+                  onClick={commitUploadEvidence}
+                >
+                  Subir
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {/* Drawer Crear/Editar */}
           <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
@@ -1213,7 +1357,27 @@ return Array.isArray(raw)
                     <Card>
                       <CardContent className="p-4 space-y-3">
                         <p className="font-semibold text-sm">Evidencias (fotos / PDF)</p>
-                        <Input type="file" multiple accept="image/*,application/pdf" onChange={(e) => addEvidences(e.target.files)} />
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Fecha de realización</p>
+                            <Input
+                              type="date"
+                              value={evidencePerformedAt}
+                              onChange={(e) => setEvidencePerformedAt(e.target.value)}
+                            />
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Archivos</p>
+                            <Input
+                              type="file"
+                              multiple
+                              accept="image/*,application/pdf"
+                              onChange={(e) => addEvidencesToForm(e.target.files, evidencePerformedAt)}
+                            />
+                          </div>
+                        </div>
 
                         {riskForm.evidences.length === 0 ? (
                           <p className="text-xs text-muted-foreground">Aún no hay evidencias.</p>
@@ -1224,14 +1388,14 @@ return Array.isArray(raw)
                                 <div className="min-w-0">
                                   <p className="text-sm font-medium truncate">{ev.name}</p>
                                   <p className="text-xs text-muted-foreground truncate">
-                                    {ev.mime} · {(ev.size / 1024).toFixed(0)} KB · {formatDateTime(ev.createdAt)}
+                                    Realización: {formatDate(ev.performedAt)} · Subida: {formatDateTime(ev.uploadedAt)}
                                   </p>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <Button size="sm" variant="secondary" onClick={() => window.open(ev.dataUrl, "_blank")}>
                                     Ver
                                   </Button>
-                                  <Button size="sm" variant="destructive" onClick={() => removeEvidence(ev.id)}>
+                                  <Button size="sm" variant="destructive" onClick={() => removeEvidenceFromForm(ev.id)}>
                                     Quitar
                                   </Button>
                                 </div>
@@ -1386,7 +1550,13 @@ return Array.isArray(raw)
                         ) : (
                           <div className="space-y-3">
                             {[...detailRow.evidences]
-                              .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+                              .sort((a, b) => {
+                                // Orden principal por fecha de realización, y luego por subida
+                                const pa = a.performedAt ?? "0000-00-00"
+                                const pb = b.performedAt ?? "0000-00-00"
+                                if (pa !== pb) return pa < pb ? 1 : -1
+                                return (a.uploadedAt ?? "") < (b.uploadedAt ?? "") ? 1 : -1
+                              })
                               .map((ev) => (
                                 <div key={ev.id} className="flex gap-3">
                                   <div className="flex flex-col items-center">
@@ -1395,7 +1565,9 @@ return Array.isArray(raw)
                                   </div>
 
                                   <div className="flex-1 rounded-md border p-3">
-                                    <p className="text-xs text-muted-foreground">{formatDateTime(ev.createdAt)}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      Realización: {formatDate(ev.performedAt)} · Subida: {formatDateTime(ev.uploadedAt)}
+                                    </p>
                                     <p className="text-sm font-medium">{ev.name}</p>
                                     <p className="text-xs text-muted-foreground">
                                       {ev.mime} · {(ev.size / 1024).toFixed(0)} KB
@@ -1431,208 +1603,36 @@ return Array.isArray(raw)
                     Cerrar
                   </Button>
 
-                  {detailRow ? (
-                    <Button
-                      variant="secondary"
-                      onClick={() => {
-                        setDetailOpen(false)
-                        openEditRiskDrawer(detailRow)
-                      }}
-                      className="gap-2"
-                    >
-                      <Pencil className="h-4 w-4" />
-                      Editar
-                    </Button>
-                  ) : null}
+                  <div className="flex gap-2">
+                    {detailRow ? (
+                      <>
+                        <Button
+                          variant="secondary"
+                          onClick={() => openUploadEvidence(detailRow.id)}
+                          className="gap-2"
+                        >
+                          <UploadCloud className="h-4 w-4" />
+                          Subir evidencia
+                        </Button>
+
+                        <Button
+                          variant="secondary"
+                          onClick={() => {
+                            setDetailOpen(false)
+                            openEditRiskDrawer(detailRow)
+                          }}
+                          className="gap-2"
+                        >
+                          <Pencil className="h-4 w-4" />
+                          Editar
+                        </Button>
+                      </>
+                    ) : null}
+                  </div>
                 </div>
               </SheetFooter>
             </SheetContent>
           </Sheet>
-        </TabsContent>
-
-        {/* ================= CAPACITACIONES ================= */}
-        <TabsContent value="trainings" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Capacitaciones</h2>
-              <p className="text-sm text-muted-foreground">Gestión de capacitaciones (mock/localStorage)</p>
-            </div>
-
-            <Button onClick={() => setTrainingOpen(true)} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Nueva Capacitación
-            </Button>
-          </div>
-
-          <Card>
-            <CardContent className="p-4 space-y-3">
-              <h3 className="font-semibold">Filtrar por</h3>
-
-              <div className="flex gap-4 flex-wrap">
-                <div>
-                  <p className="text-sm mb-1">Año</p>
-                  <Select value={yearFilter} onValueChange={setYearFilter}>
-                    <SelectTrigger className="w-[160px]">
-                      <SelectValue placeholder="Año" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      {years.map((y) => (
-                        <SelectItem key={y} value={y}>
-                          {y}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <p className="text-sm mb-1">Mes</p>
-                  <Select value={monthFilter} onValueChange={setMonthFilter}>
-                    <SelectTrigger className="w-[160px]">
-                      <SelectValue placeholder="Mes" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      {months.map((m) => (
-                        <SelectItem key={m.value} value={m.value}>
-                          {m.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <p className="text-sm mb-1">Estado</p>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Estado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todas</SelectItem>
-                      <SelectItem value="completed">Realizadas</SelectItem>
-                      <SelectItem value="scheduled">No realizadas</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="space-y-4">
-            {filteredTrainings.map((t) => (
-              <Card
-                key={t.id}
-                className={cn(
-                  "border-l-4",
-                  t.status === "completed" ? "border-l-green-600" : "border-l-red-600"
-                )}
-              >
-                <CardContent className="p-4 flex justify-between items-center">
-                  <div>
-                    <h3 className="font-semibold">{t.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {t.date} – {t.time}
-                    </p>
-                    <p className="text-sm text-muted-foreground">Responsable: {t.responsible}</p>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Badge
-                      variant="outline"
-                      className={
-                        t.status === "completed"
-                          ? "text-green-600 border-green-600"
-                          : "text-red-600 border-red-600"
-                      }
-                    >
-                      {t.status === "completed" ? "Realizada" : "No realizada"}
-                    </Badge>
-
-                    <Button size="sm" variant="secondary" onClick={() => router.push(`/dashboard/trainingPlan/${t.id}`)}>
-                      <Eye className="h-4 w-4 mr-1" />
-                      Ver detalle
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <Dialog open={trainingOpen} onOpenChange={setTrainingOpen}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Nueva Capacitación</DialogTitle>
-              </DialogHeader>
-
-              <div className="space-y-3">
-                <Input
-                  placeholder="Tema"
-                  value={newTraining.title}
-                  onChange={(e) => setNewTraining({ ...newTraining, title: e.target.value })}
-                />
-
-                <Input
-                  type="date"
-                  value={newTraining.date}
-                  onChange={(e) => setNewTraining({ ...newTraining, date: e.target.value })}
-                />
-
-                <Select value={newTraining.time} onValueChange={(value) => setNewTraining({ ...newTraining, time: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Hora de la capacitación" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-64">
-                    {timeOptions.map((time) => (
-                      <SelectItem key={time} value={time}>
-                        {time}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Input
-                  placeholder="Responsable"
-                  value={newTraining.responsible}
-                  onChange={(e) => setNewTraining({ ...newTraining, responsible: e.target.value })}
-                />
-
-                <Textarea
-                  placeholder="Descripción de la capacitación"
-                  value={newTraining.description}
-                  onChange={(e) => setNewTraining({ ...newTraining, description: e.target.value })}
-                  className="resize-none h-28 max-h-40 overflow-y-auto"
-                />
-              </div>
-
-              <DialogFooter>
-                <Button
-                  disabled={!newTraining.title || !newTraining.date || !newTraining.time || isPastDateTime()}
-                  onClick={() => {
-                    setTrainings([
-                      ...trainings,
-                      {
-                        id: Date.now().toString(),
-                        ...newTraining,
-                      },
-                    ])
-                    setTrainingOpen(false)
-                    setNewTraining({
-                      title: "",
-                      date: "",
-                      time: "",
-                      responsible: "",
-                      description: "",
-                      status: "scheduled",
-                    })
-                  }}
-                >
-                  Guardar
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
         </TabsContent>
       </Tabs>
     </div>

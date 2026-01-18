@@ -3,5 +3,8 @@
   "/dashboard/employees/page": "app/dashboard/employees/page.js",
   "/dashboard/occupational/page": "app/dashboard/occupational/page.js",
   "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/preventiveMeasures/page": "app/dashboard/preventiveMeasures/page.js",
+  "/dashboard/roles/page": "app/dashboard/roles/page.js",
+  "/dashboard/trainingPlan/page": "app/dashboard/trainingPlan/page.js",
   "/page": "app/page.js"
 }
