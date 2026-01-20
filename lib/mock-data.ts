@@ -1,3 +1,5 @@
+//lib/mock-data.ts
+
 // Datos mock para el sistema de gestión de calidad
 import type { DocumentBase } from "@/lib/sgsst-types"
 

@@ -1,4 +1,4 @@
-//src/components/document/DocumentFormPreventiveProcedure.tsx
+//components/document/DocumentFormPreventiveProcedure.tsx
 
 "use client"
 
@@ -9,7 +9,10 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import jsPDF from "jspdf"
+import { upsertUserDocument } from "@/lib/documents-storage"
+import type { StoredDocument } from "@/lib/documents-storage"
 import { departments, mockCompany } from "@/lib/mock-data"
+import { DocumentType } from '../../lib/sgsst-types';
 import {
   upsertPreventiveProcedureFilled,
   type PreventiveProcedureFilled,
@@ -34,6 +37,10 @@ export default function DocumentFormPreventiveProcedure({ documentId }: { docume
 
     department: "",
     workArea: "",
+
+    documentType: "procedure" as "manual" | "procedure" | "instruction" | "policy",
+    documentName: "",
+
 
     procedureName: "Procedimiento - Medidas de Prevención",
     objective: "",
@@ -71,7 +78,7 @@ export default function DocumentFormPreventiveProcedure({ documentId }: { docume
     const doc = new jsPDF()
 
     doc.setFontSize(16)
-    doc.text("PROCEDIMIENTO - MEDIDAS DE PREVENCIÓN (ESTÁNDAR 7)", 105, 18, { align: "center" })
+    doc.text("PROCEDIMIENTO - MEDIDAS DE PREVENCIÓN", 105, 18, { align: "center" })
 
     doc.setFontSize(11)
     let y = 30
@@ -125,12 +132,14 @@ export default function DocumentFormPreventiveProcedure({ documentId }: { docume
       doc.text("(No fue posible incrustar la firma)", 15, y + 10)
     }
 
-    doc.save("Procedimiento_Medidas_de_Prevencion.pdf")
+    return doc.output("datauristring")
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const err = validate()
+    if (!formData.documentName) return "Escribe el nombre del documento."
+    if (!formData.documentType) return "Selecciona el tipo de documento."
     if (err) return alert(err)
 
     setIsSubmitting(true)
@@ -145,7 +154,9 @@ export default function DocumentFormPreventiveProcedure({ documentId }: { docume
       department: formData.department,
       workArea: formData.workArea,
 
-      procedureName: formData.procedureName,
+      documentType: formData.documentType,
+      documentName: formData.documentName,
+
       objective: formData.objective,
       activities: formData.activities,
       resources: formData.resources,
@@ -153,13 +164,49 @@ export default function DocumentFormPreventiveProcedure({ documentId }: { docume
       responsibleName: formData.responsibleName,
       responsibleRole: formData.responsibleRole,
 
-      signatureDataUrl,
       createdAtISO: new Date().toISOString(),
     }
 
     upsertPreventiveProcedureFilled(payload)
 
-    await generatePDF()
+    // 1) Generar PDF base64
+    const pdfDataUrl = await generatePDF()
+
+    // 2) Guardar como documento para Gestión de Documentos
+    const docId = crypto.randomUUID()
+    const title = `${formData.procedureName} - ${formData.department}`
+
+    const storedDoc: StoredDocument = {
+      id: crypto.randomUUID(),
+      name: formData.documentName,
+      type: formData.documentType,
+      version: "1.0",
+      status: "approved",
+      createdAt: formData.date,
+      updatedAt: formData.date,
+      author: formData.responsibleName || "Usuario",
+      department: formData.department,
+      size: "Generado",
+      validFromISO: formData.date,
+      createdByUser: true,
+    
+      // NO guardar base64 aquí
+      file: null,
+    
+      // para poder “ver/descargar” regenerando:
+      source: {
+        kind: "preventiveProcedure",
+        filledId: payload.id,
+      },
+    }
+    upsertUserDocument(storedDoc)
+
+    // 3) Descargar
+    const a = document.createElement("a")
+    a.href = pdfDataUrl
+    a.download = `${title}.pdf`
+    a.click()
+
     setIsSubmitting(false)
   }
 
@@ -175,6 +222,30 @@ export default function DocumentFormPreventiveProcedure({ documentId }: { docume
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="text-sm font-medium">Tipo de Documento *</label>
+            <Select value={formData.documentType} onValueChange={(v) => handleChange("documentType", v)}>
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Selecciona" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="manual">Manual</SelectItem>
+                <SelectItem value="procedure">Procedimiento</SelectItem>
+                <SelectItem value="instruction">Instructivo</SelectItem>
+                <SelectItem value="policy">Política</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium">Nombre del Documento *</label>
+            <Input
+              className="mt-1"
+              value={formData.documentName}
+              onChange={(e) => handleChange("documentName", e.target.value)}
+              placeholder="Ej: Procedimiento de Control de EPP"
+            />
+          </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium">Fecha *</label>

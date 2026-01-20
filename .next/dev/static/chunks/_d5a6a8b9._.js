@@ -122,6 +122,7 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "[project]/lib/mock-data.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+//lib/mock-data.ts
 // Datos mock para el sistema de gestión de calidad
 __turbopack_context__.s([
     "departmentData",

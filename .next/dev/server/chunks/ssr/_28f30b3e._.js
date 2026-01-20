@@ -104,6 +104,7 @@ function CardFooter({ className, ...props }) {
 "[project]/lib/mock-data.ts [app-ssr] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+//lib/mock-data.ts
 // Datos mock para el sistema de gestión de calidad
 __turbopack_context__.s([
     "departmentData",

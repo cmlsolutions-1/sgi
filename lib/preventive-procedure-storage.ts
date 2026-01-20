@@ -9,8 +9,10 @@ export type PreventiveProcedureFilled = {
   
     department: string
     workArea: string
+
+    documentType: "manual" | "procedure" | "instruction" | "policy"
+    documentName: string
   
-    procedureName: string
     objective: string
     activities: string
     resources: string
@@ -19,7 +21,7 @@ export type PreventiveProcedureFilled = {
     responsibleRole: string
   
     // firma en imagen
-    signatureDataUrl: string
+    //signatureDataUrl: string
   
     createdAtISO: string
   }

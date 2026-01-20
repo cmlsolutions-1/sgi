@@ -1,15 +1,15 @@
-//src/dashboard/documents/page.tsx
+//app/dashboard/documents/page.tsx
 
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { mockDocuments, departments, type Document } from "@/lib/mock-data"
+import { mockDocuments, departments} from "@/lib/mock-data"
 import {
   Search,
   Filter,
@@ -22,9 +22,15 @@ import {
   FileCheck,
   ScrollText,
   FileQuestion,
+  Calendar as CalendarIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import type { StoredDocument } from "@/lib/documents-storage"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { getAllDocuments, renewDocument } from "@/lib/documents-storage"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { getPreventiveProceduresFilled } from "@/lib/preventive-procedure-storage"
 
 const typeIcons = {
   manual: BookOpen,
@@ -57,11 +63,40 @@ const statusLabels = {
 }
 
 export default function DocumentsPage() {
-  const [documents, setDocuments] = useState<Document[]>(mockDocuments)
+  const [documents, setDocuments] = useState<StoredDocument[]>([])
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [departmentFilter, setDepartmentFilter] = useState<string>("all")
+
+  const [renewDialogOpen, setRenewDialogOpen] = useState(false)
+  const [renewTarget, setRenewTarget] = useState<StoredDocument | null>(null)
+  const [renewDate, setRenewDate] = useState(new Date().toISOString().slice(0,10))
+
+  // Helpers
+  const addOneYear = (iso: string) => {
+    const d = new Date(iso + "T00:00:00")
+    d.setFullYear(d.getFullYear() + 1)
+    return d.toISOString().slice(0, 10)
+  }
+
+  const isExpired = (validFromISO: string) => {
+    const expiresISO = addOneYear(validFromISO)
+    const todayISO = new Date().toISOString().slice(0, 10)
+    return expiresISO < todayISO
+  }
+
+  const downloadDataUrl = (dataUrl: string, filename: string) => {
+    const a = document.createElement("a")
+    a.href = dataUrl
+    a.download = filename
+    a.click()
+  }
+
+  useEffect(() => {
+    setDocuments(getAllDocuments(mockDocuments))
+  }, [])
+
 
   const filteredDocuments = documents.filter((doc) => {
     const matchesSearch = doc.name.toLowerCase().includes(search.toLowerCase())
@@ -79,6 +114,7 @@ export default function DocumentsPage() {
     draft: documents.filter((d) => d.status === "draft").length,
   }
 
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -164,6 +200,7 @@ export default function DocumentsPage() {
                   <SelectItem value="instruction">Instructivo</SelectItem>
                 </SelectContent>
               </Select>
+
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-[150px] bg-secondary border-0">
                   <SelectValue placeholder="Estado" />
@@ -176,6 +213,7 @@ export default function DocumentsPage() {
                   <SelectItem value="obsolete">Obsoleto</SelectItem>
                 </SelectContent>
               </Select>
+
               <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
                 <SelectTrigger className="w-[180px] bg-secondary border-0">
                   <SelectValue placeholder="Departamento" />
@@ -198,9 +236,9 @@ export default function DocumentsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredDocuments.map((doc) => {
           const TypeIcon = typeIcons[doc.type]
-          // const isSGSSTDocument = doc.name.toLowerCase().includes("sgsst") || 
-          //                       doc.name.toLowerCase().includes("asignacion") ||
-          //                       doc.name.toLowerCase().includes("responsable")
+          const expired = isExpired(doc.validFromISO)
+          const expiresISO = addOneYear(doc.validFromISO)
+
           return (
             <Card key={doc.id} className="bg-card border-border hover:border-primary/50 transition-colors">
               <CardContent className="p-4">
@@ -208,26 +246,73 @@ export default function DocumentsPage() {
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                     <TypeIcon className="h-5 w-5" />
                   </div>
+
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <MoreVertical className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
+
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          window.location.href = `/dashboard/documents/${doc.id}`
+                        }}
+                      >
                         <Eye className="h-4 w-4 mr-2" /> Ver
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        disabled={!doc.file?.url}
+                        onSelect={() => {
+                          if (!doc.file?.url) return
+                          downloadDataUrl(doc.file.url, doc.file.name || `${doc.name}.pdf`)
+                        }}
+                      >
                         <Download className="h-4 w-4 mr-2" /> Descargar
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setRenewTarget(doc)
+                          setRenewDate(new Date().toISOString().slice(0, 10))
+                          setRenewDialogOpen(true)
+                        }}
+                      >
+                        <CalendarIcon className="h-4 w-4 mr-2" /> Renovar
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          if (doc.id === "1") window.location.href = `/dashboard/documents/${doc.id}/assignment`
+                          else if (doc.type === "procedure")
+                            window.location.href = `/dashboard/documents/${doc.id}/preventive-procedure`
+                        }}
+                      >
+                        <ClipboardList className="h-4 w-4 mr-2" /> Rehacer / Modificar
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
+
                 <h3 className="font-medium text-sm mb-1 line-clamp-2">{doc.name}</h3>
                 <p className="text-xs text-muted-foreground mb-3">
                   Versión {doc.version} • {doc.size}
                 </p>
+
+                <div className="flex gap-2 mb-3">
+                  <Badge
+                    variant="secondary"
+                    className={expired ? "bg-destructive/10 text-destructive" : "bg-accent/10 text-accent"}
+                  >
+                    {expired ? "Vencido" : "Vigente"}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    Vence: {expiresISO}
+                  </Badge>
+                </div>
+
                 <div className="flex items-center justify-between">
                   <Badge variant="outline" className="text-xs">
                     {typeLabels[doc.type]}
@@ -236,6 +321,7 @@ export default function DocumentsPage() {
                     {statusLabels[doc.status]}
                   </Badge>
                 </div>
+
                 <div className="mt-3 pt-3 border-t border-border">
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>{doc.department}</span>
@@ -243,31 +329,63 @@ export default function DocumentsPage() {
                   </div>
                 </div>
 
-                {/* Botón para formulario si es el documento SGSST */}
-                 {/* {isSGSSTDocument && ( 
-                   <Link href={`/dashboard/documents/${doc.id}/form`} className="block mt-3">
-                     <Button className="w-full" >
-                       Diligenciar Acta
-                     </Button>
-                   </Link>
-                 )} */}
+                {/* Acciones especiales */}
                 {doc.id === "1" && (
                   <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
                     <Button className="w-full">Diligenciar Acta</Button>
                   </Link>
                 )}
-                
+
                 {doc.id === "10" && (
                   <Link href={`/dashboard/documents/${doc.id}/preventive-procedure`} className="block mt-3">
                     <Button className="w-full">Diligenciar Procedimiento</Button>
                   </Link>
                 )}
-                
               </CardContent>
             </Card>
           )
         })}
       </div>
+
+      {/* Dialog Renovar */}
+      <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+        <DialogContent className="bg-card border-border">
+          <DialogHeader>
+            <DialogTitle>Renovar documento</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="text-sm text-muted-foreground">
+              Documento: <span className="font-medium text-foreground">{renewTarget?.name}</span>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Nueva fecha de vigencia (inicio)</Label>
+              <Input type="date" value={renewDate} onChange={(e) => setRenewDate(e.target.value)} />
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setRenewDialogOpen(false)}>
+                Cancelar
+              </Button>
+
+              <Button
+                onClick={() => {
+                  if (!renewTarget?.createdByUser) {
+                    alert("Solo se pueden renovar documentos creados por el usuario (demo).")
+                    return
+                  }
+                  renewDocument(renewTarget.id, renewDate)
+                  setDocuments(getAllDocuments(mockDocuments))
+                  setRenewDialogOpen(false)
+                }}
+              >
+                Renovar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

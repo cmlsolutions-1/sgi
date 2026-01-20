@@ -1,521 +1,3694 @@
-[00:00:10.228] Server  LOG      ✓ Ready in 8s
-[00:00:13.335] Server  LOG      ○ Compiling / ...
-[00:00:32.204] Server  LOG      ○ Compiling /dashboard ...
-[00:00:44.874] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:12.456] Server  LOG      ✓ Ready in 6.4s
+[00:20:20.586] Server  LOG      ○ Compiling / ...
+[00:20:35.507] Server  LOG      ○ Compiling /dashboard ...
+[00:20:47.373] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:44.893] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:20:47.392] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:44.911] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:20:47.399] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:44.941] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:20:47.417] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:47.191] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:49.858] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:20:49.257] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:20:51.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:49.859] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:20:51.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:49.859] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:20:51.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:49.859] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:20:51.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:49.859] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:20:51.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:49.859] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:20:51.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:49.859] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:20:51.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:49.859] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:20:51.341] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:50.422] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:50.422] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:00:50.422] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768761422607}
-[00:31:47.172] Server  LOG      ○ Compiling /dashboard/roles ...
-[00:31:48.525] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/roles color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/roles","o":"http://localhost:3000/dashboard/roles","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768763281129}
-[00:32:33.033] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees","o":"http://localhost:3000/dashboard/employees","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768763325617}
-[00:32:39.004] Server  LOG      ○ Compiling /dashboard/employees/[id] ...
-[00:32:48.327] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/employees/emp-001 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/employees/[id]","o":"http://localhost:3000/dashboard/employees/emp-001","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768763340914}
-[00:32:55.751] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:32:55.751] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:33:08.576] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768763361104}
-[00:36:27.658] Server  LOG      ✓ Compiled in 2.6s
-[00:36:30.876] Server  LOG      ✓ Compiled in 2.8s
-[00:36:57.780] Server  LOG      ✓ Compiled in 1894ms
-[00:37:07.881] Server  LOG      ✓ Compiled in 3s
-[00:37:12.210] Server  LOG      ✓ Compiled in 2.6s
-[00:37:21.646] Server  LOG      ✓ Compiled in 2.1s
-[00:37:27.351] Server  LOG      ✓ Compiled in 1815ms
-[00:37:30.699] Server  LOG      ✓ Compiled in 2.1s
-[00:37:40.349] Server  LOG      ✓ Compiled in 1124ms
-[00:37:42.451] Server  LOG      ✓ Compiled in 1527ms
-[00:38:06.784] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:38:06.784] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:54:52.341] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/trainingPlan color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/trainingPlan","o":"http://localhost:3000/dashboard/trainingPlan","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768764664774}
-[00:54:57.243] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768764669756}
-[00:55:02.061] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768764674594}
-[00:55:08.444] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768764680977}
-[00:55:38.946] Server  LOG      ✓ Compiled in 1895ms
-[00:55:58.033] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:55:58.033] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:56:06.409] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:56:06.410] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:56:34.616] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:56:34.616] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:56:51.142] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:56:51.143] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[01:03:04.095] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[01:03:04.095] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[01:28:37.637] Server  LOG      ✓ Compiled in 2.2s
-[01:30:31.954] Server  LOG      ✓ Compiled in 967ms
-[01:30:54.501] Server  LOG      ✓ Compiled in 4.7s
-[01:31:34.703] Server  LOG      ✓ Compiled in 2.4s
-[01:31:51.895] Server  LOG      ○ Compiling /_error ...
-[01:32:09.187] Server  LOG      ✓ Compiled in 1363ms
-[01:32:11.252] Browser ERROR   uncaughtError: Error: An unexpected Turbopack error occurred. Please see the output of `next dev` for more details.
-[01:38:40.451] Browser ERROR   ./app/dashboard/occupational/page.tsx:944:9
-Parsing ecmascript source code failed
-  942 |
-  943 |
-> 944 | <Button size="sm" variant="secondary" onClick={() => openUploadEvidence(r.id)} className="gap-2">
-      |         ^^^^
-  945 |                               <UploadCloud className="h-4 w-4" />
-  946 |                               Subir evidencia
-  947 |                             </Button>
+[00:20:51.563] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:20:51.563] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[00:20:51.563] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768881077246}
+[00:21:11.898] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768881097587}
+[00:30:59.279] Server  LOG      ○ Compiling /dashboard/documents/[id]/preventive-procedure ...
+[00:31:09.178] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/10/preventive-procedure color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]/preventive-procedure","o":"http://localhost:3000/dashboard/documents/10/preventive-procedure","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768881694047}
+[00:31:27.596] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768881713124}
+[00:34:23.936] Server  LOG      ✓ Compiled in 1645ms
+[00:48:15.318] Server  LOG      ✓ Compiled in 916ms
+[00:49:08.358] Server  LOG      ✓ Compiled in 1786ms
+[00:49:13.479] Browser ERROR   ./app/dashboard/documents/page.tsx:27:30
+Ecmascript file had an error
+  25 | } from "lucide-react"
+  26 | import { cn } from "@/lib/utils"
+> 27 | import { useEffect, useMemo, useState } from "react"
+     |                              ^^^^^^^^
+  28 | import type { StoredDocument } from "@/lib/documents-storage"
+  29 | import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+  30 |
 
-Expected '</', got 'size'
+the name `useState` is defined multiple times
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:38:41.503] Server  LOG      ✓ Compiled in 890ms
-[01:38:51.578] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[01:38:53.572] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:49:23.584] Browser ERROR   ./app/dashboard/documents/page.tsx:27:10
+Ecmascript file had an error
+  25 | } from "lucide-react"
+  26 | import { cn } from "@/lib/utils"
+> 27 | import { useEffect, useMemo, useState } from "react"
+     |          ^^^^^^^^^
+  28 | import type { StoredDocument } from "@/lib/documents-storage"
+  29 | import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+  30 |
 
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-https://react.dev/link/hydration-mismatch
-
-  ...
-    <Primitive.div dir="ltr" data-orientation="horizontal" data-slot="tabs" className="flex flex-..." ref={null}>
-      <div dir="ltr" data-orientation="horizontal" data-slot="tabs" className="flex flex-..." ref={null}>
-        <TabsList>
-        <TabsContent value="risk" className="space-y-4">
-          <TabsContent data-slot="tabs-content" className="flex-1 out..." value="risk">
-            <Presence present={true}>
-              <Primitive.div data-state="active" data-orientation="horizontal" role="tabpanel" ...>
-                <div data-state="active" data-orientation="horizontal" role="tabpanel" aria-labelledby="radix-_R_k..." ...>
-                  <div className="grid grid-...">
-                    <Card>
-                      <div data-slot="card" className="bg-card te...">
-                        <CardContent className="p-4 space-y-3">
-                          <div data-slot="card-content" className="p-4 space-y-3">
-                            <p>
-                            <div className="flex flex-...">
-                              <span className="rounded-fu...">
-+                               1
--                               0
-                              ...
-                            ...
-                    ...
-                  ...
-        ...
-
-[01:38:54.442] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[01:38:54.443] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
-[01:38:54.443] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/occupational","route":"/dashboard/occupational"}
-[01:38:54.443] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768767306317}
-[01:38:54.443] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/occupational color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/occupational","o":"http://localhost:3000/dashboard/occupational","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768767306317}
-[01:39:09.625] Server  LOG      ✓ Compiled in 1284ms
-[01:39:17.440] Browser ERROR   ./app/dashboard/occupational/page.tsx:941:21
-Parsing ecmascript source code failed
-  939 |                         </CardContent>
-  940 |                       </Card>
-> 941 |                     {/* =========================================
-      |                     ^
-  942 |               MODAL SUBIR EVIDENCIA (por riesgo)
-  943 |           ========================================== */}
-  944 |           <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
-
-Expected '</', got '{'
+the name `useEffect` is defined multiple times
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:39:23.052] Browser ERROR   ./app/dashboard/occupational/page.tsx:941:21
-Parsing ecmascript source code failed
-  939 |                         </CardContent>
-  940 |                       </Card>
-> 941 |                     {
-      |                     ^
-  942 |                       /* =========================================
-  943 |               MODAL SUBIR EVIDENCIA (por riesgo)
-  944 |           ========================================== */}
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:49:23.584] Browser ERROR   ./app/dashboard/documents/page.tsx:27:21
+Ecmascript file had an error
+  25 | } from "lucide-react"
+  26 | import { cn } from "@/lib/utils"
+> 27 | import { useEffect, useMemo, useState } from "react"
+     |                     ^^^^^^^
+  28 | import type { StoredDocument } from "@/lib/documents-storage"
+  29 | import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+  30 |
 
-Expected '</', got '{'
+the name `useMemo` is defined multiple times
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:39:31.426] Browser ERROR   ./app/dashboard/occupational/page.tsx:941:21
-Parsing ecmascript source code failed
-  939 |                         </CardContent>
-  940 |                       </Card>
-> 941 |                     {
-      |                     ^
-  942 |            /* =========================================
-  943 |               MODAL SUBIR EVIDENCIA (por riesgo)
-  944 |           ========================================== */}
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:49:23.584] Browser ERROR   ./app/dashboard/documents/page.tsx:27:30
+Ecmascript file had an error
+  25 | } from "lucide-react"
+  26 | import { cn } from "@/lib/utils"
+> 27 | import { useEffect, useMemo, useState } from "react"
+     |                              ^^^^^^^^
+  28 | import type { StoredDocument } from "@/lib/documents-storage"
+  29 | import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+  30 |
 
-Expected '</', got '{'
+the name `useState` is defined multiple times
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:39:51.525] Browser ERROR   ./app/dashboard/occupational/page.tsx:941:21
-Parsing ecmascript source code failed
-  939 |                         </CardContent>
-  940 |                       </Card>
-> 941 |                     {/* =========================================
-      |                     ^
-  942 |               MODAL SUBIR EVIDENCIA (por riesgo)
-  943 |           ========================================== */}
-  944 |           <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:49:26.794] Server  LOG      ✓ Compiled in 906ms
+[00:49:51.488] Server  LOG      ✓ Compiled in 2.1s
+[00:50:19.562] Server  LOG      ✓ Compiled in 849ms
+[00:50:21.071] Server  LOG      ✓ Compiled in 1073ms
+[00:50:25.137] Browser ERROR   ./app/dashboard/documents/page.tsx:70:10
+Ecmascript file had an error
+  68 |   const [departmentFilter, setDepartmentFilter] = useState<string>("all")
+  69 |
+> 70 |   const [documents, setDocuments] = useState<StoredDocument[]>([])
+     |          ^^^^^^^^^
+  71 | const [renewDialogOpen, setRenewDialogOpen] = useState(false)
+  72 | const [renewTarget, setRenewTarget] = useState<StoredDocument | null>(null)
+  73 | const [renewDate, setRenewDate] = useState(new Date().toISOString().slice(0,10))
 
-Expected '</', got '{'
+the name `documents` is defined multiple times
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:40:27.646] Browser ERROR   ./app/dashboard/occupational/page.tsx:941:21
-Parsing ecmascript source code failed
-  939 |                         </CardContent>
-  940 |                       </Card>
-> 941 |                     {
-      |                     ^
-  942 | /* =========================================
-  943 |               MODAL SUBIR EVIDENCIA (por riesgo)
-  944 |           ========================================== */}
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:50:25.137] Browser ERROR   ./app/dashboard/documents/page.tsx:70:21
+Ecmascript file had an error
+  68 |   const [departmentFilter, setDepartmentFilter] = useState<string>("all")
+  69 |
+> 70 |   const [documents, setDocuments] = useState<StoredDocument[]>([])
+     |                     ^^^^^^^^^^^^
+  71 | const [renewDialogOpen, setRenewDialogOpen] = useState(false)
+  72 | const [renewTarget, setRenewTarget] = useState<StoredDocument | null>(null)
+  73 | const [renewDate, setRenewDate] = useState(new Date().toISOString().slice(0,10))
 
-Expected '</', got '{'
+the name `setDocuments` is defined multiple times
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:40:35.963] Browser ERROR   ./app/dashboard/occupational/page.tsx:941:21
-Parsing ecmascript source code failed
-  939 |                         </CardContent>
-  940 |                       </Card>
-> 941 |                     {/* =========================================
-      |                     ^
-  942 |               MODAL SUBIR EVIDENCIA (por riesgo)
-  943 |           ========================================== */}
-  944 |           <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:50:25.137] Browser ERROR   ./app/dashboard/documents/page.tsx:70:10
+Ecmascript file had an error
+  68 |   const [departmentFilter, setDepartmentFilter] = useState<string>("all")
+  69 |
+> 70 |   const [documents, setDocuments] = useState<StoredDocument[]>([])
+     |          ^^^^^^^^^
+  71 | const [renewDialogOpen, setRenewDialogOpen] = useState(false)
+  72 | const [renewTarget, setRenewTarget] = useState<StoredDocument | null>(null)
+  73 | const [renewDate, setRenewDate] = useState(new Date().toISOString().slice(0,10))
 
-Expected '</', got '{'
+the name `documents` is defined multiple times
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:40:35.963] Browser ERROR   ./app/dashboard/occupational/page.tsx:941:21
-Parsing ecmascript source code failed
-  939 |                         </CardContent>
-  940 |                       </Card>
-> 941 |                     {/* =========================================
-      |                     ^
-  942 |               MODAL SUBIR EVIDENCIA (por riesgo)
-  943 |           ========================================== */}
-  944 |           <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:50:25.137] Browser ERROR   ./app/dashboard/documents/page.tsx:70:21
+Ecmascript file had an error
+  68 |   const [departmentFilter, setDepartmentFilter] = useState<string>("all")
+  69 |
+> 70 |   const [documents, setDocuments] = useState<StoredDocument[]>([])
+     |                     ^^^^^^^^^^^^
+  71 | const [renewDialogOpen, setRenewDialogOpen] = useState(false)
+  72 | const [renewTarget, setRenewTarget] = useState<StoredDocument | null>(null)
+  73 | const [renewDate, setRenewDate] = useState(new Date().toISOString().slice(0,10))
 
-Expected '</', got '{'
+the name `setDocuments` is defined multiple times
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:40:38.146] Server  LOG      ✓ Compiled in 1177ms
-[01:40:52.960] Server  LOG      ✓ Compiled in 886ms
-[01:40:57.421] Browser ERROR   ./app/dashboard/occupational/page.tsx:941:21
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[00:50:33.175] Server  LOG      ✓ Compiled in 1243ms
+[00:51:38.102] Server  LOG      ✓ Compiled in 1088ms
+[00:52:05.805] Server  LOG      ✓ Compiled in 665ms
+[00:52:07.967] Server  LOG      ✓ Compiled in 1314ms
+[00:52:08.375] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:52:08.380] Browser ERROR   uncaughtError: ReferenceError: doc is not defined
+[00:52:11.497] Server  ERROR   C:\Users\Familia Cortes\Desktop\DASHBOARD REACT\SISTEMA DE GESTION\.next\dev\server\chunks\ssr\_8c1f8ee9._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:52:11.515] Server  ERROR    ⨯ ReferenceError: doc is not defined
+[00:52:13.685] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:52:15.246] Browser ERROR   uncaughtError: ReferenceError: doc is not defined
+[00:52:34.051] Server  LOG      ✓ Compiled in 911ms
+[00:52:34.595] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:52:38.182] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:52:39.191] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:52:39.191] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/documents","route":"/dashboard/documents"}
+[00:52:39.192] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768882984660}
+[00:52:53.493] Server  LOG      ✓ Compiled in 855ms
+[00:53:35.258] Browser ERROR   uncaughtError: ReferenceError: Cannot access 'isExpired' before initialization
+[00:54:45.136] Server  LOG      ✓ Compiled in 1151ms
+[00:54:50.643] Server  LOG      ✓ Compiled in 1279ms
+[00:54:57.442] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:54:57.827] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:54:58.898] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:55:00.171] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:55:00.171] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/documents","route":"/dashboard/documents"}
+[00:55:00.172] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768883125106}
+[00:55:45.905] Server  LOG      ✓ Compiled in 951ms
+[00:55:50.668] Server  LOG      ✓ Compiled in 1463ms
+[00:56:16.491] Server  LOG      ✓ Compiled in 1123ms
+[00:56:23.839] Server  LOG      ✓ Compiled in 1360ms
+[00:56:27.348] Server  LOG      ✓ Compiled in 1573ms
+[00:56:42.421] Server  LOG      ✓ Compiled in 1132ms
+[00:56:46.052] Server  LOG      ✓ Compiled in 736ms
+[00:56:48.599] Server  LOG      ✓ Compiled in 555ms
+[00:57:05.948] Server  LOG      ✓ Compiled in 472ms
+[00:57:12.034] Server  LOG      ✓ Compiled in 1547ms
+[00:57:23.413] Server  LOG      ✓ Compiled in 824ms
+[00:57:24.961] Server  LOG      ✓ Compiled in 1258ms
+[00:57:31.659] Server  LOG      ✓ Compiled in 1218ms
+[00:57:39.712] Server  LOG      ✓ Compiled in 559ms
+[00:57:44.902] Server  LOG      ✓ Compiled in 549ms
+[00:58:43.948] Server  LOG      ✓ Compiled in 10.1s
+[00:59:29.958] Server  LOG      ✓ Compiled in 1674ms
+[00:59:32.376] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
 Parsing ecmascript source code failed
-  939 |                         </CardContent>
-  940 |                       </Card>
-> 941 |                     {/* =========================================
-      |                     ^
-  942 |               MODAL SUBIR EVIDENCIA (por riesgo)
-  943 |           ========================================== */}
-  944 |           <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
 
-Expected '</', got '{'
+Expected ';', got 'open'
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:42:29.450] Browser ERROR   ./app/dashboard/occupational/page.tsx:941:21
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:08.263] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
 Parsing ecmascript source code failed
-  939 |                         </CardContent>
-  940 |                       </Card>
-> 941 |                     {/* =========================================
-      |                     ^
-  942 |               MODAL SUBIR EVIDENCIA (por riesgo)
-  943 |           ========================================== */}
-  944 |           <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
 
-Expected '</', got '{'
+Expected ';', got 'open'
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:42:42.543] Server  LOG      ✓ Compiled in 1166ms
-[01:42:49.336] Browser ERROR   ./app/dashboard/occupational/page.tsx:941:21
-Parsing ecmascript source code failed
-  939 |                         </CardContent>
-  940 |                       </Card>
-> 941 |                     {/* =========================================
-      |                     ^
-  942 |               MODAL SUBIR EVIDENCIA (por riesgo)
-  943 |           ========================================== */}
-  944 |           <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
-Expected '</', got '{'
+
+[01:00:11.513] Server  LOG      ○ Compiling /_error ...
+[01:00:16.360] Server  LOG      ✓ Compiled in 7.8s
+[01:00:20.855] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:43:18.713] Server  LOG      ✓ Compiled in 2.6s
-[01:43:28.475] Server  LOG      ✓ Compiled in 5s
-[01:45:25.320] Server  LOG      ✓ Compiled in 2.7s
-[01:46:41.551] Server  LOG      ✓ Compiled in 1368ms
-[01:46:57.288] Browser ERROR   ./app/dashboard/occupational/page.tsx:1553:31
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:20.855] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
 Parsing ecmascript source code failed
-  1551 |                           <div className="space-y-3">
-  1552 |                             {[...detailRow.evidences]
-> 1553 |                               sort((a, b) => {
-       |                               ^^^^
-  1554 |                                 // Orden principal por fecha de realización, y luego por subida
-  1555 |                                 const pa = a.performedAt ?? "0000-00-00"
-  1556 |                                 const pb = b.performedAt ?? "0000-00-00"
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
 
-Expected '</', got 'sort'
+Expected ';', got 'open'
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:47:16.193] Server  LOG      ✓ Compiled in 1406ms
-[01:53:18.179] Server  LOG      ✓ Compiled in 1038ms
-[01:54:40.376] Server  LOG      ✓ Compiled in 1195ms
-[01:55:44.211] Server  LOG      ✓ Compiled in 655ms
-[01:56:07.396] Server  LOG      ✓ Compiled in 1979ms
-[01:57:36.028] Server  LOG      ✓ Compiled in 826ms
-[01:57:41.454] Browser ERROR   ./app/dashboard/occupational/page.tsx:1619:23
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:20.855] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
 Parsing ecmascript source code failed
-  1617 |                       <Pencil className="h-4 w-4" />
-  1618 |                       Editar
-> 1619 |                     </Button>
-       |                       ^^^^^^
-  1620 |                   ) : null}
-  1621 |                 </div>
-  1622 |               </SheetFooter>
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
 
-Expected '</', got 'Button'
+Expected ';', got 'open'
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:57:41.455] Browser ERROR   ./app/dashboard/occupational/page.tsx:1620:23
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:21.045] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
 Parsing ecmascript source code failed
-  1618 |                       <Pencil className="h-4 w-4" />
-  1619 |                       Editar
-> 1620 |                     </Button>
-       |                       ^^^^^^
-  1621 |                   ) : null}
-  1622 |                 </div>
-  1623 |               </SheetFooter>
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
 
-Expected '</', got 'Button'
+Expected ';', got 'open'
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:57:41.455] Browser ERROR   ./app/dashboard/occupational/page.tsx:1629:27
-Parsing ecmascript source code failed
-  1627 |                       Editar
-  1628 |                     </Button>
-> 1629 |                   ) : null}
-       |                           ^
-  1630 |                 </div>
-  1631 |               </SheetFooter>
-  1632 |             </SheetContent>
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
-Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+[01:00:21.632] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:57:41.455] Browser ERROR   ./app/dashboard/occupational/page.tsx:1630:27
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:21.632] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
 Parsing ecmascript source code failed
-  1628 |                       Editar
-  1629 |                     </Button>
-> 1630 |                   ) : null}
-       |                           ^
-  1631 |                 </div>
-  1632 |               </SheetFooter>
-  1633 |             </SheetContent>
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
 
-Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+Expected ';', got 'open'
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:57:41.455] Browser ERROR   ./app/dashboard/occupational/page.tsx:1630:27
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:21.699] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
 Parsing ecmascript source code failed
-  1628 |                       Editar
-  1629 |                     </Button>
-> 1630 |                   ) : null}
-       |                           ^
-  1631 |                 </div>
-  1632 |                 </div>
-  1633 |               </SheetFooter>
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
 
-Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+Expected ';', got 'open'
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:57:41.458] Browser ERROR   ./app/dashboard/occupational/page.tsx:1630:27
-Parsing ecmascript source code failed
-  1628 |                       Editar
-  1629 |                     </Button>
-> 1630 |                   ) : null}
-       |                           ^
-  1631 |                 </div>
-  1632 |                 </div>
-  1633 |               </SheetFooter>
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
-Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+[01:00:21.890] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
 
 Import traces:
   Client Component Browser:
-    ./app/dashboard/occupational/page.tsx [Client Component Browser]
-    ./app/dashboard/occupational/page.tsx [Server Component]
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
 
   Client Component SSR:
-    ./app/dashboard/occupational/page.tsx [Client Component SSR]
-    ./app/dashboard/occupational/page.tsx [Server Component]
-[01:57:46.965] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[01:57:46.965] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[01:58:07.250] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[01:58:07.250] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[01:58:19.717] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[01:58:19.717] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:22.075] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:22.255] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:22.373] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:22.514] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:22.908] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:23.181] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:23.181] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:23.181] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:23.181] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:23.181] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:23.181] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:23.181] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:23.181] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:23.181] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:23.181] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:23.181] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:23.181] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:23.181] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:23.181] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:23.280] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:23.546] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:23.830] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:24.440] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:24.891] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:25.060] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:25.217] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:25.632] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:25.876] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:26.058] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:26.189] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:26.340] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:26.479] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:26.899] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:27.164] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:27.336] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:27.500] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:27.623] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:27.749] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:28.145] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:28.319] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:28.465] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:28.650] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:28.781] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:28.943] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:29.050] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:29.377] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:29.529] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:29.652] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:29.745] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:29.841] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:29.945] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:30.090] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:30.190] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.250] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.251] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.251] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.251] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.251] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.251] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.251] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.251] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.251] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.251] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.251] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.251] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.251] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.251] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.251] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:30.317] Server  ERROR    ⨯ ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:31.230] Browser ERROR   uncaughtError: Error: ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+
+[01:00:32.186] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:00:32.186] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:01:53.623] Server  LOG      ✓ Compiled in 904ms
+[01:02:05.585] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:02:05.585] Browser ERROR   ./components/document/DocumentFormPreventiveProcedure.tsx:1:1
+Parsing ecmascript source code failed
+> 1 | /components/document/DocumentFormPreventiveProcedure.tsx
+    | ^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | "use client"
+  4 |
+
+Unknown regular expression flags.
+
+Import traces:
+  Client Component Browser:
+    ./components/document/DocumentFormPreventiveProcedure.tsx [Client Component Browser]
+    ./app/dashboard/documents/[id]/preventive-procedure/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/[id]/preventive-procedure/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/document/DocumentFormPreventiveProcedure.tsx [Client Component SSR]
+    ./app/dashboard/documents/[id]/preventive-procedure/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/[id]/preventive-procedure/page.tsx [Server Component]
+[01:02:05.585] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:09:50.552] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:09:50.552] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:10:02.215] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:10:18.332] Browser ERROR   ./app/dashboard/documents/page.tsx:350:11
+Parsing ecmascript source code failed
+  348 |     </div>
+  349 |   )
+> 350 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  351 |   <DialogContent className="bg-card border-border">
+  352 |     <DialogHeader>
+  353 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:10:23.181] Browser ERROR   ./app/dashboard/documents/page.tsx:350:11
+Parsing ecmascript source code failed
+  348 |     </div>
+  349 |   )
+> 350 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  351 |   <DialogContent className="bg-card border-border">
+  352 |     <DialogHeader>
+  353 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:10:55.427] Browser ERROR   ./app/dashboard/documents/page.tsx:350:11
+Parsing ecmascript source code failed
+  348 |     </div>
+  349 |   )
+> 350 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  351 |   <DialogContent className="bg-card border-border">
+  352 |     <DialogHeader>
+  353 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:11:04.176] Browser ERROR   ./app/dashboard/documents/page.tsx:350:11
+Parsing ecmascript source code failed
+  348 |     </div>
+  349 |   )
+> 350 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  351 |   <DialogContent className="bg-card border-border">
+  352 |     <DialogHeader>
+  353 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:11:10.460] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:11:16.405] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:11:16.405] Browser ERROR   ./app/dashboard/documents/page.tsx:349:11
+Parsing ecmascript source code failed
+  347 |     </div>
+  348 |   )
+> 349 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  350 |   <DialogContent className="bg-card border-border">
+  351 |     <DialogHeader>
+  352 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:11:25.186] Browser ERROR   ./app/dashboard/documents/page.tsx:356:11
+Parsing ecmascript source code failed
+  354 |     </div>
+  355 |   )
+> 356 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  357 |   <DialogContent className="bg-card border-border">
+  358 |     <DialogHeader>
+  359 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:11:35.185] Browser ERROR   ./app/dashboard/documents/page.tsx:363:11
+Parsing ecmascript source code failed
+  361 |     </div>
+  362 |   )
+> 363 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  364 |   <DialogContent className="bg-card border-border">
+  365 |     <DialogHeader>
+  366 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:11:44.811] Browser ERROR   ./app/dashboard/documents/page.tsx:89:8
+Parsing ecmascript source code failed
+  87 |   }
+  88 |
+> 89 |   onst downloadDataUrl = (dataUrl: string, filename: string) => {
+     |        ^^^^^^^^^^^^^^^
+  90 |     const a = document.createElement("a")
+  91 |     a.href = dataUrl
+  92 |     a.download = filename
+
+Expected ';', '}' or <eof>
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:11:49.373] Browser ERROR   ./app/dashboard/documents/page.tsx:369:11
+Parsing ecmascript source code failed
+  367 |     </div>
+  368 |   )
+> 369 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  370 |   <DialogContent className="bg-card border-border">
+  371 |     <DialogHeader>
+  372 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:12:03.189] Browser ERROR   ./app/dashboard/documents/page.tsx:369:11
+Parsing ecmascript source code failed
+  367 |     </div>
+  368 |   )
+> 369 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  370 |   <DialogContent className="bg-card border-border">
+  371 |     <DialogHeader>
+  372 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:12:26.555] Browser ERROR   ./app/dashboard/documents/page.tsx:366:11
+Parsing ecmascript source code failed
+  364 |     </div>
+  365 |   )
+> 366 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  367 |   <DialogContent className="bg-card border-border">
+  368 |     <DialogHeader>
+  369 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:12:33.437] Browser ERROR   ./app/dashboard/documents/page.tsx:365:11
+Parsing ecmascript source code failed
+  363 |     </div>
+  364 |   )
+> 365 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  366 |   <DialogContent className="bg-card border-border">
+  367 |     <DialogHeader>
+  368 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:12:39.318] Browser ERROR   ./app/dashboard/documents/page.tsx:365:11
+Parsing ecmascript source code failed
+  363 |     </div>
+  364 |   )
+> 365 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  366 |   <DialogContent className="bg-card border-border">
+  367 |     <DialogHeader>
+  368 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:12:52.181] Browser ERROR   ./app/dashboard/documents/page.tsx:348:11
+Parsing ecmascript source code failed
+  346 |     </div>
+  347 |   )
+> 348 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  349 |   <DialogContent className="bg-card border-border">
+  350 |     <DialogHeader>
+  351 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:12:54.541] Browser ERROR   ./app/dashboard/documents/page.tsx:347:11
+Parsing ecmascript source code failed
+  345 |     </div>
+  346 |   )
+> 347 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  348 |   <DialogContent className="bg-card border-border">
+  349 |     <DialogHeader>
+  350 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:13:00.735] Browser ERROR   ./app/dashboard/documents/page.tsx:345:11
+Parsing ecmascript source code failed
+  343 |     </div>
+  344 |   )
+> 345 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  346 |   <DialogContent className="bg-card border-border">
+  347 |     <DialogHeader>
+  348 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:13:01.180] Browser ERROR   ./app/dashboard/documents/page.tsx:344:11
+Parsing ecmascript source code failed
+  342 |     </div>
+  343 |   )
+> 344 |   <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+      |           ^^^^
+  345 |   <DialogContent className="bg-card border-border">
+  346 |     <DialogHeader>
+  347 |       <DialogTitle>Renovar documento</DialogTitle>
+
+Expected ';', got 'open'
+
+Import traces:
+  Client Component Browser:
+    ./app/dashboard/documents/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/dashboard/documents/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/page.tsx [Server Component]
+[01:13:25.753] Server  LOG      ✓ Compiled in 905ms
+[01:13:35.316] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:13:36.997] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:13:36.997] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/documents","route":"/dashboard/documents"}
+[01:13:36.997] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768884242695}
+[01:17:04.595] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/10/preventive-procedure color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]/preventive-procedure","o":"http://localhost:3000/dashboard/documents/10/preventive-procedure","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768884450277}
+[01:17:50.876] Browser ERROR   unhandledRejection: QuotaExceededError: Failed to execute 'setItem' on 'Storage': Setting the value of 'sgsst:preventiveProcedureFilled:v1' exceeded the quota.
+[01:20:59.635] Server  LOG      ✓ Compiled in 425ms
+[01:23:20.060] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768884825529}
+[01:34:31.726] Server  LOG      ✓ Compiled in 950ms
+[01:34:53.953] Server  LOG      ✓ Compiled in 905ms
+[01:35:34.895] Server  LOG      ✓ Compiled in 683ms
+[01:35:35.369] Browser ERROR   ./components/document/DocumentFormPreventiveProcedure.tsx:150:30
+Parsing ecmascript source code failed
+  148 |       workArea: formData.workArea,
+  149 |
+> 150 |       documentType: formData.,
+      |                              ^
+  151 |       documentName: formData.documentName,
+  152 |
+  153 |       objective: formData.objective,
+
+Expected ident
+
+Import traces:
+  Client Component Browser:
+    ./components/document/DocumentFormPreventiveProcedure.tsx [Client Component Browser]
+    ./app/dashboard/documents/[id]/preventive-procedure/page.tsx [Client Component Browser]
+    ./app/dashboard/documents/[id]/preventive-procedure/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/document/DocumentFormPreventiveProcedure.tsx [Client Component SSR]
+    ./app/dashboard/documents/[id]/preventive-procedure/page.tsx [Client Component SSR]
+    ./app/dashboard/documents/[id]/preventive-procedure/page.tsx [Server Component]
+[01:35:40.384] Server  LOG      ✓ Compiled in 2.5s
+[01:35:42.945] Server  LOG      ✓ Compiled in 2.2s
+[01:35:44.465] Server  LOG      ✓ Compiled in 1542ms
+[01:35:49.983] Server  LOG      ✓ Compiled in 841ms
+[01:35:53.562] Server  LOG      ✓ Compiled in 899ms
+[01:36:42.732] Server  LOG      ✓ Compiled in 738ms
+[01:36:46.343] Server  LOG      ✓ Compiled in 600ms
+[01:36:48.997] Server  LOG      ✓ Compiled in 1606ms
+[01:37:44.249] Server  LOG      ✓ Compiled in 489ms
+[01:38:34.447] Server  LOG      ✓ Compiled in 1277ms
+[01:38:51.623] Server  LOG      ✓ Compiled in 1269ms
+[01:39:40.940] Server  LOG      ✓ Compiled in 478ms
+[01:39:47.855] Server  LOG      ✓ Compiled in 2.3s
+[01:43:40.202] Server  LOG      ✓ Compiled in 695ms
+[01:43:44.838] Server  LOG      ✓ Compiled in 3s
+[01:43:51.520] Server  LOG      ✓ Compiled in 3.5s
+[01:44:37.595] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:44:39.857] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:44:39.857] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/documents","route":"/dashboard/documents"}
+[01:44:39.857] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768886105564}
+[01:44:53.855] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/10/preventive-procedure color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]/preventive-procedure","o":"http://localhost:3000/dashboard/documents/10/preventive-procedure","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768886119548}
+[01:45:51.437] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768886176826}
+[01:46:13.836] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:46:14.192] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:46:14.192] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/documents/04c3beac-3377-4703-8a68-e5b5be922709","route":"/dashboard/documents/[id]"}
+[01:46:14.192] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/04c3beac-3377-4703-8a68-e5b5be922709 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]","o":"http://localhost:3000/dashboard/documents/04c3beac-3377-4703-8a68-e5b5be922709","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768886199890}
+[01:46:21.716] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:46:22.750] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:46:22.750] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/documents","route":"/dashboard/documents"}
+[01:46:22.750] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768886208455}
+[01:46:27.545] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:46:27.545] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:46:41.763] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/preventiveMeasures color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/preventiveMeasures","o":"http://localhost:3000/dashboard/preventiveMeasures","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768886227366}
+[01:46:43.615] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:46:43.615] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:46:50.388] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768886235803}
+[01:46:56.042] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/10/preventive-procedure color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]/preventive-procedure","o":"http://localhost:3000/dashboard/documents/10/preventive-procedure","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768886241741}
+[01:47:05.996] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768886251437}

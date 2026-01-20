@@ -1,4 +1,4 @@
-//src/app/dashboard/documents/[id]/preventive-procedure/page.tsx
+//app/dashboard/documents/[id]/preventive-procedure/page.tsx
 
 
 "use client"

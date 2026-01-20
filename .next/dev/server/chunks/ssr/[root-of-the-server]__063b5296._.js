@@ -386,6 +386,7 @@ __turbopack_context__.n(__TURBOPACK__imported__module__$5b$project$5d2f$componen
 "[project]/lib/mock-data.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+//lib/mock-data.ts
 // Datos mock para el sistema de gestión de calidad
 __turbopack_context__.s([
     "departmentData",
