@@ -27,7 +27,15 @@ function fileToDataUrl(file: File): Promise<string> {
   })
 }
 
-export default function DocumentFormPreventiveProcedure({ documentId }: { documentId: string }) {
+export default function DocumentFormPreventiveProcedure({
+  documentId,
+  onCreated,
+  embedded = false,
+}: {
+  documentId: string
+  onCreated?: () => void
+  embedded?: boolean
+}) {
   const companyName = useMemo(() => mockCompany?.name ?? "—", [])
   const todayISO = useMemo(() => new Date().toISOString().slice(0, 10), [])
 
@@ -136,16 +144,33 @@ export default function DocumentFormPreventiveProcedure({ documentId }: { docume
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const err = validate()
-    if (!formData.documentName) return "Escribe el nombre del documento."
-    if (!formData.documentType) return "Selecciona el tipo de documento."
-    if (err) return alert(err)
+  e.preventDefault()
 
-    setIsSubmitting(true)
+  // Validaciones (deben mostrar alert o retornar null/true)
+  const err = validate()
+  if (err) {
+    alert(err)
+    return
+  }
+
+  if (!formData.documentName) {
+    alert("Escribe el nombre del documento.")
+    return
+  }
+
+  if (!formData.documentType) {
+    alert("Selecciona el tipo de documento.")
+    return
+  }
+
+  setIsSubmitting(true)
+
+  try {
+    // ✅ 1) ID único para el "filled" (y lo reutilizamos)
+    const filledId = crypto.randomUUID()
 
     const payload: PreventiveProcedureFilled = {
-      id: crypto.randomUUID(),
+      id: filledId,
       documentId,
 
       date: formData.date,
@@ -167,15 +192,10 @@ export default function DocumentFormPreventiveProcedure({ documentId }: { docume
       createdAtISO: new Date().toISOString(),
     }
 
+    // 2) Guardar el diligenciamiento (SIN PDF ni firma base64)
     upsertPreventiveProcedureFilled(payload)
 
-    // 1) Generar PDF base64
-    const pdfDataUrl = await generatePDF()
-
-    // 2) Guardar como documento para Gestión de Documentos
-    const docId = crypto.randomUUID()
-    const title = `${formData.procedureName} - ${formData.department}`
-
+    // 3) Crear documento en Gestión (metadata + referencia)
     const storedDoc: StoredDocument = {
       id: crypto.randomUUID(),
       name: formData.documentName,
@@ -189,29 +209,35 @@ export default function DocumentFormPreventiveProcedure({ documentId }: { docume
       size: "Generado",
       validFromISO: formData.date,
       createdByUser: true,
-    
-      // NO guardar base64 aquí
       file: null,
-    
-      // para poder “ver/descargar” regenerando:
       source: {
         kind: "preventiveProcedure",
-        filledId: payload.id,
+        filledId: filledId, // ✅ referencia al diligenciamiento
       },
     }
+
     upsertUserDocument(storedDoc)
 
-    // 3) Descargar
+    //  4) Generar PDF y descargar (NO guardarlo en localStorage)
+    const pdfDataUrl = await generatePDF()
+
     const a = document.createElement("a")
     a.href = pdfDataUrl
-    a.download = `${title}.pdf`
+    a.download = `${formData.documentName}.pdf`
     a.click()
 
+    // 5) Avisar al modal que ya se creó (para cerrar + refrescar)
+    onCreated?.()
+  } catch (error) {
+    console.error(error)
+    alert("Ocurrió un error al guardar el documento. Revisa la consola.")
+  } finally {
     setIsSubmitting(false)
   }
+}
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className={embedded ? "w-full" : "max-w-4xl mx-auto p-6"}>
       <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Procedimiento - Medidas de Prevención</CardTitle>
@@ -352,9 +378,25 @@ export default function DocumentFormPreventiveProcedure({ documentId }: { docume
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Generando..." : "Guardar y Descargar PDF"}
               </Button>
-              <Button type="button" variant="outline" onClick={() => { setSignatureDataUrl(""); setFormData({ ...formData, objective:"", activities:"", resources:"", workArea:"", department:"", responsibleName:"", responsibleRole:"" }) }}>
-                Limpiar
-              </Button>
+              <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setSignatureDataUrl("")
+                setFormData((prev) => ({
+                  ...prev,
+                  department: "",
+                  workArea: "",
+                  objective: "",
+                  activities: "",
+                  resources: "",
+                  responsibleName: "",
+                  responsibleRole: "",
+                }))
+              }}
+            >
+              Limpiar
+            </Button>
             </div>
           </form>
         </CardContent>

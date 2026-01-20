@@ -1,26 +1,34 @@
 {
   "app": {
-    "[project]/app/dashboard/documents/[id]/page": [
+    "[project]/Desktop/react/sgi/app/dashboard/documents/[id]/assignment/page": [
       "static/media/caa3a2e1cccd8315-s.p.853070df.woff2",
       "static/media/797e433ab948586e-s.p.dbea232f.woff2"
     ],
-    "[project]/app/dashboard/documents/[id]/preventive-procedure/page": [
+    "[project]/Desktop/react/sgi/app/dashboard/documents/[id]/page": [
       "static/media/caa3a2e1cccd8315-s.p.853070df.woff2",
       "static/media/797e433ab948586e-s.p.dbea232f.woff2"
     ],
-    "[project]/app/dashboard/documents/page": [
+    "[project]/Desktop/react/sgi/app/dashboard/documents/[id]/preventive-procedure/page": [
       "static/media/caa3a2e1cccd8315-s.p.853070df.woff2",
       "static/media/797e433ab948586e-s.p.dbea232f.woff2"
     ],
-    "[project]/app/dashboard/page": [
+    "[project]/Desktop/react/sgi/app/dashboard/documents/page": [
       "static/media/caa3a2e1cccd8315-s.p.853070df.woff2",
       "static/media/797e433ab948586e-s.p.dbea232f.woff2"
     ],
-    "[project]/app/dashboard/preventiveMeasures/page": [
+    "[project]/Desktop/react/sgi/app/dashboard/employees/[id]/page": [
       "static/media/caa3a2e1cccd8315-s.p.853070df.woff2",
       "static/media/797e433ab948586e-s.p.dbea232f.woff2"
     ],
-    "[project]/app/page": [
+    "[project]/Desktop/react/sgi/app/dashboard/employees/page": [
+      "static/media/caa3a2e1cccd8315-s.p.853070df.woff2",
+      "static/media/797e433ab948586e-s.p.dbea232f.woff2"
+    ],
+    "[project]/Desktop/react/sgi/app/dashboard/occupational/page": [
+      "static/media/caa3a2e1cccd8315-s.p.853070df.woff2",
+      "static/media/797e433ab948586e-s.p.dbea232f.woff2"
+    ],
+    "[project]/Desktop/react/sgi/app/dashboard/preventiveMeasures/page": [
       "static/media/caa3a2e1cccd8315-s.p.853070df.woff2",
       "static/media/797e433ab948586e-s.p.dbea232f.woff2"
     ]

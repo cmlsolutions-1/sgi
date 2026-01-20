@@ -2,7 +2,7 @@
 
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
@@ -20,6 +20,8 @@ import {
   BookOpen,
   ClipboardList,
   FileCheck,
+  FilePlus2,
+  FilePen,
   ScrollText,
   FileQuestion,
   Calendar as CalendarIcon,
@@ -30,7 +32,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { getAllDocuments, renewDocument } from "@/lib/documents-storage"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { getPreventiveProceduresFilled } from "@/lib/preventive-procedure-storage"
+
+// Formularios embebidos en modal
+import DocumentFormAssignment from "@/components/document/DocumentFormAssignment"
+import DocumentFormPreventiveProcedure from "@/components/document/DocumentFormPreventiveProcedure"
 
 const typeIcons = {
   manual: BookOpen,
@@ -62,6 +67,8 @@ const statusLabels = {
   obsolete: "Obsoleto",
 }
 
+type CreateFlow = "assignment" | "procedure" | null
+
 export default function DocumentsPage() {
   const [documents, setDocuments] = useState<StoredDocument[]>([])
   const [search, setSearch] = useState("")
@@ -69,9 +76,23 @@ export default function DocumentsPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [departmentFilter, setDepartmentFilter] = useState<string>("all")
 
+  // Renovación
   const [renewDialogOpen, setRenewDialogOpen] = useState(false)
   const [renewTarget, setRenewTarget] = useState<StoredDocument | null>(null)
   const [renewDate, setRenewDate] = useState(new Date().toISOString().slice(0,10))
+
+  // Crear documentación (modal)
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [createFlow, setCreateFlow] = useState<CreateFlow>(null)
+
+  // Puedes apuntar a una “plantilla base” para el acta y otra para procedimiento
+  // (esto evita hardcodear en 2 lados)
+  const assignmentTemplateId = "1"
+  const preventiveTemplateId = "10"
+
+  useEffect(() => {
+    setDocuments(getAllDocuments(mockDocuments))
+  }, [])
 
   // Helpers
   const addOneYear = (iso: string) => {
@@ -93,35 +114,50 @@ export default function DocumentsPage() {
     a.click()
   }
 
-  useEffect(() => {
-    setDocuments(getAllDocuments(mockDocuments))
-  }, [])
-
-
-  const filteredDocuments = documents.filter((doc) => {
-    const matchesSearch = doc.name.toLowerCase().includes(search.toLowerCase())
-    const matchesType = typeFilter === "all" || doc.type === typeFilter
-    const matchesStatus = statusFilter === "all" || doc.status === statusFilter
-    const matchesDept = departmentFilter === "all" || doc.department === departmentFilter
-    return matchesSearch && matchesType && matchesStatus && matchesDept
-  })
+ const filteredDocuments = useMemo(() => {
+    return documents.filter((doc) => {
+      const matchesSearch = doc.name.toLowerCase().includes(search.toLowerCase())
+      const matchesType = typeFilter === "all" || doc.type === typeFilter
+      const matchesStatus = statusFilter === "all" || doc.status === statusFilter
+      const matchesDept = departmentFilter === "all" || doc.department === departmentFilter
+      return matchesSearch && matchesType && matchesStatus && matchesDept
+    })
+  }, [documents, search, typeFilter, statusFilter, departmentFilter])
 
   // Stats
-  const stats = {
-    total: documents.length,
-    approved: documents.filter((d) => d.status === "approved").length,
-    review: documents.filter((d) => d.status === "review").length,
-    draft: documents.filter((d) => d.status === "draft").length,
+  const stats = useMemo(() => {
+    return {
+      total: documents.length,
+      approved: documents.filter((d) => d.status === "approved").length,
+      review: documents.filter((d) => d.status === "review").length,
+      draft: documents.filter((d) => d.status === "draft").length,
+    }
+  }, [documents])
+
+  const refreshDocuments = () => setDocuments(getAllDocuments(mockDocuments))
+
+  const openCreateDialog = () => {
+    setCreateFlow(null)
+    setCreateDialogOpen(true)
+  }
+
+  const closeCreateDialog = () => {
+    setCreateDialogOpen(false)
+    setCreateFlow(null)
   }
 
   
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Gestión de Documentos</h1>
           <p className="text-muted-foreground">Control documental del SGC</p>
         </div>
+          <Button className="gap-2" onClick={openCreateDialog}>
+            <FilePlus2 className="h-4 w-4" />
+            Crear documentación
+          </Button>
       </div>
 
       {/* Stats Cards */}
@@ -231,6 +267,9 @@ export default function DocumentsPage() {
           </div>
         </CardContent>
       </Card>
+     
+
+ 
 
       {/* Documents Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -285,12 +324,21 @@ export default function DocumentsPage() {
 
                       <DropdownMenuItem
                         onSelect={() => {
-                          if (doc.id === "1") window.location.href = `/dashboard/documents/${doc.id}/assignment`
-                          else if (doc.type === "procedure")
-                            window.location.href = `/dashboard/documents/${doc.id}/preventive-procedure`
+                          // ya no navegamos para "crear", sino que abrimos modal con el flujo correcto
+                          if (doc.id === assignmentTemplateId) {
+                            setCreateFlow("assignment")
+                            setCreateDialogOpen(true)
+                            return
+                          }
+                          if (doc.id === preventiveTemplateId) {
+                            setCreateFlow("procedure")
+                            setCreateDialogOpen(true)
+                            return
+                          }
+                          alert("Este documento no tiene diligenciamiento en línea configurado.")
                         }}
                       >
-                        <ClipboardList className="h-4 w-4 mr-2" /> Rehacer / Modificar
+                        <ClipboardList className="h-4 w-4 mr-2" /> Diligenciar / Modificar
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -329,18 +377,23 @@ export default function DocumentsPage() {
                   </div>
                 </div>
 
-                {/* Acciones especiales */}
-                {doc.id === "1" && (
-                  <Link href={`/dashboard/documents/${doc.id}/assignment`} className="block mt-3">
-                    <Button className="w-full">Diligenciar Acta</Button>
-                  </Link>
-                )}
+                {/* {doc.id === assignmentTemplateId && (
+                  <Button
+                    className="w-full mt-3"
+                    onClick={() => {
+                      setCreateFlow("assignment")
+                      setCreateDialogOpen(true)
+                    }}
+                  >
+                    Diligenciar Acta
+                  </Button>
+                )} */}
 
-                {doc.id === "10" && (
+                {/* {doc.id === "10" && (
                   <Link href={`/dashboard/documents/${doc.id}/preventive-procedure`} className="block mt-3">
                     <Button className="w-full">Diligenciar Procedimiento</Button>
                   </Link>
-                )}
+                )} */}
               </CardContent>
             </Card>
           )
@@ -386,6 +439,96 @@ export default function DocumentsPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog Crear Documentación */}
+    <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+      <DialogContent className="w-[95vw] max-w-5xl max-h-[90vh] overflow-y-auto p-0">
+        <DialogHeader className="px-6 pt-6">
+          <DialogTitle>Crear documentación</DialogTitle>
+        </DialogHeader>
+
+        <div className="px-6 pb-6">
+          {/* 1) Si no hay flujo elegido, mostramos opciones */}
+          {createFlow === null && (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Selecciona qué deseas crear:
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+               {/*  <Button 
+                className="gap-2" 
+                onClick={openCreateDialog}>
+                <FilePlus2 className="h-4 w-4" />
+                  Crear documentación
+                </Button> */}
+                
+                <Button
+                  className="gap-2"
+                  onClick={() => setCreateFlow("assignment")}
+                >
+                  <FilePen className="h-4 w-4" />
+                    Acta de asignación SGSST
+                </Button>
+
+                <Button
+                  className="gap-2"
+                  onClick={() => setCreateFlow("procedure")}
+                >
+                  <FilePlus2 className="h-4 w-4" />
+                  Crear otros documentos
+                </Button>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
+                  Cerrar
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* 2) Si ya eligió flujo, renderizamos el formulario */}
+          {createFlow === "procedure" && (
+            <DocumentFormPreventiveProcedure
+              documentId={preventiveTemplateId}
+              embedded
+              onCreated={() => {
+                setCreateDialogOpen(false)
+                setCreateFlow(null)
+                refreshDocuments()
+              }}
+            />
+          )}
+
+          {createFlow === "assignment" && (
+            <DocumentFormAssignment
+              documentId={assignmentTemplateId}
+              embedded
+              onCreated={() => {
+                setCreateDialogOpen(false)
+                setCreateFlow(null)
+                refreshDocuments()
+              }}
+            />
+          )}
+
+          {/* ✅ 3) botón volver cuando esté en un formulario */}
+          {createFlow !== null && (
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={() => setCreateFlow(null)}>
+                Volver
+              </Button>
+              <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
+                Cerrar
+              </Button>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+
+
     </div>
   )
 }

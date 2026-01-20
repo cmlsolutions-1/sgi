@@ -134,7 +134,15 @@ Se da fe de esta asignación y se invita al responsable a cumplir diligentemente
   signatureText: `\n\nFIRMAS:\n\n_________________________________                    _________________________________________\n{responsible_signature_name}                        {legal_representative_name}\nResponsable SGSST                                    Representante Legal\nFecha: {responsible_signature_date}                    Fecha: {legal_representative_date}`
 }
 
-export default function DocumentFormAssignment({ documentId }: { documentId: string }) {
+export default function DocumentFormAssignment({
+  documentId,
+  onCreated,
+  embedded = false,
+}: {
+  documentId: string
+  onCreated?: () => void
+  embedded?: boolean
+}) {
   const [formData, setFormData] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -225,14 +233,15 @@ export default function DocumentFormAssignment({ documentId }: { documentId: str
     e.preventDefault()
     setIsSubmitting(true)
     generatePDF()
+    onCreated?.()
     setIsSubmitting(false)
-  }
+  } 
 
   const mainFields = SGSST_TEMPLATE.fields.filter(field => field.section === "main")
   const signatureFields = SGSST_TEMPLATE.fields.filter(field => field.section === "signatures")
 
   return (
-    <div className="space-y-6">
+    <div className={embedded ? "w-full" : "max-w-4xl mx-auto p-6"}>
       <div className="max-w-4xl mx-auto p-6">
         <Card className="bg-card border-border">
           <CardHeader>
