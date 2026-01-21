@@ -1,74 +1,63 @@
-[00:00:18.370] Server  LOG      ✓ Ready in 15.4s
-[00:00:21.593] Server  LOG      ○ Compiling / ...
-[00:00:41.840] Server  LOG      ○ Compiling /dashboard ...
-[00:00:58.756] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:06.046] Server  LOG      ✓ Ready in 4.3s
+[00:00:09.094] Server  LOG      ○ Compiling / ...
+[00:00:17.616] Server  LOG      ○ Compiling /dashboard ...
+[00:00:21.788] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:58.769] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:21.797] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:58.785] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:21.806] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:58.805] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:21.812] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:01.402] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:01:03.441] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:24.497] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:03.442] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:24.498] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:03.442] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:24.498] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:03.442] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:24.498] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:03.442] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:24.498] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:03.442] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:24.498] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:03.442] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:24.498] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:03.442] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:24.498] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:01:03.701] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:01:03.701] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:01:03.701] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768957213216}
-[00:01:10.021] Server  LOG      ○ Compiling /dashboard/documents ...
-[00:01:18.804] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768957228318}
-[00:01:29.467] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:01:29.467] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:11:11.913] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:11:11.913] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:33:47.248] Server  LOG      ✓ Compiled in 2.5s
-[00:33:57.983] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:33:58.967] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:33:58.968] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard/documents","route":"/dashboard/documents"}
-[00:33:58.968] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768959188548}
-[00:34:12.157] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents/04c3beac-3377-4703-8a68-e5b5be922709 color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents/[id]","o":"http://localhost:3000/dashboard/documents/04c3beac-3377-4703-8a68-e5b5be922709","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768959201768}
-[00:34:14.262] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard/documents color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard/documents","o":"http://localhost:3000/dashboard/documents","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1768959203423}
-[00:34:17.849] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:34:17.849] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:34:21.225] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:34:21.225] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:35:23.990] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:35:23.990] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:00:24.687] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:24.687] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[00:00:24.687] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769027500995}
+[00:00:47.969] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:47.969] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
+[00:00:47.969] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769027524265}
+[00:21:27.266] Server  LOG      ✓ Compiled in 353ms
+[00:21:34.950] Server  LOG      ✓ Compiled in 190ms
+[00:22:09.932] Server  LOG      ✓ Compiled in 241ms
+[00:22:40.302] Server  LOG      ✓ Compiled in 335ms
+[01:15:45.340] Server  LOG      ✓ Compiled in 884ms
+[01:16:25.646] Server  LOG      ✓ Compiled in 231ms

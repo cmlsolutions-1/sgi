@@ -31,6 +31,14 @@ import {
   CheckCircle2,
   XCircle,
 } from "lucide-react"
+import nivelRiesgos from "@/lib/nivelRiesgos.json"
+
+type NivelRiesgoItem = {
+  "CLASE DE RIESGO": number
+  "CÓDIGO CIIU": number
+  "CODIGO ADICIONAL": number
+  "DESCRIPCION DE ACTIVIDAD ECONÓMICA FINAL": string
+}
 
 // Tipos de datos
 type Module = {
@@ -131,6 +139,40 @@ export function SuperAdminDashboard() {
   const [isModulesDialogOpen, setIsModulesDialogOpen] = useState(false)
   const [newCompany, setNewCompany] = useState({ name: "", email: "" })
 
+  const [ciiu, setCiiu] = useState("")
+  const [ciiuResults, setCiiuResults] = useState<NivelRiesgoItem[]>([])
+  const [ciiuError, setCiiuError] = useState<string | null>(null)
+
+  const handleConsultarCiiu = () => {
+    setCiiuError(null)
+    setCiiuResults([])
+
+    // Permite que el usuario pegue cosas como "6201", "6201.0", " 6201 "
+    const cleaned = ciiu.replace(/[^\d]/g, "")
+    if (!cleaned) {
+      setCiiuError("Ingresa un código CIIU válido (solo números).")
+      return
+    }
+
+    const code = Number(cleaned)
+    if (Number.isNaN(code)) {
+      setCiiuError("Código CIIU inválido.")
+      return
+    }
+
+    const data = nivelRiesgos as NivelRiesgoItem[]
+    const matches = data
+      .filter((x) => x["CÓDIGO CIIU"] === code)
+      .sort((a, b) => (a["CODIGO ADICIONAL"] ?? 0) - (b["CODIGO ADICIONAL"] ?? 0))
+
+    if (matches.length === 0) {
+      setCiiuError(`No se encontró información para el CIIU ${code}.`)
+      return
+    }
+
+    setCiiuResults(matches)
+  }
+
   // Crear nueva empresa
   const handleCreateCompany = () => {
     if (!newCompany.name || !newCompany.email) return
@@ -212,6 +254,96 @@ export function SuperAdminDashboard() {
           </CardHeader>
         </Card>
       </div>
+            {/* Consulta CIIU */}
+      <Card className="bg-card border-border shadow-sm mb-8">
+        <CardHeader>
+          <CardTitle className="text-foreground">Consulta de Riesgo por CIIU</CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Ingresa el código CIIU para ver a qué clase(s) de riesgo está asociado.
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 md:grid-cols-[1fr_auto] items-end">
+            <div className="grid gap-2">
+              <Label htmlFor="ciiu" className="text-foreground">
+                CÓDIGO CIIU
+              </Label>
+              <Input
+                id="ciiu"
+                value={ciiu}
+                onChange={(e) => setCiiu(e.target.value)}
+                placeholder="Ej: 6201"
+                className="bg-input border-border text-foreground"
+                inputMode="numeric"
+              />
+            </div>
+
+            <Button
+              onClick={handleConsultarCiiu}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Consultar
+            </Button>
+          </div>
+
+          {ciiuError && (
+            <div className="text-sm text-destructive">{ciiuError}</div>
+          )}
+
+          {ciiuResults.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-sm text-muted-foreground">
+                  Resultados para:
+                </span>
+                <Badge variant="secondary" className="bg-muted text-muted-foreground">
+                  CIIU {ciiu.replace(/[^\d]/g, "")}
+                </Badge>
+
+                {/* Clases únicas */}
+                {Array.from(new Set(ciiuResults.map(r => r["CLASE DE RIESGO"])))
+                  .sort((a, b) => a - b)
+                  .map((clase) => (
+                    <Badge
+                      key={clase}
+                      className="bg-primary/10 text-primary border-primary/20"
+                      variant="outline"
+                    >
+                      Clase de riesgo: {clase}
+                    </Badge>
+                  ))}
+              </div>
+
+              <div className="grid gap-3">
+                {ciiuResults.map((r, idx) => (
+                  <div
+                    key={`${r["CÓDIGO CIIU"]}-${r["CODIGO ADICIONAL"]}-${idx}`}
+                    className="p-4 rounded-lg border border-border bg-white shadow-sm space-y-2"
+                  >
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="outline" className="border-border text-foreground">
+                        CIIU {r["CÓDIGO CIIU"]}
+                      </Badge>
+                      <Badge variant="outline" className="border-border text-foreground">
+                        Adicional {r["CODIGO ADICIONAL"]}
+                      </Badge>
+                      <Badge className="bg-success/20 text-success border-success/30" variant="outline">
+                        Riesgo {r["CLASE DE RIESGO"]}
+                      </Badge>
+                    </div>
+
+                    <p className="text-sm text-muted-foreground">
+                      {r["DESCRIPCION DE ACTIVIDAD ECONÓMICA FINAL"]}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
 
       {/* Main Content */}
       <div className="grid gap-6 lg:grid-cols-3">
