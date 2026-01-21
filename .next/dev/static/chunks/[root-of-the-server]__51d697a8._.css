@@ -174,6 +174,7 @@
     --container-2xl: 42rem;
     --container-3xl: 48rem;
     --container-4xl: 56rem;
+    --container-5xl: 64rem;
     --text-xs: .75rem;
     --text-xs--line-height: calc(1 / .75);
     --text-sm: .875rem;
@@ -1093,6 +1094,10 @@
     max-height: calc(var(--spacing) * 64);
   }
 
+  .max-h-\[90vh\] {
+    max-height: 90vh;
+  }
+
   .max-h-\[300px\] {
     max-height: 300px;
   }
@@ -1229,6 +1234,10 @@
     width: calc(var(--spacing) * 72);
   }
 
+  .w-\[95vw\] {
+    width: 95vw;
+  }
+
   .w-\[100px\] {
     width: 100px;
   }
@@ -1287,6 +1296,10 @@
 
   .max-w-4xl {
     max-width: var(--container-4xl);
+  }
+
+  .max-w-5xl {
+    max-width: var(--container-5xl);
   }
 
   .max-w-\[calc\(100\%-2rem\)\] {
@@ -2384,6 +2397,10 @@
 
   .pb-4 {
     padding-bottom: calc(var(--spacing) * 4);
+  }
+
+  .pb-6 {
+    padding-bottom: calc(var(--spacing) * 6);
   }
 
   .pl-2 {
