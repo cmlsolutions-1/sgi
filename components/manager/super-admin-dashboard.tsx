@@ -173,6 +173,14 @@ export function SuperAdminDashboard() {
     setCiiuResults(matches)
   }
 
+  //limpiar busqueda
+  const handleClearCiiu = () => {
+    setCiiu("")
+    setCiiuResults([])
+    setCiiuError(null)
+  }
+
+
   // Crear nueva empresa
   const handleCreateCompany = () => {
     if (!newCompany.name || !newCompany.email) return
@@ -264,7 +272,7 @@ export function SuperAdminDashboard() {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <div className="grid gap-3 md:grid-cols-[1fr_auto] items-end">
+        <div className="grid gap-3 md:grid-cols-[1fr_auto_auto] items-end">
             <div className="grid gap-2">
               <Label htmlFor="ciiu" className="text-foreground">
                 CÓDIGO CIIU
@@ -285,7 +293,17 @@ export function SuperAdminDashboard() {
             >
               Consultar
             </Button>
-          </div>
+
+            {Boolean(ciiu || ciiuResults.length > 0 || ciiuError) && (
+            <Button
+              variant="outline"
+              onClick={handleClearCiiu}
+              className="border-border text-foreground hover:bg-secondary"
+            >
+              Cerrar
+            </Button>
+          )}
+        </div>
 
           {ciiuError && (
             <div className="text-sm text-destructive">{ciiuError}</div>
