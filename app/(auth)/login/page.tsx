@@ -1,13 +1,5 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -15,6 +7,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Building2 } from "lucide-react";
+
+import React, { useMemo, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { AlertCircle, Eye, EyeOff, Lock, User } from "lucide-react";
 
 type Company = { id: string; name: string };
 type Role = "superadmin" | "asesor" | "empresa";
@@ -32,18 +30,25 @@ export default function LoginPage() {
   const [companyId, setCompanyId] = useState<string>("");
   const [password, setPassword] = useState("");
 
-  const [bannerError, setBannerError] = useState(false);
+  const [error, setError] = useState<string>("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const canConsult = useMemo(() => email.trim().includes("@"), [email]);
 
   async function handleConsult() {
     setLoading(true);
+    setError("");
     try {
       const res = await fetch("/api/auth/lookup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
+
+      if (!res.ok) {
+        setError("No se pudo consultar el correo. Intenta nuevamente.");
+        return;
+      }
 
       const data = await res.json();
       const list: Company[] = data?.companies ?? [];
@@ -53,6 +58,10 @@ export default function LoginPage() {
 
       if (list.length === 1) setCompanyId(list[0].id);
       setStep(2);
+
+      if (list.length === 0) setError("No hay empresas asociadas a este correo.");
+    } catch {
+      setError("Error al consultar. Intenta nuevamente.");
     } finally {
       setLoading(false);
     }
@@ -61,6 +70,8 @@ export default function LoginPage() {
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    setError("");
+
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
@@ -70,15 +81,15 @@ export default function LoginPage() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        alert(err?.error ?? "No se pudo iniciar sesión");
+        setError(err?.error ?? "Credenciales incorrectas");
         return;
       }
 
-      // ✅ Redirect por rol
       if (role === "superadmin") router.push("/manager");
       else router.push("/dashboard");
-
       router.refresh();
+    } catch {
+      setError("Error al iniciar sesión. Intente nuevamente.");
     } finally {
       setLoading(false);
     }
@@ -90,146 +101,209 @@ export default function LoginPage() {
     setCompanyId("");
     setPassword("");
     setRole(null);
+    setError("");
   }
 
   return (
-    <div className="min-h-screen grid md:grid-cols-2 bg-slate-50">
-      {/* LADO IZQUIERDO – HERO */}
-      <div className="relative hidden md:flex items-center justify-center overflow-hidden bg-slate-950">
-        {/* Fondo con gradiente */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-950 via-slate-950 to-blue-900" />
+    <div className="flex h-screen w-screen bg-white">
+      {/* IZQUIERDA (50%) - banner a pantalla completa */}
+      <div className="relative hidden md:block w-1/2 overflow-hidden">
+        {/* Banner como background */}
+        <Image
+          src="/logo.png"
+          alt="SafeCloud"
+          fill
+          priority
+          className="object-cover"
+          sizes="50vw"
+        />
 
-        {/* Glow decorativo */}
-        <div className="absolute -top-20 -left-20 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" />
-        <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl" />
+        {/* Overlay leve para legibilidad del texto */}
+        <div className="absolute inset-0 bg-black/15" />
 
-        {/* Contenido */}
-        <div className="relative z-10 w-[86%] max-w-2xl">
-          {/* Imagen o fallback */}
-          {!bannerError ? (
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-2xl backdrop-blur">
-              <Image
-                src="logo.png"
-                alt="SafeCloud"
-                width={1600}
-                height={900}
-                priority
-                onError={() => setBannerError(true)}
-                className="w-full h-auto rounded-xl object-contain"
-              />
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-10 shadow-2xl backdrop-blur text-center">
-              <div className="mx-auto mb-4 h-14 w-14 rounded-2xl bg-white/10 grid place-items-center text-white text-2xl font-bold">
-                SC
+
+      </div>
+
+      {/* DERECHA (50%) - formulario */}
+      <div className="w-full md:w-1/2 flex items-center justify-center p-6">
+        <div className="w-full max-w-md space-y-6">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-900">Iniciar Sesión</h2>
+          </div>
+
+          {/* PASO 1 */}
+          {step === 1 && (
+            <div className="space-y-6">
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Correo electrónico"
+                  className="h-12 w-full rounded-full bg-white
+                  border border-gray-300
+                  pl-11 pr-4
+                  outline-none
+                  focus:ring-2 focus:ring-[#187ef2]/30"
+                  required
+                />
               </div>
-              <p className="text-slate-200">
-                (No se encontró <span className="font-semibold">/public/safecloud-logo.png</span>)
-              </p>
-              <p className="text-slate-400 text-sm mt-2">
-                Pon tu banner en la carpeta <span className="font-semibold">public</span> y reinicia el servidor.
-              </p>
+
+              {error && (
+                <div className="flex items-center text-sm text-red-500">
+                  <AlertCircle className="mr-2 h-5 w-5" />
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="button"
+                disabled={!canConsult || loading}
+                onClick={handleConsult}
+                className={`w-full h-12 rounded-full text-lg font-medium transition-colors ${
+                  !canConsult || loading
+                    ? "bg-[#187ef2] cursor-not-allowed text-white"
+                    : "bg-[#187ef2] hover:bg-[#187ef2c7] text-white"
+                }`}
+              >
+                {loading ? "Consultando..." : "Consultar"}
+              </button>
+
+              {/* Logo empresa (corrige la ruta en /public) */}
+              <div className="mt-2 text-center">
+                <img
+                  src="/SGI.png"
+                  alt="Logo Empresa"
+                  className="max-w-full h-12 md:h-16 mx-auto"
+                />
+              </div>
             </div>
           )}
 
-          <div className="mt-8 text-center">
-
-          </div>
-        </div>
-      </div>
-
-      {/* LADO DERECHO – FORMULARIO */}
-        <div className="flex items-center justify-center p-6">
-        <Card className="w-full max-w-md shadow-lg">
-            <CardHeader className="text-center">
-            <CardTitle className="text-center">
-                Iniciar Sesión
-            </CardTitle>
-            </CardHeader>
-
-          <CardContent>
-            {/* PASO 1 */}
-            {step === 1 && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Correo</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="correo@empresa.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-
-                <Button
-                  disabled={!canConsult || loading}
-                  className="w-full"
-                  onClick={handleConsult}
+          {/* PASO 2 */}
+          {step === 2 && (
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div className="flex items-center justify-between text-sm text-gray-500">
+                <span className="truncate max-w-[240px]">{email}</span>
+                <button
+                  type="button"
+                  className="underline hover:text-gray-700"
+                  onClick={resetToStep1}
                 >
-                  {loading ? "Consultando..." : "Consultar"}
-                </Button>
+                  Cambiar
+                </button>
               </div>
-            )}
 
-            {/* PASO 2 */}
-            {step === 2 && (
-              <form className="space-y-4" onSubmit={handleLogin}>
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span className="truncate max-w-[240px]">{email}</span>
-                  <button
-                    type="button"
-                    className="underline"
-                    onClick={resetToStep1}
+              <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Empresa</label>
+
+          <div className="relative">
+            <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5 z-10 pointer-events-none" />
+
+            <Select
+              value={companyId}
+              onValueChange={setCompanyId}
+              disabled={companies.length === 0}
+            >
+              <SelectTrigger
+                className="
+                h-12 min-h-[3rem]
+                w-full rounded-full bg-white
+                border border-gray-300
+                pl-11 pr-4
+                py-0
+                flex items-center
+                outline-none
+                focus:ring-2 focus:ring-[#187ef2]/30
+                data-placeholder:text-gray-400
+                "
+              >
+                <SelectValue placeholder="Selecciona una empresa" />
+              </SelectTrigger>
+
+              <SelectContent
+                className="
+                  mt-2 rounded-2xl border border-gray-200
+                  bg-white shadow-xl
+                  overflow-hidden
+                "
+              >
+                {companies.map((c) => (
+                  <SelectItem
+                    key={c.id}
+                    value={c.id}
+                    className="cursor-pointer rounded-xl mx-1 my-1 focus:bg-[#187ef2]/10"
                   >
-                    Cambiar
-                  </button>
-                </div>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-                <div className="space-y-2">
-                  <Label>Empresa</Label>
-                  <Select value={companyId} onValueChange={setCompanyId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona una empresa" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {companies.map((c) => (
-                        <SelectItem key={c.id} value={c.id}>
-                          {c.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+          {companies.length === 0 && (
+            <p className="text-sm text-red-500">
+              No hay empresas asociadas a este correo.
+            </p>
+          )}
+        </div>
 
-                  {companies.length === 0 && (
-                    <p className="text-sm text-destructive">
-                      No hay empresas asociadas a este correo.
-                    </p>
-                  )}
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="password">Contraseña</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="********"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={loading || !companyId || !password || companies.length === 0}
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Contraseña"
+                  className="h-12 w-full rounded-full bg-white
+                  border border-gray-300
+                  pl-11 pr-11
+                  outline-none
+                  focus:ring-2 focus:ring-[#187ef2]/30"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                 >
-                  {loading ? "Ingresando..." : "Iniciar sesión"}
-                </Button>
-              </form>
-            )}
-          </CardContent>
-        </Card>
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+
+              {error && (
+                <div className="flex items-center text-sm text-red-500">
+                  <AlertCircle className="mr-2 h-5 w-5" />
+                  {error}
+                </div>
+              )}
+              {/* ? "bg-[#187ef2] cursor-not-allowed text-white"
+                    : "bg-[#187ef2] hover:bg-[#187ef2c7] text-white" */}
+
+              <button
+                type="submit"
+                disabled={loading || !companyId || !password || companies.length === 0}
+                className={`w-full h-12 rounded-full text-lg font-medium transition-colors ${
+                  loading || !companyId || !password || companies.length === 0
+                    ? "bg-[#187ef2] cursor-not-allowed text-white"
+                    : "bg-[#187ef2] hover:bg-[#187ef2c7] text-white"
+                }`}
+              >
+                {loading ? "Iniciando..." : "Ingresar"}
+              </button>
+
+              <div className="mt-2 text-center">
+                <img
+                  src="/SGI.png"
+                  alt="Logo Empresa"
+                  className="max-w-full h-12 md:h-16 mx-auto"
+                />
+              </div>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -4,6 +4,10 @@
 
 import type React from "react"
 
+import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
+import { doLogout } from "@/lib/auth/logout";
+
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -143,6 +147,14 @@ export function SuperAdminDashboard() {
   const [ciiuResults, setCiiuResults] = useState<NivelRiesgoItem[]>([])
   const [ciiuError, setCiiuError] = useState<string | null>(null)
 
+  const router = useRouter();
+
+  async function handleLogout() {
+    await doLogout();
+    router.push("/login");
+    router.refresh();
+  }
+
   const handleConsultarCiiu = () => {
     setCiiuError(null)
     setCiiuResults([])
@@ -230,9 +242,27 @@ export function SuperAdminDashboard() {
   return (
     <div className="min-h-screen bg-background p-6">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-foreground mb-2 text-balance">Panel de Super Usuario Empresarial</h1>
-        <p className="text-muted-foreground text-lg">Gestionar empresas y sus módulos</p>
+      <div className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-bold text-foreground mb-2 text-balance">
+            Panel de Super Usuario Empresarial
+          </h1>
+          <p className="text-muted-foreground text-lg">Gestionar empresas y sus módulos</p>
+        </div>
+
+        <Button
+          onClick={handleLogout}
+          className="
+            bg-red-400 
+            text-white 
+            hover:bg-red-500 
+            active:bg-red-600
+            flex items-center gap-2
+          "
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          Cerrar sesión
+        </Button>
       </div>
 
       {/* Stats Cards */}

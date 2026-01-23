@@ -1,6 +1,10 @@
 //components/dashboard/sidebar.tsx
 "use client";
 
+import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
+import { doLogout } from "@/lib/auth/logout";
+
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -100,6 +104,14 @@ export function Sidebar() {
   const toggleDropdown = (name: string) => {
     setOpenDropdown(openDropdown === name ? null : name);
   };
+
+  const router = useRouter();
+
+  async function handleLogout() {
+    await doLogout();
+    router.push("/login");
+    router.refresh();
+  }
 
   return (
     <aside
@@ -215,7 +227,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="p-2 border-t border-sidebar-border">
+      <div className="p-2 border-t border-sidebar-border space-y-1">
         <Link
           href="/dashboard/settings"
           className={cn(
@@ -226,7 +238,21 @@ export function Sidebar() {
           <Settings className="h-5 w-5 shrink-0" />
           {!collapsed && <span>Configuración</span>}
         </Link>
+
+        <button
+          type="button"
+          onClick={handleLogout}
+          className={cn(
+            "flex items-center w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+            "text-sidebar-foreground hover:bg-red-500 hover:text-sidebar-accent-foreground"
+          )}
+        >
+          <LogOut className="h-5 w-5 shrink-0" />
+          {!collapsed && <span>Cerrar sesión</span>}
+        </button>
       </div>
+
+
     </aside>
   );
 }

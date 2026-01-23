@@ -1,254 +1,2659 @@
-[00:00:02.338] Server  WARN     ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[00:00:02.789] Server  LOG      ✓ Ready in 1925ms
-[00:00:05.877] Server  LOG      ○ Compiling /login ...
-[00:00:11.380] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:11.380] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
-[00:00:11.380] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769111540842}
-[00:00:30.073] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769111560336}
-[00:00:40.584] Server  LOG      ○ Compiling /dashboard ...
-[00:00:43.047] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:00:08.171] Server  WARN     ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+[00:00:09.837] Server  LOG      ✓ Ready in 7.5s
+[00:00:30.510] Server  LOG      ○ Compiling / ...
+[00:00:49.217] Server  LOG      ○ Compiling /login ...
+[00:00:52.815] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:53.870] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:53.870] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:00:53.870] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769129644594}
+[00:06:12.676] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:06:13.400] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <div className="lg:col-span-2">
+      <Card className="bg-card bo...">
+        <div data-slot="card" className="text-card-...">
+          <CardHeader className="flex flex-...">
+            <div data-slot="card-header" className="@container...">
+              <div>
+              <Dialog open={false} onOpenChange={function bound dispatchSetState}>
+                <Dialog data-slot="dialog" open={false} onOpenChange={function bound dispatchSetState}>
+                  <DialogProvider scope={undefined} triggerRef={{current:null}} contentRef={{current:null}} ...>
+                    <DialogTrigger asChild={true}>
+                      <DialogTrigger data-slot="dialog-tri..." asChild={true}>
+                        <Primitive.button type="button" aria-haspopup="dialog" aria-expanded={false} ...>
+                          <Slot type="button" aria-haspopup="dialog" aria-expanded={false} aria-controls="radix-_R_i..." ...>
+                            <SlotClone type="button" aria-haspopup="dialog" aria-expanded={false} ...>
+                              <Button className="bg-primary..." type="button" aria-haspopup="dialog" ...>
+                                <button
+                                  data-slot="dialog-trigger"
+                                  className={"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded..."}
+                                  type="button"
+                                  aria-haspopup="dialog"
+                                  aria-expanded={false}
++                                 aria-controls="radix-_R_iolrkndlb_"
+-                                 aria-controls="radix-_R_2b4lrkndlb_"
+                                  data-state="closed"
+                                  onClick={function handleEvent}
+                                  ref={function}
+                                >
+                    ...
+          ...
+
+[00:06:13.404] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:06:13.404] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
+[00:06:13.404] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769129964087}
+[00:06:27.739] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:06:28.141] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:06:28.141] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:06:28.141] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769129978856}
+[00:08:27.618] Server  LOG      ✓ Compiled in 4s
+[00:08:34.667] Server  LOG      ✓ Compiled in 2.3s
+[00:09:07.720] Server  LOG      ✓ Compiled in 2.1s
+[00:09:15.414] Server  LOG      ✓ Compiled in 1565ms
+[00:11:11.795] Server  LOG      ✓ Compiled in 1312ms
+[00:11:13.439] Server  LOG      ✓ Compiled in 1250ms
+[00:11:15.765] Server  LOG      ✓ Compiled in 1034ms
+[00:11:22.946] Server  LOG      ✓ Compiled in 1736ms
+[00:11:26.984] Server  LOG      ✓ Compiled in 507ms
+[00:11:34.845] Server  LOG      ✓ Compiled in 3.1s
+[00:13:31.900] Server  LOG      ✓ Compiled in 2.8s
+[00:13:35.654] Browser WARN    Image with src "http://localhost:3000/logo.png" has "fill" and a height value of 0. This is likely because the parent element of the image has not been styled to have a set height.
+[00:13:38.843] Server  LOG      ✓ Compiled in 3.3s
+[00:20:04.493] Server  LOG      ✓ Compiled in 754ms
+[00:20:50.802] Server  LOG      ✓ Compiled in 1474ms
+[00:21:04.659] Server  LOG      ✓ Compiled in 1358ms
+[00:21:19.718] Server  LOG      ✓ Compiled in 499ms
+[00:21:27.476] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:21:27.810] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:21:27.810] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:21:27.810] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769130878441}
+[00:21:27.810] Browser WARN    Image with src "http://localhost:3000/logo.png" has "fill" and a height value of 0. This is likely because the parent element of the image has not been styled to have a set height.
+[00:21:33.989] Server  LOG      ✓ Compiled in 1286ms
+[00:21:38.246] Server  LOG      ✓ Compiled in 786ms
+[00:26:21.489] Server  LOG      ✓ Compiled in 3.2s
+[00:26:46.597] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:26:46.968] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:26:46.969] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:26:46.969] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769131197613}
+[00:27:25.235] Server  LOG      ✓ Compiled in 537ms
+[00:29:51.857] Server  LOG      ✓ Compiled in 3.5s
+[00:29:54.005] Browser ERROR   ./app/(auth)/login/page.tsx:231:1
+Parsing ecmascript source code failed
+  229 |     </div>
+  230 |   );
+> 231 | }
+      | ^
+  232 |
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+[00:29:59.603] Server  LOG      ✓ Compiled in 2.3s
+[00:30:22.817] Server  LOG      ✓ Compiled in 1306ms
+[00:31:03.313] Server  LOG      ✓ Compiled in 699ms
+[00:31:18.781] Server  LOG      ✓ Compiled in 1763ms
+[00:31:30.357] Server  LOG      ✓ Compiled in 1467ms
+[00:34:06.405] Server  LOG      ✓ Compiled in 922ms
+[00:34:31.564] Server  LOG      ✓ Compiled in 968ms
+[00:34:35.533] Server  LOG      ✓ Compiled in 1854ms
+[00:36:03.071] Server  LOG      ✓ Compiled in 965ms
+[00:36:08.574] Server  LOG      ✓ Compiled in 2.1s
+[00:36:09.009] Browser ERROR   ./app/(auth)/login/page.tsx:122:13
+Parsing ecmascript source code failed
+  120 |                 />
+  121 |               </div>
+> 122 |             }
+      |             ^
+  123 |           </div>
+  124 |
+  125 |       </div>
+
+Expected '</', got '}'
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+[00:36:23.008] Server  LOG      ✓ Compiled in 733ms
+[00:36:23.920] Browser ERROR   ./app/(auth)/login/page.tsx:134:14
+Parsing ecmascript source code failed
+  132 |                 </p>
+  133 |               </div>
+> 134 |             )}
+      |              ^
+  135 |           </div>
+  136 |
+  137 |       </div>
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+[00:36:28.853] Server  LOG      ✓ Compiled in 1528ms
+[00:36:36.911] Server  LOG      ✓ Compiled in 483ms
+[00:37:00.308] Server  LOG      ✓ Compiled in 970ms
+[00:37:07.327] Server  LOG      ✓ Compiled in 559ms
+[00:37:07.459] Browser ERROR   ./app/(auth)/login/page.tsx:126:7
+Parsing ecmascript source code failed
+  124 |       </div>
+  125 |
+> 126 |       {/* LADO DERECHO – FORMULARIO */}
+      |       ^
+  127 |         <div className="flex items-center justify-center p-6">
+  128 |         <Card className="w-full max-w-md shadow-lg">
+  129 |             <CardHeader className="text-center">
+
+Expected ',', got '{'
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+[00:37:22.758] Server  LOG      ✓ Compiled in 1168ms
+[00:37:25.699] Server  LOG      ✓ Compiled in 943ms
+[00:37:27.425] Server  LOG      ✓ Compiled in 727ms
+[00:37:27.831] Browser ERROR   ./app/(auth)/login/page.tsx:134:14
+Parsing ecmascript source code failed
+  132 |                 </p>
+  133 |               </div>
+> 134 |             )}
+      |              ^
+  135 |           </div>
+  136 |
+  137 |       </div>
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+[00:37:29.546] Server  LOG      ✓ Compiled in 753ms
+[00:37:43.436] Server  LOG      ✓ Compiled in 456ms
+[00:37:51.833] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:37:52.156] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:37:52.156] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:37:52.156] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769131862793}
+[00:38:46.152] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769131916754}
+[00:41:50.909] Server  LOG      ○ Compiling /dashboard ...
+[00:42:07.476] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:43.052] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:42:07.486] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:43.057] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:42:07.494] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:43.065] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:42:07.508] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:44.997] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:42:09.092] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:42:12.200] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:44.997] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:42:12.200] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:44.997] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:42:12.200] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:44.997] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:42:12.200] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:44.997] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:42:12.200] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:44.997] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:42:12.200] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:44.997] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:42:12.200] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:44.997] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:42:12.200] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:00:45.133] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:45.133] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:00:45.133] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769111575382}
-[00:04:36.617] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:42:12.510] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:42:12.510] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[00:42:12.510] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769132122947}
+[00:49:05.275] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:49:06.023] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:49:06.023] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
+[00:49:06.023] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769132536634}
+[00:50:56.375] Server  LOG      ✓ Compiled in 1118ms
+[00:51:35.703] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769132686306}
+[00:52:10.324] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:36.621] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:52:10.324] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:36.625] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:52:10.324] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:36.630] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:52:10.324] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:37.890] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:52:10.324] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:37.890] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:52:10.324] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:37.890] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:52:10.324] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:37.890] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:52:10.324] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:37.890] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[00:52:10.324] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769132719683}
+[00:53:14.269] Server  LOG      ✓ Compiled in 496ms
+[00:53:16.828] Server  LOG      ✓ Compiled in 1511ms
+[00:53:22.898] Server  LOG      ✓ Compiled in 2.9s
+[00:53:35.581] Server  LOG      ✓ Compiled in 1330ms
+[00:53:43.652] Server  LOG      ✓ Compiled in 1604ms
+[00:53:47.334] Server  LOG      ✓ Compiled in 2.1s
+[00:53:58.067] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769132828567}
+[00:54:13.099] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:54:13.653] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:54:13.653] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
+[00:54:13.653] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769132844262}
+[00:55:08.360] Server  LOG      ✓ Compiled in 808ms
+[00:55:10.477] Server  LOG      ✓ Compiled in 1279ms
+[00:55:32.587] Server  LOG      ✓ Compiled in 1829ms
+[00:55:48.830] Server  LOG      ✓ Compiled in 1377ms
+[00:56:56.221] Server  LOG      ✓ Compiled in 1278ms
+[00:57:37.946] Server  LOG      ✓ Compiled in 1673ms
+[00:58:00.746] Server  LOG      ✓ Compiled in 2.4s
+[00:58:22.513] Server  LOG      ✓ Compiled in 1885ms
+[00:58:25.835] Server  LOG      ✓ Compiled in 2.5s
+[00:58:28.396] Server  LOG      ✓ Compiled in 2.2s
+[01:03:27.493] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769133398008}
+[01:08:03.051] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:08:03.146] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:08:03.200] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:08:03.266] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:08:03.456] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:08:03.511] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:08:03.536] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:08:03.586] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:08:03.669] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:08:03.705] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:08:03.752] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:08:03.792] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:08:03.852] Server  LOG      ✓ Compiled in 3.5s
+[01:08:04.079] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:10:44.100] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.js:2:15
+Module not found: Can't resolve '../lib'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | var GenIcon = require('../lib').GenIcon
+    |               ^^^^^^^^^^^^^^^^^
+  3 | module.exports.IoAccessibilityOutline = function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.js [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.js [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:10:45.121] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.js:2:15
+Module not found: Can't resolve '../lib'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | var GenIcon = require('../lib').GenIcon
+    |               ^^^^^^^^^^^^^^^^^
+  3 | module.exports.IoAccessibilityOutline = function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.js [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.js [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:10:46.146] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.js:2:15
+Module not found: Can't resolve '../lib'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | var GenIcon = require('../lib').GenIcon
+    |               ^^^^^^^^^^^^^^^^^
+  3 | module.exports.IoAccessibilityOutline = function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.js [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.js [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:10:46.869] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.js:2:15
+Module not found: Can't resolve '../lib'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | var GenIcon = require('../lib').GenIcon
+    |               ^^^^^^^^^^^^^^^^^
+  3 | module.exports.IoAccessibilityOutline = function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.js [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.js [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:10:47.452] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.js:2:15
+Module not found: Can't resolve '../lib'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | var GenIcon = require('../lib').GenIcon
+    |               ^^^^^^^^^^^^^^^^^
+  3 | module.exports.IoAccessibilityOutline = function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.js [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.js [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:10:48.151] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.js:2:15
+Module not found: Can't resolve '../lib'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | var GenIcon = require('../lib').GenIcon
+    |               ^^^^^^^^^^^^^^^^^
+  3 | module.exports.IoAccessibilityOutline = function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.js [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.js [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:10:48.798] Server  LOG      ✓ Compiled in 1920ms
+[01:10:50.832] Server  LOG      ✓ Compiled in 1538ms
+[01:11:00.731] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:00.752] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:00.794] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:00.811] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:00.830] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:00.932] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:00.977] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:01.020] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:01.057] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:01.122] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:01.264] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:01.359] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:01.629] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:01.709] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:01.827] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:01.981] Server  ERROR    ⨯ ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:02.064] Server  LOG      ✓ Compiled in 430ms
+[01:11:21.554] Server  LOG      ✓ Compiled in 874ms
+[01:11:25.355] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.mjs:2:1
+Module not found: Can't resolve '../lib/index.mjs'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | import { GenIcon } from '../lib/index.mjs';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | export function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.mjs [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.mjs [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:26.147] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.mjs:2:1
+Module not found: Can't resolve '../lib/index.mjs'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | import { GenIcon } from '../lib/index.mjs';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | export function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.mjs [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.mjs [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:26.908] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.mjs:2:1
+Module not found: Can't resolve '../lib/index.mjs'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | import { GenIcon } from '../lib/index.mjs';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | export function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.mjs [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.mjs [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:27.835] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.mjs:2:1
+Module not found: Can't resolve '../lib/index.mjs'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | import { GenIcon } from '../lib/index.mjs';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | export function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.mjs [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.mjs [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:28.830] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.mjs:2:1
+Module not found: Can't resolve '../lib/index.mjs'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | import { GenIcon } from '../lib/index.mjs';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | export function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.mjs [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.mjs [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:29.587] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.mjs:2:1
+Module not found: Can't resolve '../lib/index.mjs'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | import { GenIcon } from '../lib/index.mjs';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | export function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.mjs [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.mjs [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:30.157] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.mjs:2:1
+Module not found: Can't resolve '../lib/index.mjs'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | import { GenIcon } from '../lib/index.mjs';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | export function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.mjs [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.mjs [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:30.757] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.mjs:2:1
+Module not found: Can't resolve '../lib/index.mjs'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | import { GenIcon } from '../lib/index.mjs';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | export function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.mjs [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.mjs [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:31.495] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.mjs:2:1
+Module not found: Can't resolve '../lib/index.mjs'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | import { GenIcon } from '../lib/index.mjs';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | export function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.mjs [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.mjs [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:32.179] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.mjs:2:1
+Module not found: Can't resolve '../lib/index.mjs'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | import { GenIcon } from '../lib/index.mjs';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | export function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.mjs [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.mjs [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:32.968] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.mjs:2:1
+Module not found: Can't resolve '../lib/index.mjs'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | import { GenIcon } from '../lib/index.mjs';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | export function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.mjs [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.mjs [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:33.553] Server  ERROR    ⨯ ./node_modules/react-icons/io5/index.mjs:2:1
+Module not found: Can't resolve '../lib/index.mjs'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | import { GenIcon } from '../lib/index.mjs';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | export function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.mjs [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.mjs [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[01:11:34.308] Server  LOG      ✓ Compiled in 3.6s
+[01:11:37.141] Server  LOG      ✓ Compiled in 28ms
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.269] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.270] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.270] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:17.270] Browser ERROR   ./node_modules/react-icons/io5/index.js:2:15
+Module not found: Can't resolve '../lib'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | var GenIcon = require('../lib').GenIcon
+    |               ^^^^^^^^^^^^^^^^^
+  3 | module.exports.IoAccessibilityOutline = function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.js [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.js [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.211] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.211] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.211] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.211] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.211] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.211] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.211] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.211] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.211] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.211] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./app/(auth)/login/page.tsx:6:1
+Module not found: Can't resolve 'react-icons/io5'
+  4 | import Image from "next/image";
+  5 | import { useRouter } from "next/navigation";
+> 6 | import { IoInformationOutline } from "react-icons/io5";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  7 | import { User, Lock, Eye, EyeOff } from "lucide-react";
+  8 |
+  9 | type Company = { id: string; name: string };
+
+Import traces:
+  Client Component Browser:
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./node_modules/react-icons/io5/index.mjs:2374:99
+Parsing ecmascript source code failed
+  2372 | };
+  2373 | export function IoLogoTwitter (props) {
+> 2374 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"path","attr":{"d":"M496 109.5a201.8 201.8 0 0 1-56.55 15.3 97.51 97.51 0 0 0 43.33-53.6 197.74 197.74 0 0 1-62.56 23.5A99.14 99.14 0 0 0 348.31 64c-54.42 0-98.46 43.4-98.46 96.9a93.21 93.21 0 0 0 2.54 22.1 280.7 280.7 0 0 1-203-101.3A95.69 95.69 0 0 0 36 130.4c0 33.6 17.53 63.3 44 80.7A97.5 97.5 0 0 1 35.22 199v1.2c0 47 34 86.1 79 95a100.76 100.76 0 0 1-25.94 3.4 94.38 94.38 
+       |                                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Unterminated string constant
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.mjs [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.mjs [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+[01:12:22.212] Browser ERROR   ./node_modules/react-icons/io5/index.mjs:2:1
+Module not found: Can't resolve '../lib/index.mjs'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | import { GenIcon } from '../lib/index.mjs';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | export function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.mjs [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.mjs [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:12:22.212] Browser ERROR   ./node_modules/react-icons/io5/index.mjs:2:1
+Module not found: Can't resolve '../lib/index.mjs'
+  1 | // THIS FILE IS AUTO GENERATED
+> 2 | import { GenIcon } from '../lib/index.mjs';
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | export function IoAccessibilityOutline (props) {
+  4 |   return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 512 512"},"child":[{"tag":"circle","attr":{"cx":"256","cy":"56","r":"40","fill":"none","strokeLinejoin":"round","strokeWidth":"32"},"child":[]},{"tag":"path","attr":{"fill":"none","strokeLinejoin":"round","strokeWidth":"32","d":"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.91c-8 3-21 9-26 18.18-6 10.75-5 29.53-2.1 47.59l5.9 29.63 37.41 163.9c2.8 13.15-6.3 25.44-19.4 27.74S308 489 304.12 476.28l-37.56-115.93q-2.71-8.34-4.8-16.87L256 320l-5.3 21.65q-2.52 10.35-5.8 20.48L208 476.18c-4 12.85-14.5 21.75-27.6 19.46s-22.4-15.59-19.46-27.74l37.39-163.83z"},"child":[]}]})(props);
+  5 | };
+
+Import traces:
+  Client Component Browser:
+    ./node_modules/react-icons/io5/index.mjs [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Client Component Browser]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./node_modules/react-icons/io5/index.mjs [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Client Component SSR]
+    ./app/(auth)/login/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[01:19:33.225] Server  LOG      ✓ Compiled in 1388ms
+[01:19:37.394] Server  LOG      ✓ Compiled in 785ms
+[01:19:40.797] Server  LOG      ✓ Compiled in 1894ms
+[01:22:15.171] Server  LOG      ✓ Compiled in 1642ms
+[01:26:06.981] Server  LOG      ✓ Compiled in 565ms
+[01:46:41.614] Server  LOG      ✓ Compiled in 2.8s
+[01:46:47.925] Server  LOG      ✓ Compiled in 3.4s
+[01:47:06.864] Server  LOG      ✓ Compiled in 2s
+[01:47:18.020] Server  LOG      ✓ Compiled in 1890ms
+[01:47:49.506] Server  LOG      ✓ Compiled in 2.1s
+[01:47:58.423] Server  LOG      ✓ Compiled in 806ms
+[02:05:12.767] Server  LOG      ✓ Compiled in 1037ms
+[02:05:20.701] Server  LOG      ✓ Compiled in 2s
+[02:05:24.541] Server  LOG      ✓ Compiled in 1798ms
+[02:05:27.986] Server  LOG      ✓ Compiled in 2.1s
+[02:05:30.406] Server  LOG      ✓ Compiled in 752ms
+[02:06:54.080] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:37.890] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[02:06:54.096] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:37.890] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[02:06:54.121] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:37.890] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[02:06:54.134] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:38.038] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:04:38.038] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:04:38.038] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769111808287}
-[00:04:39.961] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[02:06:55.730] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:06:57.755] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:39.964] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[02:06:57.755] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:39.968] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[02:06:57.755] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:39.973] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[02:06:57.755] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:40.943] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[02:06:57.755] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:40.943] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[02:06:57.755] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:40.943] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[02:06:57.755] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:40.943] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
+[02:06:57.757] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
        please check the style of container, or the props width(100%) and height(100%),
        or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
        height and width.
-[00:04:40.944] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:40.944] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:40.944] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:40.944] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:41.001] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:04:41.001] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:04:41.001] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769111811337}
-[00:04:41.889] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:04:41.889] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:04:41.889] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769111812161}
-[00:04:43.544] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:04:43.544] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:04:43.544] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769111813809}
-[00:04:44.216] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:44.220] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:44.225] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:44.230] Server  WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:45.255] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:45.255] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:45.255] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:45.255] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:45.255] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:45.255] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:45.255] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:45.255] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:04:45.478] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:04:45.478] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
-[00:04:45.478] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769111815750}
-[00:04:49.766] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:04:49.766] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
-[00:04:49.766] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769111820038}
-[00:05:02.043] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:05:02.043] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:05:02.043] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:05:02.043] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:05:02.043] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:05:02.043] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:05:02.043] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:05:02.043] Browser WARN    The width(-1) and height(-1) of chart should be greater than 0,
-       please check the style of container, or the props width(100%) and height(100%),
-       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
-       height and width.
-[00:05:02.043] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769111831799}
+[02:06:58.630] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[02:06:58.630] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[02:06:58.630] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769137209180}
+[02:18:17.856] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:18:18.181] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[02:18:18.181] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[02:18:18.181] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769137888729}
+[02:18:54.462] Server  LOG      ✓ Compiled in 1676ms
+[02:30:38.974] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:30:39.284] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[02:30:39.284] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[02:30:39.284] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769138629838}
+[02:31:16.612] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:31:16.833] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[02:31:16.833] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[02:31:16.833] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769138667377}
+[02:45:32.819] Server  LOG      ✓ Compiled in 665ms
+[02:49:11.481] Server  LOG      ✓ Compiled in 3.1s
+[02:56:58.656] Server  LOG      ✓ Compiled in 619ms
+[03:06:36.932] Server  LOG      ✓ Compiled in 1275ms
+[03:06:57.526] Server  LOG      ✓ Compiled in 1938ms
+[03:13:49.201] Server  LOG      ✓ Compiled in 2.7s
+[03:16:41.695] Server  LOG      ✓ Compiled in 1629ms
+[03:17:41.900] Server  LOG      ✓ Compiled in 5.7s
+[03:17:51.515] Server  LOG      ✓ Compiled in 4.4s
+[03:17:59.458] Server  LOG      ✓ Compiled in 1558ms
+[03:18:07.635] Server  LOG      ✓ Compiled in 1491ms
+[03:18:15.305] Server  LOG      ✓ Compiled in 1463ms
+[03:18:22.163] Server  LOG      ✓ Compiled in 735ms
+[03:18:31.277] Server  LOG      ✓ Compiled in 1645ms
+[03:18:37.750] Server  LOG      ✓ Compiled in 771ms
+[03:18:43.662] Server  LOG      ✓ Compiled in 5.1s
+[03:18:47.858] Server  LOG      ✓ Compiled in 758ms
+[03:19:44.014] Server  LOG      ✓ Compiled in 1359ms
+[03:19:51.194] Server  LOG      ✓ Compiled in 1242ms
+[03:27:10.082] Server  LOG      ✓ Compiled in 2.5s
