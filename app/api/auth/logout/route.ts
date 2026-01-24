@@ -1,19 +1,39 @@
 import { NextResponse } from "next/server";
 
-export async function POST() {
-  // Ajusta el nombre de tu cookie real si ya usas uno distinto.
-  // Ejemplos comunes: "token", "access_token", "session", etc.
-  const cookieName = "token";
+export async function POST(req: Request) {
+  const API_URL = process.env.API_URL;
 
-  const res = NextResponse.json({ ok: true });
+  if (!API_URL) {
+    return NextResponse.json(
+      { message: "API_URL no configurada" },
+      { status: 500 }
+    );
+  }
 
-  // Borra cookie (Max-Age=0). Si tu cookie usa path/domain específicos, igualarlos aquí.
-  res.cookies.set(cookieName, "", {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 0,
+  const authHeader = req.headers.get("authorization");
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return NextResponse.json(
+      { message: "Token requerido" },
+      { status: 401 }
+    );
+  }
+
+  const r = await fetch(`${API_URL}/api/auth/logout`, {
+    method: "POST",
+    headers: {
+      Authorization: authHeader,
+    },
   });
 
-  return res;
+  const backendJson = await r.json().catch(() => ({}));
+
+  if (!r.ok) {
+    return NextResponse.json(
+      { message: backendJson?.message ?? "No se pudo cerrar sesión" },
+      { status: r.status }
+    );
+  }
+
+  return NextResponse.json({ ok: true }, { status: 200 });
 }
