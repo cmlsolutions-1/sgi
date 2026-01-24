@@ -3,6 +3,8 @@
 "use client"
 
 import type React from "react"
+import type { Module } from "@/lib/modules"
+
 
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
@@ -36,6 +38,37 @@ import {
   XCircle,
 } from "lucide-react"
 import nivelRiesgos from "@/lib/nivelRiesgos.json"
+import { getModulesFromSidebar } from "@/lib/modules"
+
+
+
+type CompanyStatus = "active" | "inactive"
+type UserStatus = "active" | "inactive"
+
+type Company = {
+  id: string
+  name: string
+  nit: string
+  address: string
+  phone: string
+  email: string
+  registrationDate: string
+  status: CompanyStatus
+  activeModules: string[]
+  totalUsers: number
+}
+
+type User = {
+  id: string
+  companyId: string
+  name: string
+  email: string
+  roleId: string
+  status: UserStatus
+  creationDate: string
+  // NO guardes passwordHash en UI (eso es del backend)
+}
+
 
 type NivelRiesgoItem = {
   "CLASE DE RIESGO": number
@@ -44,110 +77,132 @@ type NivelRiesgoItem = {
   "DESCRIPCION DE ACTIVIDAD ECONÓMICA FINAL": string
 }
 
-// Tipos de datos
-type Module = {
-  id: string
-  name: string
-  icon: React.ReactNode
-  description: string
-}
 
-type Company = {
-  id: string
-  name: string
-  email: string
-  createdAt: string
-  activeModules: string[]
-  totalUsers: number
-  status: "active" | "inactive"
-}
-
-// Módulos disponibles
-const AVAILABLE_MODULES: Module[] = [
-  {
-    id: "usuarios",
-    name: "Usuarios",
-    icon: <Users className="h-4 w-4" />,
-    description: "Gestión de usuarios y permisos",
-  },
-  {
-    id: "empleados",
-    name: "Empleados",
-    icon: <Users className="h-4 w-4" />,
-    description: "Control de empleados y nómina",
-  },
-  {
-    id: "gestion-documental",
-    name: "Gestión Documental",
-    icon: <FileText className="h-4 w-4" />,
-    description: "Almacenamiento y organización de documentos",
-  },
-  {
-    id: "planificacion",
-    name: "Planificación",
-    icon: <Calendar className="h-4 w-4" />,
-    description: "Planificación de proyectos y tareas",
-  },
-  {
-    id: "riesgos",
-    name: "Riesgos",
-    icon: <AlertTriangle className="h-4 w-4" />,
-    description: "Gestión y análisis de riesgos",
-  },
-]
 
 // Datos de empresas (quemados)
 const INITIAL_COMPANIES: Company[] = [
   {
     id: "1",
     name: "Tech Solutions S.A.",
+    nit: "900123456",
+    address: "Calle 10 # 20-30",
+    phone: "3001234567",
     email: "contacto@techsolutions.com",
-    createdAt: "2024-01-15",
+    registrationDate: "2024-01-15",
+    status: "active",
     activeModules: ["usuarios", "empleados", "gestion-documental"],
     totalUsers: 45,
-    status: "active",
   },
   {
     id: "2",
     name: "Innovatech Group",
+    nit: "900987654",
+    address: "Carrera 50 # 10-20",
+    phone: "3019876543",
     email: "admin@innovatech.com",
-    createdAt: "2024-02-20",
+    registrationDate: "2024-02-20",
+    status: "active",
     activeModules: ["usuarios", "planificacion", "riesgos"],
     totalUsers: 28,
-    status: "active",
   },
   {
     id: "3",
     name: "Global Services Corp",
+    nit: "901555666",
+    address: "Av 80 # 12-40",
+    phone: "3025556667",
     email: "info@globalservices.com",
-    createdAt: "2024-03-10",
+    registrationDate: "2024-03-10",
+    status: "active",
     activeModules: ["usuarios", "empleados"],
     totalUsers: 62,
-    status: "active",
   },
   {
     id: "4",
     name: "Digital Partners",
+    nit: "902333444",
+    address: "Calle 100 # 15-20",
+    phone: "3033334445",
     email: "hola@digitalpartners.com",
-    createdAt: "2024-04-05",
+    registrationDate: "2024-04-05",
+    status: "inactive",
     activeModules: ["usuarios", "gestion-documental", "planificacion", "riesgos"],
     totalUsers: 18,
-    status: "inactive",
   },
 ]
+
 
 export function SuperAdminDashboard() {
   const [companies, setCompanies] = useState<Company[]>(INITIAL_COMPANIES)
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isModulesDialogOpen, setIsModulesDialogOpen] = useState(false)
-  const [newCompany, setNewCompany] = useState({ name: "", email: "" })
+
 
   const [ciiu, setCiiu] = useState("")
   const [ciiuResults, setCiiuResults] = useState<NivelRiesgoItem[]>([])
   const [ciiuError, setCiiuError] = useState<string | null>(null)
 
+  const [users, setUsers] = useState<User[]>([])
+  const AVAILABLE_MODULES = getModulesFromSidebar()
+
   const router = useRouter();
+
+  const [newCompany, setNewCompany] = useState({
+  name: "",
+  nit: "",
+  address: "",
+  phone: "",
+  email: "",
+  status: "active" as CompanyStatus,
+})
+
+const [newUser, setNewUser] = useState({
+  name: "",
+  email: "",
+  password: "",
+  roleId: "admin", // o el id real
+  status: "active" as UserStatus,
+})
+
+const handleCreateCompanyWithUser = () => {
+    if (!newCompany.name || !newCompany.nit || !newCompany.email) return
+    if (!newUser.name || !newUser.email || !newUser.password) return
+
+    const companyId = Date.now().toString()
+
+    const company: Company = {
+      id: companyId,
+      name: newCompany.name,
+      nit: newCompany.nit,
+      address: newCompany.address,
+      phone: newCompany.phone,
+      email: newCompany.email,
+      registrationDate: new Date().toISOString().split("T")[0],
+      status: newCompany.status,
+      activeModules: ["usuarios"],
+      totalUsers: 1,
+    }
+
+    const user: User = {
+      id: (Date.now() + 1).toString(),
+      companyId,
+      name: newUser.name,
+      email: newUser.email,
+      roleId: newUser.roleId,
+      status: newUser.status,
+      creationDate: new Date().toISOString().split("T")[0],
+    }
+
+    setCompanies((prev) => [...prev, company])
+    setUsers((prev) => [...prev, user])
+
+    setNewCompany({ name: "", nit: "", address: "", phone: "", email: "", status: "active" })
+    setNewUser({ name: "", email: "", password: "", roleId: "admin", status: "active" })
+    setIsCreateDialogOpen(false)
+  }
+
+
 
   async function handleLogout() {
     await doLogout();
@@ -192,25 +247,6 @@ export function SuperAdminDashboard() {
     setCiiuError(null)
   }
 
-
-  // Crear nueva empresa
-  const handleCreateCompany = () => {
-    if (!newCompany.name || !newCompany.email) return
-
-    const company: Company = {
-      id: Date.now().toString(),
-      name: newCompany.name,
-      email: newCompany.email,
-      createdAt: new Date().toISOString().split("T")[0],
-      activeModules: ["usuarios"], // Por defecto, todas las empresas tienen el módulo de usuarios
-      totalUsers: 0,
-      status: "active",
-    }
-
-    setCompanies([...companies, company])
-    setNewCompany({ name: "", email: "" })
-    setIsCreateDialogOpen(false)
-  }
 
   // Toggle módulo para empresa seleccionada
   const toggleModule = (moduleId: string) => {
@@ -448,7 +484,7 @@ export function SuperAdminDashboard() {
                   </div>
                   <DialogFooter>
                     <Button
-                      onClick={handleCreateCompany}
+                      onClick={handleCreateCompanyWithUser}
                       className="bg-primary text-primary-foreground hover:bg-primary/90"
                     >
                       Crear Empresa
@@ -493,7 +529,7 @@ export function SuperAdminDashboard() {
                           <span>•</span>
                           <span>{company.activeModules.length} módulos activos</span>
                           <span>•</span>
-                          <span>Creada: {new Date(company.createdAt).toLocaleDateString("es-ES")}</span>
+                          <span>Creada: {new Date(company.registrationDate).toLocaleDateString("es-ES")}</span>
                         </div>
                       </div>
                     </div>
@@ -534,7 +570,7 @@ export function SuperAdminDashboard() {
                     <div key={module.id} className="p-4 rounded-lg border border-border bg-white shadow-sm">
                       <div className="flex items-start gap-3">
                         <div className="h-8 w-8 rounded bg-primary/10 flex items-center justify-center text-primary">
-                          {module.icon}
+                          <module.icon className="h-4 w-4" />
                         </div>
                         <div className="flex-1">
                           <h4 className="font-medium text-foreground mb-1">{module.name}</h4>
@@ -557,60 +593,180 @@ export function SuperAdminDashboard() {
       <Dialog open={isModulesDialogOpen} onOpenChange={setIsModulesDialogOpen}>
         <DialogContent className="bg-card border-border max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-foreground">Gestionar Módulos - {selectedCompany?.name}</DialogTitle>
+            <DialogTitle className="text-foreground">Crear Empresa + Usuario Administrador</DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              Habilita o deshabilita los módulos para esta empresa
+              Registra la empresa y crea su usuario inicial (admin).
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            {AVAILABLE_MODULES.map((module) => {
-              const isActive = selectedCompany?.activeModules.includes(module.id) || false
-              const isUsuarios = module.id === "usuarios"
 
-              return (
-                <div
-                  key={module.id}
-                  className="flex items-center justify-between p-4 rounded-lg border border-border bg-white shadow-sm"
-                >
-                  <div className="flex items-start gap-3 flex-1">
-                    <div
-                      className={`h-10 w-10 rounded-lg flex items-center justify-center ${
-                        isActive ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {module.icon}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-medium text-foreground">{module.name}</h4>
-                        {isUsuarios && (
-                          <Badge variant="secondary" className="text-xs bg-muted text-muted-foreground">
-                            Requerido
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">{module.description}</p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={isActive}
-                    onCheckedChange={() => toggleModule(module.id)}
-                    disabled={isUsuarios} // El módulo de usuarios no se puede desactivar
-                    className="data-[state=checked]:bg-primary"
+          <div className="grid gap-6 py-4">
+            {/* ===================== */}
+            {/* Datos de la empresa   */}
+            {/* ===================== */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-foreground">Datos de la empresa</h3>
+                <Badge variant="secondary" className="bg-muted text-muted-foreground">
+                  Company
+                </Badge>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-2">
+                  <Label htmlFor="company-name" className="text-foreground">
+                    Nombre de la Empresa
+                  </Label>
+                  <Input
+                    id="company-name"
+                    value={newCompany.name}
+                    onChange={(e) => setNewCompany({ ...newCompany, name: e.target.value })}
+                    placeholder="Tech Solutions S.A."
+                    className="bg-input border-border text-foreground"
                   />
                 </div>
-              )
-            })}
+
+                <div className="grid gap-2">
+                  <Label htmlFor="company-nit" className="text-foreground">
+                    NIT
+                  </Label>
+                  <Input
+                    id="company-nit"
+                    value={newCompany.nit}
+                    onChange={(e) => setNewCompany({ ...newCompany, nit: e.target.value })}
+                    placeholder="900123456"
+                    className="bg-input border-border text-foreground"
+                    inputMode="numeric"
+                  />
+                </div>
+
+                <div className="grid gap-2 md:col-span-2">
+                  <Label htmlFor="company-address" className="text-foreground">
+                    Dirección
+                  </Label>
+                  <Input
+                    id="company-address"
+                    value={newCompany.address}
+                    onChange={(e) => setNewCompany({ ...newCompany, address: e.target.value })}
+                    placeholder="Calle 10 # 20-30"
+                    className="bg-input border-border text-foreground"
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="company-phone" className="text-foreground">
+                    Teléfono
+                  </Label>
+                  <Input
+                    id="company-phone"
+                    value={newCompany.phone}
+                    onChange={(e) => setNewCompany({ ...newCompany, phone: e.target.value })}
+                    placeholder="3001234567"
+                    className="bg-input border-border text-foreground"
+                    inputMode="tel"
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="company-email" className="text-foreground">
+                    Email de Contacto
+                  </Label>
+                  <Input
+                    id="company-email"
+                    type="email"
+                    value={newCompany.email}
+                    onChange={(e) => setNewCompany({ ...newCompany, email: e.target.value })}
+                    placeholder="contacto@empresa.com"
+                    className="bg-input border-border text-foreground"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="h-px bg-border" />
+
+            {/* ===================== */}
+            {/* Usuario administrador */}
+            {/* ===================== */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-foreground">Usuario administrador inicial</h3>
+                <Badge className="bg-primary/10 text-primary border-primary/20" variant="outline">
+                  User
+                </Badge>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-2">
+                  <Label htmlFor="user-name" className="text-foreground">
+                    Nombre
+                  </Label>
+                  <Input
+                    id="user-name"
+                    value={newUser.name}
+                    onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                    placeholder="Juan Pérez"
+                    className="bg-input border-border text-foreground"
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="user-email" className="text-foreground">
+                    Email
+                  </Label>
+                  <Input
+                    id="user-email"
+                    type="email"
+                    value={newUser.email}
+                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                    placeholder="admin@empresa.com"
+                    className="bg-input border-border text-foreground"
+                  />
+                </div>
+
+                <div className="grid gap-2 md:col-span-2">
+                  <Label htmlFor="user-password" className="text-foreground">
+                    Contraseña (se encripta en backend)
+                  </Label>
+                  <Input
+                    id="user-password"
+                    type="password"
+                    value={newUser.password}
+                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                    placeholder="********"
+                    className="bg-input border-border text-foreground"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Nota: aquí capturamos la contraseña, pero el <b>hash</b> debe generarse en el servidor.
+                  </p>
+                </div>
+              </div>
+
+              {/* Role fijo por ahora */}
+              <div className="text-xs text-muted-foreground">
+                Rol asignado: <span className="font-medium text-foreground">Administrador</span> (roleId:{" "}
+                <span className="font-mono">{newUser.roleId}</span>)
+              </div>
+            </div>
           </div>
-          <DialogFooter>
+
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button
-              onClick={() => setIsModulesDialogOpen(false)}
+              variant="outline"
+              onClick={() => setIsCreateDialogOpen(false)}
+              className="border-border text-foreground hover:bg-secondary"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleCreateCompanyWithUser}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              Guardar Cambios
+              Crear Empresa y Usuario
             </Button>
           </DialogFooter>
         </DialogContent>
+
       </Dialog>
     </div>
   )

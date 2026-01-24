@@ -4,6 +4,8 @@
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { doLogout } from "@/lib/auth/logout";
+import { navigation } from "./navigation"
+
 
 import { useState } from "react";
 import Link from "next/link";
@@ -53,48 +55,6 @@ type NavigationItem =
       href?: never; // No tiene href
     };
 
-const navigation: NavigationItem[] = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  {
-    name: "Usuarios",
-    icon: UsersRound,
-    subItems: [
-      { name: "Gestión de Usuarios", href: "/dashboard/users", icon: Users },
-      { name: "Roles", href: "/dashboard/roles", icon: ShieldPlus},
-    ],
-  },
-  {
-    name: "Empleados",
-    icon: IdCardIcon,
-    subItems: [
-      { name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle }, 
-    ],
-  },
-
-  // { name: "Roles", href: "/dashboard/roles", icon: Shield }, // Puedes mover esta línea a subItems si lo deseas
-  { name: "Gestión Documental", href: "/dashboard/documents", icon: FileText },
-  //{ name: "Cargar Archivos", href: "/dashboard/upload", icon: Upload },
-  //{ name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle },
-  //{ name: "Auditorías", href: "/dashboard/audits", icon: ClipboardCheck },
-  {
-    name: "Planificación",
-    icon: CalendarDays,
-    subItems: [
-      { name: "Capacitaciones", href: "/dashboard/trainingPlan", icon: Brain }, 
-      //{ name: "Plan de Trabajo", href: "/dashboard/workingPlan", icon: ClipboardCheck },
-    ],
-  },
-  {
-    name: "Riesgos",
-    icon: TriangleAlert,
-    subItems: [
-      { name: "Laborales", href: "/dashboard/occupational", icon: BrickWallIcon },
-      { name: "Medidas de Prevención", href: "/dashboard/preventiveMeasures", icon: ShieldCheck },
-    ],
-  },
-
-  
-];
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
