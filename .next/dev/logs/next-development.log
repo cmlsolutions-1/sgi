@@ -1,490 +1,205 @@
-[00:00:03.882] Server  WARN     ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[00:00:04.448] Server  LOG      ✓ Ready in 3.3s
-[00:01:41.264] Server  LOG      ○ Compiling / ...
-[00:01:50.440] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:01:50.440] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
-[00:01:50.440] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769269757734}
-[00:02:12.681] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:02:12.681] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:02:12.681] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769269779980}
-[00:06:02.463] Server  LOG      ✓ Compiled in 369ms
-[00:06:05.822] Server  LOG      ✓ Compiled in 566ms
-[00:18:59.304] Server  LOG      ✓ Compiled in 1240ms
-[00:19:02.455] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_5817818b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:19:02.467] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:19:02.789] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:19:02.838] Server  ERROR    ⨯ ReferenceError: getModulesFromSidebar is not defined
-[00:19:07.466] Browser ERROR   uncaughtError: ReferenceError: getModulesFromSidebar is not defined
-[00:31:45.186] Server  LOG      ✓ Compiled in 993ms
-[00:31:45.247] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:31:45.249] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[00:31:45.259] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:31:47.948] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:31:47.991] Server  ERROR    ⨯ Error: Objects are not valid as a React child (found: object with keys {$$typeof, render}). If you meant to render a collection of children, use an array instead.
-[00:31:54.464] Browser ERROR   uncaughtError: Error: Objects are not valid as a React child (found: object with keys {$$typeof, render}). If you meant to render a collection of children, use an array instead.
-[00:33:45.165] Server  LOG      ✓ Compiled in 334ms
-[00:33:45.175] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:33:49.461] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:33:49.461] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:33:49.461] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769271676160}
-[00:34:03.563] Server  LOG      ✓ Compiled in 781ms
-[00:34:26.699] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:34:26.699] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:34:26.699] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769271714002}
-[00:34:36.645] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:34:36.645] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
-[00:34:36.645] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769271723960}
-[00:34:41.806] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:34:41.806] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
-[00:34:41.806] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769271729113}
-[00:34:48.647] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:34:48.647] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:34:48.647] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769271735963}
-[00:47:24.872] Server  LOG      ✓ Compiled in 958ms
-[00:47:45.041] Server  LOG      ✓ Compiled in 554ms
-[00:48:08.590] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:48:08.590] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:48:08.590] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769272535904}
-[00:49:02.280] Server  LOG      ○ Compiling /_not-found/page ...
-[00:49:08.505] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:49:08.505] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:49:08.505] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769272595814}
-[00:49:19.452] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:49:19.452] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[00:49:19.453] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769272606772}
-[00:49:33.556] Server  LOG      ✓ Compiled in 1331ms
-[00:55:26.403] Server  LOG      ✓ Compiled in 391ms
-[00:55:36.037] Server  LOG      ✓ Compiled in 382ms
-[00:56:03.156] Server  LOG      ✓ Compiled in 458ms
-[00:56:05.396] Server  LOG      ✓ Compiled in 522ms
-[00:56:16.930] Server  LOG      ✓ Compiled in 465ms
-[00:56:18.206] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:56:18.213] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b601273c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:56:18.217] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:56:18.237] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[00:56:22.462] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[00:56:41.592] Server  LOG      ✓ Compiled in 436ms
-[00:56:42.459] Browser ERROR   ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx:146:10
+[00:00:15.690] Server  WARN     ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+[00:00:19.526] Server  LOG      ✓ Ready in 14.2s
+[00:00:22.731] Server  LOG      ○ Compiling / ...
+[00:00:40.439] Server  LOG      ○ Compiling /login ...
+[00:00:43.124] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:43.440] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:43.440] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:00:43.440] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769276944511}
+[00:00:57.944] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:58.184] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:58.184] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:00:58.184] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769276959254}
+[00:01:07.227] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:08.912] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:01:08.912] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
+[00:01:08.912] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769276969611}
+[00:10:26.132] Server  LOG      ✓ Compiled in 1698ms
+[00:12:06.203] Server  LOG      ✓ Compiled in 1356ms
+[00:12:18.225] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:12:18.665] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:12:18.665] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
+[00:12:18.666] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769277639762}
+[00:12:27.115] Server  LOG      ✓ Compiled in 1712ms
+[00:12:31.128] Server  LOG      ✓ Compiled in 2.8s
+[00:12:38.430] Server  LOG      ✓ Compiled in 2.6s
+[00:13:15.892] Server  LOG      ○ Compiling /_error ...
+[00:13:21.910] Browser ERROR   uncaughtError: Error: An unexpected Turbopack error occurred. Please see the output of `next dev` for more details.
+[00:20:09.496] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:20:10.852] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:20:10.852] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
+[00:20:10.852] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769278111985}
+[00:37:42.434] Server  LOG      ✓ Compiled in 1162ms
+[00:37:52.953] Server  LOG      ✓ Compiled in 8.2s
+[00:38:39.581] Server  LOG      ✓ Compiled in 1366ms
+[00:38:44.884] Server  LOG      ✓ Compiled in 2.4s
+[00:38:46.038] Browser ERROR   ./components/manager/super-admin-dashboard.tsx:162:10
 Ecmascript file had an error
-  144 |   const router = useRouter();
-  145 |
-> 146 |   const [newCompany, setNewCompany] = useState({
-      |          ^^^^^^^^^^
-  147 |   name: "",
-  148 |   nit: "",
-  149 |   address: "",
+  160 |   })
+  161 |
+> 162 |   const [newUser, setNewUser] = useState({
+      |          ^^^^^^^
+  163 |     name: "",
+  164 |     email: "",
+  165 |     password: "",
 
-the name `newCompany` is defined multiple times
+the name `newUser` is defined multiple times
 
 Import trace:
   Server Component:
-    ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx
-    ./Desktop/react/sgi/app/manager/page.tsx
-[00:56:42.459] Browser ERROR   ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx:146:22
+    ./components/manager/super-admin-dashboard.tsx
+    ./app/manager/page.tsx
+[00:38:46.039] Browser ERROR   ./components/manager/super-admin-dashboard.tsx:162:19
 Ecmascript file had an error
-  144 |   const router = useRouter();
-  145 |
-> 146 |   const [newCompany, setNewCompany] = useState({
-      |                      ^^^^^^^^^^^^^
-  147 |   name: "",
-  148 |   nit: "",
-  149 |   address: "",
+  160 |   })
+  161 |
+> 162 |   const [newUser, setNewUser] = useState({
+      |                   ^^^^^^^^^^
+  163 |     name: "",
+  164 |     email: "",
+  165 |     password: "",
 
-the name `setNewCompany` is defined multiple times
+the name `setNewUser` is defined multiple times
 
 Import trace:
   Server Component:
-    ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx
-    ./Desktop/react/sgi/app/manager/page.tsx
-[00:56:42.459] Browser ERROR   ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx:146:10
+    ./components/manager/super-admin-dashboard.tsx
+    ./app/manager/page.tsx
+[00:38:50.321] Browser ERROR   ./components/manager/super-admin-dashboard.tsx:162:10
 Ecmascript file had an error
-  144 |   const router = useRouter();
-  145 |
-> 146 |   const [newCompany, setNewCompany] = useState({
-      |          ^^^^^^^^^^
-  147 |   name: "",
-  148 |   nit: "",
-  149 |   address: "",
+  160 |   })
+  161 |
+> 162 |   const [newUser, setNewUser] = useState({
+      |          ^^^^^^^
+  163 |     name: "",
+  164 |     email: "",
+  165 |     password: "",
 
-the name `newCompany` is defined multiple times
+the name `newUser` is defined multiple times
 
 Import trace:
   Server Component:
-    ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx
-    ./Desktop/react/sgi/app/manager/page.tsx
-[00:56:42.459] Browser ERROR   ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx:146:22
+    ./components/manager/super-admin-dashboard.tsx
+    ./app/manager/page.tsx
+[00:38:50.321] Browser ERROR   ./components/manager/super-admin-dashboard.tsx:162:19
 Ecmascript file had an error
-  144 |   const router = useRouter();
-  145 |
-> 146 |   const [newCompany, setNewCompany] = useState({
-      |                      ^^^^^^^^^^^^^
-  147 |   name: "",
-  148 |   nit: "",
-  149 |   address: "",
+  160 |   })
+  161 |
+> 162 |   const [newUser, setNewUser] = useState({
+      |                   ^^^^^^^^^^
+  163 |     name: "",
+  164 |     email: "",
+  165 |     password: "",
 
-the name `setNewCompany` is defined multiple times
+the name `setNewUser` is defined multiple times
 
 Import trace:
   Server Component:
-    ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx
-    ./Desktop/react/sgi/app/manager/page.tsx
-[00:56:48.985] Server  LOG      ✓ Compiled in 382ms
-[00:56:49.634] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:56:49.638] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b601273c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:56:49.643] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:56:49.645] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[00:56:49.716] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:56:49.717] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[00:56:49.718] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:56:49.923] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:56:49.925] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b601273c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:56:49.926] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:56:49.929] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[00:56:52.473] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[00:57:20.378] Server  LOG      ✓ Compiled in 306ms
-[00:57:20.386] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:57:20.387] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[00:57:20.394] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:57:21.251] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:57:21.256] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b601273c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:57:21.261] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:57:21.264] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[00:57:24.467] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:01:11.787] Server  LOG      ✓ Compiled in 320ms
-[01:01:12.452] Browser ERROR   ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx:42:10
+    ./components/manager/super-admin-dashboard.tsx
+    ./app/manager/page.tsx
+[00:39:03.432] Server  LOG      ✓ Compiled in 1517ms
+[00:39:04.684] Browser ERROR   ./components/manager/super-admin-dashboard.tsx:162:10
 Ecmascript file had an error
-  40 | } from "lucide-react"
-  41 | import nivelRiesgos from "@/lib/nivelRiesgos.json"
-> 42 | import { getModulesFromSidebar } from "@/lib/modules"
-     |          ^^^^^^^^^^^^^^^^^^^^^
-  43 |
-  44 |
-  45 |
+  160 |   })
+  161 |
+> 162 |   const [newUser, setNewUser] = useState({
+      |          ^^^^^^^
+  163 |     name: "",
+  164 |     email: "",
+  165 |     password: "",
 
-the name `getModulesFromSidebar` is defined multiple times
+the name `newUser` is defined multiple times
 
 Import trace:
   Server Component:
-    ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx
-    ./Desktop/react/sgi/app/manager/page.tsx
-[01:01:24.048] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:01:24.050] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b601273c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:01:24.053] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:01:24.056] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:01:24.129] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:01:27.468] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:02:11.454] Server  LOG      ✓ Compiled in 569ms
-[01:02:11.473] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:02:11.474] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[01:02:11.480] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:02:12.351] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:02:12.358] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b601273c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:02:12.368] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:02:12.370] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:02:15.457] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:02:32.860] Server  LOG      ✓ Compiled in 450ms
-[01:02:32.866] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:02:32.867] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[01:02:32.874] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:02:33.559] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:02:33.563] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b601273c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:02:33.566] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:02:33.568] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:02:37.465] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:03:17.970] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:03:17.971] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[01:03:17.973] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:03:17.987] Server  LOG      ✓ Compiled in 589ms
-[01:03:18.909] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:03:18.913] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b601273c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:03:18.917] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:03:18.919] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:03:22.461] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:03:39.941] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:03:39.943] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[01:03:39.944] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:03:39.962] Server  LOG      ✓ Compiled in 280ms
-[01:03:40.782] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:03:40.786] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b601273c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:03:40.790] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:03:40.794] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:03:43.464] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:04:02.880] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:04:02.881] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[01:04:02.883] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:04:02.896] Server  LOG      ✓ Compiled in 564ms
-[01:04:03.821] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:04:03.827] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b601273c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:04:03.831] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:04:03.833] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:04:06.455] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:04:28.060] Server  LOG      ✓ Compiled in 742ms
-[01:04:28.142] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:04:28.147] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[01:04:29.287] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:04:29.296] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b601273c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:04:29.314] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:04:29.319] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:04:29.475] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:04:29.918] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:04:29.922] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b601273c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:04:29.926] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:04:29.953] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:04:33.459] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:05:02.460] Server  LOG      ✓ Compiled in 651ms
-[01:05:02.470] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:05:02.474] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[01:05:02.478] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:05:03.228] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:05:03.232] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_b601273c._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:05:03.238] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:05:03.241] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:05:06.464] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:07:12.746] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:07:12.799] Server  LOG      ✓ Compiled in 895ms
-[01:07:13.736] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:07:13.743] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_6015db28._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:07:13.748] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:07:13.750] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:07:13.885] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:07:13.886] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[01:07:13.888] Browser ERROR   unhandledRejection: Error: No link element found for chunk /_next/static/chunks/%5Broot-of-the-server%5D__5207b241._.css
-[01:07:13.895] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:07:14.261] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:07:14.280] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_6015db28._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:07:14.283] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:07:14.295] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:07:19.466] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:07:29.713] Server  LOG      ✓ Compiled in 658ms
-[01:07:29.742] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:07:29.743] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[01:07:29.747] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:07:30.750] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:07:30.758] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_6015db28._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:07:30.779] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:07:30.782] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:07:36.696] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:09:01.546] Server  LOG      ✓ Compiled in 443ms
-[01:09:01.566] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:09:01.567] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[01:09:01.572] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:09:02.184] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:09:02.188] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_6015db28._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:09:02.192] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:09:02.195] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:09:05.453] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:09:15.506] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:09:15.508] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_6015db28._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:09:15.509] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:09:15.510] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:09:16.674] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:09:49.538] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:09:49.539] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_6015db28._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:09:49.540] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:09:49.541] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:09:50.612] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:10:34.968] Server  LOG      ✓ Compiled in 707ms
-[01:10:35.092] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:10:35.100] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[01:10:35.118] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:10:36.721] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:10:36.733] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_6015db28._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:10:36.740] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:10:36.750] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:10:37.486] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:10:37.531] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_6015db28._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:10:37.539] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:10:37.596] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:10:39.655] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:10:52.147] Server  LOG      ✓ Compiled in 981ms
-[01:10:52.154] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:10:52.159] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[01:10:52.168] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:10:53.914] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:10:53.920] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_6015db28._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:10:53.926] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:10:53.929] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:10:54.149] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:10:54.153] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[01:10:54.154] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:10:55.983] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:10:56.248] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\Desktop_react_sgi_6015db28._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:10:56.349] Server  ERROR   C:\Users\apoyo\Desktop\react\sgi\.next\dev\server\chunks\ssr\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[01:10:56.402] Server  ERROR    ⨯ Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:10:56.661] Server  LOG      ✓ Compiled in 4ms
-[01:10:59.298] Browser ERROR   uncaughtError: Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
-[01:11:04.580] Server  LOG      ✓ Compiled in 879ms
-[01:11:04.860] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:11:04.896] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[01:11:04.908] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:11:08.014] Server  LOG      ✓ Compiled in 1478ms
-[01:11:08.061] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:11:08.070] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./Desktop/react/sgi/components/manager/super-admin-dashboard.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[01:11:08.071] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[01:11:10.730] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[01:11:10.730] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
-[01:11:10.730] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769273918054}
+    ./components/manager/super-admin-dashboard.tsx
+    ./app/manager/page.tsx
+[00:39:04.684] Browser ERROR   ./components/manager/super-admin-dashboard.tsx:162:19
+Ecmascript file had an error
+  160 |   })
+  161 |
+> 162 |   const [newUser, setNewUser] = useState({
+      |                   ^^^^^^^^^^
+  163 |     name: "",
+  164 |     email: "",
+  165 |     password: "",
+
+the name `setNewUser` is defined multiple times
+
+Import trace:
+  Server Component:
+    ./components/manager/super-admin-dashboard.tsx
+    ./app/manager/page.tsx
+[00:39:26.963] Server  LOG      ✓ Compiled in 1272ms
+[00:39:29.117] Browser ERROR   ./components/manager/super-admin-dashboard.tsx:162:10
+Ecmascript file had an error
+  160 |   })
+  161 |
+> 162 |   const [newUser, setNewUser] = useState({
+      |          ^^^^^^^
+  163 |     name: "",
+  164 |     email: "",
+  165 |     password: "",
+
+the name `newUser` is defined multiple times
+
+Import trace:
+  Server Component:
+    ./components/manager/super-admin-dashboard.tsx
+    ./app/manager/page.tsx
+[00:39:29.117] Browser ERROR   ./components/manager/super-admin-dashboard.tsx:162:19
+Ecmascript file had an error
+  160 |   })
+  161 |
+> 162 |   const [newUser, setNewUser] = useState({
+      |                   ^^^^^^^^^^
+  163 |     name: "",
+  164 |     email: "",
+  165 |     password: "",
+
+the name `setNewUser` is defined multiple times
+
+Import trace:
+  Server Component:
+    ./components/manager/super-admin-dashboard.tsx
+    ./app/manager/page.tsx
+[00:39:29.350] Server  LOG      ✓ Compiled in 1229ms
+[00:39:29.861] Browser ERROR   ./components/manager/super-admin-dashboard.tsx:162:10
+Ecmascript file had an error
+  160 |   })
+  161 |
+> 162 |   const [newUser, setNewUser] = useState({
+      |          ^^^^^^^
+  163 |     name: "",
+  164 |     email: "",
+  165 |     password: "",
+
+the name `newUser` is defined multiple times
+
+Import trace:
+  Server Component:
+    ./components/manager/super-admin-dashboard.tsx
+    ./app/manager/page.tsx
+[00:39:29.861] Browser ERROR   ./components/manager/super-admin-dashboard.tsx:162:19
+Ecmascript file had an error
+  160 |   })
+  161 |
+> 162 |   const [newUser, setNewUser] = useState({
+      |                   ^^^^^^^^^^
+  163 |     name: "",
+  164 |     email: "",
+  165 |     password: "",
+
+the name `setNewUser` is defined multiple times
+
+Import trace:
+  Server Component:
+    ./components/manager/super-admin-dashboard.tsx
+    ./app/manager/page.tsx
+[00:47:48.592] Server  LOG      ✓ Compiled in 3.4s
+[00:49:12.734] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:49:13.287] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:49:13.287] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/manager","route":"/manager"}
+[00:49:13.287] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/manager color: rgb(120, 120, 120) color: inherit {"dp":"/manager","o":"http://localhost:3000/manager","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1769279854493}
+[00:52:03.388] Server  LOG      ✓ Compiled in 1543ms
+[00:52:16.750] Server  LOG      ✓ Compiled in 1504ms
