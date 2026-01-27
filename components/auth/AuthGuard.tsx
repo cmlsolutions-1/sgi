@@ -16,7 +16,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     if (!token) {
       const next = encodeURIComponent(pathname);
       router.replace(`/login?next=${next}`);
-      return; // 👈 no marcamos ready
+      return; // no marcamos ready
     }
 
     setReady(true);
