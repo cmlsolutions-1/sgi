@@ -38,7 +38,7 @@ export async function logoutRequest(): Promise<void> {
       },
     });
   } finally {
-    // Pase lo que pase, limpiamos el token local
+    // Pase lo que pase, limpiamos el token local mejor
     localStorage.removeItem(ACCESS_TOKEN_KEY);
   }
 }
