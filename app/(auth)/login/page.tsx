@@ -35,6 +35,8 @@ export default function LoginPage() {
   const [error, setError] = useState<string>("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const [userId, setUserId] = useState<string>("");
+
   const canConsult = useMemo(() => email.trim().includes("@"), [email]);
 
   async function handleConsult() {
@@ -53,15 +55,18 @@ export default function LoginPage() {
       }
 
       const data = await res.json();
+      
       const list: Company[] = data?.companies ?? [];
 
       setCompanies(list);
       setRole(data?.role ?? null);
+      setUserId(data?.userId ?? "");
 
       if (list.length === 1) setCompanyId(list[0].id);
       setStep(2);
 
       if (list.length === 0) setError("No hay empresas asociadas a este correo.");
+
     } catch {
       setError("Error al consultar. Intenta nuevamente.");
     } finally {
@@ -74,16 +79,24 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
+    //debug
+    console.log("LOGIN DATA:", {
+    email,
+    userId,
+    companyId,
+    password,
+  });
+
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, companyId, password }),
+        body: JSON.stringify({ userId, companyId, password }),
       });
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        setError(err?.error ?? "Credenciales incorrectas");
+        setError(err?.error ?? err?.message ?? "Credenciales incorrectas");
         return;
       }
 
@@ -104,6 +117,7 @@ export default function LoginPage() {
     setPassword("");
     setRole(null);
     setError("");
+    setUserId("");
   }
 
   return (

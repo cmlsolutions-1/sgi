@@ -1,5 +1,6 @@
 // app/manager/layout.tsx
 import type { Metadata } from "next";
+import AuthGuard from "@/components/auth/AuthGuard";
 
 export const metadata: Metadata = {
   title: "Super Administrador",
@@ -20,5 +21,5 @@ export default function ManagerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <AuthGuard>{children}</AuthGuard>;
 }

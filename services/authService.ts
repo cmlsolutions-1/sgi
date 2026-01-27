@@ -2,11 +2,11 @@
 
 import type { LoginResponse } from "@/interfaces/auth.interface";
 
-export async function loginRequest(email: string, password: string): Promise<LoginResponse> {
+export async function loginRequest(userId: string, password: string): Promise<LoginResponse> {
   const response = await fetch("/api/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ userId, password }),
   });
 
   const data = await response.json().catch(() => null);
