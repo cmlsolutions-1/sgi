@@ -1,35 +1,35 @@
+//components/auth/AuthGuard.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-
-const TOKEN_KEY = "sgc_at";
+import { useAuthStore } from "@/store/auth.store";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [ready, setReady] = useState(false);
+
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const hasHydrated = useAuthStore((s) => s.hasHydrated);
 
   useEffect(() => {
-    const token = localStorage.getItem(TOKEN_KEY);
+    if (!hasHydrated) return;
 
-    if (!token) {
-      const next = encodeURIComponent(pathname);
-      router.replace(`/login?next=${next}`);
-      return; // no marcamos ready
+    if (!accessToken) {
+      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
     }
+  }, [hasHydrated, accessToken, router, pathname]);
 
-    setReady(true);
-  }, [router, pathname]);
-
-  // Mientras valida, NO renderiza el contenido protegido
-  if (!ready) {
+  if (!hasHydrated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p>Cargando...</p>
       </div>
     );
   }
+
+  if (!accessToken) return null;
 
   return <>{children}</>;
 }
