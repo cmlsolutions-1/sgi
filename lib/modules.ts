@@ -2,7 +2,7 @@
 import type { NavigationItem } from "@/components/dashboard/navigation"
 import { navigation } from "@/components/dashboard/navigation"
 
-// aquí icon NO es ReactNode, es el componente (ElementType)
+// aaquí icon NO es ReactNode, es el componente (ElementType)
 export type Module = {
   id: string
   name: string
