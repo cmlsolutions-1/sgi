@@ -10,17 +10,25 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Building2 } from "lucide-react";
+import { getMyModules } from "@/services/modulesService";
 
 import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AlertCircle, Eye, EyeOff, Lock, User } from "lucide-react";
 
+
+import { isManagerUser } from "@/lib/permissions";
+import { useAuthStore, type AuthState } from "@/store/auth.store";
+
 type Company = { id: string; name: string };
 type Role = "superadmin" | "asesor" | "empresa";
 
 export default function LoginPage() {
   const router = useRouter();
+  const setTokens = useAuthStore((s: AuthState) => s.setTokens);
+  const setModules = useAuthStore((s: AuthState) => s.setModules);
+
 
   const [step, setStep] = useState<1 | 2>(1);
   const [loading, setLoading] = useState(false);
@@ -75,40 +83,55 @@ export default function LoginPage() {
   }
 
   async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    //debug
-    console.log("LOGIN DATA:", {
-    email,
-    userId,
-    companyId,
-    password,
-  });
+  console.log("LOGIN DATA:", { email, userId, companyId, password });
 
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, companyId, password }),
-      });
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      // si tu backend NO necesita companyId, quítalo aquí
+      body: JSON.stringify({ userId, password }),
+    });
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        setError(err?.error ?? err?.message ?? "Credenciales incorrectas");
-        return;
-      }
+    // leer JSON UNA SOLA VEZ
+    const json = await res.json().catch(() => ({}));
+    console.log("LOGIN RESPONSE:", res.status, json);
 
-      if (role === "superadmin") router.push("/manager");
-      else router.push("/dashboard");
-      router.refresh();
-    } catch {
-      setError("Error al iniciar sesión. Intente nuevamente.");
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      setError(json?.error ?? json?.message ?? "Credenciales incorrectas");
+      return;
     }
+
+    //  validar tokens
+    if (!json?.token || !json?.refreshToken) {
+      setError("Login OK pero faltan tokens (token/refreshToken)");
+      return;
+    }
+
+    // guardar tokens en Zustand
+    setTokens(json.token, json.refreshToken);
+
+    //  cargar módulos
+    const modules = await getMyModules();
+    setModules(modules);
+
+    //  redirect por módulos
+    if (isManagerUser(modules)) router.push("/manager");
+    else router.push("/dashboard");
+
+    router.refresh();
+  } catch (err) {
+    console.error("LOGIN ERROR:", err);
+    setError("Error al iniciar sesión. Intente nuevamente.");
+  } finally {
+    setLoading(false);
   }
+}
+
 
   function resetToStep1() {
     setStep(1);

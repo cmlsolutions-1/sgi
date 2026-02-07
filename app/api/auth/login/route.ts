@@ -1,5 +1,4 @@
 // app/api/auth/login/route.ts
-
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -30,16 +29,18 @@ export async function POST(req: Request) {
       );
     }
 
-    // Tokens reales del backend
     const token = backendJson?.data?.accesToken;
-    if (!token) {
-      return NextResponse.json({ error: "Token faltante" }, { status: 502 });
+    const refreshToken = backendJson?.data?.refreshToken;
+
+    if (!token || !refreshToken) {
+      return NextResponse.json({ error: "Tokens faltantes" }, { status: 502 });
     }
 
-    // Manteniendo tu interface actual (token + user)
+    // mantenemos tu formato, pero devolvemos refreshToken también
     return NextResponse.json(
       {
         token,
+        refreshToken,
         user: {
           _id: userId,
           id: userId,

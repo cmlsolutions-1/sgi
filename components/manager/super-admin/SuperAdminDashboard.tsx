@@ -39,8 +39,8 @@ export default function SuperAdminDashboard() {
 
   async function handleLogout() {
     await doLogout()
-    router.push("/login")
-    router.refresh()
+    //router.replace("/login")
+    //router.refresh()
   }
 
   return (
