@@ -28,7 +28,7 @@ type Props = {
     phone: string
     email: string
     status: CompanyStatus
-  }) => void
+  }) => Promise<void>
 }
 
 export function CreateCompanyDialog({ onCreate }: Props) {
@@ -43,11 +43,11 @@ export function CreateCompanyDialog({ onCreate }: Props) {
     status: "active" as CompanyStatus,
   })
 
-  const submit = () => {
-    onCreate(form)
-    setForm({ name: "", nit: "", address: "", phone: "", email: "", status: "active" })
-    setOpen(false)
-  }
+  const submit = async () => {
+  await onCreate(form)
+  setForm({ name: "", nit: "", address: "", phone: "", email: "", status: "active" })
+  setOpen(false)
+}
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

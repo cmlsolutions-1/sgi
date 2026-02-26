@@ -1,20 +1,24 @@
-// hooks/manager/useSuperAdmin.ts
-
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import type { Company, CompanyStatus, User, UserStatus } from "@/types/manager/super-admin"
 import type { Module } from "@/lib/modules"
 import { getModulesFromSidebar } from "@/lib/modules"
 
-import { INITIAL_COMPANIES, INITIAL_USERS } from "@/data/manager/super-admin.seed"
-import type { NivelRiesgoItem } from "@/types/manager/super-admin"
+// puedes dejar users seed si aún no integras usuarios
+import { INITIAL_USERS } from "@/data/manager/super-admin.seed"
 
+import { listCompanies, createCompany as createCompanyRequest} from "@/services/companyService"
 
 export function useSuperAdmin() {
-  const [companies, setCompanies] = useState<Company[]>(INITIAL_COMPANIES)
+  // ahora empezamos vacío y cargamos del backend
+  const [companies, setCompanies] = useState<Company[]>([])
   const [users, setUsers] = useState<User[]>(INITIAL_USERS)
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null)
+
+  // opcional: estados de UI
+  const [loadingCompanies, setLoadingCompanies] = useState(false)
+  const [companyError, setCompanyError] = useState<string | null>(null)
 
   const AVAILABLE_MODULES: Module[] = useMemo(() => getModulesFromSidebar(), [])
 
@@ -23,9 +27,9 @@ export function useSuperAdmin() {
       totalCompanies: companies.length,
       activeCompanies: companies.filter((c) => c.status === "active").length,
       totalUsers: companies.reduce((acc, c) => acc + c.totalUsers, 0),
-      avgModulesPerCompany: (
-        companies.reduce((acc, c) => acc + c.activeModules.length, 0) / companies.length
-      ).toFixed(1),
+      avgModulesPerCompany: companies.length
+        ? (companies.reduce((acc, c) => acc + c.activeModules.length, 0) / companies.length).toFixed(1)
+        : "0.0",
     }
   }, [companies])
 
@@ -35,7 +39,48 @@ export function useSuperAdmin() {
 
   const selectCompany = (company: Company) => setSelectedCompany(company)
 
-  const createCompany = (payload: {
+  async function refreshCompanies() {
+    setLoadingCompanies(true)
+    setCompanyError(null)
+
+    try {
+      const data = await listCompanies()
+
+      // tu backend solo devuelve {id,name}
+      // entonces mapeamos a tu tipo Company con defaults
+      const mapped: Company[] = data.map((c) => ({
+        id: c.id,
+        name: c.name,
+        nit: "",              // no viene del backend en este endpoint
+        address: "",
+        phone: "",
+        email: "",
+        registrationDate: "", // idem
+        status: "active",     // default (ajusta si tu negocio dice otra cosa)
+        activeModules: ["usuarios"], // default
+        totalUsers: 0,        // default
+      }))
+
+      setCompanies(mapped)
+
+      // mantener selección si existía
+      setSelectedCompany((prev) => {
+        if (!prev) return mapped[0] ?? null
+        return mapped.find((x) => x.id === prev.id) ?? (mapped[0] ?? null)
+      })
+    } catch (e: any) {
+      setCompanyError(e?.message ?? "Error cargando compañías")
+    } finally {
+      setLoadingCompanies(false)
+    }
+  }
+
+  useEffect(() => {
+    refreshCompanies()
+  }, [])
+
+  // ahora crea en backend
+  const createCompany = async (payload: {
     name: string
     nit: string
     address: string
@@ -45,12 +90,22 @@ export function useSuperAdmin() {
   }) => {
     if (!payload.name || !payload.nit || !payload.email) return
 
-    const today = new Date().toISOString().split("T")[0]
-    const companyId = Date.now().toString()
+    setCompanyError(null)
 
+    const created = await createCompanyRequest({
+  name: payload.name,
+  nit: payload.nit,
+  address: payload.address,
+  phone: payload.phone,
+  email: payload.email,
+})
+
+    const today = new Date().toISOString().split("T")[0]
+
+    // como el backend responde {id,name}, completamos el resto con payload/defaults
     const company: Company = {
-      id: companyId,
-      name: payload.name,
+      id: created.id,
+      name: created.name,
       nit: payload.nit,
       address: payload.address,
       phone: payload.phone,
@@ -119,6 +174,9 @@ export function useSuperAdmin() {
     AVAILABLE_MODULES,
     stats,
     companyUsers,
+    loadingCompanies,
+    companyError,
+    refreshCompanies,
     selectCompany,
     createCompany,
     createUser,

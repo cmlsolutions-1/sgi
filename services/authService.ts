@@ -1,3 +1,4 @@
+
 //services/authService.ts
 
 import type { LoginResponse } from "@/interfaces/auth.interface";
@@ -43,13 +44,13 @@ export async function logoutRequest(): Promise<void> {
       }
     }
   } finally {
-    // ✅ 1) limpia el estado en memoria
+    // 1) limpia el estado en memoria
     store.clear();
 
-    // ✅ 2) borra el storage persistido de zustand (CRÍTICO)
+    // 2) borra el storage persistido de zustand (CRÍTICO)
     await useAuthStore.persist.clearStorage();
 
-    // ✅ 3) borra llaves legacy por si quedaron de antes
+    // 3) borra llaves legacy por si quedaron de antes
     localStorage.removeItem("sgc_at");
     localStorage.removeItem("sgc_rt");
     localStorage.removeItem("sgc_role");
