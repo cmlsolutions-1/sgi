@@ -1,19 +1,18 @@
+//hooks/manager/useSuperAdmin.ts
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
 import type { Company, CompanyStatus, User, UserStatus } from "@/types/manager/super-admin"
 import type { Module } from "@/lib/modules"
 import { getModulesFromSidebar } from "@/lib/modules"
-
-// puedes dejar users seed si aún no integras usuarios
-import { INITIAL_USERS } from "@/data/manager/super-admin.seed"
-
-import { listCompanies, createCompany as createCompanyRequest} from "@/services/companyService"
+import {
+  listCompanies,
+  createCompany as createCompanyRequest,
+} from "@/services/companyService"
 
 export function useSuperAdmin() {
   // ahora empezamos vacío y cargamos del backend
   const [companies, setCompanies] = useState<Company[]>([])
-  const [users, setUsers] = useState<User[]>(INITIAL_USERS)
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null)
 
   // opcional: estados de UI
@@ -28,14 +27,12 @@ export function useSuperAdmin() {
       activeCompanies: companies.filter((c) => c.status === "active").length,
       totalUsers: companies.reduce((acc, c) => acc + c.totalUsers, 0),
       avgModulesPerCompany: companies.length
-        ? (companies.reduce((acc, c) => acc + c.activeModules.length, 0) / companies.length).toFixed(1)
+        ? (companies.reduce((acc, c) => acc + c.activeModules.length, 0) / 
+        companies.length).toFixed(1)
         : "0.0",
     }
   }, [companies])
 
-  const companyUsers = useMemo(() => {
-    return selectedCompany ? users.filter((u) => u.companyId === selectedCompany.id) : []
-  }, [users, selectedCompany])
 
   const selectCompany = (company: Company) => setSelectedCompany(company)
 
@@ -46,8 +43,6 @@ export function useSuperAdmin() {
     try {
       const data = await listCompanies()
 
-      // tu backend solo devuelve {id,name}
-      // entonces mapeamos a tu tipo Company con defaults
       const mapped: Company[] = data.map((c) => ({
         id: c.id,
         name: c.name,
@@ -92,13 +87,14 @@ export function useSuperAdmin() {
 
     setCompanyError(null)
 
-    const created = await createCompanyRequest({
-  name: payload.name,
-  nit: payload.nit,
-  address: payload.address,
-  phone: payload.phone,
-  email: payload.email,
-})
+    try {
+      const created = await createCompanyRequest({
+        name: payload.name,
+        nit: payload.nit,
+        address: payload.address,
+        phone: payload.phone,
+        email: payload.email,
+      })
 
     const today = new Date().toISOString().split("T")[0]
 
@@ -119,36 +115,13 @@ export function useSuperAdmin() {
     setCompanies((prev) => [...prev, company])
     setSelectedCompany(company)
   }
-
-  const createUser = (payload: {
-    name: string
-    email: string
-    password: string
-    roleId: string
-    status: UserStatus
-  }) => {
-    if (!selectedCompany) return
-    if (!payload.name || !payload.email || !payload.password) return
-
-    const today = new Date().toISOString().split("T")[0]
-
-    const user: User = {
-      id: Date.now().toString(),
-      companyId: selectedCompany.id,
-      name: payload.name,
-      email: payload.email,
-      roleId: payload.roleId,
-      status: payload.status,
-      creationDate: today,
+     catch (e: any) {
+      setCompanyError(e?.message ?? "Error creando compañía")
+      throw e
     }
-
-    setUsers((prev) => [...prev, user])
-
-    setCompanies((prev) =>
-      prev.map((c) => (c.id === selectedCompany.id ? { ...c, totalUsers: c.totalUsers + 1 } : c))
-    )
   }
 
+  
   const toggleModule = (moduleId: string) => {
     if (!selectedCompany) return
 
@@ -169,17 +142,14 @@ export function useSuperAdmin() {
 
   return {
     companies,
-    users,
     selectedCompany,
     AVAILABLE_MODULES,
     stats,
-    companyUsers,
     loadingCompanies,
     companyError,
     refreshCompanies,
     selectCompany,
     createCompany,
-    createUser,
     toggleModule,
   }
 }

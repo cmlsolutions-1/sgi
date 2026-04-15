@@ -1,7 +1,7 @@
 // components/manager/super-admin/SuperAdminDashboard.tsx
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { LogOut } from "lucide-react"
 import { doLogout } from "@/lib/auth/logout"
@@ -11,6 +11,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 
 import { useSuperAdmin } from "@/hooks/manager/useSuperAdmin"
 import { useCiiu } from "@/hooks/manager/useCiiu"
+import { useUsers } from "@/hooks/useUsers"
 
 import { CiiuCard } from "@/components/manager/super-admin/dialogs/CiiuCard"
 import { CompaniesCard } from "@/components/manager/super-admin/dialogs/CompaniesCard"
@@ -28,19 +29,31 @@ export default function SuperAdminDashboard() {
     selectedCompany,
     AVAILABLE_MODULES,
     stats,
-    companyUsers,
     selectCompany,
     createCompany,
-    createUser,
     toggleModule,
   } = useSuperAdmin()
 
+  const {
+    users,
+    loading: usersLoading,
+    fetchUsers,
+    createUser,
+    updateUser,
+    deleteUser,
+  } = useUsers(false)
+
   const [modulesOpen, setModulesOpen] = useState(false)
+
+
+  useEffect(() => {
+    if (selectedCompany) {
+      fetchUsers()
+    }
+  }, [selectedCompany, fetchUsers])
 
   async function handleLogout() {
     await doLogout()
-    //router.replace("/login")
-    //router.refresh()
   }
 
   return (
@@ -116,8 +129,12 @@ export default function SuperAdminDashboard() {
           <UsersCard
             companyName={selectedCompany?.name}
             hasCompanySelected={Boolean(selectedCompany)}
-            users={companyUsers}
+            users={users}
+            loading={usersLoading}
             onCreateUser={createUser}
+            onUpdateUser={updateUser}
+            onDeleteUser={deleteUser}
+            onRefresh={fetchUsers}
           />
         </div>
 
