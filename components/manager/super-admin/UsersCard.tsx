@@ -22,10 +22,10 @@ import {
 
 type Props = {
   companyName?: string
+  companyId?: string  
   hasCompanySelected: boolean
   users: User[]
   loading: boolean
-  // ✅ Tipos corregidos para coincidir con useUsers
   onCreateUser: (payload: CreateUserDto) => Promise<User | null>
   onUpdateUser: (id: string, payload: UpdateUserDto) => Promise<boolean>
   onDeleteUser: (id: string) => Promise<boolean>
@@ -34,6 +34,7 @@ type Props = {
 
 export function UsersCard({
   companyName,
+  companyId,
   hasCompanySelected,
   users,
   loading,
@@ -94,6 +95,7 @@ export function UsersCard({
           <CreateUserDialog
             disabled={!hasCompanySelected || loading}
             companyName={companyName}
+            companyId={companyId || ""}  // ✅ Pasar companyId
             loading={loading}
             onCreate={onCreateUser}
           />
@@ -131,9 +133,7 @@ export function UsersCard({
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => {
-                      // TODO: Implementar diálogo de edición
-                    }}
+                    onClick={() => {}}
                     className="h-8 w-8 text-muted-foreground hover:text-foreground"
                   >
                     <Edit2 className="h-4 w-4" />

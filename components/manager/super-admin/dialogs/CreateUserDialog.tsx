@@ -1,7 +1,7 @@
 // components/manager/super-admin/dialogs/CreateUserDialog.tsx
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,57 +14,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Plus, Loader2 } from "lucide-react"
-import type { CreateUserDto, User } from "@/types/manager/user"
-import { useRoles } from "@/hooks/useRoles"
+import type { CreateCompanyAdminDto } from "@/types/manager/user"
+import type { User } from "@/types/manager/user"
 
 type Props = {
   disabled?: boolean
   companyName?: string
   loading?: boolean
-  onCreate: (payload: CreateUserDto) => Promise<User | null> | Promise<void>
+  onCreate: (payload: CreateCompanyAdminDto) => Promise<User | null> | Promise<void>
 }
 
 export function CreateUserDialog({ disabled, companyName, loading, onCreate }: Props) {
   const [open, setOpen] = useState(false)
-  const { roles, loading: loadingRoles, getRoleByName } = useRoles(false)
-  const [form, setForm] = useState<CreateUserDto>({
+
+  // ✅ Form SIN rolesIds
+  const [form, setForm] = useState<CreateCompanyAdminDto>({
     name: "",
     email: "",
     phone: "",
     password: "",
-    rolesIds: [],
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
-
-  // Cargar roles cuando se abre el diálogo
-  useEffect(() => {
-    if (open && roles.length === 0) {
-      // useRoles ya maneja el fetch si autoFetch=true
-      // Si usas autoFetch=false, descomenta:
-      // fetchRoles()
-    }
-  }, [open, roles.length])
-
-  // Seleccionar rol por defecto cuando carguen los roles
-  useEffect(() => {
-    if (roles.length > 0 && form.rolesIds.length === 0) {
-      // Prioridad: buscar "admin", luego "ADMIN", luego primer rol activo
-      const adminRole = getRoleByName("admin") || getRoleByName("ADMIN")
-      const defaultRole = adminRole || roles[0]
-      
-      if (defaultRole) {
-        setForm((prev) => ({ ...prev, rolesIds: [defaultRole.id] }))
-      }
-    }
-  }, [roles, getRoleByName, form.rolesIds.length])
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -85,10 +56,6 @@ export function CreateUserDialog({ disabled, companyName, loading, onCreate }: P
       newErrors.password = "Mínimo 6 caracteres"
     }
 
-    if (form.rolesIds.length === 0) {
-      newErrors.rolesIds = "Debe seleccionar al menos un rol"
-    }
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -102,36 +69,17 @@ export function CreateUserDialog({ disabled, companyName, loading, onCreate }: P
       return
     }
 
-    // Éxito → limpiar y cerrar
-    const defaultRoleId = form.rolesIds[0]
-    
-    setForm({
-      name: "",
-      email: "",
-      phone: "",
-      password: "",
-      rolesIds: defaultRoleId ? [defaultRoleId] : [],
-    })
+    setForm({ name: "", email: "", phone: "", password: "" })
     setErrors({})
     setOpen(false)
   }
 
-  const handleChange = (field: keyof CreateUserDto, value: string) => {
+  const handleChange = (field: keyof CreateCompanyAdminDto, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }))
     }
   }
-
-  const handleRoleChange = (roleId: string) => {
-    setForm((prev) => ({ ...prev, rolesIds: [roleId] }))
-    if (errors.rolesIds) {
-      setErrors((prev) => ({ ...prev, rolesIds: "" }))
-    }
-  }
-
-  // Filtrar solo roles activos
-  const activeRoles = roles.filter((r) => r.status === "ACTIVE")
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -151,7 +99,7 @@ export function CreateUserDialog({ disabled, companyName, loading, onCreate }: P
             Crear Usuario {companyName ? `- ${companyName}` : ""}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Crea un usuario para esta empresa. La contraseña se encriptará en el backend.
+            Crea un usuario administrador para esta empresa. La contraseña se encriptará en el backend.
           </DialogDescription>
         </DialogHeader>
 
@@ -202,44 +150,9 @@ export function CreateUserDialog({ disabled, companyName, loading, onCreate }: P
             {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
           </div>
 
-          <div className="grid gap-2">
-            <Label className="text-foreground">Rol *</Label>
-            <Select
-              value={form.rolesIds[0]}
-              onValueChange={handleRoleChange}
-              disabled={loadingRoles || activeRoles.length === 0}
-            >
-              <SelectTrigger
-                className={`bg-input border-border text-foreground ${errors.rolesIds ? "border-destructive" : ""}`}
-              >
-                <SelectValue
-                  placeholder={
-                    loadingRoles
-                      ? "Cargando roles..."
-                      : activeRoles.length === 0
-                      ? "No hay roles disponibles"
-                      : "Seleccionar rol"
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent className="bg-popover border-border">
-                {activeRoles.map((role) => (
-                  <SelectItem
-                    key={role.id}
-                    value={role.id}
-                    className="text-foreground hover:bg-accent"
-                  >
-                    {role.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.rolesIds && <p className="text-xs text-destructive">{errors.rolesIds}</p>}
-            {form.rolesIds[0] && (
-              <p className="text-xs text-muted-foreground">
-                ID: <span className="font-mono">{form.rolesIds[0]}</span>
-              </p>
-            )}
+          {/* ✅ Rol asignado automáticamente por el backend */}
+          <div className="text-xs text-muted-foreground">
+            Rol asignado: <span className="font-medium text-foreground">Administrador de Empresa</span>
           </div>
         </div>
 
