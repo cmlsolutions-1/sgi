@@ -1,7 +1,7 @@
 // components/manager/super-admin/SuperAdminDashboard.tsx
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { LogOut } from "lucide-react"
 import { doLogout } from "@/lib/auth/logout"
@@ -16,8 +16,9 @@ import { useUsers } from "@/hooks/useUsers"
 import { CiiuCard } from "@/components/manager/super-admin/dialogs/CiiuCard"
 import { CompaniesCard } from "@/components/manager/super-admin/dialogs/CompaniesCard"
 import { UsersCard } from "@/components/manager/super-admin/UsersCard"
-import { ModulesCard } from "@/components/manager/super-admin/ModulesCard"
 import { ManageModulesDialog } from "@/components/manager/super-admin/dialogs/ManageModulesDialog"
+import { getModulesByCompany } from "@/services/modulesService"
+import type { Company } from "@/types/manager/super-admin"
 
 export default function SuperAdminDashboard() {
   const router = useRouter()
@@ -26,14 +27,13 @@ export default function SuperAdminDashboard() {
   const {
     companies,
     selectedCompany,
-    AVAILABLE_MODULES,
     stats,
     selectCompany,
     createCompany,
-    toggleModule,
+    refreshCompanies,
+    updateCompanyInList,
   } = useSuperAdmin()
 
-  // Pasar selectedCompany?.id al hook para filtrar usuarios
   const {
     users,
     loading: usersLoading,
@@ -44,31 +44,107 @@ export default function SuperAdminDashboard() {
   } = useUsers(selectedCompany?.id, false)
 
   const [modulesOpen, setModulesOpen] = useState(false)
+  const lastLoadedCompanyId = useRef<string | null>(null)
 
-  // Cargar usuarios cuando cambia la empresa seleccionada
+  // Seleccionar primera empresa cuando carguen
   useEffect(() => {
-    if (selectedCompany) {
-      fetchUsers()
+    if (companies.length > 0 && !selectedCompany) {
+      selectCompany(companies[0])
     }
-  }, [selectedCompany, fetchUsers])
+  }, [companies, selectedCompany, selectCompany])
+
+  // Función explícita para cargar módulos de una empresa
+  const loadCompanyModules = useCallback(
+    async (companyId: string) => {
+      if (!companyId) return
+
+      console.log("🔄 Cargando módulos para empresa:", companyId)
+
+      try {
+        const activeModulesData = await getModulesByCompany(companyId)
+        const activeModuleIds = activeModulesData.map((m) => m.id)
+
+        console.log("Módulos obtenidos:", activeModuleIds)
+
+        // Actualizar selectedCompany
+        if (selectedCompany?.id === companyId) {
+          const updatedCompany: Company = {
+            ...selectedCompany,
+            activeModules: activeModuleIds,
+          }
+          selectCompany(updatedCompany)
+        }
+
+        // Actualizar en la lista
+        const companyInList = companies.find((c) => c.id === companyId)
+        if (companyInList) {
+          updateCompanyInList({
+            ...companyInList,
+            activeModules: activeModuleIds,
+          })
+        }
+      } catch (err) {
+        console.error("Error cargando módulos:", err)
+      }
+    },
+    [selectedCompany, companies, selectCompany, updateCompanyInList]
+  )
+
+  // Cargar módulos y usuarios cuando cambia la empresa
+  useEffect(() => {
+    const loadCompanyDetails = async () => {
+      if (!selectedCompany) return
+
+      // Evitar cargar si ya cargamos esta empresa
+      if (lastLoadedCompanyId.current === selectedCompany.id) {
+        return
+      }
+
+      lastLoadedCompanyId.current = selectedCompany.id
+      console.log("Cargando detalles para empresa:", selectedCompany.id)
+
+      await loadCompanyModules(selectedCompany.id)
+      await fetchUsers()
+    }
+
+    loadCompanyDetails()
+  }, [selectedCompany?.id, loadCompanyModules, fetchUsers])
 
   async function handleLogout() {
     await doLogout()
   }
 
-  // Wrapper que agrega companyId al payload
-  const handleCreateUser = async (payload: any) => {
-    if (!selectedCompany) {
-      return null
-    }
-    
-    // Agregar companyId al payload
-    const payloadWithCompany = {
-      ...payload,
-      companyId: selectedCompany.id,
-    }
-    
-    return await createUser(payloadWithCompany)
+  // Refrescar todo y forzar recarga de módulos
+  const handleRefreshAll = async () => {
+    if (!selectedCompany) return
+
+    // Resetear ref para permitir recarga
+    lastLoadedCompanyId.current = null
+
+    // Refrescar lista de empresas
+    await refreshCompanies()
+
+    // Cargar módulos explícitamente
+    await loadCompanyModules(selectedCompany.id)
+
+    // Refrescar usuarios
+    await fetchUsers()
+  }
+
+  const hasActiveModules = selectedCompany
+    ? selectedCompany.activeModules.length > 0
+    : false
+
+  const handleCreateCompany = async (payload: {
+    name: string
+    nit: string
+    address: string
+    phone: string
+    email: string
+    status: "active" | "inactive"
+  }) => {
+    lastLoadedCompanyId.current = null
+    await createCompany(payload)
   }
 
   return (
@@ -134,7 +210,7 @@ export default function SuperAdminDashboard() {
             companies={companies}
             selectedCompany={selectedCompany}
             onSelect={selectCompany}
-            onCreateCompany={createCompany}
+            onCreateCompany={handleCreateCompany}
             onOpenModules={(company) => {
               selectCompany(company)
               setModulesOpen(true)
@@ -144,24 +220,23 @@ export default function SuperAdminDashboard() {
           <UsersCard
             companyName={selectedCompany?.name}
             hasCompanySelected={Boolean(selectedCompany)}
+            hasActiveModules={hasActiveModules}
             users={users}
             loading={usersLoading}
             onCreateUser={createUser}
             onUpdateUser={updateUser}
             onDeleteUser={deleteUser}
             onRefresh={fetchUsers}
+            onOpenModules={() => setModulesOpen(true)}
           />
         </div>
-
-        <ModulesCard modules={AVAILABLE_MODULES} companies={companies} />
       </div>
 
       <ManageModulesDialog
         open={modulesOpen}
         onOpenChange={setModulesOpen}
         company={selectedCompany}
-        modules={AVAILABLE_MODULES}
-        onToggle={toggleModule}
+        onRefresh={handleRefreshAll}
       />
     </div>
   )

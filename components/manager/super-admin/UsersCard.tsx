@@ -2,12 +2,13 @@
 "use client"
 
 import { useState } from "react"
-import type { User, CreateUserDto, UpdateUserDto } from "@/types/manager/user"
+// Importar CreateCompanyAdminDto en lugar de CreateUserDto
+import type { User, CreateCompanyAdminDto, UpdateUserDto } from "@/types/manager/user"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CreateUserDialog } from "@/components/manager/super-admin/dialogs/CreateUserDialog"
-import { Loader2, Trash2, Edit2, RefreshCw } from "lucide-react"
+import { Loader2, Trash2, Edit2, RefreshCw, AlertTriangle, Settings } from "lucide-react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,26 +23,30 @@ import {
 
 type Props = {
   companyName?: string
-  companyId?: string  
+  // Eliminar companyId
   hasCompanySelected: boolean
+  hasActiveModules: boolean
   users: User[]
   loading: boolean
-  onCreateUser: (payload: CreateUserDto) => Promise<User | null>
+  //  Usar CreateCompanyAdminDto
+  onCreateUser: (payload: CreateCompanyAdminDto) => Promise<User | null>
   onUpdateUser: (id: string, payload: UpdateUserDto) => Promise<boolean>
   onDeleteUser: (id: string) => Promise<boolean>
   onRefresh: () => Promise<void>
+  onOpenModules: () => void
 }
 
 export function UsersCard({
   companyName,
-  companyId,
   hasCompanySelected,
+  hasActiveModules,
   users,
   loading,
   onCreateUser,
   onUpdateUser,
   onDeleteUser,
   onRefresh,
+  onOpenModules,
 }: Props) {
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
@@ -93,9 +98,8 @@ export function UsersCard({
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
           </Button>
           <CreateUserDialog
-            disabled={!hasCompanySelected || loading}
+            disabled={!hasCompanySelected || loading || !hasActiveModules}
             companyName={companyName}
-            companyId={companyId || ""}  // ✅ Pasar companyId
             loading={loading}
             onCreate={onCreateUser}
           />
@@ -106,6 +110,27 @@ export function UsersCard({
         {!hasCompanySelected ? (
           <div className="text-sm text-muted-foreground py-8 text-center">
             Selecciona una empresa para ver y crear usuarios.
+          </div>
+        ) : !hasActiveModules ? (
+          <div className="py-8 text-center">
+            <div className="flex justify-center mb-3">
+              <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6 text-amber-600" />
+              </div>
+            </div>
+            <p className="text-sm text-foreground font-medium mb-2">
+              No hay módulos activos en esta empresa
+            </p>
+            <p className="text-xs text-muted-foreground mb-4">
+              Debes activar al menos un módulo antes de poder crear usuarios.
+            </p>
+            <Button
+              onClick={onOpenModules}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Settings className="h-4 w-4 mr-2" />
+              Activar Módulos
+            </Button>
           </div>
         ) : users.length === 0 ? (
           <div className="text-sm text-muted-foreground py-8 text-center">

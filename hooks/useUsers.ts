@@ -58,7 +58,6 @@ export function useUsers(companyId?: string, autoFetch = true) {
       try {
         const response = await createCompanyAdmin(companyId, dto)
 
-        // Mapear la respuesta a nuestro tipo User
         const newUser: User = {
           id: response.user.id,
           name: response.user.name,

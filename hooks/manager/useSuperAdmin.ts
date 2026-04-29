@@ -1,25 +1,15 @@
-//hooks/manager/useSuperAdmin.ts
+// hooks/manager/useSuperAdmin.ts
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
-import type { Company, CompanyStatus, User, UserStatus } from "@/types/manager/super-admin"
-import type { Module } from "@/lib/modules"
-import { getModulesFromSidebar } from "@/lib/modules"
-import {
-  listCompanies,
-  createCompany as createCompanyRequest,
-} from "@/services/companyService"
+import { useEffect, useMemo, useState, useCallback } from "react"
+import type { Company, CompanyStatus } from "@/types/manager/super-admin"
+import { listCompanies, createCompany as createCompanyRequest } from "@/services/companyService"
 
 export function useSuperAdmin() {
-  // ahora empezamos vacío y cargamos del backend
   const [companies, setCompanies] = useState<Company[]>([])
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null)
-
-  // opcional: estados de UI
   const [loadingCompanies, setLoadingCompanies] = useState(false)
   const [companyError, setCompanyError] = useState<string | null>(null)
-
-  const AVAILABLE_MODULES: Module[] = useMemo(() => getModulesFromSidebar(), [])
 
   const stats = useMemo(() => {
     return {
@@ -27,129 +17,132 @@ export function useSuperAdmin() {
       activeCompanies: companies.filter((c) => c.status === "active").length,
       totalUsers: companies.reduce((acc, c) => acc + c.totalUsers, 0),
       avgModulesPerCompany: companies.length
-        ? (companies.reduce((acc, c) => acc + c.activeModules.length, 0) / 
-        companies.length).toFixed(1)
+        ? (
+            companies.reduce((acc, c) => acc + c.activeModules.length, 0) /
+            companies.length
+          ).toFixed(1)
         : "0.0",
     }
   }, [companies])
 
+  // Memoizar selectCompany
+  const selectCompany = useCallback((company: Company) => {
+    setSelectedCompany(company)
+  }, [])
 
-  const selectCompany = (company: Company) => setSelectedCompany(company)
+  // Memoizar updateCompanyInList
+  const updateCompanyInList = useCallback((updatedCompany: Company) => {
+    setCompanies((prev) =>
+      prev.map((c) => (c.id === updatedCompany.id ? updatedCompany : c))
+    )
+  }, [])
 
-  async function refreshCompanies() {
+  // Memoizar refreshCompanies
+  const refreshCompanies = useCallback(async () => {
     setLoadingCompanies(true)
     setCompanyError(null)
 
     try {
       const data = await listCompanies()
 
-      const mapped: Company[] = data.map((c) => ({
-        id: c.id,
-        name: c.name,
-        nit: "",              // no viene del backend en este endpoint
-        address: "",
-        phone: "",
-        email: "",
-        registrationDate: "", // idem
-        status: "active",     // default (ajusta si tu negocio dice otra cosa)
-        activeModules: ["usuarios"], // default
-        totalUsers: 0,        // default
-      }))
+      // Usar functional update para no depender de companies
+      setCompanies((prevCompanies) => {
+        const mapped: Company[] = data.map((c) => {
+          const existing = prevCompanies.find((prev) => prev.id === c.id)
+          return {
+            id: c.id,
+            name: c.name,
+            nit: existing?.nit ?? "",
+            address: existing?.address ?? "",
+            phone: existing?.phone ?? "",
+            email: existing?.email ?? "",
+            registrationDate: existing?.registrationDate ?? "",
+            status: existing?.status ?? "active",
+            activeModules: existing?.activeModules ?? [],
+            totalUsers: existing?.totalUsers ?? 0,
+          }
+        })
+        return mapped
+      })
 
-      setCompanies(mapped)
-
-      // mantener selección si existía
+      // Usar functional update para selectedCompany
       setSelectedCompany((prev) => {
-        if (!prev) return mapped[0] ?? null
-        return mapped.find((x) => x.id === prev.id) ?? (mapped[0] ?? null)
+        if (!prev) {
+          // Seleccionar primera empresa si no hay selección
+          return null // No seleccionar automáticamente aquí para evitar bucles
+        }
+        // Mantener selección si existe en la nueva lista
+        return prev // Mantener referencia si el ID coincide
       })
     } catch (e: any) {
       setCompanyError(e?.message ?? "Error cargando compañías")
     } finally {
       setLoadingCompanies(false)
     }
-  }
-
-  useEffect(() => {
-    refreshCompanies()
   }, [])
 
-  // ahora crea en backend
-  const createCompany = async (payload: {
-    name: string
-    nit: string
-    address: string
-    phone: string
-    email: string
-    status: CompanyStatus
-  }) => {
-    if (!payload.name || !payload.nit || !payload.email) return
+  // Cargar empresas al montar (solo una vez)
+  useEffect(() => {
+    refreshCompanies()
+  }, [refreshCompanies])
 
-    setCompanyError(null)
+  // Memoizar createCompany
+  const createCompany = useCallback(
+    async (payload: {
+      name: string
+      nit: string
+      address: string
+      phone: string
+      email: string
+      status: CompanyStatus
+    }) => {
+      if (!payload.name || !payload.nit || !payload.email) return
 
-    try {
-      const created = await createCompanyRequest({
-        name: payload.name,
-        nit: payload.nit,
-        address: payload.address,
-        phone: payload.phone,
-        email: payload.email,
-      })
+      setCompanyError(null)
 
-    const today = new Date().toISOString().split("T")[0]
+      try {
+        const created = await createCompanyRequest({
+          name: payload.name,
+          nit: payload.nit,
+          address: payload.address,
+          phone: payload.phone,
+          email: payload.email,
+        })
 
-    // como el backend responde {id,name}, completamos el resto con payload/defaults
-    const company: Company = {
-      id: created.id,
-      name: created.name,
-      nit: payload.nit,
-      address: payload.address,
-      phone: payload.phone,
-      email: payload.email,
-      registrationDate: today,
-      status: payload.status,
-      activeModules: ["usuarios"],
-      totalUsers: 0,
-    }
+        const today = new Date().toISOString().split("T")[0]
 
-    setCompanies((prev) => [...prev, company])
-    setSelectedCompany(company)
-  }
-     catch (e: any) {
-      setCompanyError(e?.message ?? "Error creando compañía")
-      throw e
-    }
-  }
+        const company: Company = {
+          id: created.id,
+          name: created.name,
+          nit: payload.nit,
+          address: payload.address,
+          phone: payload.phone,
+          email: payload.email,
+          registrationDate: today,
+          status: payload.status,
+          activeModules: [],
+          totalUsers: 0,
+        }
 
-  
-  const toggleModule = (moduleId: string) => {
-    if (!selectedCompany) return
-
-    const updatedCompanies = companies.map((company) => {
-      if (company.id === selectedCompany.id) {
-        const activeModules = company.activeModules.includes(moduleId)
-          ? company.activeModules.filter((id) => id !== moduleId)
-          : [...company.activeModules, moduleId]
-
-        return { ...company, activeModules }
+        setCompanies((prev) => [...prev, company])
+        setSelectedCompany(company)
+      } catch (e: any) {
+        setCompanyError(e?.message ?? "Error creando compañía")
+        throw e
       }
-      return company
-    })
-
-    setCompanies(updatedCompanies)
-    setSelectedCompany(updatedCompanies.find((c) => c.id === selectedCompany.id) || null)
-  }
+    },
+    []
+  )
 
   return {
     companies,
     selectedCompany,
-    AVAILABLE_MODULES,
     stats,
     loadingCompanies,
     companyError,
     refreshCompanies,
     selectCompany,
     createCompany,
-    toggleModule,
+    updateCompanyInList,
   }
 }

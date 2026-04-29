@@ -1,3 +1,4 @@
+// services/companyService.ts
 import { apiFetch } from "@/lib/apiClient";
 import type { ApiResponse, CompanyLite, CreateCompanyDto, UpdateCompanyDto } from "@/types/manager/company";
 

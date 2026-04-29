@@ -21,7 +21,7 @@ type Props = {
     phone: string
     email: string
     status: "active" | "inactive"
-  }) => void
+  }) => Promise<void>
   onOpenModules: (company: Company) => void
 }
 

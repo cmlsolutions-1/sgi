@@ -28,7 +28,7 @@ type Props = {
 export function CreateUserDialog({ disabled, companyName, loading, onCreate }: Props) {
   const [open, setOpen] = useState(false)
 
-  // ✅ Form SIN rolesIds
+  // Form SIN rolesIds
   const [form, setForm] = useState<CreateCompanyAdminDto>({
     name: "",
     email: "",
