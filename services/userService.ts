@@ -8,11 +8,13 @@ import type {
   UserResponse,
   UsersResponse,
   CreateCompanyAdminApiResponse,
+  GetCompanyAdminResponse,
+  GetCompanyAdminApiResponse,
   CreateCompanyAdminResponse,
 } from "@/types/manager/user";
 
 async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
-  const json = (await res.json().catch(() => null)) as UserResponse | UsersResponse | CreateCompanyAdminApiResponse | null;
+  const json = (await res.json().catch(() => null)) as UserResponse | UsersResponse | CreateCompanyAdminApiResponse | GetCompanyAdminApiResponse | null;
 
   if (!res.ok || !json?.ok) {
     const msg = json?.message ?? fallbackMsg;
@@ -21,6 +23,34 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
 
   return json.data as T;
 }
+
+/**
+ * Obtener administrador de la empresa
+ * GET /api/admin/companies/{companyId}/company-admin
+ */
+export async function getCompanyAdmin(companyId: string): Promise<User> {
+  const res = await apiFetch(`/api/admin/companies/${companyId}/company-admin`, {
+    method: "GET",
+  })
+  
+  // Usar GetCompanyAdminResponse que tiene 'admin'
+  const data = await parseOrThrow<GetCompanyAdminResponse>(res, "No se pudo cargar el administrador")
+  
+  // Mapear data.admin al tipo User
+  const user: User = {
+    id: data.admin.id,
+    name: data.admin.name,
+    email: data.admin.email,
+    phone: data.admin.phone,
+    description: "",
+    status: "ACTIVE",
+    companyId: data.company.id,
+    roles: [{ id: "company-admin", name: "Administrador de Empresa" }],
+  }
+  
+  return user
+}
+
 
 /**
  * Listar usuarios (opcionalmente filtrar por companyId)

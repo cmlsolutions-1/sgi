@@ -52,8 +52,8 @@ export function CreateUserDialog({ disabled, companyName, loading, onCreate }: P
 
     if (!form.password.trim()) {
       newErrors.password = "La contraseña es requerida"
-    } else if (form.password.length < 6) {
-      newErrors.password = "Mínimo 6 caracteres"
+    } else if (form.password.length < 8) {
+      newErrors.password = "Mínimo 8 caracteres"
     }
 
     setErrors(newErrors)
@@ -145,12 +145,12 @@ export function CreateUserDialog({ disabled, companyName, loading, onCreate }: P
               value={form.password}
               onChange={(e) => handleChange("password", e.target.value)}
               className={`bg-input border-border text-foreground ${errors.password ? "border-destructive" : ""}`}
-              placeholder="Mínimo 6 caracteres"
+              placeholder="Mínimo 8 caracteres"
             />
             {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
           </div>
 
-          {/* ✅ Rol asignado automáticamente por el backend */}
+          {/* Rol asignado automáticamente por el backend */}
           <div className="text-xs text-muted-foreground">
             Rol asignado: <span className="font-medium text-foreground">Administrador de Empresa</span>
           </div>

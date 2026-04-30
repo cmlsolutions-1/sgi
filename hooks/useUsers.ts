@@ -3,18 +3,15 @@
 
 import { useState, useCallback, useEffect } from "react"
 import {
-  listUsers,
+  getCompanyAdmin,
   createCompanyAdmin,
-  createUser,
   updateUser,
   deleteUser,
 } from "@/services/userService"
-import type { 
-  User, 
-  CreateUserDto, 
+import type {
+  User,
   CreateCompanyAdminDto,
   UpdateUserDto,
-  CreateCompanyAdminResponse, 
 } from "@/types/manager/user"
 import { toast } from "sonner"
 
@@ -23,28 +20,44 @@ export function useUsers(companyId?: string, autoFetch = true) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // ✅ LIMPIAR USUARIOS AL CAMBIAR DE EMPRESA
+  // Esto asegura que no queden datos "stale" de la empresa anterior
+  useEffect(() => {
+    setUsers([])
+    setError(null)
+  }, [companyId])
+
   const fetchUsers = useCallback(async () => {
+    if (!companyId) {
+      setUsers([])
+      return
+    }
+
     setLoading(true)
     setError(null)
     try {
-      const data = await listUsers(companyId)
-      setUsers(data)
+      const adminUser = await getCompanyAdmin(companyId)
+      setUsers([adminUser])
     } catch (err: any) {
-      setError(err.message ?? "Error al cargar usuarios")
-      toast.error(err.message ?? "Error al cargar usuarios")
+      // Si no hay admin (404), lista vacía
+      if (err.message?.includes("404") || err.message?.includes("not found")) {
+        setUsers([])
+      } else {
+        setError(err.message ?? "Error al cargar usuarios")
+        toast.error(err.message ?? "Error al cargar usuarios")
+        // ✅ Limpiar usuarios en error para no mostrar datos viejos
+        setUsers([])
+      }
     } finally {
       setLoading(false)
     }
   }, [companyId])
 
   useEffect(() => {
-    if (autoFetch && companyId) {
+    if (autoFetch) {
       fetchUsers()
-    } else if (autoFetch && !companyId) {
-      // Si no hay companyId, limpiar usuarios
-      setUsers([])
     }
-  }, [autoFetch, companyId, fetchUsers])
+  }, [autoFetch, fetchUsers])
 
   const createUserHandler = useCallback(
     async (dto: CreateCompanyAdminDto): Promise<User | null> => {
@@ -69,7 +82,7 @@ export function useUsers(companyId?: string, autoFetch = true) {
           roles: [response.role],
         }
 
-        setUsers((prev) => [...prev, newUser])
+        setUsers([newUser])
         toast.success("Usuario creado exitosamente")
         return newUser
       } catch (err: any) {
@@ -108,7 +121,7 @@ export function useUsers(companyId?: string, autoFetch = true) {
     setError(null)
     try {
       await deleteUser(id)
-      setUsers((prev) => prev.filter((u) => u.id !== id))
+      setUsers([])
       toast.success("Usuario eliminado exitosamente")
       return true
     } catch (err: any) {

@@ -1,7 +1,7 @@
 // components/manager/super-admin/SuperAdminDashboard.tsx
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { LogOut } from "lucide-react"
 import { doLogout } from "@/lib/auth/logout"
@@ -44,90 +44,71 @@ export default function SuperAdminDashboard() {
   } = useUsers(selectedCompany?.id, false)
 
   const [modulesOpen, setModulesOpen] = useState(false)
-  const lastLoadedCompanyId = useRef<string | null>(null)
 
-  // Seleccionar primera empresa cuando carguen
+  // ✅ Seleccionar primera empresa automáticamente
   useEffect(() => {
     if (companies.length > 0 && !selectedCompany) {
       selectCompany(companies[0])
     }
   }, [companies, selectedCompany, selectCompany])
 
-  // Función explícita para cargar módulos de una empresa
-  const loadCompanyModules = useCallback(
-    async (companyId: string) => {
-      if (!companyId) return
+  // ✅ Función PURA: solo obtiene módulos, NO actualiza estado
+  // Esto evita dependencias circulares
+  const fetchCompanyModules = useCallback(async (companyId: string): Promise<string[]> => {
+    try {
+      const modulesData = await getModulesByCompany(companyId)
+      return modulesData.map((m) => m.id)
+    } catch (err) {
+      console.error("Error cargando módulos:", err)
+      return []
+    }
+  }, [])
 
-      console.log("🔄 Cargando módulos para empresa:", companyId)
-
-      try {
-        const activeModulesData = await getModulesByCompany(companyId)
-        const activeModuleIds = activeModulesData.map((m) => m.id)
-
-        console.log("Módulos obtenidos:", activeModuleIds)
-
-        // Actualizar selectedCompany
-        if (selectedCompany?.id === companyId) {
-          const updatedCompany: Company = {
-            ...selectedCompany,
-            activeModules: activeModuleIds,
-          }
-          selectCompany(updatedCompany)
-        }
-
-        // Actualizar en la lista
-        const companyInList = companies.find((c) => c.id === companyId)
-        if (companyInList) {
-          updateCompanyInList({
-            ...companyInList,
-            activeModules: activeModuleIds,
-          })
-        }
-      } catch (err) {
-        console.error("Error cargando módulos:", err)
-      }
-    },
-    [selectedCompany, companies, selectCompany, updateCompanyInList]
-  )
-
-  // Cargar módulos y usuarios cuando cambia la empresa
+  // ✅ Cargar detalles cuando cambia el ID de la empresa
   useEffect(() => {
     const loadCompanyDetails = async () => {
       if (!selectedCompany) return
 
-      // Evitar cargar si ya cargamos esta empresa
-      if (lastLoadedCompanyId.current === selectedCompany.id) {
-        return
+      console.log("🔄 Cargando detalles para empresa:", selectedCompany.id)
+
+      // Obtener módulos (fetch puro)
+      const activeModuleIds = await fetchCompanyModules(selectedCompany.id)
+
+      console.log("✅ Módulos obtenidos:", activeModuleIds)
+
+      // Actualizar selectedCompany
+      const updatedCompany: Company = {
+        ...selectedCompany,
+        activeModules: activeModuleIds,
       }
+      selectCompany(updatedCompany)
 
-      lastLoadedCompanyId.current = selectedCompany.id
-      console.log("Cargando detalles para empresa:", selectedCompany.id)
+      // Actualizar en la lista
+      updateCompanyInList(updatedCompany)
 
-      await loadCompanyModules(selectedCompany.id)
+      // Cargar usuarios
       await fetchUsers()
     }
 
     loadCompanyDetails()
-  }, [selectedCompany?.id, loadCompanyModules, fetchUsers])
+  }, [selectedCompany?.id, fetchCompanyModules, selectCompany, updateCompanyInList, fetchUsers])
 
   async function handleLogout() {
     await doLogout()
   }
 
-  // Refrescar todo y forzar recarga de módulos
   const handleRefreshAll = async () => {
     if (!selectedCompany) return
-
-    // Resetear ref para permitir recarga
-    lastLoadedCompanyId.current = null
-
-    // Refrescar lista de empresas
     await refreshCompanies()
-
-    // Cargar módulos explícitamente
-    await loadCompanyModules(selectedCompany.id)
-
-    // Refrescar usuarios
+    
+    const activeModuleIds = await fetchCompanyModules(selectedCompany.id)
+    const updatedCompany: Company = {
+      ...selectedCompany,
+      activeModules: activeModuleIds,
+    }
+    selectCompany(updatedCompany)
+    updateCompanyInList(updatedCompany)
+    
     await fetchUsers()
   }
 
@@ -143,7 +124,6 @@ export default function SuperAdminDashboard() {
     email: string
     status: "active" | "inactive"
   }) => {
-    lastLoadedCompanyId.current = null
     await createCompany(payload)
   }
 
