@@ -2,24 +2,46 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
+import { tokenHasRole } from "@/lib/jwt";
 
-export default function AuthGuard({ children }: { children: React.ReactNode }) {
+type AuthGuardProps = {
+  children: React.ReactNode;
+  requireAdmin?: boolean;
+  redirectAdminToManager?: boolean;
+};
+
+export default function AuthGuard({
+  children,
+  requireAdmin = false,
+  redirectAdminToManager = false,
+}: AuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
 
   const accessToken = useAuthStore((s) => s.accessToken);
   const hasHydrated = useAuthStore((s) => s.hasHydrated);
+  const isAdmin = tokenHasRole(accessToken, "ADMIN");
 
   useEffect(() => {
     if (!hasHydrated) return;
 
     if (!accessToken) {
       router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+      return;
     }
-  }, [hasHydrated, accessToken, router, pathname]);
+
+    if (requireAdmin && !isAdmin) {
+      router.replace("/dashboard");
+      return;
+    }
+
+    if (redirectAdminToManager && isAdmin) {
+      router.replace("/manager");
+    }
+  }, [hasHydrated, accessToken, isAdmin, requireAdmin, redirectAdminToManager, router, pathname]);
 
   if (!hasHydrated) {
     return (
@@ -30,6 +52,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   if (!accessToken) return null;
+  if (requireAdmin && !isAdmin) return null;
+  if (redirectAdminToManager && isAdmin) return null;
 
   return <>{children}</>;
 }

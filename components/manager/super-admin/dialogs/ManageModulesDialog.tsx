@@ -1,7 +1,7 @@
 // components/manager/super-admin/dialogs/ManageModulesDialog.tsx
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import type { Company } from "@/types/manager/super-admin"
 import type { Module } from "@/types/manager/module"
 import { Button } from "@/components/ui/button"
@@ -15,8 +15,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Loader2, AlertTriangle, Package } from "lucide-react"
-import { listModules, activateModule, deactivateModule } from "@/services/modulesService" // Verifica nombre del archivo
+import { AlertTriangle, Loader2, Package } from "lucide-react"
+import { listModules, updateCompanyModules } from "@/services/modulesService"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
@@ -24,39 +24,52 @@ type Props = {
   open: boolean
   onOpenChange: (open: boolean) => void
   company: Company | null
-  onRefresh: () => Promise<void>
+  onRefresh: (activeModuleIds?: string[]) => Promise<void>
 }
 
 export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: Props) {
   const [modules, setModules] = useState<Module[]>([])
+  const [activeModuleIds, setActiveModuleIds] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [activatingId, setActivatingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (open && company) {
-      fetchModules()
-    }
-  }, [open, company])
+    if (!open || !company) return
+
+    setActiveModuleIds(company.activeModules)
+    fetchModules()
+  }, [open, company?.id])
 
   const fetchModules = async () => {
     setLoading(true)
     setError(null)
+
     try {
       const data = await listModules()
-      console.log("🔍 Módulos cargados:", data) // Debug
       setModules(data)
+      const parentIds = new Set(data.map((module) => module.id))
+      setActiveModuleIds((currentIds) => currentIds.filter((moduleId) => parentIds.has(moduleId)))
     } catch (err: any) {
-      console.error("❌ Error cargando módulos:", err)
-      setError(err.message ?? "Error al cargar módulos")
-      toast.error(err.message ?? "Error al cargar módulos")
+      const message = err.message ?? "Error al cargar modulos"
+      setError(message)
+      toast.error(message)
     } finally {
       setLoading(false)
     }
   }
 
   const isModuleActive = (moduleId: string): boolean => {
-    return company?.activeModules.includes(moduleId) || false
+    return activeModuleIds.includes(moduleId)
+  }
+
+  const isChildActive = (parentId: string, childId: string): boolean => {
+    return isModuleActive(parentId) || isModuleActive(childId)
+  }
+
+  const getParentModuleIds = (moduleIds: string[]): string[] => {
+    const parentIds = new Set(modules.map((module) => module.id))
+    return moduleIds.filter((moduleId) => parentIds.has(moduleId))
   }
 
   const handleToggle = async (moduleId: string, moduleName: string) => {
@@ -65,32 +78,35 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
       return
     }
 
+    const currentlyActive = isModuleActive(moduleId)
+    const previousActiveIds = activeModuleIds
+    const nextActiveIds = currentlyActive
+      ? previousActiveIds.filter((id) => id !== moduleId)
+      : Array.from(new Set([...previousActiveIds, moduleId]))
+
     setActivatingId(moduleId)
+    setActiveModuleIds(nextActiveIds)
+
     try {
-      const currentlyActive = isModuleActive(moduleId)
-      console.log(`Toggle ${moduleName}:`, currentlyActive ? "desactivar" : "activar")
+      const moduleIdsToPersist = getParentModuleIds(nextActiveIds)
+      const persistedActiveIds = await updateCompanyModules(
+        company.id,
+        moduleIdsToPersist,
+        currentlyActive ? `Modulo "${moduleName}" desactivado desde panel` : "Actualizado desde panel"
+      )
 
-      if (currentlyActive) {
-        await deactivateModule(company.id, moduleId)
-        toast.success(`Módulo "${moduleName}" desactivado`)
-      } else {
-        await activateModule(company.id, moduleId)
-        toast.success(`Módulo "${moduleName}" activado`)
-      }
-
-      console.log("Toggle exitoso, refrescando...")
-      // Esto llama a handleRefreshAll que carga módulos explícitamente
-      await onRefresh()
+      setActiveModuleIds(persistedActiveIds)
+      toast.success(`Modulo "${moduleName}" ${currentlyActive ? "desactivado" : "activado"}`)
+      await onRefresh(persistedActiveIds)
     } catch (err: any) {
-      console.error("❌ Error en toggle:", err)
-      toast.error(err.message ?? "Error al actualizar módulo")
+      setActiveModuleIds(previousActiveIds)
+      toast.error(err.message ?? "Error al actualizar modulo")
     } finally {
       setActivatingId(null)
     }
   }
 
-  // Ajusta esta validación según los códigos reales de tu backend
-  const isRequiredModule = (module: Module): boolean => {
+  const isRequiredModule = (module: Pick<Module, "code">): boolean => {
     return module.code === "USER_MANAGEMENT" || module.code === "usuarios"
   }
 
@@ -100,11 +116,11 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
         <DialogHeader>
           <DialogTitle className="text-foreground flex items-center gap-2">
             <Package className="h-5 w-5" />
-            Gestionar Módulos
+            Gestionar Modulos
             {company && <span className="text-muted-foreground">- {company.name}</span>}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Habilita o deshabilita los módulos para esta empresa.
+            Habilita o deshabilita los modulos para esta empresa.
           </DialogDescription>
         </DialogHeader>
 
@@ -112,7 +128,7 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              <span className="ml-3 text-sm text-muted-foreground">Cargando módulos...</span>
+              <span className="ml-3 text-sm text-muted-foreground">Cargando modulos...</span>
             </div>
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -124,7 +140,7 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
             </div>
           ) : modules.length === 0 ? (
             <div className="text-sm text-muted-foreground py-8 text-center">
-              No hay módulos disponibles
+              No hay modulos disponibles
             </div>
           ) : (
             <div className="space-y-4">
@@ -145,9 +161,7 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
                         <div
                           className={cn(
                             "h-10 w-10 rounded-lg flex items-center justify-center transition-colors",
-                            isActive
-                              ? "bg-primary/20 text-primary"
-                              : "bg-muted text-muted-foreground"
+                            isActive ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
                           )}
                         >
                           <Package className="h-5 w-5" />
@@ -156,9 +170,7 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <h4 className="font-medium text-foreground">{module.name}</h4>
-                            <span className="text-xs text-muted-foreground font-mono">
-                              {module.code}
-                            </span>
+                            <span className="text-xs text-muted-foreground font-mono">{module.code}</span>
                             {isRequired && (
                               <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700">
                                 Requerido
@@ -184,8 +196,8 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
                     {module.children.length > 0 && (
                       <div className="border-t border-border bg-muted/30">
                         {module.children.map((child) => {
-                          const childActive = isModuleActive(child.id)
-                          const childRequired = isRequiredModule({ ...module, code: child.code } as Module)
+                          const childActive = isChildActive(module.id, child.id)
+                          const childRequired = isRequiredModule(child)
 
                           return (
                             <div
@@ -196,9 +208,7 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
                                 <div
                                   className={cn(
                                     "h-8 w-8 rounded-md flex items-center justify-center",
-                                    childActive
-                                      ? "bg-primary/20 text-primary"
-                                      : "bg-muted text-muted-foreground"
+                                    childActive ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
                                   )}
                                 >
                                   <Package className="h-4 w-4" />
@@ -211,7 +221,7 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
 
                               <Switch
                                 checked={childActive}
-                                onCheckedChange={() => handleToggle(child.id, child.name)}
+                                onCheckedChange={() => handleToggle(module.id, module.name)}
                                 disabled={childRequired || activatingId === child.id}
                                 className="data-[state=checked]:bg-primary"
                               />
@@ -228,11 +238,7 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
         </div>
 
         <DialogFooter className="border-t border-border pt-4">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="border-border"
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="border-border">
             Cerrar
           </Button>
         </DialogFooter>

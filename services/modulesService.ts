@@ -76,6 +76,38 @@ export async function activateModule(companyId: string, moduleId: string): Promi
 export async function deactivateModule(companyId: string, moduleId: string): Promise<void> {
   const res = await apiFetch(`/api/companies/${companyId}/modules/${moduleId}/deactivate`, {
     method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ reason: "Desactivado desde el panel de super administrador" }),
   })
   await parseOrThrow<Record<string, never>>(res, "No se pudo desactivar el módulo")
+}
+
+type BulkModulesResponse = {
+  companyId: string
+  activeModuleIds: string[]
+}
+
+/**
+ * Reemplazar los mÃ³dulos activos de una empresa
+ * PUT /api/companies/{companyId}/modules/bulk
+ */
+export async function updateCompanyModules(
+  companyId: string,
+  moduleIds: string[],
+  deactivationReason = "Actualizado desde el panel de super administrador"
+): Promise<string[]> {
+  console.log("Actualizando modulos de empresa:", { companyId, moduleIds })
+
+  const res = await apiFetch(`/api/companies/${companyId}/modules/bulk`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      moduleIds,
+      deactivationReason,
+    }),
+  })
+
+  const data = await parseOrThrow<BulkModulesResponse>(res, "No se pudo actualizar los mÃ³dulos")
+  console.log("Modulos actualizados por backend:", data.activeModuleIds)
+  return data.activeModuleIds ?? moduleIds
 }

@@ -21,5 +21,5 @@ export default function ManagerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <AuthGuard>{children}</AuthGuard>;
+  return <AuthGuard requireAdmin>{children}</AuthGuard>;
 }

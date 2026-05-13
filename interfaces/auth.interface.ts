@@ -2,6 +2,7 @@
 
 export interface LoginResponse {
   token: string;
+  refreshToken: string;
   user: {
     _id: string;
     id: string;

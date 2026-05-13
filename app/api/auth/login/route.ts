@@ -1,5 +1,15 @@
 // app/api/auth/login/route.ts
 import { NextResponse } from "next/server";
+import { decodeJwt } from "@/lib/jwt";
+
+function getTokenMaxAge(token: string) {
+  const payload = decodeJwt(token);
+  const exp = typeof payload?.exp === "number" ? payload.exp : null;
+
+  if (!exp) return 60 * 60;
+
+  return Math.max(exp - Math.floor(Date.now() / 1000), 0);
+}
 
 export async function POST(req: Request) {
   try {
@@ -37,7 +47,8 @@ export async function POST(req: Request) {
     }
 
     // mantenemos tu formato, pero devolvemos refreshToken también
-    return NextResponse.json(
+    const payload = decodeJwt(token);
+    const response = NextResponse.json(
       {
         token,
         refreshToken,
@@ -46,11 +57,21 @@ export async function POST(req: Request) {
           id: userId,
           email: "",
           name: "",
-          role: "",
+          role: typeof payload?.role === "string" ? payload.role : "",
         },
       },
       { status: 200 }
     );
+
+    response.cookies.set("sgc_session", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: getTokenMaxAge(token),
+    });
+
+    return response;
   } catch {
     return NextResponse.json({ error: "Error procesando login" }, { status: 400 });
   }

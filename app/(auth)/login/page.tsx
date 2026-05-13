@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 import { AlertCircle, Eye, EyeOff, Lock, User } from "lucide-react";
 
 
-import { isManagerUser } from "@/lib/permissions";
+import { tokenHasRole } from "@/lib/jwt";
 import { useAuthStore, type AuthState } from "@/store/auth.store";
 
 type Company = { id: string; name: string };
@@ -112,16 +112,22 @@ export default function LoginPage() {
       return;
     }
 
+    const isAdmin = tokenHasRole(json.token, "ADMIN");
+
     // guardar tokens en Zustand
     setTokens(json.token, json.refreshToken);
 
-    //  cargar módulos
+    if (isAdmin) {
+      setModules([]);
+      router.push("/manager");
+      router.refresh();
+      return;
+    }
+
+    //  cargar módulos para usuarios de empresa
     const modules = await getMyModules();
     setModules(modules);
-
-    //  redirect por módulos
-    if (isManagerUser(modules)) router.push("/manager");
-    else router.push("/dashboard");
+    router.push("/dashboard");
 
     router.refresh();
   } catch (err) {

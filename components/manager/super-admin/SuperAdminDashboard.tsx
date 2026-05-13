@@ -19,6 +19,14 @@ import { UsersCard } from "@/components/manager/super-admin/UsersCard"
 import { ManageModulesDialog } from "@/components/manager/super-admin/dialogs/ManageModulesDialog"
 import { getModulesByCompany } from "@/services/modulesService"
 import type { Company } from "@/types/manager/super-admin"
+import type { Module } from "@/types/manager/module"
+
+function collectModuleIds(modules: Module[]): string[] {
+  return modules.flatMap((module) => [
+    module.id,
+    ...(module.children?.map((child) => child.id) ?? []),
+  ])
+}
 
 export default function SuperAdminDashboard() {
   const router = useRouter()
@@ -57,7 +65,7 @@ export default function SuperAdminDashboard() {
   const fetchCompanyModules = useCallback(async (companyId: string): Promise<string[]> => {
     try {
       const modulesData = await getModulesByCompany(companyId)
-      return modulesData.map((m) => m.id)
+      return collectModuleIds(modulesData)
     } catch (err) {
       console.error("Error cargando módulos:", err)
       return []
@@ -97,18 +105,21 @@ export default function SuperAdminDashboard() {
     await doLogout()
   }
 
-  const handleRefreshAll = async () => {
+  const handleRefreshAll = async (activeModuleIdsFromSave?: string[]) => {
     if (!selectedCompany) return
-    await refreshCompanies()
-    
-    const activeModuleIds = await fetchCompanyModules(selectedCompany.id)
+
+    const activeModuleIds = activeModuleIdsFromSave ?? await fetchCompanyModules(selectedCompany.id)
     const updatedCompany: Company = {
       ...selectedCompany,
       activeModules: activeModuleIds,
     }
     selectCompany(updatedCompany)
     updateCompanyInList(updatedCompany)
-    
+
+    if (!activeModuleIdsFromSave) {
+      await refreshCompanies()
+    }
+
     await fetchUsers()
   }
 

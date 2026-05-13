@@ -1,4 +1,14 @@
 import { NextResponse } from "next/server";
+import { decodeJwt } from "@/lib/jwt";
+
+function getTokenMaxAge(token: string) {
+  const payload = decodeJwt(token);
+  const exp = typeof payload?.exp === "number" ? payload.exp : null;
+
+  if (!exp) return 60 * 60;
+
+  return Math.max(exp - Math.floor(Date.now() / 1000), 0);
+}
 
 export async function POST(req: Request) {
   try {
@@ -35,11 +45,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Respuesta inválida del servidor" }, { status: 502 });
     }
 
-    // respuesta simple al front
-    return NextResponse.json(
+    const response = NextResponse.json(
       { token: newAccess, refreshToken: newRefresh },
       { status: 200 }
     );
+
+    response.cookies.set("sgc_session", newAccess, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: getTokenMaxAge(newAccess),
+    });
+
+    return response;
   } catch {
     return NextResponse.json({ message: "Error procesando refresh" }, { status: 400 });
   }

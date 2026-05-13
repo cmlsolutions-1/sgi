@@ -4,10 +4,12 @@
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { doLogout } from "@/lib/auth/logout";
-import { navigation } from "./navigation"
+import { filterNavigationByModules, navigation } from "./navigation"
+import { getMyModules } from "@/services/modulesService";
+import { useAuthStore } from "@/store/auth.store";
 
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -60,6 +62,22 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const modules = useAuthStore((s) => s.modules);
+  const setModules = useAuthStore((s) => s.setModules);
+  const visibleNavigation = useMemo(() => filterNavigationByModules(navigation, modules), [modules]);
+
+  useEffect(() => {
+    if (!accessToken || loggingOut) return;
+    if (modules.length > 0) return;
+
+    getMyModules()
+      .then(setModules)
+      .catch((error) => {
+        console.warn("No se pudieron cargar los modulos del usuario:", error);
+      });
+  }, [accessToken, loggingOut, modules.length, setModules]);
 
   const toggleDropdown = (name: string) => {
     setOpenDropdown(openDropdown === name ? null : name);
@@ -68,9 +86,12 @@ export function Sidebar() {
   const router = useRouter();
 
   async function handleLogout() {
-    await doLogout();
-    router.push("/login");
-    router.refresh();
+    setLoggingOut(true);
+    try {
+      await doLogout();
+    } finally {
+      router.replace("/login");
+    }
   }
 
   return (
@@ -108,7 +129,7 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 p-2 space-y-1">
-        {navigation.map((item) => {
+        {visibleNavigation.map((item) => {
           // Comprobar si el ítem tiene subItems (menú desplegable)
           if (item.subItems) {
             return (
@@ -202,13 +223,15 @@ export function Sidebar() {
         <button
           type="button"
           onClick={handleLogout}
+          disabled={loggingOut}
           className={cn(
             "flex items-center w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-            "text-sidebar-foreground hover:bg-red-500 hover:text-sidebar-accent-foreground"
+            "text-sidebar-foreground hover:bg-red-500 hover:text-sidebar-accent-foreground",
+            loggingOut && "pointer-events-none opacity-60"
           )}
         >
           <LogOut className="h-5 w-5 shrink-0" />
-          {!collapsed && <span>Cerrar sesión</span>}
+          {!collapsed && <span>{loggingOut ? "Cerrando..." : "Cerrar sesión"}</span>}
         </button>
       </div>
 
