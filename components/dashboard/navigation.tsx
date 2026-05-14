@@ -6,6 +6,7 @@ import {
   FileText,
   TriangleAlert,
   UserCircle,
+  BriefcaseBusiness,
   ShieldCheck,
   BrickWallIcon,
   CalendarDays,
@@ -62,6 +63,8 @@ export const navigation: NavigationItem[] = [
     icon: IdCardIcon,
     subItems: [
       { code: "EMPLOYEE_MANAGEMENT", name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle },
+      { code: "WORKAREA", name: "Areas de trabajo", href: "/dashboard/work-areas", icon: Users },
+      { code: "JOBS", name: "Puestos de trabajo", href: "/dashboard/jobs", icon: BriefcaseBusiness },
     ],
   },
   { code: "DOCUMENTS", name: "Gestion Documental", href: "/dashboard/documents", icon: FileText },
