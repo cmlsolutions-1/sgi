@@ -25,7 +25,6 @@ export type CreateUserDto = {
   phone: string;
   password: string;
   rolesIds: string[];
-  companyId: string
 };
 
 export type CreateCompanyAdminDto = {
@@ -36,7 +35,6 @@ export type CreateCompanyAdminDto = {
 }
 
 export type UpdateUserDto = Partial<Omit<CreateUserDto, "password" | "rolesIds">> & {
-  password?: string;
   rolesIds?: string[];
 };
 

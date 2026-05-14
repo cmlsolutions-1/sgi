@@ -115,9 +115,12 @@ export function filterNavigationByModules(items: NavigationItem[], modules: Modu
     }
 
     if (hasSubItems(item)) {
-      const subItems = item.subItems.filter((subItem) => !subItem.code || allowedCodes.has(subItem.code))
+      const parentAllowed = allowedCodes.has(item.code)
+      const subItems = parentAllowed
+        ? item.subItems
+        : item.subItems.filter((subItem) => !subItem.code || allowedCodes.has(subItem.code))
 
-      if (allowedCodes.has(item.code) || subItems.length > 0) {
+      if (parentAllowed || subItems.length > 0) {
         filteredItems.push({ ...item, subItems })
       }
 

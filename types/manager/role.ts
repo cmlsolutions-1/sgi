@@ -6,8 +6,9 @@ export type RoleStatus = "ACTIVE" | "INACTIVE"
 export type Role = {
   id: string
   name: string
+  description?: string
   status: RoleStatus
-  permissions: string[]
+  permissions: Array<string | { id?: string; name?: string }>
 }
 
 export type CreateRoleDto = {

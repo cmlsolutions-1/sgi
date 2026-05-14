@@ -29,6 +29,15 @@ export async function listRoles(): Promise<Role[]> {
 }
 
 /**
+ * Listar roles por compaÃ±Ã­a
+ * GET /api/role/get_roles_by_company/{companyId}
+ */
+export async function listRolesByCompany(companyId: string): Promise<Role[]> {
+  const res = await apiFetch(`/api/role/get_roles_by_company/${companyId}`, { method: "GET" })
+  return parseOrThrow<Role[]>(res, "No se pudo listar los roles de la compaÃ±Ã­a")
+}
+
+/**
  * Obtener rol por ID
  * GET /api/role/{id}
  */
@@ -70,4 +79,17 @@ export async function updateRole(id: string, dto: UpdateRoleDto): Promise<void> 
 export async function deleteRole(id: string): Promise<void> {
   const res = await apiFetch(`/api/role/${id}`, { method: "DELETE" })
   await parseOrThrow<Record<string, never>>(res, "No se pudo eliminar el rol")
+}
+
+/**
+ * Actualizar rol desde super administrador para una compaÃ±Ã­a
+ * PUT /api/role/update_rol_by_system_admin/{id}/company/{companyId}
+ */
+export async function updateRoleBySystemAdmin(id: string, companyId: string, dto: UpdateRoleDto): Promise<void> {
+  const res = await apiFetch(`/api/role/update_rol_by_system_admin/${id}/company/${companyId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dto),
+  })
+  await parseOrThrow<Record<string, never>>(res, "No se pudo actualizar el rol")
 }

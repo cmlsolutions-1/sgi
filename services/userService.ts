@@ -118,3 +118,12 @@ export async function deleteUser(id: string): Promise<void> {
   const res = await apiFetch(`/api/user/${id}`, { method: "DELETE" });
   await parseOrThrow<Record<string, never>>(res, "No se pudo eliminar el usuario");
 }
+
+/**
+ * Activar usuario por ID
+ * PUT /api/user/active/{id}
+ */
+export async function activateUser(id: string): Promise<void> {
+  const res = await apiFetch(`/api/user/active/${id}`, { method: "PUT" });
+  await parseOrThrow<Record<string, never>>(res, "No se pudo activar el usuario");
+}
