@@ -37,7 +37,7 @@ const emptyForm: FormState = {
   description: "",
 }
 
-export default function WorkAreasPage() {
+export function WorkAreasManager() {
   const [workAreas, setWorkAreas] = useState<WorkArea[]>([])
   const [search, setSearch] = useState("")
   const [open, setOpen] = useState(false)
@@ -283,4 +283,8 @@ export default function WorkAreasPage() {
       </Card>
     </div>
   )
+}
+
+export default function WorkAreasPage() {
+  return <WorkAreasManager />
 }

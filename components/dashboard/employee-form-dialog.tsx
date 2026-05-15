@@ -1,98 +1,160 @@
-"use client";
+"use client"
 
-import type React from "react";
-import { useState } from "react";
+import type React from "react"
+import { useEffect, useMemo, useState } from "react"
+import { Loader2, Pencil, Plus } from "lucide-react"
+import { toast } from "sonner"
+
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { typeContract, type Employee } from "@/lib/mock-data";
-import { Plus, Pencil } from "lucide-react";
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { listJobs } from "@/services/jobService"
+import { listWorkAreaOptions } from "@/services/workAreaService"
+import type { CreateEmployeeDto, Employee, UpdateEmployeeDto } from "@/types/manager/employee"
+import type { Job } from "@/types/manager/job"
+import type { WorkAreaOption } from "@/types/manager/work-area"
+
+type EmployeeFormValues = {
+  name: string
+  lastName: string
+  phone: string
+  email: string
+  address: string
+  birthDate: string
+  workAreaId: string
+  jobId: string
+  status: boolean
+}
+
+type EmployeeFormPayload = CreateEmployeeDto | UpdateEmployeeDto
 
 interface EmployeeFormDialogProps {
-  employee?: Employee;
-  onSave: (employee: Partial<Employee>) => void;
-  trigger?: React.ReactNode;
+  employee?: Employee
+  onSave: (employee: EmployeeFormPayload) => Promise<void> | void
+  trigger?: React.ReactNode
+}
+
+const emptyForm: EmployeeFormValues = {
+  name: "",
+  lastName: "",
+  phone: "",
+  email: "",
+  address: "",
+  birthDate: "",
+  workAreaId: "",
+  jobId: "",
+  status: true,
+}
+
+function toDateInput(value?: string | null) {
+  if (!value) return ""
+  return value.slice(0, 10)
+}
+
+function getInitialForm(employee?: Employee): EmployeeFormValues {
+  if (!employee) return emptyForm
+
+  return {
+    name: employee.name ?? "",
+    lastName: employee.lastName ?? "",
+    phone: employee.phone ?? "",
+    email: employee.email ?? "",
+    address: employee.address ?? "",
+    birthDate: toDateInput(employee.birthDate),
+    workAreaId: employee.workAreaId ?? "",
+    jobId: employee.jobId ?? "",
+    status: employee.status ?? true,
+  }
 }
 
 export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDialogProps) {
-  const [open, setOpen] = useState(false);
-  
-  // Ajustamos los valores por defecto según el modelo de Employee
-  const [formData, setFormData] = useState<Partial<Employee>>(
-    employee || {
-      id: "",
-      name: "",
-      lastName: "",
-      document: "",
-      companyId: "comp-001", // Valor por defecto, puedes cambiarlo
-      userId: "", // Este campo probablemente deba ser seleccionable de los usuarios existentes
-      jobId: "", // Este campo probablemente deba ser seleccionable de los jobs existentes
-      workAreId: "", // Este campo probablemente deba ser seleccionable de las áreas existentes
-      entryDate: new Date().toISOString().split("T")[0], // Fecha actual por defecto
-      typeContract: "Término indefinido", // Valor por defecto
-      status: true, // Booleano por defecto
-      position: "",
-      department: "",
-      phone: "",
-      hireDate: new Date().toISOString().split("T")[0],
-      birthDate: "",
-      address: "",
-      education: "",
-      certifications: [],
-    }
-  );
+  const [open, setOpen] = useState(false)
+  const [formData, setFormData] = useState<EmployeeFormValues>(() => getInitialForm(employee))
+  const [workAreas, setWorkAreas] = useState<WorkAreaOption[]>([])
+  const [jobs, setJobs] = useState<Job[]>([])
+  const [loadingOptions, setLoadingOptions] = useState(false)
+  const [saving, setSaving] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Si es un nuevo empleado, generamos un ID único
-    const employeeToSave = {
-      ...formData,
-      id: employee?.id || `emp-${Date.now()}`, // Generamos un ID único para el empleado
-    };
-    
-    onSave(employeeToSave);
-    setOpen(false);
-    
-    // Reiniciar el formulario después de guardar un nuevo empleado
-    if (!employee) {
-      setFormData({
-        id: "",
-        name: "",
-        lastName: "",
-        document: "",
-        companyId: "comp-001",
-        userId: "",
-        jobId: "",
-        workAreId: "",
-        entryDate: new Date().toISOString().split("T")[0],
-        typeContract: "Término indefinido",
-        status: true,
-        position: "",
-        department: "",
-        phone: "",
-        hireDate: new Date().toISOString().split("T")[0],
-        birthDate: "",
-        address: "",
-        education: "",
-        certifications: [],
-      });
+  const availableJobs = useMemo(() => {
+    if (!formData.workAreaId) return jobs
+    return jobs.filter((job) => job.workAreaId === formData.workAreaId)
+  }, [formData.workAreaId, jobs])
+
+  useEffect(() => {
+    if (!open) return
+
+    setFormData(getInitialForm(employee))
+    setLoadingOptions(true)
+
+    Promise.all([listWorkAreaOptions(), listJobs()])
+      .then(([workAreaData, jobsData]) => {
+        setWorkAreas(workAreaData)
+        setJobs(jobsData.items ?? [])
+      })
+      .catch((error: any) => {
+        toast.error(error.message ?? "No se pudieron cargar areas y puestos")
+      })
+      .finally(() => setLoadingOptions(false))
+  }, [employee, open])
+
+  function updateField<K extends keyof EmployeeFormValues>(field: K, value: EmployeeFormValues[K]) {
+    setFormData((current) => {
+      if (field === "workAreaId" && current.workAreaId !== value) {
+        return { ...current, workAreaId: value as string, jobId: "" }
+      }
+
+      return { ...current, [field]: value }
+    })
+  }
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault()
+
+    if (!formData.name.trim() || !formData.lastName.trim()) {
+      toast.error("Nombre y apellido son requeridos")
+      return
     }
-  };
+
+    if (!formData.workAreaId) {
+      toast.error("Selecciona un area de trabajo")
+      return
+    }
+
+    if (!formData.jobId) {
+      toast.error("Selecciona un puesto de trabajo")
+      return
+    }
+
+    const payload: EmployeeFormPayload = {
+      name: formData.name.trim(),
+      lastName: formData.lastName.trim(),
+      phone: formData.phone.trim(),
+      email: formData.email.trim(),
+      address: formData.address.trim(),
+      birthDate: formData.birthDate,
+      workAreaId: formData.workAreaId,
+      jobId: formData.jobId,
+      status: formData.status,
+    }
+
+    setSaving(true)
+    try {
+      await onSave(payload)
+      setOpen(false)
+      if (!employee) setFormData(emptyForm)
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -100,294 +162,157 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
         {trigger || (
           <Button className="gap-2">
             <Plus className="h-4 w-4" />
-            Nuevo Empleado
+            Nuevo funcionario
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="bg-card border-border max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>{employee ? "Editar Empleado" : "Crear Empleado"}</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Información Básica */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="document">Documento</Label>
-              <Input
-                id="document"
-                value={formData.document}
-                onChange={(e) =>
-                  setFormData({ ...formData, document: e.target.value })
-                }
-                placeholder="Número de documento"
-                className="bg-secondary border-border"
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="name">Nombre</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                placeholder="Nombre del empleado"
-                className="bg-secondary border-border"
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Apellido</Label>
-              <Input
-                id="lastName"
-                value={formData.lastName}
-                onChange={(e) =>
-                  setFormData({ ...formData, lastName: e.target.value })
-                }
-                placeholder="Apellido del empleado"
-                className="bg-secondary border-border"
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="position">Cargo</Label>
-              <Input
-                id="position"
-                value={formData.position || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, position: e.target.value })
-                }
-                placeholder="Cargo del empleado"
-                className="bg-secondary border-border"
-              />
-            </div>
-          </div>
+      <DialogContent className="max-w-3xl bg-card border-border">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>{employee ? "Editar funcionario" : "Crear funcionario"}</DialogTitle>
+          </DialogHeader>
 
-          {/* Información Adicional */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="phone">Teléfono</Label>
-              <Input
-                id="phone"
-                value={formData.phone || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
-                placeholder="Teléfono de contacto"
-                className="bg-secondary border-border"
-              />
+          {loadingOptions ? (
+            <div className="flex min-h-[260px] items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="hireDate">Fecha de Ingreso</Label>
-              <Input
-                id="hireDate"
-                type="date"
-                value={formData.hireDate || formData.entryDate || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, hireDate: e.target.value, entryDate: e.target.value })
-                }
-                className="bg-secondary border-border"
-              />
+          ) : (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="employee-name">Nombre</Label>
+                  <Input
+                    id="employee-name"
+                    value={formData.name}
+                    onChange={(event) => updateField("name", event.target.value)}
+                    placeholder="Nombre"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="employee-lastName">Apellido</Label>
+                  <Input
+                    id="employee-lastName"
+                    value={formData.lastName}
+                    onChange={(event) => updateField("lastName", event.target.value)}
+                    placeholder="Apellido"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="employee-phone">Telefono</Label>
+                  <Input
+                    id="employee-phone"
+                    value={formData.phone}
+                    onChange={(event) => updateField("phone", event.target.value)}
+                    placeholder="Telefono de contacto"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="employee-email">Correo</Label>
+                  <Input
+                    id="employee-email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(event) => updateField("email", event.target.value)}
+                    placeholder="correo@empresa.com"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="employee-birthDate">Fecha de nacimiento</Label>
+                  <Input
+                    id="employee-birthDate"
+                    type="date"
+                    value={formData.birthDate}
+                    onChange={(event) => updateField("birthDate", event.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Estado</Label>
+                  <Select value={String(formData.status)} onValueChange={(value) => updateField("status", value === "true")}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true">Activo</SelectItem>
+                      <SelectItem value="false">Inactivo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="employee-address">Direccion</Label>
+                  <Input
+                    id="employee-address"
+                    value={formData.address}
+                    onChange={(event) => updateField("address", event.target.value)}
+                    placeholder="Direccion de residencia"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Area de trabajo</Label>
+                  <Select value={formData.workAreaId} onValueChange={(value) => updateField("workAreaId", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona un area" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {workAreas.map((area) => (
+                        <SelectItem key={area.id} value={area.id}>
+                          {area.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Puesto de trabajo</Label>
+                  <Select
+                    value={formData.jobId}
+                    onValueChange={(value) => updateField("jobId", value)}
+                    disabled={!formData.workAreaId || availableJobs.length === 0}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona un puesto" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableJobs.map((job) => (
+                        <SelectItem key={job.id} value={job.id}>
+                          {job.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="birthDate">Fecha de Nacimiento</Label>
-              <Input
-                id="birthDate"
-                type="date"
-                value={formData.birthDate || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, birthDate: e.target.value })
-                }
-                className="bg-secondary border-border"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="address">Dirección</Label>
-              <Input
-                id="address"
-                value={formData.address || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, address: e.target.value })
-                }
-                placeholder="Dirección del empleado"
-                className="bg-secondary border-border"
-              />
-            </div>
-          </div>
+          )}
 
-          {/* Selecciones */}
-          <div className="grid grid-cols-6 md:grid-cols-3 lg:grid-cols-3 gap-3">
-
-          <div className="space-y-2">
-              <Label htmlFor="jobId">Cargo/Posición</Label>
-              <Select
-                value={formData.jobId}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, jobId: value })
-                }
-              >
-                <SelectTrigger className="bg-secondary border-border">
-                  <SelectValue placeholder="Seleccionar" />
-                </SelectTrigger>
-                <SelectContent>
-                  {/* Aquí deberías mapear los jobs disponibles */}
-                  <SelectItem value="job-001">Desarrollador Full Stack</SelectItem>
-                  <SelectItem value="job-002">Analista de Calidad</SelectItem>
-                  {/* Agrega más opciones según tus datos reales */}
-                </SelectContent>
-              </Select>
-            </div>
-          
-          <div className="space-y-2">
-              <Label htmlFor="typeContract">Tipo de Contrato</Label>
-              <Select
-                value={formData.typeContract || "Término indefinido"}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, typeContract: value })
-                }
-              >
-                <SelectTrigger className="bg-secondary border-border">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {typeContract.map((contract) => (
-                    <SelectItem key={contract} value={contract}>
-                      {contract}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-
-            
-
-            <div className="space-y-2">
-              <Label htmlFor="workAreId">Área de Trabajo</Label>
-              <Select
-                value={formData.workAreId}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, workAreId: value })
-                }
-              >
-                <SelectTrigger className="bg-secondary border-border">
-                  <SelectValue placeholder="Seleccionar" />
-                </SelectTrigger>
-                <SelectContent>
-                  {/* Aquí deberías mapear las áreas disponibles */}
-                  <SelectItem value="area-001">Desarrollo de Software</SelectItem>
-                  <SelectItem value="area-002">Calidad</SelectItem>
-                  {/* Agrega más opciones según tus datos reales */}
-                </SelectContent>
-              </Select>
-            </div>
-
-            
-          </div>
-
-          {/* Estado */}
-          <div className="grid grid-cols-3 md:grid-cols-3 gap-4">
-
-          <div className="space-y-2">
-              <Label htmlFor="userId">Usuario Asociado</Label>
-              <Select
-                value={formData.userId}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, userId: value })
-                }
-              >
-                <SelectTrigger className="bg-secondary border-border">
-                  <SelectValue placeholder="Seleccionar" />
-                </SelectTrigger>
-                <SelectContent>
-                  {/* Aquí deberías mapear los usuarios disponibles */}
-                  <SelectItem value="usr-123">Usuario 1</SelectItem>
-                  <SelectItem value="usr-124">Usuario 2</SelectItem>
-                  {/* Agrega más opciones según tus datos reales */}
-                </SelectContent>
-              </Select>
-            </div>
-            
-          
-
-            <div className="space-y-2">
-              <Label htmlFor="status">Estado</Label>
-              <Select
-                value={formData.status !== undefined ? formData.status.toString() : "true"}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, status: value === "true" })
-                }
-              >
-                <SelectTrigger className="bg-secondary border-border">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="true">Activo</SelectItem>
-                  <SelectItem value="false">Inactivo</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="education">Educación</Label>
-              <Input
-                id="education"
-                value={formData.education || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, education: e.target.value })
-                }
-                placeholder="Nivel educativo"
-                className="bg-secondary border-border"
-              />
-            </div>
-          </div>
-
-          {/* Certificaciones */}
-          <div className="space-y-2">
-            <Label htmlFor="certifications">Certificaciones (separadas por coma)</Label>
-            <Input
-              id="certifications"
-              value={formData.certifications ? formData.certifications.join(", ") : ""}
-              onChange={(e) => {
-                const certs = e.target.value.split(",").map(cert => cert.trim()).filter(cert => cert);
-                setFormData({ ...formData, certifications: certs });
-              }}
-              placeholder="Certificado 1, Certificado 2, etc."
-              className="bg-secondary border-border"
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
-            <Button type="submit">
-              {employee ? "Guardar Cambios" : "Crear Empleado"}
+            <Button type="submit" disabled={saving || loadingOptions}>
+              {saving ? "Guardando..." : employee ? "Guardar cambios" : "Crear funcionario"}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
 
 export function EditEmployeeButton({
   employee,
   onSave,
 }: {
-  employee: Employee;
-  onSave: (employee: Partial<Employee>) => void;
+  employee: Employee
+  onSave: (employee: EmployeeFormPayload) => Promise<void> | void
 }) {
   return (
     <EmployeeFormDialog
@@ -399,5 +324,5 @@ export function EditEmployeeButton({
         </Button>
       }
     />
-  );
+  )
 }

@@ -38,7 +38,7 @@ const emptyForm: FormState = {
   status: "ACTIVE",
 }
 
-export default function JobsPage() {
+export function JobsManager() {
   const [jobs, setJobs] = useState<Job[]>([])
   const [workAreas, setWorkAreas] = useState<WorkAreaOption[]>([])
   const [search, setSearch] = useState("")
@@ -359,4 +359,8 @@ export default function JobsPage() {
       </Card>
     </div>
   )
+}
+
+export default function JobsPage() {
+  return <JobsManager />
 }
