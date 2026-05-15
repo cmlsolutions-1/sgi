@@ -9,11 +9,13 @@ import {
   Building,
   Calendar,
   Edit,
+  GraduationCap,
   Loader2,
   Mail,
   MapPin,
   Phone,
   Plus,
+  Trash2,
   User,
 } from "lucide-react"
 import { toast } from "sonner"
@@ -35,15 +37,26 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
+  createEmployeeEducation,
+  deleteEmployeeEducation,
   getEmployeeById,
+  listEmployeeEducation,
   listArlCatalog,
   listCompensationCatalog,
   listEpsCatalog,
   listPensionCatalog,
+  updateEmployeeEducation,
   updateEmployeeSocialSecurity,
 } from "@/services/employeeService"
 import { cn } from "@/lib/utils"
-import type { Employee, EmployeeCatalogOption, UpdateEmployeeSocialSecurityDto } from "@/types/manager/employee"
+import type {
+  CreateEmployeeEducationDto,
+  Employee,
+  EmployeeCatalogOption,
+  EmployeeEducation,
+  UpdateEmployeeEducationDto,
+  UpdateEmployeeSocialSecurityDto,
+} from "@/types/manager/employee"
 
 type SocialSecurityItem = {
   key: "eps" | "arl" | "pension" | "compensation"
@@ -250,9 +263,180 @@ function SocialSecurityDialog({
   )
 }
 
+type EducationFormState = CreateEmployeeEducationDto
+
+const emptyEducationForm: EducationFormState = {
+  level: "",
+  institution: "",
+  degree: "",
+  fieldOfStudy: "",
+  startDate: "",
+  endDate: "",
+  isCompleted: true,
+}
+
+function EducationDialog({
+  education,
+  onSave,
+}: {
+  education?: EmployeeEducation
+  onSave: (payload: CreateEmployeeEducationDto | UpdateEmployeeEducationDto, educationId?: string) => Promise<void>
+}) {
+  const [open, setOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState<EducationFormState>(emptyEducationForm)
+
+  useEffect(() => {
+    if (!open) return
+
+    setForm(
+      education
+        ? {
+            level: education.level ?? "",
+            institution: education.institution ?? "",
+            degree: education.degree ?? "",
+            fieldOfStudy: education.fieldOfStudy ?? "",
+            startDate: formatDate(education.startDate) === "No registrada" ? "" : formatDate(education.startDate),
+            endDate: formatDate(education.endDate) === "No registrada" ? "" : formatDate(education.endDate),
+            isCompleted: education.isCompleted ?? true,
+          }
+        : emptyEducationForm,
+    )
+  }, [education, open])
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault()
+
+    if (!form.level || !form.institution || !form.degree || !form.startDate) {
+      toast.error("Completa nivel, institucion, titulo y fecha de inicio")
+      return
+    }
+
+    setSaving(true)
+    try {
+      await onSave(form, education?.id)
+      setOpen(false)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant={education ? "outline" : "default"} size="sm" className="gap-2">
+          {education ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          {education ? "Editar" : "Agregar educacion"}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-card max-w-2xl">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>{education ? "Editar educacion" : "Agregar educacion"}</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="education-level">Nivel</Label>
+                <Input
+                  id="education-level"
+                  value={form.level}
+                  onChange={(event) => setForm((current) => ({ ...current, level: event.target.value }))}
+                  placeholder="Ej: Universitario"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="education-institution">Institucion</Label>
+                <Input
+                  id="education-institution"
+                  value={form.institution}
+                  onChange={(event) => setForm((current) => ({ ...current, institution: event.target.value }))}
+                  placeholder="Nombre de la institucion"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="education-degree">Titulo</Label>
+                <Input
+                  id="education-degree"
+                  value={form.degree}
+                  onChange={(event) => setForm((current) => ({ ...current, degree: event.target.value }))}
+                  placeholder="Ej: Ingeniero Industrial"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="education-field">Area de estudio</Label>
+                <Input
+                  id="education-field"
+                  value={form.fieldOfStudy}
+                  onChange={(event) => setForm((current) => ({ ...current, fieldOfStudy: event.target.value }))}
+                  placeholder="Ej: Seguridad y salud"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="grid gap-2">
+                <Label htmlFor="education-start">Fecha inicio</Label>
+                <Input
+                  id="education-start"
+                  type="date"
+                  value={form.startDate}
+                  onChange={(event) => setForm((current) => ({ ...current, startDate: event.target.value }))}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="education-end">Fecha fin</Label>
+                <Input
+                  id="education-end"
+                  type="date"
+                  value={form.endDate}
+                  onChange={(event) => setForm((current) => ({ ...current, endDate: event.target.value }))}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>Estado</Label>
+                <Select
+                  value={String(form.isCompleted)}
+                  onValueChange={(value) => setForm((current) => ({ ...current, isCompleted: value === "true" }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="true">Finalizado</SelectItem>
+                    <SelectItem value="false">En curso</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Guardando..." : "Guardar educacion"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export default function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const [employee, setEmployee] = useState<Employee | null>(null)
+  const [education, setEducation] = useState<EmployeeEducation[]>([])
   const [catalogs, setCatalogs] = useState({
     eps: [] as EmployeeCatalogOption[],
     arl: [] as EmployeeCatalogOption[],
@@ -267,14 +451,16 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     async function loadEmployee() {
       setLoading(true)
       try {
-        const [data, eps, arl, pension, compensation] = await Promise.all([
+        const [data, educationData, eps, arl, pension, compensation] = await Promise.all([
           getEmployeeById(id),
+          listEmployeeEducation(id),
           listEpsCatalog(),
           listArlCatalog(),
           listPensionCatalog(),
           listCompensationCatalog(),
         ])
         if (mounted) setEmployee(data)
+        if (mounted) setEducation(educationData)
         if (mounted) setCatalogs({ eps, arl, pension, compensation })
       } catch (error: any) {
         toast.error(error.message ?? "No se pudo cargar el funcionario")
@@ -377,6 +563,43 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     }
   }
 
+  async function handleSaveEducation(
+    payload: CreateEmployeeEducationDto | UpdateEmployeeEducationDto,
+    educationId?: string,
+  ) {
+    if (!employee) return
+
+    try {
+      if (educationId) {
+        await updateEmployeeEducation(employee.id, educationId, payload)
+        toast.success("Educacion actualizada")
+      } else {
+        await createEmployeeEducation(employee.id, payload as CreateEmployeeEducationDto)
+        toast.success("Educacion agregada")
+      }
+
+      const updatedEducation = await listEmployeeEducation(employee.id)
+      setEducation(updatedEducation)
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo guardar la educacion")
+      throw error
+    }
+  }
+
+  async function handleDeleteEducation(educationId: string) {
+    if (!employee) return
+    if (!window.confirm("Eliminar este registro de educacion?")) return
+
+    try {
+      await deleteEmployeeEducation(employee.id, educationId)
+      const updatedEducation = await listEmployeeEducation(employee.id)
+      setEducation(updatedEducation)
+      toast.success("Educacion eliminada")
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo eliminar la educacion")
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -450,6 +673,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         <TabsList className="bg-secondary">
           <TabsTrigger value="info">Informacion Personal</TabsTrigger>
           <TabsTrigger value="socialSecurity">Seguridad Social</TabsTrigger>
+          <TabsTrigger value="education">Educacion</TabsTrigger>
         </TabsList>
 
         <TabsContent value="info">
@@ -555,6 +779,81 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                   )
                 })}
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="education">
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <div className="flex items-center justify-between gap-4">
+                <CardTitle className="flex items-center gap-2 text-base font-medium">
+                  <GraduationCap className="h-5 w-5" />
+                  Educacion
+                </CardTitle>
+                <EducationDialog onSave={handleSaveEducation} />
+              </div>
+            </CardHeader>
+            <CardContent>
+              {education.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-border p-8 text-center">
+                  <GraduationCap className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm font-medium">Sin registros de educacion</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Agrega estudios, certificaciones academicas o formacion profesional del funcionario.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {education.map((item) => (
+                    <div key={item.id} className="rounded-lg border border-border p-4">
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="font-medium">{item.degree}</h3>
+                            <Badge variant={item.isCompleted ? "default" : "secondary"}>
+                              {item.isCompleted ? "Finalizado" : "En curso"}
+                            </Badge>
+                          </div>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {item.level} - {item.institution}
+                          </p>
+                          {item.fieldOfStudy && (
+                            <p className="mt-1 text-sm text-muted-foreground">Area: {item.fieldOfStudy}</p>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <EducationDialog education={item} onSave={handleSaveEducation} />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2 text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteEducation(item.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Eliminar
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Inicio: {formatDate(item.startDate)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Fin: {formatDate(item.endDate)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Creado: {formatDate(item.createdAt)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

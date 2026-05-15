@@ -49,6 +49,31 @@ export type Employee = {
   status: boolean
 }
 
+export type EmployeeEducation = {
+  id: string
+  employeeId: string
+  level: string
+  institution: string
+  degree: string
+  fieldOfStudy: string
+  startDate: string
+  endDate: string
+  isCompleted: boolean
+  createdAt: string
+}
+
+export type CreateEmployeeEducationDto = {
+  level: string
+  institution: string
+  degree: string
+  fieldOfStudy: string
+  startDate: string
+  endDate: string
+  isCompleted: boolean
+}
+
+export type UpdateEmployeeEducationDto = Partial<CreateEmployeeEducationDto>
+
 export type CreateEmployeeDto = {
   name: string
   lastName: string
@@ -114,3 +139,5 @@ export type UpdateEmployeeSocialSecurityDto = Partial<
 export type EmployeeResponse = ApiResponse<Employee>
 export type EmployeesResponse = ApiResponse<Employee[]>
 export type EmployeeCatalogResponse = ApiResponse<EmployeeCatalogOption[]>
+export type EmployeeEducationResponse = ApiResponse<EmployeeEducation>
+export type EmployeeEducationsResponse = ApiResponse<EmployeeEducation[]>

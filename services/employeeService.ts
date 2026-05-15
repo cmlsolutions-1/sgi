@@ -1,12 +1,17 @@
 import { apiFetch } from "@/lib/apiClient"
 import type {
   CreateEmployeeDto,
+  CreateEmployeeEducationDto,
   Employee,
   EmployeeCatalogOption,
   EmployeeCatalogResponse,
+  EmployeeEducation,
+  EmployeeEducationResponse,
+  EmployeeEducationsResponse,
   EmployeeResponse,
   EmployeesResponse,
   UpdateEmployeeDto,
+  UpdateEmployeeEducationDto,
   UpdateEmployeeSocialSecurityDto,
 } from "@/types/manager/employee"
 
@@ -15,6 +20,8 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
     | EmployeeResponse
     | EmployeesResponse
     | EmployeeCatalogResponse
+    | EmployeeEducationResponse
+    | EmployeeEducationsResponse
     | null
 
   if (!res.ok || !json?.ok) {
@@ -92,4 +99,44 @@ export async function listPensionCatalog(): Promise<EmployeeCatalogOption[]> {
 export async function listCompensationCatalog(): Promise<EmployeeCatalogOption[]> {
   const res = await apiFetch("/api/employees/catalogs/compensations", { method: "GET" })
   return parseOrThrow<EmployeeCatalogOption[]>(res, "No se pudo cargar el catalogo de cajas de compensacion")
+}
+
+export async function createEmployeeEducation(
+  employeeId: string,
+  dto: CreateEmployeeEducationDto,
+): Promise<EmployeeEducation> {
+  const res = await apiFetch(`/api/employees/${employeeId}/education`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dto),
+  })
+  return parseOrThrow<EmployeeEducation>(res, "No se pudo crear la educacion")
+}
+
+export async function listEmployeeEducation(employeeId: string): Promise<EmployeeEducation[]> {
+  const res = await apiFetch(`/api/employees/${employeeId}/education`, { method: "GET" })
+  return parseOrThrow<EmployeeEducation[]>(res, "No se pudo cargar la educacion")
+}
+
+export async function getEmployeeEducationById(employeeId: string, educationId: string): Promise<EmployeeEducation> {
+  const res = await apiFetch(`/api/employees/${employeeId}/education/${educationId}`, { method: "GET" })
+  return parseOrThrow<EmployeeEducation>(res, "No se pudo cargar la educacion")
+}
+
+export async function updateEmployeeEducation(
+  employeeId: string,
+  educationId: string,
+  dto: UpdateEmployeeEducationDto,
+): Promise<EmployeeEducation> {
+  const res = await apiFetch(`/api/employees/${employeeId}/education/${educationId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dto),
+  })
+  return parseOrThrow<EmployeeEducation>(res, "No se pudo actualizar la educacion")
+}
+
+export async function deleteEmployeeEducation(employeeId: string, educationId: string): Promise<void> {
+  const res = await apiFetch(`/api/employees/${employeeId}/education/${educationId}`, { method: "DELETE" })
+  await parseOrThrow<Record<string, never>>(res, "No se pudo eliminar la educacion")
 }
