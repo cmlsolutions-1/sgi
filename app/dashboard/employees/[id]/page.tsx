@@ -4,17 +4,21 @@ import { use, useEffect, useState } from "react"
 import Link from "next/link"
 import {
   Activity,
+  Award,
   ArrowLeft,
   BriefcaseBusiness,
   Building,
   Calendar,
+  ClipboardCheck,
   Edit,
+  ExternalLink,
   GraduationCap,
   Loader2,
   Mail,
   MapPin,
   Phone,
   Plus,
+  Stethoscope,
   Trash2,
   User,
 } from "lucide-react"
@@ -37,26 +41,56 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
+  createEmployeeCertification,
+  createEmployeeContract,
   createEmployeeEducation,
+  createEmployeeEvaluation,
+  createEmployeeMedicalEvaluation,
+  deleteEmployeeCertification,
+  deleteEmployeeContract,
   deleteEmployeeEducation,
+  deleteEmployeeEvaluation,
+  deleteEmployeeMedicalEvaluation,
   getEmployeeById,
+  listEmployeeCertifications,
+  listEmployeeContracts,
   listEmployeeEducation,
+  listEmployeeEvaluations,
+  listEmployeeMedicalEvaluations,
+  listEmployees,
   listArlCatalog,
   listCompensationCatalog,
   listEpsCatalog,
   listPensionCatalog,
+  updateEmployeeCertification,
+  updateEmployeeContract,
   updateEmployeeEducation,
+  updateEmployeeEvaluation,
+  updateEmployeeMedicalEvaluation,
   updateEmployeeSocialSecurity,
 } from "@/services/employeeService"
 import { cn } from "@/lib/utils"
 import type {
+  CreateEmployeeCertificationDto,
+  CreateEmployeeContractDto,
   CreateEmployeeEducationDto,
+  CreateEmployeeEvaluationDto,
+  CreateEmployeeMedicalEvaluationDto,
   Employee,
   EmployeeCatalogOption,
+  EmployeeCertification,
+  EmployeeContract,
   EmployeeEducation,
+  EmployeeEvaluation,
+  EmployeeMedicalEvaluation,
+  UpdateEmployeeCertificationDto,
+  UpdateEmployeeContractDto,
   UpdateEmployeeEducationDto,
+  UpdateEmployeeEvaluationDto,
+  UpdateEmployeeMedicalEvaluationDto,
   UpdateEmployeeSocialSecurityDto,
 } from "@/types/manager/employee"
+import { Textarea } from "@/components/ui/textarea"
 
 type SocialSecurityItem = {
   key: "eps" | "arl" | "pension" | "compensation"
@@ -73,6 +107,16 @@ type SocialSecurityItem = {
 function formatDate(value?: string | null) {
   if (!value) return "No registrada"
   return value.slice(0, 10)
+}
+
+function formatCurrency(value?: number | null) {
+  if (typeof value !== "number") return "No registrado"
+
+  return new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  }).format(value)
 }
 
 function getInitials(employee: Employee) {
@@ -433,10 +477,721 @@ function EducationDialog({
   )
 }
 
+type CertificationFormState = CreateEmployeeCertificationDto
+
+const emptyCertificationForm: CertificationFormState = {
+  name: "",
+  issuer: "",
+  issuedAt: "",
+  expiresAt: "",
+  credentialId: "",
+  credentialUrl: "",
+}
+
+function CertificationDialog({
+  certification,
+  onSave,
+}: {
+  certification?: EmployeeCertification
+  onSave: (
+    payload: CreateEmployeeCertificationDto | UpdateEmployeeCertificationDto,
+    certificationId?: string,
+  ) => Promise<void>
+}) {
+  const [open, setOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState<CertificationFormState>(emptyCertificationForm)
+
+  useEffect(() => {
+    if (!open) return
+
+    setForm(
+      certification
+        ? {
+            name: certification.name ?? "",
+            issuer: certification.issuer ?? "",
+            issuedAt: formatDate(certification.issuedAt) === "No registrada" ? "" : formatDate(certification.issuedAt),
+            expiresAt: formatDate(certification.expiresAt) === "No registrada" ? "" : formatDate(certification.expiresAt),
+            credentialId: certification.credentialId ?? "",
+            credentialUrl: certification.credentialUrl ?? "",
+          }
+        : emptyCertificationForm,
+    )
+  }, [certification, open])
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault()
+
+    if (!form.name || !form.issuer || !form.issuedAt) {
+      toast.error("Completa nombre, entidad emisora y fecha de expedicion")
+      return
+    }
+
+    setSaving(true)
+    try {
+      await onSave(form, certification?.id)
+      setOpen(false)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant={certification ? "outline" : "default"} size="sm" className="gap-2">
+          {certification ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          {certification ? "Editar" : "Agregar certificacion"}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-card max-w-2xl">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>{certification ? "Editar certificacion" : "Agregar certificacion"}</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="certification-name">Nombre</Label>
+                <Input
+                  id="certification-name"
+                  value={form.name}
+                  onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+                  placeholder="Ej: Trabajo seguro en alturas"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="certification-issuer">Entidad emisora</Label>
+                <Input
+                  id="certification-issuer"
+                  value={form.issuer}
+                  onChange={(event) => setForm((current) => ({ ...current, issuer: event.target.value }))}
+                  placeholder="Ej: SENA"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="certification-issued">Fecha expedicion</Label>
+                <Input
+                  id="certification-issued"
+                  type="date"
+                  value={form.issuedAt}
+                  onChange={(event) => setForm((current) => ({ ...current, issuedAt: event.target.value }))}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="certification-expires">Fecha vencimiento</Label>
+                <Input
+                  id="certification-expires"
+                  type="date"
+                  value={form.expiresAt}
+                  onChange={(event) => setForm((current) => ({ ...current, expiresAt: event.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="certification-credential-id">ID credencial</Label>
+                <Input
+                  id="certification-credential-id"
+                  value={form.credentialId}
+                  onChange={(event) => setForm((current) => ({ ...current, credentialId: event.target.value }))}
+                  placeholder="Codigo o numero de certificado"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="certification-credential-url">URL credencial</Label>
+                <Input
+                  id="certification-credential-url"
+                  value={form.credentialUrl}
+                  onChange={(event) => setForm((current) => ({ ...current, credentialUrl: event.target.value }))}
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Guardando..." : "Guardar certificacion"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+type ContractFormState = Omit<CreateEmployeeContractDto, "salary"> & {
+  endDate: string
+  salary: string
+}
+
+const emptyContractForm: ContractFormState = {
+  type: "INDEFINIDO",
+  status: "ACTIVE",
+  startDate: "",
+  endDate: "",
+  signedAt: "",
+  salary: "",
+}
+
+function ContractDialog({
+  contract,
+  onSave,
+}: {
+  contract?: EmployeeContract
+  onSave: (payload: CreateEmployeeContractDto | UpdateEmployeeContractDto, contractId?: string) => Promise<void>
+}) {
+  const [open, setOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState<ContractFormState>(emptyContractForm)
+
+  useEffect(() => {
+    if (!open) return
+
+    setForm(
+      contract
+        ? {
+            type: contract.type ?? "INDEFINIDO",
+            status: contract.status ?? "ACTIVE",
+            startDate: formatDate(contract.startDate) === "No registrada" ? "" : formatDate(contract.startDate),
+            endDate: formatDate(contract.endDate) === "No registrada" ? "" : formatDate(contract.endDate),
+            signedAt: formatDate(contract.signedAt) === "No registrada" ? "" : formatDate(contract.signedAt),
+            salary: String(contract.salary ?? ""),
+          }
+        : emptyContractForm,
+    )
+  }, [contract, open])
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault()
+
+    const salary = Number(form.salary)
+    const requiresEndDate = form.type !== "INDEFINIDO"
+
+    if (!form.type || !form.status || !form.startDate || !form.signedAt || Number.isNaN(salary)) {
+      toast.error("Completa tipo, estado, fechas requeridas y salario")
+      return
+    }
+
+    if (requiresEndDate && !form.endDate) {
+      toast.error("La fecha fin es requerida para contratos que no son indefinidos")
+      return
+    }
+
+    const payload: CreateEmployeeContractDto = {
+      type: form.type,
+      status: form.status,
+      startDate: form.startDate,
+      signedAt: form.signedAt,
+      salary,
+      ...(form.endDate ? { endDate: form.endDate } : {}),
+    }
+
+    setSaving(true)
+    try {
+      await onSave(payload, contract?.id)
+      setOpen(false)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant={contract ? "outline" : "default"} size="sm" className="gap-2">
+          {contract ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          {contract ? "Editar" : "Agregar contrato"}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-card max-w-2xl">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>{contract ? "Editar contrato" : "Agregar contrato"}</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label>Tipo de contrato</Label>
+                <Select
+                  value={form.type}
+                  onValueChange={(value) => setForm((current) => ({ ...current, type: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="INDEFINIDO">Indefinido</SelectItem>
+                    <SelectItem value="FIJO">Fijo</SelectItem>
+                    <SelectItem value="OBRA_LABOR">Obra o labor</SelectItem>
+                    <SelectItem value="PRESTACION_SERVICIOS">Prestacion de servicios</SelectItem>
+                    <SelectItem value="APRENDIZAJE">Aprendizaje</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Estado</Label>
+                <Select
+                  value={form.status}
+                  onValueChange={(value) => setForm((current) => ({ ...current, status: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ACTIVE">Activo</SelectItem>
+                    <SelectItem value="INACTIVE">Inactivo</SelectItem>
+                    <SelectItem value="FINISHED">Finalizado</SelectItem>
+                    <SelectItem value="SUSPENDED">Suspendido</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="grid gap-2">
+                <Label htmlFor="contract-start">Fecha inicio</Label>
+                <Input
+                  id="contract-start"
+                  type="date"
+                  value={form.startDate}
+                  onChange={(event) => setForm((current) => ({ ...current, startDate: event.target.value }))}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="contract-end">Fecha fin</Label>
+                <Input
+                  id="contract-end"
+                  type="date"
+                  value={form.endDate}
+                  onChange={(event) => setForm((current) => ({ ...current, endDate: event.target.value }))}
+                  required={form.type !== "INDEFINIDO"}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="contract-signed">Fecha firma</Label>
+                <Input
+                  id="contract-signed"
+                  type="date"
+                  value={form.signedAt}
+                  onChange={(event) => setForm((current) => ({ ...current, signedAt: event.target.value }))}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="contract-salary">Salario</Label>
+              <Input
+                id="contract-salary"
+                type="number"
+                min="0"
+                step="1"
+                value={form.salary}
+                onChange={(event) => setForm((current) => ({ ...current, salary: event.target.value }))}
+                placeholder="0"
+                required
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Guardando..." : "Guardar contrato"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+type EvaluationFormState = CreateEmployeeEvaluationDto
+type EvaluatorOption = Pick<Employee, "id" | "name" | "lastName" | "email">
+
+const emptyEvaluationForm: EvaluationFormState = {
+  evaluatorId: "",
+  startDate: "",
+  endDate: "",
+  score: "",
+  comment: "",
+  type: "PERFORMANCE",
+}
+
+function EvaluationDialog({
+  evaluation,
+  evaluators,
+  onSave,
+}: {
+  evaluation?: EmployeeEvaluation
+  evaluators: EvaluatorOption[]
+  onSave: (payload: CreateEmployeeEvaluationDto | UpdateEmployeeEvaluationDto, evaluationId?: string) => Promise<void>
+}) {
+  const [open, setOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState<EvaluationFormState>(emptyEvaluationForm)
+
+  useEffect(() => {
+    if (!open) return
+
+    setForm(
+      evaluation
+        ? {
+            evaluatorId: evaluation.evaluatorId ?? "",
+            startDate: formatDate(evaluation.startDate) === "No registrada" ? "" : formatDate(evaluation.startDate),
+            endDate: formatDate(evaluation.endDate) === "No registrada" ? "" : formatDate(evaluation.endDate),
+            score: evaluation.score ?? "",
+            comment: evaluation.comment ?? "",
+            type: evaluation.type ?? "PERFORMANCE",
+          }
+        : emptyEvaluationForm,
+    )
+  }, [evaluation, open])
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault()
+
+    if (!form.evaluatorId || !form.startDate || !form.endDate || !form.score || !form.type) {
+      toast.error("Completa evaluador, fechas, puntaje y tipo")
+      return
+    }
+
+    setSaving(true)
+    try {
+      await onSave(form, evaluation?.id)
+      setOpen(false)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant={evaluation ? "outline" : "default"} size="sm" className="gap-2">
+          {evaluation ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          {evaluation ? "Editar" : "Agregar evaluacion"}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-card max-w-2xl">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>{evaluation ? "Editar evaluacion" : "Agregar evaluacion"}</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label>Evaluador</Label>
+                <Select
+                  value={form.evaluatorId}
+                  onValueChange={(value) => setForm((current) => ({ ...current, evaluatorId: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona un evaluador" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {evaluators.map((item) => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {`${item.name ?? ""} ${item.lastName ?? ""}`.trim() || item.email || item.id}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Tipo</Label>
+                <Select
+                  value={form.type}
+                  onValueChange={(value) => setForm((current) => ({ ...current, type: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PERFORMANCE">Desempeno</SelectItem>
+                    <SelectItem value="COMPETENCY">Competencias</SelectItem>
+                    <SelectItem value="PROBATION">Periodo de prueba</SelectItem>
+                    <SelectItem value="FOLLOW_UP">Seguimiento</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="grid gap-2">
+                <Label htmlFor="evaluation-start">Fecha inicio</Label>
+                <Input
+                  id="evaluation-start"
+                  type="date"
+                  value={form.startDate}
+                  onChange={(event) => setForm((current) => ({ ...current, startDate: event.target.value }))}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="evaluation-end">Fecha fin</Label>
+                <Input
+                  id="evaluation-end"
+                  type="date"
+                  value={form.endDate}
+                  onChange={(event) => setForm((current) => ({ ...current, endDate: event.target.value }))}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="evaluation-score">Puntaje</Label>
+                <Input
+                  id="evaluation-score"
+                  value={form.score}
+                  onChange={(event) => setForm((current) => ({ ...current, score: event.target.value }))}
+                  placeholder="Ej: 95"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="evaluation-comment">Comentario</Label>
+              <Textarea
+                id="evaluation-comment"
+                value={form.comment}
+                onChange={(event) => setForm((current) => ({ ...current, comment: event.target.value }))}
+                placeholder="Observaciones de la evaluacion"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Guardando..." : "Guardar evaluacion"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+type MedicalEvaluationFormState = Omit<CreateEmployeeMedicalEvaluationDto, "nextEvaluationDate"> & {
+  nextEvaluationDate: string
+}
+
+const emptyMedicalEvaluationForm: MedicalEvaluationFormState = {
+  type: "INCOME",
+  date: "",
+  result: "APT",
+  observations: "",
+  nextEvaluationDate: "",
+  medicalProfessional: "",
+  institution: "",
+}
+
+function MedicalEvaluationDialog({
+  medicalEvaluation,
+  onSave,
+}: {
+  medicalEvaluation?: EmployeeMedicalEvaluation
+  onSave: (
+    payload: CreateEmployeeMedicalEvaluationDto | UpdateEmployeeMedicalEvaluationDto,
+    medicalEvaluationId?: string,
+  ) => Promise<void>
+}) {
+  const [open, setOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState<MedicalEvaluationFormState>(emptyMedicalEvaluationForm)
+
+  useEffect(() => {
+    if (!open) return
+
+    setForm(
+      medicalEvaluation
+        ? {
+            type: medicalEvaluation.type ?? "INCOME",
+            date: formatDate(medicalEvaluation.date) === "No registrada" ? "" : formatDate(medicalEvaluation.date),
+            result: medicalEvaluation.result ?? "APT",
+            observations: medicalEvaluation.observations ?? "",
+            nextEvaluationDate:
+              formatDate(medicalEvaluation.nextEvaluationDate) === "No registrada"
+                ? ""
+                : formatDate(medicalEvaluation.nextEvaluationDate),
+            medicalProfessional: medicalEvaluation.medicalProfessional ?? "",
+            institution: medicalEvaluation.institution ?? "",
+          }
+        : emptyMedicalEvaluationForm,
+    )
+  }, [medicalEvaluation, open])
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault()
+
+    if (!form.type || !form.date || !form.result || !form.medicalProfessional || !form.institution) {
+      toast.error("Completa tipo, fecha, resultado, profesional e institucion")
+      return
+    }
+
+    const payload: CreateEmployeeMedicalEvaluationDto = {
+      type: form.type,
+      date: form.date,
+      result: form.result,
+      observations: form.observations,
+      medicalProfessional: form.medicalProfessional,
+      institution: form.institution,
+      ...(form.nextEvaluationDate ? { nextEvaluationDate: form.nextEvaluationDate } : {}),
+    }
+
+    setSaving(true)
+    try {
+      await onSave(payload, medicalEvaluation?.id)
+      setOpen(false)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant={medicalEvaluation ? "outline" : "default"} size="sm" className="gap-2">
+          {medicalEvaluation ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          {medicalEvaluation ? "Editar" : "Agregar evaluacion medica"}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-card max-w-2xl">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>{medicalEvaluation ? "Editar evaluacion medica" : "Agregar evaluacion medica"}</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label>Tipo</Label>
+                <Select value={form.type} onValueChange={(value) => setForm((current) => ({ ...current, type: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="INCOME">Ingreso</SelectItem>
+                    <SelectItem value="PERIODIC">Periodica</SelectItem>
+                    <SelectItem value="RETIREMENT">Retiro</SelectItem>
+                    <SelectItem value="POST_INCAPACITY">Post incapacidad</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Resultado</Label>
+                <Select value={form.result} onValueChange={(value) => setForm((current) => ({ ...current, result: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="APT">Apto</SelectItem>
+                    <SelectItem value="APT_WITH_RESTRICTIONS">Apto con restricciones</SelectItem>
+                    <SelectItem value="NOT_APT">No apto</SelectItem>
+                    <SelectItem value="PENDING">Pendiente</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="medical-evaluation-date">Fecha evaluacion</Label>
+                <Input
+                  id="medical-evaluation-date"
+                  type="date"
+                  value={form.date}
+                  onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="medical-next-date">Proxima evaluacion</Label>
+                <Input
+                  id="medical-next-date"
+                  type="date"
+                  value={form.nextEvaluationDate}
+                  onChange={(event) => setForm((current) => ({ ...current, nextEvaluationDate: event.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="medical-professional">Profesional medico</Label>
+                <Input
+                  id="medical-professional"
+                  value={form.medicalProfessional}
+                  onChange={(event) => setForm((current) => ({ ...current, medicalProfessional: event.target.value }))}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="medical-institution">Institucion</Label>
+                <Input
+                  id="medical-institution"
+                  value={form.institution}
+                  onChange={(event) => setForm((current) => ({ ...current, institution: event.target.value }))}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="medical-observations">Observaciones</Label>
+              <Textarea
+                id="medical-observations"
+                value={form.observations}
+                onChange={(event) => setForm((current) => ({ ...current, observations: event.target.value }))}
+                placeholder="Observaciones y restricciones medicas"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Guardando..." : "Guardar evaluacion medica"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export default function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const [employee, setEmployee] = useState<Employee | null>(null)
   const [education, setEducation] = useState<EmployeeEducation[]>([])
+  const [certifications, setCertifications] = useState<EmployeeCertification[]>([])
+  const [contracts, setContracts] = useState<EmployeeContract[]>([])
+  const [evaluations, setEvaluations] = useState<EmployeeEvaluation[]>([])
+  const [medicalEvaluations, setMedicalEvaluations] = useState<EmployeeMedicalEvaluation[]>([])
+  const [evaluatorOptions, setEvaluatorOptions] = useState<EvaluatorOption[]>([])
   const [catalogs, setCatalogs] = useState({
     eps: [] as EmployeeCatalogOption[],
     arl: [] as EmployeeCatalogOption[],
@@ -451,9 +1206,26 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     async function loadEmployee() {
       setLoading(true)
       try {
-        const [data, educationData, eps, arl, pension, compensation] = await Promise.all([
+        const [
+          data,
+          educationData,
+          certificationsData,
+          contractsData,
+          evaluationsData,
+          medicalEvaluationsData,
+          employeesData,
+          eps,
+          arl,
+          pension,
+          compensation,
+        ] = await Promise.all([
           getEmployeeById(id),
           listEmployeeEducation(id),
+          listEmployeeCertifications(id),
+          listEmployeeContracts(id),
+          listEmployeeEvaluations(id),
+          listEmployeeMedicalEvaluations(id),
+          listEmployees(),
           listEpsCatalog(),
           listArlCatalog(),
           listPensionCatalog(),
@@ -461,6 +1233,11 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         ])
         if (mounted) setEmployee(data)
         if (mounted) setEducation(educationData)
+        if (mounted) setCertifications(certificationsData)
+        if (mounted) setContracts(contractsData)
+        if (mounted) setEvaluations(evaluationsData)
+        if (mounted) setMedicalEvaluations(medicalEvaluationsData)
+        if (mounted) setEvaluatorOptions(employeesData.filter((item) => item.id !== id))
         if (mounted) setCatalogs({ eps, arl, pension, compensation })
       } catch (error: any) {
         toast.error(error.message ?? "No se pudo cargar el funcionario")
@@ -600,6 +1377,154 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     }
   }
 
+  async function handleSaveCertification(
+    payload: CreateEmployeeCertificationDto | UpdateEmployeeCertificationDto,
+    certificationId?: string,
+  ) {
+    if (!employee) return
+
+    try {
+      if (certificationId) {
+        await updateEmployeeCertification(employee.id, certificationId, payload)
+        toast.success("Certificacion actualizada")
+      } else {
+        await createEmployeeCertification(employee.id, payload as CreateEmployeeCertificationDto)
+        toast.success("Certificacion agregada")
+      }
+
+      const updatedCertifications = await listEmployeeCertifications(employee.id)
+      setCertifications(updatedCertifications)
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo guardar la certificacion")
+      throw error
+    }
+  }
+
+  async function handleDeleteCertification(certificationId: string) {
+    if (!employee) return
+    if (!window.confirm("Eliminar esta certificacion?")) return
+
+    try {
+      await deleteEmployeeCertification(employee.id, certificationId)
+      const updatedCertifications = await listEmployeeCertifications(employee.id)
+      setCertifications(updatedCertifications)
+      toast.success("Certificacion eliminada")
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo eliminar la certificacion")
+    }
+  }
+
+  async function handleSaveContract(
+    payload: CreateEmployeeContractDto | UpdateEmployeeContractDto,
+    contractId?: string,
+  ) {
+    if (!employee) return
+
+    try {
+      if (contractId) {
+        await updateEmployeeContract(employee.id, contractId, payload)
+        toast.success("Contrato actualizado")
+      } else {
+        await createEmployeeContract(employee.id, payload as CreateEmployeeContractDto)
+        toast.success("Contrato agregado")
+      }
+
+      const updatedContracts = await listEmployeeContracts(employee.id)
+      setContracts(updatedContracts)
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo guardar el contrato")
+      throw error
+    }
+  }
+
+  async function handleDeleteContract(contractId: string) {
+    if (!employee) return
+    if (!window.confirm("Eliminar este contrato?")) return
+
+    try {
+      await deleteEmployeeContract(employee.id, contractId)
+      const updatedContracts = await listEmployeeContracts(employee.id)
+      setContracts(updatedContracts)
+      toast.success("Contrato eliminado")
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo eliminar el contrato")
+    }
+  }
+
+  async function handleSaveEvaluation(
+    payload: CreateEmployeeEvaluationDto | UpdateEmployeeEvaluationDto,
+    evaluationId?: string,
+  ) {
+    if (!employee) return
+
+    try {
+      if (evaluationId) {
+        await updateEmployeeEvaluation(employee.id, evaluationId, payload)
+        toast.success("Evaluacion actualizada")
+      } else {
+        await createEmployeeEvaluation(employee.id, payload as CreateEmployeeEvaluationDto)
+        toast.success("Evaluacion agregada")
+      }
+
+      const updatedEvaluations = await listEmployeeEvaluations(employee.id)
+      setEvaluations(updatedEvaluations)
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo guardar la evaluacion")
+      throw error
+    }
+  }
+
+  async function handleDeleteEvaluation(evaluationId: string) {
+    if (!employee) return
+    if (!window.confirm("Eliminar esta evaluacion?")) return
+
+    try {
+      await deleteEmployeeEvaluation(employee.id, evaluationId)
+      const updatedEvaluations = await listEmployeeEvaluations(employee.id)
+      setEvaluations(updatedEvaluations)
+      toast.success("Evaluacion eliminada")
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo eliminar la evaluacion")
+    }
+  }
+
+  async function handleSaveMedicalEvaluation(
+    payload: CreateEmployeeMedicalEvaluationDto | UpdateEmployeeMedicalEvaluationDto,
+    medicalEvaluationId?: string,
+  ) {
+    if (!employee) return
+
+    try {
+      if (medicalEvaluationId) {
+        await updateEmployeeMedicalEvaluation(employee.id, medicalEvaluationId, payload)
+        toast.success("Evaluacion medica actualizada")
+      } else {
+        await createEmployeeMedicalEvaluation(employee.id, payload as CreateEmployeeMedicalEvaluationDto)
+        toast.success("Evaluacion medica agregada")
+      }
+
+      const updatedMedicalEvaluations = await listEmployeeMedicalEvaluations(employee.id)
+      setMedicalEvaluations(updatedMedicalEvaluations)
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo guardar la evaluacion medica")
+      throw error
+    }
+  }
+
+  async function handleDeleteMedicalEvaluation(medicalEvaluationId: string) {
+    if (!employee) return
+    if (!window.confirm("Eliminar esta evaluacion medica?")) return
+
+    try {
+      await deleteEmployeeMedicalEvaluation(employee.id, medicalEvaluationId)
+      const updatedMedicalEvaluations = await listEmployeeMedicalEvaluations(employee.id)
+      setMedicalEvaluations(updatedMedicalEvaluations)
+      toast.success("Evaluacion medica eliminada")
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo eliminar la evaluacion medica")
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -674,6 +1599,10 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           <TabsTrigger value="info">Informacion Personal</TabsTrigger>
           <TabsTrigger value="socialSecurity">Seguridad Social</TabsTrigger>
           <TabsTrigger value="education">Educacion</TabsTrigger>
+          <TabsTrigger value="certifications">Certificaciones</TabsTrigger>
+          <TabsTrigger value="contracts">Contrato</TabsTrigger>
+          <TabsTrigger value="evaluations">Evaluaciones</TabsTrigger>
+          <TabsTrigger value="medicalEvaluations">Evaluaciones medicas</TabsTrigger>
         </TabsList>
 
         <TabsContent value="info">
@@ -844,6 +1773,322 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
                           <span>Fin: {formatDate(item.endDate)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Creado: {formatDate(item.createdAt)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="certifications">
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <div className="flex items-center justify-between gap-4">
+                <CardTitle className="flex items-center gap-2 text-base font-medium">
+                  <Award className="h-5 w-5" />
+                  Certificaciones
+                </CardTitle>
+                <CertificationDialog onSave={handleSaveCertification} />
+              </div>
+            </CardHeader>
+            <CardContent>
+              {certifications.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-border p-8 text-center">
+                  <Award className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm font-medium">Sin certificaciones registradas</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Agrega certificados laborales, tecnicos o profesionales del funcionario.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {certifications.map((item) => (
+                    <div key={item.id} className="rounded-lg border border-border p-4">
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="font-medium">{item.name}</h3>
+                            {item.expiresAt ? (
+                              <Badge variant="secondary">Vence: {formatDate(item.expiresAt)}</Badge>
+                            ) : (
+                              <Badge variant="outline">Sin vencimiento</Badge>
+                            )}
+                          </div>
+                          <p className="mt-1 text-sm text-muted-foreground">Emitido por: {item.issuer}</p>
+                          {item.credentialId && (
+                            <p className="mt-1 text-sm text-muted-foreground">Credencial: {item.credentialId}</p>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {item.credentialUrl && (
+                            <a href={item.credentialUrl} target="_blank" rel="noreferrer">
+                              <Button variant="outline" size="sm" className="gap-2" type="button">
+                                <ExternalLink className="h-4 w-4" />
+                                Ver
+                              </Button>
+                            </a>
+                          )}
+                          <CertificationDialog certification={item} onSave={handleSaveCertification} />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2 text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteCertification(item.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Eliminar
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Expedicion: {formatDate(item.issuedAt)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Vencimiento: {formatDate(item.expiresAt)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Creado: {formatDate(item.createdAt)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="contracts">
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <div className="flex items-center justify-between gap-4">
+                <CardTitle className="flex items-center gap-2 text-base font-medium">
+                  <BriefcaseBusiness className="h-5 w-5" />
+                  Contrato
+                </CardTitle>
+                <ContractDialog onSave={handleSaveContract} />
+              </div>
+            </CardHeader>
+            <CardContent>
+              {contracts.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-border p-8 text-center">
+                  <BriefcaseBusiness className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm font-medium">Sin contratos registrados</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Agrega la informacion contractual del funcionario.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {contracts.map((item) => (
+                    <div key={item.id} className="rounded-lg border border-border p-4">
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="font-medium">{item.type}</h3>
+                            <Badge variant={item.status === "ACTIVE" ? "default" : "secondary"}>
+                              {item.status === "ACTIVE" ? "Activo" : item.status}
+                            </Badge>
+                          </div>
+                          <p className="mt-1 text-sm text-muted-foreground">Salario: {formatCurrency(item.salary)}</p>
+                          <p className="mt-1 text-sm text-muted-foreground">Firmado: {formatDate(item.signedAt)}</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <ContractDialog contract={item} onSave={handleSaveContract} />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2 text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteContract(item.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Eliminar
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Inicio: {formatDate(item.startDate)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Fin: {formatDate(item.endDate)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Creado: {formatDate(item.createdAt)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="evaluations">
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <div className="flex items-center justify-between gap-4">
+                <CardTitle className="flex items-center gap-2 text-base font-medium">
+                  <ClipboardCheck className="h-5 w-5" />
+                  Evaluaciones
+                </CardTitle>
+                <EvaluationDialog evaluators={evaluatorOptions} onSave={handleSaveEvaluation} />
+              </div>
+            </CardHeader>
+            <CardContent>
+              {evaluations.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-border p-8 text-center">
+                  <ClipboardCheck className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm font-medium">Sin evaluaciones registradas</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Agrega evaluaciones de desempeno, seguimiento o competencias del funcionario.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {evaluations.map((item) => (
+                    <div key={item.id} className="rounded-lg border border-border p-4">
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="font-medium">{item.type}</h3>
+                            <Badge variant="secondary">Puntaje: {item.score}</Badge>
+                          </div>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            Evaluador:{" "}
+                            {item.evaluator
+                              ? `${item.evaluator.name ?? ""} ${item.evaluator.lastName ?? ""}`.trim()
+                              : item.evaluatorId}
+                          </p>
+                          {item.comment && <p className="mt-1 text-sm text-muted-foreground">{item.comment}</p>}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <EvaluationDialog
+                            evaluation={item}
+                            evaluators={
+                              item.evaluatorId && !evaluatorOptions.some((option) => option.id === item.evaluatorId) && item.evaluator
+                                ? [
+                                    {
+                                      id: item.evaluatorId,
+                                      name: item.evaluator.name,
+                                      lastName: item.evaluator.lastName,
+                                      email: "",
+                                    },
+                                    ...evaluatorOptions,
+                                  ]
+                                : evaluatorOptions
+                            }
+                            onSave={handleSaveEvaluation}
+                          />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2 text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteEvaluation(item.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Eliminar
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Inicio: {formatDate(item.startDate)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Fin: {formatDate(item.endDate)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Creado: {formatDate(item.createdAt)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="medicalEvaluations">
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <div className="flex items-center justify-between gap-4">
+                <CardTitle className="flex items-center gap-2 text-base font-medium">
+                  <Stethoscope className="h-5 w-5" />
+                  Evaluaciones medicas
+                </CardTitle>
+                <MedicalEvaluationDialog onSave={handleSaveMedicalEvaluation} />
+              </div>
+            </CardHeader>
+            <CardContent>
+              {medicalEvaluations.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-border p-8 text-center">
+                  <Stethoscope className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm font-medium">Sin evaluaciones medicas registradas</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Agrega examenes de ingreso, periodicos, retiro o seguimiento medico ocupacional.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {medicalEvaluations.map((item) => (
+                    <div key={item.id} className="rounded-lg border border-border p-4">
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="font-medium">{item.type}</h3>
+                            <Badge variant={item.result === "APT" ? "default" : "secondary"}>{item.result}</Badge>
+                          </div>
+                          <p className="mt-1 text-sm text-muted-foreground">Institucion: {item.institution}</p>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            Profesional: {item.medicalProfessional}
+                          </p>
+                          {item.observations && <p className="mt-1 text-sm text-muted-foreground">{item.observations}</p>}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <MedicalEvaluationDialog medicalEvaluation={item} onSave={handleSaveMedicalEvaluation} />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2 text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteMedicalEvaluation(item.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Eliminar
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Fecha: {formatDate(item.date)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Proxima: {formatDate(item.nextEvaluationDate)}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-muted-foreground" />

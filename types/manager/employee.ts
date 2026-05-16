@@ -74,6 +74,132 @@ export type CreateEmployeeEducationDto = {
 
 export type UpdateEmployeeEducationDto = Partial<CreateEmployeeEducationDto>
 
+export type EmployeeCertification = {
+  id: string
+  employeeId: string
+  name: string
+  issuer: string
+  issuedAt: string
+  expiresAt: string
+  credentialId: string
+  credentialUrl: string
+  createdAt: string
+}
+
+export type CreateEmployeeCertificationDto = {
+  name: string
+  issuer: string
+  issuedAt: string
+  expiresAt: string
+  credentialId: string
+  credentialUrl: string
+}
+
+export type UpdateEmployeeCertificationDto = Partial<CreateEmployeeCertificationDto>
+
+export type EmployeeContract = {
+  id: string
+  employeeId: string
+  type: string
+  status: string
+  startDate: string
+  endDate: string
+  signedAt: string
+  salary: number
+  createdAt: string
+}
+
+export type CreateEmployeeContractDto = {
+  type: string
+  status: string
+  startDate: string
+  endDate?: string
+  signedAt: string
+  salary: number
+}
+
+export type UpdateEmployeeContractDto = Partial<CreateEmployeeContractDto>
+
+export type EmployeeEvaluationPerson = {
+  id: string
+  name: string
+  lastName: string
+}
+
+export type EmployeeEvaluation = {
+  id: string
+  companyId: string
+  employeeId: string
+  evaluatorId: string
+  startDate: string
+  endDate: string
+  score: string
+  comment: string
+  type: string
+  employee: EmployeeEvaluationPerson
+  evaluator: EmployeeEvaluationPerson
+  createdAt: string
+}
+
+export type CreateEmployeeEvaluationDto = {
+  evaluatorId: string
+  startDate: string
+  endDate: string
+  score: string
+  comment: string
+  type: string
+}
+
+export type UpdateEmployeeEvaluationDto = Partial<CreateEmployeeEvaluationDto>
+
+export type EmployeeMedicalEvaluation = {
+  id: string
+  companyId: string
+  employeeId: string
+  type: string
+  date: string
+  result: string
+  observations: string
+  nextEvaluationDate: string
+  medicalProfessional: string
+  institution: string
+  employee: EmployeeEvaluationPerson
+  createdAt: string
+}
+
+export type CreateEmployeeMedicalEvaluationDto = {
+  type: string
+  date: string
+  result: string
+  observations: string
+  nextEvaluationDate?: string
+  medicalProfessional: string
+  institution: string
+}
+
+export type UpdateEmployeeMedicalEvaluationDto = Partial<CreateEmployeeMedicalEvaluationDto>
+
+export type EmployeeSgiResponsibleEmployee = {
+  id: string
+  name: string
+  lastName: string
+  email: string
+  phone: string
+}
+
+export type EmployeeSgiResponsible = {
+  id: string
+  companyId: string
+  employeeId: string
+  signatureDate: string
+  employee: EmployeeSgiResponsibleEmployee
+}
+
+export type UpsertEmployeeSgiResponsibleDto = {
+  employeeId: string
+  signatureDate: string
+}
+
 export type CreateEmployeeDto = {
   name: string
   lastName: string
@@ -141,3 +267,12 @@ export type EmployeesResponse = ApiResponse<Employee[]>
 export type EmployeeCatalogResponse = ApiResponse<EmployeeCatalogOption[]>
 export type EmployeeEducationResponse = ApiResponse<EmployeeEducation>
 export type EmployeeEducationsResponse = ApiResponse<EmployeeEducation[]>
+export type EmployeeCertificationResponse = ApiResponse<EmployeeCertification>
+export type EmployeeCertificationsResponse = ApiResponse<EmployeeCertification[]>
+export type EmployeeContractResponse = ApiResponse<EmployeeContract>
+export type EmployeeContractsResponse = ApiResponse<EmployeeContract[]>
+export type EmployeeEvaluationResponse = ApiResponse<EmployeeEvaluation>
+export type EmployeeEvaluationsResponse = ApiResponse<EmployeeEvaluation[]>
+export type EmployeeMedicalEvaluationResponse = ApiResponse<EmployeeMedicalEvaluation>
+export type EmployeeMedicalEvaluationsResponse = ApiResponse<EmployeeMedicalEvaluation[]>
+export type EmployeeSgiResponsibleResponse = ApiResponse<EmployeeSgiResponsible>

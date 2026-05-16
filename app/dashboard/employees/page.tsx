@@ -17,7 +17,7 @@ import {
 import { toast } from "sonner"
 
 import { EmployeeFormDialog } from "@/components/dashboard/employee-form-dialog"
-import { SgiResponsibleData, SgiResponsibleFormDialog } from "@/components/dashboard/SgiResponsibleFormDialog"
+import { SgiResponsibleFormDialog } from "@/components/dashboard/SgiResponsibleFormDialog"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -30,23 +30,31 @@ import { WorkAreasManager } from "@/app/dashboard/work-areas/page"
 import {
   activateEmployee,
   createEmployee,
+  createSgiResponsible,
   deleteEmployee,
   listEmployees,
+  updateSgiResponsible,
   updateEmployee,
 } from "@/services/employeeService"
 import { cn } from "@/lib/utils"
-import type { CreateEmployeeDto, Employee, UpdateEmployeeDto } from "@/types/manager/employee"
+import type {
+  CreateEmployeeDto,
+  Employee,
+  EmployeeSgiResponsible,
+  UpdateEmployeeDto,
+  UpsertEmployeeSgiResponsibleDto,
+} from "@/types/manager/employee"
+
+const SGI_RESPONSIBLE_STORAGE_KEY = "sgi-responsible"
 
 export default function EmployeesPage() {
   const [search, setSearch] = useState("")
   const [workAreaFilter, setWorkAreaFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [employees, setEmployees] = useState<Employee[]>([])
+  const [sgiResponsible, setSgiResponsible] = useState<EmployeeSgiResponsible | null>(null)
   const [loading, setLoading] = useState(true)
-  const [sgiResponsibleDialog, setSgiResponsibleDialog] = useState({
-    open: false,
-    employee: null as Employee | null,
-  })
+  const [sgiResponsibleDialogOpen, setSgiResponsibleDialogOpen] = useState(false)
 
   const workAreas = useMemo(() => {
     const unique = new Map<string, string>()
@@ -82,14 +90,16 @@ export default function EmployeesPage() {
     })
   }, [employees, search, statusFilter, workAreaFilter])
 
-  const sgiResponsibleEmployee = employees[0] ?? null
-
   const stats = {
     total: employees.length,
     active: employees.filter((employee) => employee.status).length,
     inactive: employees.filter((employee) => !employee.status).length,
     workAreas: workAreas.length,
   }
+
+  const sgiResponsibleEmployee =
+    sgiResponsible?.employee ??
+    (sgiResponsible?.employeeId ? employees.find((employee) => employee.id === sgiResponsible.employeeId) : null)
 
   async function loadEmployees() {
     setLoading(true)
@@ -103,8 +113,18 @@ export default function EmployeesPage() {
     }
   }
 
+  function loadSgiResponsible() {
+    try {
+      const stored = window.localStorage.getItem(SGI_RESPONSIBLE_STORAGE_KEY)
+      setSgiResponsible(stored ? (JSON.parse(stored) as EmployeeSgiResponsible) : null)
+    } catch {
+      setSgiResponsible(null)
+    }
+  }
+
   useEffect(() => {
     loadEmployees()
+    loadSgiResponsible()
   }, [])
 
   async function handleCreateEmployee(payload: CreateEmployeeDto | UpdateEmployeeDto) {
@@ -151,9 +171,28 @@ export default function EmployeesPage() {
     }
   }
 
-  const handleSaveSgiResponsible = (data: SgiResponsibleData) => {
-    console.log("Responsable del SGI guardado:", data)
-    setSgiResponsibleDialog({ open: false, employee: null })
+  async function handleSaveSgiResponsible(data: UpsertEmployeeSgiResponsibleDto) {
+    try {
+      const saved = sgiResponsible ? await updateSgiResponsible(data) : await createSgiResponsible(data)
+      const selectedEmployee = employees.find((employee) => employee.id === data.employeeId)
+      const responsibleToStore: EmployeeSgiResponsible = {
+        ...saved,
+        employee: saved.employee ?? {
+          id: selectedEmployee?.id ?? data.employeeId,
+          name: selectedEmployee?.name ?? "",
+          lastName: selectedEmployee?.lastName ?? "",
+          email: selectedEmployee?.email ?? "",
+          phone: selectedEmployee?.phone ?? "",
+        },
+      }
+
+      setSgiResponsible(responsibleToStore)
+      window.localStorage.setItem(SGI_RESPONSIBLE_STORAGE_KEY, JSON.stringify(responsibleToStore))
+      toast.success(sgiResponsible ? "Responsable SGI actualizado" : "Responsable SGI asignado")
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo guardar el responsable SGI")
+      throw error
+    }
   }
 
   return (
@@ -162,17 +201,28 @@ export default function EmployeesPage() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Funcionarios</h1>
           <p className="text-muted-foreground">Gestion del talento humano</p>
+          {sgiResponsibleEmployee && (
+            <p className="mt-1 text-sm text-muted-foreground">
+              Responsable SGI:{" "}
+              <span className="font-medium text-foreground">
+                {sgiResponsibleEmployee.name} {sgiResponsibleEmployee.lastName}
+              </span>
+              {sgiResponsible?.signatureDate && (
+                <span> · Firma: {sgiResponsible.signatureDate.slice(0, 10)}</span>
+              )}
+            </p>
+          )}
         </div>
 
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={() => sgiResponsibleEmployee && setSgiResponsibleDialog({ open: true, employee: sgiResponsibleEmployee })}
+            onClick={() => setSgiResponsibleDialogOpen(true)}
             className="gap-2"
-            disabled={!sgiResponsibleEmployee}
+            disabled={employees.length === 0}
           >
             <UserCheck className="h-4 w-4" />
-            Asignar Responsable SGI
+            {sgiResponsible ? "Actualizar Responsable SGI" : "Asignar Responsable SGI"}
           </Button>
           <EmployeeFormDialog onSave={handleCreateEmployee} />
         </div>
@@ -409,14 +459,13 @@ export default function EmployeesPage() {
         </TabsContent>
       </Tabs>
 
-      {sgiResponsibleDialog.employee && (
-        <SgiResponsibleFormDialog
-          open={sgiResponsibleDialog.open}
-          onOpenChange={(open) => setSgiResponsibleDialog({ ...sgiResponsibleDialog, open })}
-          employee={sgiResponsibleDialog.employee as any}
-          onSave={handleSaveSgiResponsible}
-        />
-      )}
+      <SgiResponsibleFormDialog
+        employees={employees}
+        open={sgiResponsibleDialogOpen}
+        responsible={sgiResponsible}
+        onOpenChange={setSgiResponsibleDialogOpen}
+        onSave={handleSaveSgiResponsible}
+      />
     </div>
   )
 }
