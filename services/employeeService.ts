@@ -15,6 +15,10 @@ import type {
   EmployeeContract,
   EmployeeContractResponse,
   EmployeeContractsResponse,
+  EmployeeDocument,
+  EmployeeDocumentContext,
+  EmployeeDocumentResponse,
+  EmployeeDocumentsResponse,
   EmployeeEducation,
   EmployeeEducationResponse,
   EmployeeEducationsResponse,
@@ -35,6 +39,7 @@ import type {
   UpdateEmployeeEvaluationDto,
   UpdateEmployeeMedicalEvaluationDto,
   UpdateEmployeeSocialSecurityDto,
+  UploadEmployeeDocumentDto,
   UpsertEmployeeSgiResponsibleDto,
 } from "@/types/manager/employee"
 
@@ -47,6 +52,8 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
     | EmployeeCertificationsResponse
     | EmployeeContractResponse
     | EmployeeContractsResponse
+    | EmployeeDocumentResponse
+    | EmployeeDocumentsResponse
     | EmployeeEducationResponse
     | EmployeeEducationsResponse
     | EmployeeEvaluationResponse
@@ -61,6 +68,49 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
   }
 
   return json.data as T
+}
+
+function getEmployeeDocumentPath(employeeId: string, context: EmployeeDocumentContext, documentId?: string) {
+  const suffix = documentId ? `/documents/${documentId}` : "/documents"
+
+  if (context.kind === "education") {
+    return `/api/employees/${employeeId}/education/${context.educationId}${suffix}`
+  }
+
+  if (context.kind === "certification") {
+    return `/api/employees/${employeeId}/certifications/${context.certificationId}${suffix}`
+  }
+
+  if (context.kind === "contract") {
+    return `/api/employees/${employeeId}/contracts/${context.contractId}${suffix}`
+  }
+
+  if (context.kind === "evaluation") {
+    return `/api/employees/${employeeId}/evaluations/${context.evaluationId}${suffix}`
+  }
+
+  if (context.kind === "medicalEvaluation") {
+    return `/api/employees/${employeeId}/medical-evaluations/${context.medicalEvaluationId}${suffix}`
+  }
+
+  return `/api/employees/${employeeId}${suffix}`
+}
+
+function createDocumentFormData(dto: UploadEmployeeDocumentDto) {
+  const formData = new FormData()
+  formData.append("file", dto.file)
+  formData.append("type", dto.type)
+  formData.append("isConfirmed", String(dto.isConfirmed))
+  return formData
+}
+
+async function parseFileOrThrow(res: Response, fallbackMsg: string): Promise<Blob> {
+  if (!res.ok) {
+    const json = (await res.json().catch(() => null)) as { message?: string } | null
+    throw new Error(json?.message ?? fallbackMsg)
+  }
+
+  return res.blob()
 }
 
 export async function createEmployee(dto: CreateEmployeeDto): Promise<Employee> {
@@ -106,6 +156,58 @@ export async function updateEmployeeSocialSecurity(
     body: JSON.stringify(dto),
   })
   return parseOrThrow<Employee>(res, "No se pudo actualizar la seguridad social")
+}
+
+export async function uploadEmployeeDocument(
+  employeeId: string,
+  context: EmployeeDocumentContext,
+  dto: UploadEmployeeDocumentDto,
+): Promise<EmployeeDocument> {
+  const res = await apiFetch(getEmployeeDocumentPath(employeeId, context), {
+    method: "POST",
+    body: createDocumentFormData(dto),
+  })
+  return parseOrThrow<EmployeeDocument>(res, "No se pudo subir el documento")
+}
+
+export async function listEmployeeDocuments(
+  employeeId: string,
+  context: EmployeeDocumentContext,
+): Promise<EmployeeDocument[]> {
+  const res = await apiFetch(getEmployeeDocumentPath(employeeId, context), { method: "GET" })
+  return parseOrThrow<EmployeeDocument[]>(res, "No se pudo cargar los documentos")
+}
+
+export async function deleteEmployeeDocument(
+  employeeId: string,
+  context: EmployeeDocumentContext,
+  documentId: string,
+): Promise<void> {
+  const res = await apiFetch(getEmployeeDocumentPath(employeeId, context, documentId), { method: "DELETE" })
+  await parseOrThrow<Record<string, never>>(res, "No se pudo eliminar el documento")
+}
+
+export async function downloadEmployeeDocumentFile(downloadUrl: string): Promise<Blob> {
+  const res = await apiFetch(downloadUrl, { method: "GET" })
+  return parseFileOrThrow(res, "No se pudo descargar el documento")
+}
+
+export async function uploadSgiResponsibleDocument(dto: UploadEmployeeDocumentDto): Promise<EmployeeDocument> {
+  const res = await apiFetch("/api/employee/sgi-responsible/documents", {
+    method: "POST",
+    body: createDocumentFormData(dto),
+  })
+  return parseOrThrow<EmployeeDocument>(res, "No se pudo subir el documento del responsable SGI")
+}
+
+export async function listSgiResponsibleDocuments(): Promise<EmployeeDocument[]> {
+  const res = await apiFetch("/api/employee/sgi-responsible/documents", { method: "GET" })
+  return parseOrThrow<EmployeeDocument[]>(res, "No se pudo cargar los documentos del responsable SGI")
+}
+
+export async function deleteSgiResponsibleDocument(documentId: string): Promise<void> {
+  const res = await apiFetch(`/api/employee/sgi-responsible/documents/${documentId}`, { method: "DELETE" })
+  await parseOrThrow<Record<string, never>>(res, "No se pudo eliminar el documento del responsable SGI")
 }
 
 export async function activateEmployee(id: string): Promise<void> {

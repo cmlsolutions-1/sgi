@@ -200,6 +200,38 @@ export type UpsertEmployeeSgiResponsibleDto = {
   signatureDate: string
 }
 
+export type EmployeeDocument = {
+  id: string
+  companyId: string
+  ownerType: string
+  ownerId: string
+  referenceType: string
+  referenceId: string
+  type: string
+  originalName: string
+  mimeType: string
+  size: number
+  storageProvider: string
+  isConfirmed: boolean
+  downloadUrl: string
+  createdAt: string
+  createdBy: string
+}
+
+export type UploadEmployeeDocumentDto = {
+  file: File
+  type: string
+  isConfirmed: boolean
+}
+
+export type EmployeeDocumentContext =
+  | { kind: "employee" }
+  | { kind: "education"; educationId: string }
+  | { kind: "certification"; certificationId: string }
+  | { kind: "contract"; contractId: string }
+  | { kind: "evaluation"; evaluationId: string }
+  | { kind: "medicalEvaluation"; medicalEvaluationId: string }
+
 export type CreateEmployeeDto = {
   name: string
   lastName: string
@@ -276,3 +308,5 @@ export type EmployeeEvaluationsResponse = ApiResponse<EmployeeEvaluation[]>
 export type EmployeeMedicalEvaluationResponse = ApiResponse<EmployeeMedicalEvaluation>
 export type EmployeeMedicalEvaluationsResponse = ApiResponse<EmployeeMedicalEvaluation[]>
 export type EmployeeSgiResponsibleResponse = ApiResponse<EmployeeSgiResponsible>
+export type EmployeeDocumentResponse = ApiResponse<EmployeeDocument>
+export type EmployeeDocumentsResponse = ApiResponse<EmployeeDocument[]>

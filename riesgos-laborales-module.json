@@ -1,0 +1,352 @@
+{
+  "module": {
+    "code": "LABOR",
+    "parentCode": "RISKS",
+    "name": "Laborales",
+    "parentName": "Riesgos",
+    "route": "/dashboard/occupational",
+    "description": "Modulo de riesgos laborales para la gestion de matriz de peligros, cuadro de riesgos, medidas de intervencion y evidencias."
+  },
+  "navigation": {
+    "sidebarGroup": "Riesgos",
+    "sidebarItem": "Laborales",
+    "href": "/dashboard/occupational",
+    "icon": "BrickWallIcon"
+  },
+  "storage": {
+    "currentPersistence": "localStorage",
+    "riskRowsKey": "risk_matrix_rows_v1",
+    "trainingKey": "trainings"
+  },
+  "views": [
+    {
+      "id": "risk",
+      "label": "Matriz de Peligros",
+      "mainTitle": "Diagnostico de Condiciones de Trabajo",
+      "subtitle": "SG-SST - Matriz de Peligros y Capacitaciones",
+      "sections": [
+        "Niveles de intervencion",
+        "Estado del proceso",
+        "Cuadro de riesgos",
+        "Nueva fila de riesgo",
+        "Detalle de riesgo",
+        "Evidencias"
+      ]
+    }
+  ],
+  "entities": {
+    "riskRow": {
+      "description": "Fila principal de la matriz de peligros.",
+      "fields": [
+        { "name": "id", "type": "string", "required": true },
+        { "name": "proceso", "type": "string", "required": true },
+        { "name": "zonaLugar", "type": "string", "required": true },
+        { "name": "actividades", "type": "string", "required": true },
+        { "name": "tareas", "type": "string", "required": true },
+        { "name": "rutinario", "type": "enum", "required": true, "options": ["SI", "NO"] },
+        { "name": "peligroClasificacion", "type": "enum", "required": true },
+        { "name": "peligroDescripcion", "type": "enum", "required": true },
+        { "name": "efectosPosibles", "type": "string", "required": false },
+        { "name": "controlesFuente", "type": "string", "required": false },
+        { "name": "controlesMedio", "type": "string", "required": false },
+        { "name": "controlesPersona", "type": "string", "required": false },
+        { "name": "ndKey", "type": "enum", "required": true, "options": ["MA", "A", "M", "B"] },
+        { "name": "neKey", "type": "enum", "required": true, "options": ["EC", "EF", "EO", "EE"] },
+        { "name": "ncKey", "type": "enum", "required": true, "options": ["M", "MG", "G", "L"] },
+        { "name": "np", "type": "number", "required": true, "calculated": true },
+        { "name": "npInterpretacion", "type": "string", "required": true, "calculated": true },
+        { "name": "nr", "type": "number", "required": true, "calculated": true },
+        { "name": "nrNivel", "type": "string", "required": true, "calculated": true },
+        { "name": "nrInterpretacion", "type": "string", "required": true, "calculated": true },
+        { "name": "aceptabilidad", "type": "string", "required": true, "calculated": true },
+        { "name": "numeroExpuestos", "type": "string", "required": false },
+        { "name": "peorConsecuencia", "type": "string", "required": false },
+        { "name": "requisitoLegal", "type": "enum", "required": true, "options": ["SI", "NO"] },
+        { "name": "measures", "type": "MeasureControl[]", "required": true },
+        { "name": "evidences", "type": "Evidence[]", "required": true }
+      ]
+    },
+    "measureControl": {
+      "description": "Medida de intervencion asociada a una fila de riesgo.",
+      "fields": [
+        { "name": "id", "type": "string", "required": true },
+        { "name": "key", "type": "enum", "required": true, "options": ["ELIMINACION", "SUSTITUCION", "INGENIERIA", "ADMINISTRATIVOS", "EPP"] },
+        { "name": "title", "type": "string", "required": true },
+        { "name": "description", "type": "string", "required": false },
+        { "name": "type", "type": "enum", "required": true, "options": ["DATE", "PERMANENT"] },
+        { "name": "dueDate", "type": "date", "required": false },
+        { "name": "status", "type": "enum", "required": true, "options": ["PENDING", "DONE"] },
+        { "name": "doneDate", "type": "date", "required": false }
+      ]
+    },
+    "evidence": {
+      "description": "Archivo o soporte adjunto a un riesgo.",
+      "fields": [
+        { "name": "id", "type": "string", "required": true },
+        { "name": "name", "type": "string", "required": true },
+        { "name": "mime", "type": "string", "required": true },
+        { "name": "size", "type": "number", "required": true },
+        { "name": "dataUrl", "type": "string", "required": true },
+        { "name": "performedAt", "type": "date", "required": true },
+        { "name": "uploadedAt", "type": "datetime", "required": true }
+      ]
+    }
+  },
+  "wizard": {
+    "steps": [
+      {
+        "index": 1,
+        "label": "Contexto",
+        "requiredFields": ["proceso", "zonaLugar", "actividades", "tareas"]
+      },
+      {
+        "index": 2,
+        "label": "Peligro",
+        "requiredFields": ["peligroClasificacion", "peligroDescripcion"]
+      },
+      {
+        "index": 3,
+        "label": "Controles",
+        "requiredFields": []
+      },
+      {
+        "index": 4,
+        "label": "Evaluacion",
+        "requiredFields": ["ndKey", "neKey", "ncKey"]
+      },
+      {
+        "index": 5,
+        "label": "Medidas",
+        "requiredFields": []
+      }
+    ]
+  },
+  "defaultRiskRow": {
+    "proceso": "",
+    "zonaLugar": "",
+    "actividades": "",
+    "tareas": "",
+    "rutinario": "SI",
+    "peligroClasificacion": "",
+    "peligroDescripcion": "",
+    "efectosPosibles": "",
+    "controlesFuente": "",
+    "controlesMedio": "",
+    "controlesPersona": "",
+    "ndKey": "B",
+    "neKey": "EE",
+    "ncKey": "L",
+    "np": 0,
+    "npInterpretacion": "",
+    "nr": 0,
+    "nrNivel": "",
+    "nrInterpretacion": "",
+    "aceptabilidad": "",
+    "numeroExpuestos": "",
+    "peorConsecuencia": "",
+    "requisitoLegal": "NO",
+    "measures": [],
+    "evidences": []
+  },
+  "defaultMeasures": [
+    {
+      "key": "ELIMINACION",
+      "title": "Eliminacion",
+      "description": "",
+      "type": "PERMANENT",
+      "status": "PENDING"
+    },
+    {
+      "key": "SUSTITUCION",
+      "title": "Sustitucion",
+      "description": "",
+      "type": "PERMANENT",
+      "status": "PENDING"
+    },
+    {
+      "key": "INGENIERIA",
+      "title": "Controles de ingenieria",
+      "description": "",
+      "type": "PERMANENT",
+      "status": "PENDING"
+    },
+    {
+      "key": "ADMINISTRATIVOS",
+      "title": "Controles administrativos / senalizacion / advertencia",
+      "description": "",
+      "type": "PERMANENT",
+      "status": "PENDING"
+    },
+    {
+      "key": "EPP",
+      "title": "Equipos y elementos de proteccion personal (EPP)",
+      "description": "",
+      "type": "PERMANENT",
+      "status": "PENDING"
+    }
+  ],
+  "hazards": {
+    "BIOLOGICOS": [
+      "VIRUS",
+      "BACTERIAS",
+      "HONGOS",
+      "RICKTESIAS",
+      "PARASITOS",
+      "PICADURAS",
+      "MORDEDURAS",
+      "FLUIDOS O EXCREMENTOS"
+    ],
+    "FISICOS": [
+      "RUIDO (DE IMPACTO, INTERMITENTE O CONTINUO)",
+      "ILUMINACION (LUZ EN EXCESO O AUSENCIA)",
+      "VIBRACION (CUERPO ENTERO O SEGMENTARIA)",
+      "EXPOSICION TEMPERATURAS EXTREMAS (FRIO O CALOR)",
+      "CONTACTOS TERMICOS",
+      "RADIACION IONIZANTE (RAYOS X, GAMA)",
+      "RADIACION NO IONIZANTE (LASER, UV, IR)",
+      "PRESIONES EXTREMAS (ALTA O BAJA)"
+    ],
+    "QUIMICOS": [
+      "POLVOS ORGANICOS O INORGANICOS",
+      "LIQUIDOS (NIEBLAS Y ROCIOS)",
+      "GASES Y VAPORES",
+      "MATERIAL PARTICULADO"
+    ],
+    "PSICOSOCIALES": [
+      "GESTION ORGANIZACIONAL (ESTILO DE MANDO, PAGO, BIENESTAR SOCIAL, EVALUACION DEL DESEMPENO, MANEJO DE CAMBIOS)",
+      "CARACTERISTICAS DE LA ORGANIZACION DEL TRABAJO (COMUNICACION, TECNOLOGIA, ORGANIZACION DEL TRABAJO, DEMANDAS CUALITATIVAS Y CUANTITATIVAS DE LA LABOR)",
+      "CARACTERISTICAS DEL GRUPO SOCIAL DEL TRABAJO (RELACIONES, COHESION, CALIDAD DE INTERACCION, TRABAJO EN EQUIPO)",
+      "CONDICIONES DE LA TAREA (CARGA MENTAL, CONTENIDO DE LA TAREA, DEMANDAS EMOCIONALES, SISTEMAS DE CONTROL, DEFINICION DE ROLES, MONOTONIA, ETC.)",
+      "INTERFASE PERSONA - TAREA (CONOCIMIENTOS, HABILIDAD EN RELACION CON LA DEMANDA DE LA TAREA, INICIATIVA, AUTONOMIA Y RECONOCIMIENTO, IDENTIFICACION DE LA PERSONA CON LA TAREA Y LA ORGANIZACION)",
+      "JORNADA DE TRABAJO (PAUSAS, TRABAJO NOCTURNO, ROTACION, HORAS EXTRA, DESCANSO)"
+    ],
+    "BIOMECANICOS": [
+      "POSTURA (PROLONGADA, MANTENIDA, FORZADA, ANTIGRAVITACIONAL)",
+      "ESFUERZO",
+      "MOVIMIENTO REPETITIVO",
+      "MANIPULACION MANUAL DE CARGAS"
+    ],
+    "CONDICIONES DE SEGURIDAD": [
+      "MECANICOS (ELEMENTOS O PARTES DE MAQUINAS, HERRAMIENTAS, EQUIPOS, PIEZAS A TRABAJAR, MATERIALES PROYECTADOS SOLIDOS O FLUIDOS)",
+      "ELECTRICO (ALTA Y BAJA TENSION, ESTATICA)",
+      "LOCATIVO (SISTEMAS Y MEDIOS DE ALMACENAMIENTO) SUPERFICIES DE TRABAJO (IRREGULARIDAD, DESLIZANTE, CON DIFERENCIA DEL NIVEL) CONDICIONES DE ORDEN Y ASEO (CAIDAS DE PERSONAS AL MISMO U OTRO NIVEL)",
+      "TECNOLOGICO (EXPLOSION, FUGA, DERRAME, INCENDIO)",
+      "ATROPELLO O GOLPE DE PERSONAS CON VEHICULO",
+      "PUBLICOS (ROBOS, ATRACOS, ASALTOS, ATENTADOS, DE ORDEN PUBLICO, ETC.)",
+      "TRABAJO EN ALTURAS",
+      "ESPACIOS CONFINADOS"
+    ],
+    "FENOMENOS NATURALES": [
+      "SISMO",
+      "TERREMOTO",
+      "VENDAVAL",
+      "INUNDACION",
+      "DERRUMBE",
+      "PRECIPITACIONES (LLUVIAS, GRANIZADAS, HELADAS)"
+    ]
+  },
+  "scales": {
+    "ndOptions": [
+      { "label": "Muy Alto (MA)", "value": "MA", "nd": 10 },
+      { "label": "Alto (A)", "value": "A", "nd": 6 },
+      { "label": "Medio (M)", "value": "M", "nd": 2 },
+      { "label": "Bajo (B)", "value": "B", "nd": 0 }
+    ],
+    "neOptions": [
+      { "label": "Continua (EC)", "value": "EC", "ne": 4 },
+      { "label": "Frecuente (EF)", "value": "EF", "ne": 3 },
+      { "label": "Ocasional (EO)", "value": "EO", "ne": 2 },
+      { "label": "Esporadica (EE)", "value": "EE", "ne": 1 }
+    ],
+    "ncOptions": [
+      { "label": "Mortal (M)", "value": "M", "nc": 100 },
+      { "label": "Muy grave (MG)", "value": "MG", "nc": 60 },
+      { "label": "Grave (G)", "value": "G", "nc": 25 },
+      { "label": "Leve (L)", "value": "L", "nc": 10 }
+    ]
+  },
+  "calculations": {
+    "np": {
+      "formula": "nd * ne",
+      "interpretation": [
+        { "min": 24, "label": "Muy Alto" },
+        { "min": 10, "label": "Alto" },
+        { "min": 6, "label": "Medio" },
+        { "min": 2, "label": "Bajo" },
+        { "min": 0, "label": "Sin valoracion" }
+      ]
+    },
+    "nr": {
+      "formula": "np * nc",
+      "classification": [
+        {
+          "min": 400,
+          "level": "I",
+          "interpretation": "Situacion critica. Suspender actividades hasta controlar el riesgo. Intervencion urgente.",
+          "acceptability": "No aceptable"
+        },
+        {
+          "min": 150,
+          "level": "II",
+          "interpretation": "Corregir y adoptar medidas de control de inmediato.",
+          "acceptability": "No aceptable o aceptable con control especifico"
+        },
+        {
+          "min": 40,
+          "level": "III",
+          "interpretation": "Mejorar si es posible. Justificar la intervencion y su rentabilidad.",
+          "acceptability": "Aceptable"
+        },
+        {
+          "min": 20,
+          "level": "IV",
+          "interpretation": "Mantener controles existentes. Considerar mejoras.",
+          "acceptability": "Aceptable"
+        }
+      ]
+    },
+    "progress": {
+      "formula": "doneMeasures / totalMeasures * 100",
+      "states": [
+        {
+          "value": "CUMPLIDO",
+          "rule": "pct === 100"
+        },
+        {
+          "value": "VENCIDO",
+          "rule": "exists pending measure with type DATE and dueDate before today"
+        },
+        {
+          "value": "ACTIVO",
+          "rule": "default when not completed and not overdue"
+        }
+      ]
+    }
+  },
+  "dashboard": {
+    "levelCounters": ["I", "II", "III", "IV", "NA"],
+    "progressCounters": ["ACTIVO", "VENCIDO", "CUMPLIDO"],
+    "totalCounter": "riskRows.length"
+  },
+  "actions": [
+    "createRiskRow",
+    "editRiskRow",
+    "deleteRiskRow",
+    "viewRiskDetail",
+    "uploadEvidence",
+    "updateMeasure",
+    "trackProgress"
+  ],
+  "backendStatus": {
+    "connectedToApi": false,
+    "currentDataSource": "localStorage",
+    "suggestedEndpoints": [
+      { "method": "POST", "path": "/api/risks/labor" },
+      { "method": "GET", "path": "/api/risks/labor" },
+      { "method": "GET", "path": "/api/risks/labor/{riskId}" },
+      { "method": "PUT", "path": "/api/risks/labor/{riskId}" },
+      { "method": "DELETE", "path": "/api/risks/labor/{riskId}" },
+      { "method": "POST", "path": "/api/risks/labor/{riskId}/evidences" }
+    ]
+  }
+}

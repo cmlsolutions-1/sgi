@@ -32,6 +32,7 @@ import {
   createEmployee,
   createSgiResponsible,
   deleteEmployee,
+  getSgiResponsible,
   listEmployees,
   updateSgiResponsible,
   updateEmployee,
@@ -44,8 +45,6 @@ import type {
   UpdateEmployeeDto,
   UpsertEmployeeSgiResponsibleDto,
 } from "@/types/manager/employee"
-
-const SGI_RESPONSIBLE_STORAGE_KEY = "sgi-responsible"
 
 export default function EmployeesPage() {
   const [search, setSearch] = useState("")
@@ -113,10 +112,10 @@ export default function EmployeesPage() {
     }
   }
 
-  function loadSgiResponsible() {
+  async function loadSgiResponsible() {
     try {
-      const stored = window.localStorage.getItem(SGI_RESPONSIBLE_STORAGE_KEY)
-      setSgiResponsible(stored ? (JSON.parse(stored) as EmployeeSgiResponsible) : null)
+      const data = await getSgiResponsible()
+      setSgiResponsible(data)
     } catch {
       setSgiResponsible(null)
     }
@@ -175,19 +174,21 @@ export default function EmployeesPage() {
     try {
       const saved = sgiResponsible ? await updateSgiResponsible(data) : await createSgiResponsible(data)
       const selectedEmployee = employees.find((employee) => employee.id === data.employeeId)
-      const responsibleToStore: EmployeeSgiResponsible = {
-        ...saved,
-        employee: saved.employee ?? {
-          id: selectedEmployee?.id ?? data.employeeId,
-          name: selectedEmployee?.name ?? "",
-          lastName: selectedEmployee?.lastName ?? "",
-          email: selectedEmployee?.email ?? "",
-          phone: selectedEmployee?.phone ?? "",
-        },
-      }
 
-      setSgiResponsible(responsibleToStore)
-      window.localStorage.setItem(SGI_RESPONSIBLE_STORAGE_KEY, JSON.stringify(responsibleToStore))
+      setSgiResponsible({
+        ...saved,
+        employeeId: data.employeeId,
+        signatureDate: data.signatureDate,
+        employee: selectedEmployee
+          ? {
+              id: selectedEmployee.id,
+              name: selectedEmployee.name,
+              lastName: selectedEmployee.lastName,
+              email: selectedEmployee.email,
+              phone: selectedEmployee.phone,
+            }
+          : saved.employee,
+      })
       toast.success(sgiResponsible ? "Responsable SGI actualizado" : "Responsable SGI asignado")
     } catch (error: any) {
       toast.error(error.message ?? "No se pudo guardar el responsable SGI")

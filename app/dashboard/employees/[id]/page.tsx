@@ -10,8 +10,10 @@ import {
   Building,
   Calendar,
   ClipboardCheck,
+  Download,
   Edit,
   ExternalLink,
+  FileText,
   GraduationCap,
   Loader2,
   Mail,
@@ -20,6 +22,7 @@ import {
   Plus,
   Stethoscope,
   Trash2,
+  Upload,
   User,
 } from "lucide-react"
 import { toast } from "sonner"
@@ -28,6 +31,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -48,12 +52,15 @@ import {
   createEmployeeMedicalEvaluation,
   deleteEmployeeCertification,
   deleteEmployeeContract,
+  deleteEmployeeDocument,
   deleteEmployeeEducation,
   deleteEmployeeEvaluation,
   deleteEmployeeMedicalEvaluation,
+  downloadEmployeeDocumentFile,
   getEmployeeById,
   listEmployeeCertifications,
   listEmployeeContracts,
+  listEmployeeDocuments,
   listEmployeeEducation,
   listEmployeeEvaluations,
   listEmployeeMedicalEvaluations,
@@ -68,6 +75,7 @@ import {
   updateEmployeeEvaluation,
   updateEmployeeMedicalEvaluation,
   updateEmployeeSocialSecurity,
+  uploadEmployeeDocument,
 } from "@/services/employeeService"
 import { cn } from "@/lib/utils"
 import type {
@@ -80,6 +88,8 @@ import type {
   EmployeeCatalogOption,
   EmployeeCertification,
   EmployeeContract,
+  EmployeeDocument,
+  EmployeeDocumentContext,
   EmployeeEducation,
   EmployeeEvaluation,
   EmployeeMedicalEvaluation,
@@ -117,6 +127,28 @@ function formatCurrency(value?: number | null) {
     currency: "COP",
     maximumFractionDigits: 0,
   }).format(value)
+}
+
+function formatFileSize(value?: number | null) {
+  if (!value) return "0 KB"
+  if (value < 1024 * 1024) return `${Math.max(1, Math.round(value / 1024))} KB`
+  return `${(value / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function getDocumentContextKey(context: EmployeeDocumentContext) {
+  if (context.kind === "education") return `education:${context.educationId}`
+  if (context.kind === "certification") return `certification:${context.certificationId}`
+  if (context.kind === "contract") return `contract:${context.contractId}`
+  if (context.kind === "evaluation") return `evaluation:${context.evaluationId}`
+  if (context.kind === "medicalEvaluation") return `medicalEvaluation:${context.medicalEvaluationId}`
+  return "employee"
+}
+
+function getSocialSecurityDocumentType(key: SocialSecurityItem["key"]) {
+  if (key === "eps") return "EPS"
+  if (key === "arl") return "ARL"
+  if (key === "pension") return "PENSION"
+  return "COMPENSATION"
 }
 
 function getInitials(employee: Employee) {
@@ -304,6 +336,178 @@ function SocialSecurityDialog({
         </form>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function DocumentManager({
+  employeeId,
+  context,
+  defaultType,
+  filterType = false,
+}: {
+  employeeId: string
+  context: EmployeeDocumentContext
+  defaultType: string
+  filterType?: boolean
+}) {
+  const contextKey = getDocumentContextKey(context)
+  const [documents, setDocuments] = useState<EmployeeDocument[]>([])
+  const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [file, setFile] = useState<File | null>(null)
+  const [type, setType] = useState(defaultType)
+  const [isConfirmed, setIsConfirmed] = useState(true)
+
+  async function loadDocuments() {
+    setLoading(true)
+    try {
+      const data = await listEmployeeDocuments(employeeId, context)
+      setDocuments(filterType ? data.filter((item) => item.type === defaultType) : data)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar los documentos")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadDocuments()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [employeeId, contextKey, defaultType, filterType])
+
+  async function handleUpload(event: React.FormEvent) {
+    event.preventDefault()
+
+    if (!file) {
+      toast.error("Selecciona un archivo para subir")
+      return
+    }
+
+    if (!type.trim()) {
+      toast.error("Ingresa el tipo de documento")
+      return
+    }
+
+    setUploading(true)
+    try {
+      await uploadEmployeeDocument(employeeId, context, {
+        file,
+        type: type.trim(),
+        isConfirmed,
+      })
+      setFile(null)
+      await loadDocuments()
+      toast.success("Documento subido correctamente")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo subir el documento")
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  async function handleDelete(documentId: string) {
+    try {
+      await deleteEmployeeDocument(employeeId, context, documentId)
+      setDocuments((current) => current.filter((item) => item.id !== documentId))
+      toast.success("Documento eliminado correctamente")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar el documento")
+    }
+  }
+
+  async function handleView(document: EmployeeDocument) {
+    if (!document.downloadUrl) return
+
+    try {
+      const blob = await downloadEmployeeDocumentFile(document.downloadUrl)
+      const url = URL.createObjectURL(blob)
+      window.open(url, "_blank", "noopener,noreferrer")
+      window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo abrir el documento")
+    }
+  }
+
+  return (
+    <div className="mt-4 rounded-md border border-dashed border-border bg-secondary/20 p-4">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h4 className="flex items-center gap-2 text-sm font-medium">
+            <FileText className="h-4 w-4" />
+            Documentos
+          </h4>
+          <p className="text-xs text-muted-foreground">
+            Primero guarda el registro; luego sube el soporte desde aqui.
+          </p>
+        </div>
+        {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+      </div>
+
+      <form onSubmit={handleUpload} className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_180px_auto_auto] lg:items-end">
+        <div className="grid gap-2">
+          <Label>Archivo</Label>
+          <Input
+            type="file"
+            onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+            disabled={uploading}
+          />
+        </div>
+        <div className="grid gap-2">
+          <Label>Tipo</Label>
+          <Input value={type} onChange={(event) => setType(event.target.value)} disabled={uploading || filterType} />
+        </div>
+        <label className="flex h-10 items-center gap-2 text-sm">
+          <Checkbox
+            checked={isConfirmed}
+            onCheckedChange={(checked) => setIsConfirmed(checked === true)}
+            disabled={uploading}
+          />
+          Confirmado
+        </label>
+        <Button type="submit" size="sm" className="gap-2" disabled={uploading}>
+          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          Subir
+        </Button>
+      </form>
+
+      <div className="mt-4 space-y-2">
+        {documents.length === 0 && !loading ? (
+          <p className="rounded-md bg-background/70 px-3 py-2 text-xs text-muted-foreground">Sin documentos cargados.</p>
+        ) : (
+          documents.map((document) => (
+            <div
+              key={document.id}
+              className="flex flex-col gap-3 rounded-md bg-background/80 px-3 py-2 text-sm md:flex-row md:items-center md:justify-between"
+            >
+              <div className="min-w-0">
+                <p className="truncate font-medium">{document.originalName || document.type}</p>
+                <p className="text-xs text-muted-foreground">
+                  {document.type} · {formatFileSize(document.size)} · {document.isConfirmed ? "Confirmado" : "Pendiente"}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {document.downloadUrl && (
+                  <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => handleView(document)}>
+                    <Download className="h-4 w-4" />
+                    Ver
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 text-destructive hover:text-destructive"
+                  onClick={() => handleDelete(document.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Eliminar
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
   )
 }
 
@@ -1704,6 +1908,14 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                       <div className="mt-4">
                         <SocialSecurityDialog item={item} onSave={handleSaveSocialSecurity} />
                       </div>
+                      {completed && (
+                        <DocumentManager
+                          employeeId={employee.id}
+                          context={{ kind: "employee" }}
+                          defaultType={getSocialSecurityDocumentType(item.key)}
+                          filterType
+                        />
+                      )}
                     </div>
                   )
                 })}
@@ -1779,6 +1991,11 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                           <span>Creado: {formatDate(item.createdAt)}</span>
                         </div>
                       </div>
+                      <DocumentManager
+                        employeeId={employee.id}
+                        context={{ kind: "education", educationId: item.id }}
+                        defaultType="EDUCATION"
+                      />
                     </div>
                   ))}
                 </div>
@@ -1862,6 +2079,11 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                           <span>Creado: {formatDate(item.createdAt)}</span>
                         </div>
                       </div>
+                      <DocumentManager
+                        employeeId={employee.id}
+                        context={{ kind: "certification", certificationId: item.id }}
+                        defaultType="CERTIFICATION"
+                      />
                     </div>
                   ))}
                 </div>
@@ -1933,6 +2155,11 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                           <span>Creado: {formatDate(item.createdAt)}</span>
                         </div>
                       </div>
+                      <DocumentManager
+                        employeeId={employee.id}
+                        context={{ kind: "contract", contractId: item.id }}
+                        defaultType="CONTRACT"
+                      />
                     </div>
                   ))}
                 </div>
@@ -2023,6 +2250,11 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                           <span>Creado: {formatDate(item.createdAt)}</span>
                         </div>
                       </div>
+                      <DocumentManager
+                        employeeId={employee.id}
+                        context={{ kind: "evaluation", evaluationId: item.id }}
+                        defaultType="EVALUATION"
+                      />
                     </div>
                   ))}
                 </div>
@@ -2095,6 +2327,11 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                           <span>Creado: {formatDate(item.createdAt)}</span>
                         </div>
                       </div>
+                      <DocumentManager
+                        employeeId={employee.id}
+                        context={{ kind: "medicalEvaluation", medicalEvaluationId: item.id }}
+                        defaultType="MEDICAL_EVALUATION"
+                      />
                     </div>
                   ))}
                 </div>
