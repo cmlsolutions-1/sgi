@@ -1,358 +1,455 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { useRouter, useParams } from "next/navigation"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import {
-  Trash2,
-  Upload,
-  Download,
-  ArrowLeft,
-  Pencil,
-} from "lucide-react"
+import { use, useEffect, useMemo, useState } from "react"
+import { useRouter } from "next/navigation"
+import { ArrowLeft, Download, Edit, Loader2, Plus, Trash2, Users } from "lucide-react"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
+import { toast } from "sonner"
 
-/* =====================
-   TIPO
-===================== */
-interface Training {
-  id: string
-  title: string
-  date: string
-  time: string
-  responsible: string
-  description: string
-  status: "scheduled" | "completed"
-  actaFile?: string
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { listEmployees } from "@/services/employeeService"
+import {
+  createTrainingAttendance,
+  deleteTraining,
+  deleteTrainingAttendance,
+  getTrainingById,
+  listTrainingAttendances,
+  updateTrainingAttendance,
+} from "@/services/trainingService"
+import type { Employee } from "@/types/manager/employee"
+import type {
+  CreateTrainingAttendanceDto,
+  Training,
+  TrainingAttendance,
+  TrainingAttendanceStatus,
+  UpdateTrainingAttendanceDto,
+} from "@/types/manager/training"
+
+const attendanceStatusOptions: { value: TrainingAttendanceStatus; label: string }[] = [
+  { value: "ASSIGNED", label: "Asignado" },
+  { value: "ATTENDED", label: "Asistio" },
+  { value: "ABSENT", label: "Ausente" },
+]
+
+function formatDate(value?: string | null) {
+  if (!value) return "No registrada"
+  return value.slice(0, 10)
 }
 
-export default function TrainingDetailPage() {
-  const { id } = useParams()
-  const router = useRouter()
-  const uploadRef = useRef<HTMLInputElement>(null)
+function getAttendanceStatusLabel(value?: string | null) {
+  return attendanceStatusOptions.find((option) => option.value === value)?.label ?? value ?? "No registrado"
+}
 
-  const [training, setTraining] = useState<Training | null>(null)
-  const [file, setFile] = useState<File | null>(null)
-  const [canEdit, setCanEdit] = useState(false)
+function getTrainingStatusLabel(status?: string | null) {
+  if (status === "ACTIVE") return "Activa"
+  if (status === "INACTIVE") return "Inactiva"
+  if (status === "FINISHED") return "Finalizada"
+  if (status === "CANCELLED") return "Cancelada"
+  return status ?? "No registrada"
+}
 
-  /* =====================
-     CARGA INICIAL
-  ===================== */
+type AttendanceFormState = CreateTrainingAttendanceDto
+
+const emptyAttendanceForm: AttendanceFormState = {
+  employeeId: "",
+  status: "ASSIGNED",
+}
+
+function AttendanceDialog({
+  attendance,
+  employees,
+  onSave,
+}: {
+  attendance?: TrainingAttendance
+  employees: Employee[]
+  onSave: (
+    payload: CreateTrainingAttendanceDto | UpdateTrainingAttendanceDto,
+    attendanceId?: string,
+  ) => Promise<void>
+}) {
+  const [open, setOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState<AttendanceFormState>(emptyAttendanceForm)
+
   useEffect(() => {
-    const stored = localStorage.getItem("trainings")
-    if (!stored) return
-    const list: Training[] = JSON.parse(stored)
-    const found = list.find(t => t.id === id)
-    if (found) setTraining(found)
-  }, [id])
+    if (!open) return
+    setForm(attendance ? { employeeId: attendance.employeeId, status: attendance.status } : emptyAttendanceForm)
+  }, [attendance, open])
 
-  if (!training) return null
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault()
 
-  const now = new Date()
-  const trainingDate = new Date(`${training.date}T${training.time}`)
-  const tenDaysAfter = new Date(trainingDate)
-  tenDaysAfter.setDate(tenDaysAfter.getDate() + 10)
-
-  const canDelete =
-    training.status === "scheduled" &&
-    now < trainingDate
-
-  /* =====================
-     ACTUALIZAR CAMPOS
-  ===================== */
-  const updateField = (field: keyof Training, value: string) => {
-    const updated = { ...training, [field]: value }
-    setTraining(updated)
-
-    const stored = JSON.parse(localStorage.getItem("trainings") || "[]")
-    const updatedList = stored.map((t: Training) =>
-      t.id === updated.id ? updated : t
-    )
-    localStorage.setItem("trainings", JSON.stringify(updatedList))
-  }
-
-  const handleSaveEdit = () => {
-    setCanEdit(false)
-  }
-
-  const handleCancelEdit = () => {
-    const stored = localStorage.getItem("trainings")
-    if (!stored) return
-    const list: Training[] = JSON.parse(stored)
-    const original = list.find(t => t.id === training.id)
-    if (original) setTraining(original)
-    setCanEdit(false)
-  }
-
-  /* =====================
-     ELIMINAR
-  ===================== */
-  const handleDelete = () => {
-    const stored = JSON.parse(localStorage.getItem("trainings") || "[]")
-    const updated = stored.filter((t: Training) => t.id !== training.id)
-    localStorage.setItem("trainings", JSON.stringify(updated))
-    router.push("/dashboard/trainingPlan")
-  }
-
-  /* =====================
-     SUBIR ACTA FIRMADA
-  ===================== */
-  const handleUpload = () => {
-    if (!file) return
-
-    const stored = JSON.parse(localStorage.getItem("trainings") || "[]")
-    const updated = stored.map((t: Training) =>
-      t.id === training.id
-        ? { ...t, status: "completed", actaFile: file.name }
-        : t
-    )
-
-    localStorage.setItem("trainings", JSON.stringify(updated))
-    setTraining({ ...training, status: "completed", actaFile: file.name })
-    setCanEdit(false)
-  }
-
-  /* =====================
-     GENERAR ACTA SG-SST
-  ===================== */
-  const handleDownloadActa = () => {
-    const doc = new jsPDF("p", "mm", "a4")
-
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(14)
-    doc.text("ACTA DE CAPACITACIÓN SG-SST", 105, 15, { align: "center" })
-
-    let y = 30
-    doc.setFontSize(10)
-
-    const row = (label: string, value: string) => {
-      doc.setFont("helvetica", "bold")
-      doc.text(label, 14, y)
-      doc.setFont("helvetica", "normal")
-      doc.text(value, 45, y)
-      y += 6
+    if (!form.employeeId || !form.status) {
+      toast.error("Selecciona funcionario y estado")
+      return
     }
 
-    row("Tema:", training.title)
-    row("Fecha:", training.date)
-    row("Hora inicio:", "________________")
-    row("Hora fin:", "________________")
-    row("Responsable:", training.responsible)
+    setSaving(true)
+    try {
+      await onSave(form, attendance?.id)
+      setOpen(false)
+    } finally {
+      setSaving(false)
+    }
+  }
 
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant={attendance ? "outline" : "default"} size="sm" className="gap-2">
+          {attendance ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          {attendance ? "Editar" : "Asignar asistente"}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-card">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>{attendance ? "Editar asistente" : "Asignar asistente"}</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label>Funcionario</Label>
+              <Select
+                value={form.employeeId}
+                onValueChange={(value) => setForm((current) => ({ ...current, employeeId: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona un funcionario" />
+                </SelectTrigger>
+                <SelectContent>
+                  {employees.map((employee) => (
+                    <SelectItem key={employee.id} value={employee.id}>
+                      {`${employee.name ?? ""} ${employee.lastName ?? ""}`.trim() || employee.email || employee.id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label>Estado</Label>
+              <Select
+                value={form.status}
+                onValueChange={(value) =>
+                  setForm((current) => ({ ...current, status: value as TrainingAttendanceStatus }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {attendanceStatusOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Guardando..." : "Guardar"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+export default function TrainingDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
+  const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const [training, setTraining] = useState<Training | null>(null)
+  const [attendances, setAttendances] = useState<TrainingAttendance[]>([])
+  const [employees, setEmployees] = useState<Employee[]>([])
+  const [assigningAll, setAssigningAll] = useState(false)
+
+  async function loadData() {
+    setLoading(true)
+    try {
+      const [trainingData, attendanceData, employeesData] = await Promise.all([
+        getTrainingById(id),
+        listTrainingAttendances(id),
+        listEmployees(),
+      ])
+      setTraining(trainingData)
+      setAttendances(attendanceData)
+      setEmployees(employeesData)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar la capacitacion")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
+
+  const assignedEmployeeIds = useMemo(() => new Set(attendances.map((item) => item.employeeId)), [attendances])
+
+  const availableEmployees = useMemo(
+    () => employees.filter((employee) => !assignedEmployeeIds.has(employee.id)),
+    [assignedEmployeeIds, employees],
+  )
+
+  async function handleSaveAttendance(
+    payload: CreateTrainingAttendanceDto | UpdateTrainingAttendanceDto,
+    attendanceId?: string,
+  ) {
+    if (!training) return
+
+    try {
+      if (attendanceId) {
+        await updateTrainingAttendance(training.id, attendanceId, payload)
+        toast.success("Asistente actualizado")
+      } else {
+        await createTrainingAttendance(training.id, payload as CreateTrainingAttendanceDto)
+        toast.success("Asistente asignado")
+      }
+      const updated = await listTrainingAttendances(training.id)
+      setAttendances(updated)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar el asistente")
+    }
+  }
+
+  async function handleAssignAllAvailable() {
+    if (!training) return
+
+    if (availableEmployees.length === 0) {
+      toast.info("Todos los funcionarios ya estan asignados")
+      return
+    }
+
+    setAssigningAll(true)
+    try {
+      await Promise.all(
+        availableEmployees.map((employee) =>
+          createTrainingAttendance(training.id, {
+            employeeId: employee.id,
+            status: "ASSIGNED",
+          }),
+        ),
+      )
+      const updated = await listTrainingAttendances(training.id)
+      setAttendances(updated)
+      toast.success("Todos los funcionarios disponibles fueron asignados")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo asignar todos los funcionarios")
+    } finally {
+      setAssigningAll(false)
+    }
+  }
+
+  async function handleDeleteAttendance(attendanceId: string) {
+    if (!training) return
+
+    try {
+      await deleteTrainingAttendance(training.id, attendanceId)
+      setAttendances((current) => current.filter((item) => item.id !== attendanceId))
+      toast.success("Asistente eliminado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar el asistente")
+    }
+  }
+
+  async function handleDeleteTraining() {
+    if (!training) return
+
+    try {
+      await deleteTraining(training.id)
+      toast.success("Capacitacion eliminada")
+      router.push("/dashboard/trainingPlan")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar la capacitacion")
+    }
+  }
+
+  function handleDownloadActa() {
+    if (!training) return
+
+    const doc = new jsPDF("p", "mm", "a4")
     doc.setFont("helvetica", "bold")
-    doc.text("Descripción de la capacitación:", 14, y)
-    y += 5
-    doc.setFont("helvetica", "normal")
-    doc.text(training.description, 14, y, { maxWidth: 180 })
+    doc.setFontSize(14)
+    doc.text("ACTA DE CAPACITACION SG-SST", 105, 15, { align: "center" })
+
+    doc.setFontSize(10)
+    doc.text(`Tema: ${training.topic?.name ?? training.topicId}`, 14, 30)
+    doc.text(`Fecha: ${formatDate(training.date)}`, 14, 37)
+    doc.text(`Duracion: ${training.durationHours} horas`, 14, 44)
+    doc.text(`Estado: ${getTrainingStatusLabel(training.status)}`, 14, 51)
 
     autoTable(doc, {
-      startY: y + 12,
+      startY: 62,
       theme: "grid",
-      head: [[
-        "No.",
-        "NOMBRE COMPLETO",
-        "DOCUMENTO",
-        "CARGO",
-        "TELÉFONO",
-        "FIRMA",
-      ]],
-      body: Array.from({ length: 20 }).map((_, i) => [
-        i + 1, "", "", "", "", ""
+      head: [["No.", "Nombre", "Correo", "Estado", "Firma"]],
+      body: attendances.map((attendance, index) => [
+        index + 1,
+        `${attendance.employee?.name ?? ""} ${attendance.employee?.lastName ?? ""}`.trim(),
+        attendance.employee?.email ?? "",
+        getAttendanceStatusLabel(attendance.status),
+        "",
       ]),
       styles: { fontSize: 8 },
       headStyles: { fillColor: [41, 128, 185], textColor: 255 },
     })
 
-    const finalY = (doc as any).lastAutoTable.finalY + 10
-    doc.text("Firma del Responsable de la Capacitación:", 14, finalY)
-    doc.rect(14, finalY + 3, 80, 10)
+    doc.save(`Acta_Capacitacion_${formatDate(training.date)}.pdf`)
+  }
 
-    doc.setFontSize(8)
-    doc.text(
-      "Este documento hace parte del Sistema de Gestión de la Seguridad y Salud en el Trabajo (SG-SST).",
-      105,
-      290,
-      { align: "center" }
+  if (loading) {
+    return (
+      <div className="flex min-h-80 items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
     )
+  }
 
-    doc.save(`Acta_Capacitacion_${training.date}.pdf`)
+  if (!training) {
+    return (
+      <div className="space-y-4">
+        <Button variant="ghost" className="gap-2" onClick={() => router.push("/dashboard/trainingPlan")}>
+          <ArrowLeft className="h-4 w-4" />
+          Volver
+        </Button>
+        <Card>
+          <CardContent className="p-8 text-center text-sm text-muted-foreground">Capacitacion no encontrada.</CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
     <div className="space-y-6">
-
-      {/* VOLVER */}
-      <Button
-        variant="ghost"
-        className="gap-2"
-        onClick={() => router.push("/dashboard/trainingPlan")}
-      >
+      <Button variant="ghost" className="gap-2" onClick={() => router.push("/dashboard/trainingPlan")}>
         <ArrowLeft className="h-4 w-4" />
-        Volver al Plan de Capacitación
+        Volver al plan
       </Button>
 
-      {/* DETALLE */}
       <Card>
-        <CardContent className="p-6 space-y-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">
-              Detalle de la Capacitación
-            </h1>
-
-            <Badge
-              className={
-                training.status === "completed"
-                  ? "bg-green-600"
-                  : "bg-red-600"
-              }
-            >
-              {training.status === "completed"
-                ? "Realizada"
-                : "No realizada"}
-            </Badge>
+        <CardHeader className="flex flex-row items-start justify-between gap-4">
+          <div>
+            <CardTitle>{training.topic?.name ?? "Capacitacion"}</CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {formatDate(training.date)} · {training.durationHours} horas
+            </p>
           </div>
+          <Badge variant={training.status === "ACTIVE" ? "default" : "secondary"}>
+            {getTrainingStatusLabel(training.status)}
+          </Badge>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Button variant="outline" className="gap-2" onClick={handleDownloadActa}>
+            <Download className="h-4 w-4" />
+            Descargar acta
+          </Button>
+          <Button
+            variant="outline"
+            className="gap-2 text-destructive hover:text-destructive"
+            onClick={handleDeleteTraining}
+          >
+            <Trash2 className="h-4 w-4" />
+            Eliminar capacitacion
+          </Button>
+        </CardContent>
+      </Card>
 
-          {training.status === "scheduled" && !canEdit && (
+      <Card>
+        <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <CardTitle>Asistentes</CardTitle>
+          <div className="flex flex-wrap gap-2">
             <Button
+              type="button"
               variant="outline"
-              className="gap-2 w-fit"
-              onClick={() => setCanEdit(true)}
+              size="sm"
+              className="gap-2"
+              disabled={assigningAll || availableEmployees.length === 0}
+              onClick={handleAssignAllAvailable}
             >
-              <Pencil className="h-4 w-4" />
-              Modificar
+              {assigningAll ? <Loader2 className="h-4 w-4 animate-spin" /> : <Users className="h-4 w-4" />}
+              Seleccionar todos
             </Button>
-          )}
+            <AttendanceDialog employees={availableEmployees} onSave={handleSaveAttendance} />
+          </div>
+        </CardHeader>
+        <CardContent>
+          {attendances.length === 0 ? (
+            <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+              No hay asistentes asignados.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {attendances.map((attendance) => {
+                const employeeOptions = employees.some((employee) => employee.id === attendance.employeeId)
+                  ? employees
+                  : [
+                      {
+                        id: attendance.employeeId,
+                        name: attendance.employee?.name ?? "",
+                        lastName: attendance.employee?.lastName ?? "",
+                        email: attendance.employee?.email ?? "",
+                      } as Employee,
+                      ...employees,
+                    ]
 
-          {canEdit && (
-            <div className="flex gap-2">
-              <Button
-                className="bg-green-600 hover:bg-green-700"
-                onClick={handleSaveEdit}
-              >
-                Guardar cambios
-              </Button>
-
-              <Button variant="outline" onClick={handleCancelEdit}>
-                Cancelar
-              </Button>
+                return (
+                  <div
+                    key={attendance.id}
+                    className="flex flex-col gap-4 rounded-lg border p-4 md:flex-row md:items-center md:justify-between"
+                  >
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-medium">
+                          {`${attendance.employee?.name ?? ""} ${attendance.employee?.lastName ?? ""}`.trim() ||
+                            attendance.employeeId}
+                        </h3>
+                        <Badge variant={attendance.status === "ATTENDED" ? "default" : "secondary"}>
+                          {getAttendanceStatusLabel(attendance.status)}
+                        </Badge>
+                      </div>
+                      <p className="mt-1 text-sm text-muted-foreground">{attendance.employee?.email}</p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <AttendanceDialog attendance={attendance} employees={employeeOptions} onSave={handleSaveAttendance} />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 text-destructive hover:text-destructive"
+                        onClick={() => handleDeleteAttendance(attendance.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Eliminar
+                      </Button>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           )}
-
-          <div>
-            <label className="font-semibold">Tema</label>
-            <Input
-              disabled={!canEdit}
-              value={training.title}
-              onChange={(e) => updateField("title", e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="font-semibold">Fecha</label>
-            <Input
-              disabled={!canEdit}
-              type="date"
-              value={training.date}
-              onChange={(e) => updateField("date", e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="font-semibold">Hora de inicio</label>
-            <Input
-              disabled={!canEdit}
-              type="time"
-              value={training.time}
-              onChange={(e) => updateField("time", e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="font-semibold">Responsable</label>
-            <Input
-              disabled={!canEdit}
-              value={training.responsible}
-              onChange={(e) =>
-                updateField("responsible", e.target.value)
-              }
-            />
-          </div>
-
-          <div>
-            <label className="font-semibold">Descripción</label>
-            <Textarea
-              disabled={!canEdit}
-              value={training.description}
-              onChange={(e) =>
-                updateField("description", e.target.value)
-              }
-            />
-          </div>
         </CardContent>
       </Card>
-
-      {/* ACTA */}
-      <Card>
-        <CardContent className="p-6 space-y-4">
-
-          {training.status === "completed" && training.actaFile ? (
-            <Button variant="outline" className="gap-2">
-              <Download className="h-4 w-4" />
-              Descargar acta firmada
-            </Button>
-          ) : (
-            <>
-              <Button
-                variant="outline"
-                onClick={handleDownloadActa}
-                className="gap-2"
-              >
-                <Download className="h-4 w-4" />
-                Descargar acta para firma
-              </Button>
-
-              <input
-                ref={uploadRef}
-                type="file"
-                accept="application/pdf"
-                className="hidden"
-                onChange={(e) =>
-                  setFile(e.target.files?.[0] || null)
-                }
-              />
-
-              <Button
-                onClick={() => uploadRef.current?.click()}
-                className="bg-blue-600 hover:bg-blue-700 gap-2"
-              >
-                <Upload className="h-4 w-4" />
-                Subir acta firmada
-              </Button>
-
-              {file && (
-                <Button onClick={handleUpload}>
-                  Confirmar carga
-                </Button>
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      {canDelete && (
-        <Button
-          onClick={handleDelete}
-          className="bg-orange-700 hover:bg-orange-800 gap-2"
-        >
-          <Trash2 className="h-4 w-4" />
-          Eliminar capacitación
-        </Button>
-      )}
     </div>
   )
 }

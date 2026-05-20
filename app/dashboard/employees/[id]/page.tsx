@@ -6,13 +6,13 @@ import {
   Activity,
   Award,
   ArrowLeft,
+  Brain,
   BriefcaseBusiness,
   Building,
   Calendar,
   ClipboardCheck,
   Download,
   Edit,
-  ExternalLink,
   FileText,
   GraduationCap,
   Loader2,
@@ -77,6 +77,7 @@ import {
   updateEmployeeSocialSecurity,
   uploadEmployeeDocument,
 } from "@/services/employeeService"
+import { listEmployeeTrainings } from "@/services/trainingService"
 import { cn } from "@/lib/utils"
 import type {
   CreateEmployeeCertificationDto,
@@ -100,6 +101,7 @@ import type {
   UpdateEmployeeMedicalEvaluationDto,
   UpdateEmployeeSocialSecurityDto,
 } from "@/types/manager/employee"
+import type { EmployeeTraining, TrainingAttendanceStatus } from "@/types/manager/training"
 import { Textarea } from "@/components/ui/textarea"
 
 type SocialSecurityItem = {
@@ -127,6 +129,13 @@ function formatCurrency(value?: number | null) {
     currency: "COP",
     maximumFractionDigits: 0,
   }).format(value)
+}
+
+function getAttendanceStatusLabel(value?: string | null) {
+  if (value === "ASSIGNED") return "Asignado"
+  if (value === "ATTENDED") return "Asistio"
+  if (value === "ABSENT") return "Ausente"
+  return value ?? "No registrado"
 }
 
 function formatFileSize(value?: number | null) {
@@ -513,6 +522,16 @@ function DocumentManager({
 
 type EducationFormState = CreateEmployeeEducationDto
 
+const educationLevelOptions = [
+  { value: "BACHILLER", label: "Bachiller" },
+  { value: "TECNICO", label: "Tecnico" },
+  { value: "TECNOLOGO", label: "Tecnologo" },
+  { value: "PROFESIONAL", label: "Profesional" },
+  { value: "ESPECIALIZACION", label: "Especializacion" },
+  { value: "MAESTRIA", label: "Maestria" },
+  { value: "DOCTORADO", label: "Doctorado" },
+]
+
 const emptyEducationForm: EducationFormState = {
   level: "",
   institution: "",
@@ -586,14 +605,19 @@ function EducationDialog({
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="grid gap-2">
-                <Label htmlFor="education-level">Nivel</Label>
-                <Input
-                  id="education-level"
-                  value={form.level}
-                  onChange={(event) => setForm((current) => ({ ...current, level: event.target.value }))}
-                  placeholder="Ej: Universitario"
-                  required
-                />
+                <Label>Nivel</Label>
+                <Select value={form.level} onValueChange={(value) => setForm((current) => ({ ...current, level: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona un nivel" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {educationLevelOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="education-institution">Institucion</Label>
@@ -688,8 +712,6 @@ const emptyCertificationForm: CertificationFormState = {
   issuer: "",
   issuedAt: "",
   expiresAt: "",
-  credentialId: "",
-  credentialUrl: "",
 }
 
 function CertificationDialog({
@@ -716,8 +738,6 @@ function CertificationDialog({
             issuer: certification.issuer ?? "",
             issuedAt: formatDate(certification.issuedAt) === "No registrada" ? "" : formatDate(certification.issuedAt),
             expiresAt: formatDate(certification.expiresAt) === "No registrada" ? "" : formatDate(certification.expiresAt),
-            credentialId: certification.credentialId ?? "",
-            credentialUrl: certification.credentialUrl ?? "",
           }
         : emptyCertificationForm,
     )
@@ -800,26 +820,6 @@ function CertificationDialog({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="grid gap-2">
-                <Label htmlFor="certification-credential-id">ID credencial</Label>
-                <Input
-                  id="certification-credential-id"
-                  value={form.credentialId}
-                  onChange={(event) => setForm((current) => ({ ...current, credentialId: event.target.value }))}
-                  placeholder="Codigo o numero de certificado"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="certification-credential-url">URL credencial</Label>
-                <Input
-                  id="certification-credential-url"
-                  value={form.credentialUrl}
-                  onChange={(event) => setForm((current) => ({ ...current, credentialUrl: event.target.value }))}
-                  placeholder="https://..."
-                />
-              </div>
-            </div>
           </div>
 
           <DialogFooter>
@@ -1030,6 +1030,19 @@ function ContractDialog({
 type EvaluationFormState = CreateEmployeeEvaluationDto
 type EvaluatorOption = Pick<Employee, "id" | "name" | "lastName" | "email">
 
+const evaluationTypeOptions = [
+  { value: "PERFORMANCE", label: "Desempeno" },
+  { value: "SKILLS", label: "Habilidades" },
+]
+
+function normalizeEvaluationType(value?: string | null) {
+  return evaluationTypeOptions.some((option) => option.value === value) ? value! : "PERFORMANCE"
+}
+
+function getEvaluationTypeLabel(value?: string | null) {
+  return evaluationTypeOptions.find((option) => option.value === value)?.label ?? value ?? "No registrado"
+}
+
 const emptyEvaluationForm: EvaluationFormState = {
   evaluatorId: "",
   startDate: "",
@@ -1063,7 +1076,7 @@ function EvaluationDialog({
             endDate: formatDate(evaluation.endDate) === "No registrada" ? "" : formatDate(evaluation.endDate),
             score: evaluation.score ?? "",
             comment: evaluation.comment ?? "",
-            type: evaluation.type ?? "PERFORMANCE",
+            type: normalizeEvaluationType(evaluation.type),
           }
         : emptyEvaluationForm,
     )
@@ -1130,10 +1143,11 @@ function EvaluationDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="PERFORMANCE">Desempeno</SelectItem>
-                    <SelectItem value="COMPETENCY">Competencias</SelectItem>
-                    <SelectItem value="PROBATION">Periodo de prueba</SelectItem>
-                    <SelectItem value="FOLLOW_UP">Seguimiento</SelectItem>
+                    {evaluationTypeOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -1395,6 +1409,8 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const [contracts, setContracts] = useState<EmployeeContract[]>([])
   const [evaluations, setEvaluations] = useState<EmployeeEvaluation[]>([])
   const [medicalEvaluations, setMedicalEvaluations] = useState<EmployeeMedicalEvaluation[]>([])
+  const [employeeTrainings, setEmployeeTrainings] = useState<EmployeeTraining[]>([])
+  const [trainingStatusFilter, setTrainingStatusFilter] = useState<TrainingAttendanceStatus | "all">("all")
   const [evaluatorOptions, setEvaluatorOptions] = useState<EvaluatorOption[]>([])
   const [catalogs, setCatalogs] = useState({
     eps: [] as EmployeeCatalogOption[],
@@ -1417,6 +1433,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           contractsData,
           evaluationsData,
           medicalEvaluationsData,
+          employeeTrainingsData,
           employeesData,
           eps,
           arl,
@@ -1429,6 +1446,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           listEmployeeContracts(id),
           listEmployeeEvaluations(id),
           listEmployeeMedicalEvaluations(id),
+          listEmployeeTrainings(id),
           listEmployees(),
           listEpsCatalog(),
           listArlCatalog(),
@@ -1441,6 +1459,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         if (mounted) setContracts(contractsData)
         if (mounted) setEvaluations(evaluationsData)
         if (mounted) setMedicalEvaluations(medicalEvaluationsData)
+        if (mounted) setEmployeeTrainings(employeeTrainingsData)
         if (mounted) setEvaluatorOptions(employeesData.filter((item) => item.id !== id))
         if (mounted) setCatalogs({ eps, arl, pension, compensation })
       } catch (error: any) {
@@ -1530,6 +1549,11 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       catalog: catalogs.compensation,
     },
   ]
+
+  const filteredEmployeeTrainings =
+    trainingStatusFilter === "all"
+      ? employeeTrainings
+      : employeeTrainings.filter((item) => item.status === trainingStatusFilter)
 
   async function handleSaveSocialSecurity(item: SocialSecurityItem, payload: UpdateEmployeeSocialSecurityDto) {
     if (!employee) return
@@ -1807,6 +1831,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           <TabsTrigger value="contracts">Contrato</TabsTrigger>
           <TabsTrigger value="evaluations">Evaluaciones</TabsTrigger>
           <TabsTrigger value="medicalEvaluations">Evaluaciones medicas</TabsTrigger>
+          <TabsTrigger value="trainings">Capacitaciones</TabsTrigger>
         </TabsList>
 
         <TabsContent value="info">
@@ -2039,19 +2064,8 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                             )}
                           </div>
                           <p className="mt-1 text-sm text-muted-foreground">Emitido por: {item.issuer}</p>
-                          {item.credentialId && (
-                            <p className="mt-1 text-sm text-muted-foreground">Credencial: {item.credentialId}</p>
-                          )}
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {item.credentialUrl && (
-                            <a href={item.credentialUrl} target="_blank" rel="noreferrer">
-                              <Button variant="outline" size="sm" className="gap-2" type="button">
-                                <ExternalLink className="h-4 w-4" />
-                                Ver
-                              </Button>
-                            </a>
-                          )}
                           <CertificationDialog certification={item} onSave={handleSaveCertification} />
                           <Button
                             variant="outline"
@@ -2195,7 +2209,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="font-medium">{item.type}</h3>
+                            <h3 className="font-medium">{getEvaluationTypeLabel(item.type)}</h3>
                             <Badge variant="secondary">Puntaje: {item.score}</Badge>
                           </div>
                           <p className="mt-1 text-sm text-muted-foreground">
@@ -2332,6 +2346,84 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                         context={{ kind: "medicalEvaluation", medicalEvaluationId: item.id }}
                         defaultType="MEDICAL_EVALUATION"
                       />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="trainings">
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <CardTitle className="flex items-center gap-2 text-base font-medium">
+                  <Brain className="h-5 w-5" />
+                  Capacitaciones asignadas
+                </CardTitle>
+                <Select
+                  value={trainingStatusFilter}
+                  onValueChange={(value) => setTrainingStatusFilter(value as TrainingAttendanceStatus | "all")}
+                >
+                  <SelectTrigger className="w-full md:w-48">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas</SelectItem>
+                    <SelectItem value="ASSIGNED">Asignadas</SelectItem>
+                    <SelectItem value="ATTENDED">Asistidas</SelectItem>
+                    <SelectItem value="ABSENT">Ausentes</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {filteredEmployeeTrainings.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-border p-8 text-center">
+                  <Brain className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm font-medium">Sin capacitaciones registradas</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Aqui se mostraran las capacitaciones asignadas, asistidas o ausentes del funcionario.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredEmployeeTrainings.map((item) => (
+                    <div key={item.attendanceId} className="rounded-lg border border-border p-4">
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="font-medium">{item.training.topic?.name ?? item.training.topicId}</h3>
+                            <Badge variant={item.status === "ATTENDED" ? "default" : "secondary"}>
+                              {getAttendanceStatusLabel(item.status)}
+                            </Badge>
+                          </div>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            Duracion: {item.training.durationHours} horas
+                          </p>
+                        </div>
+                        <Link href={`/dashboard/trainingPlan/${item.training.id}`}>
+                          <Button variant="outline" size="sm">
+                            Ver capacitacion
+                          </Button>
+                        </Link>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Fecha: {formatDate(item.training.date)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Estado capacitacion: {item.training.status}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Asistencia: {getAttendanceStatusLabel(item.status)}</span>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>

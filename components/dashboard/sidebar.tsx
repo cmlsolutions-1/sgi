@@ -97,11 +97,11 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "flex flex-col h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300",
+        "sticky top-0 flex h-dvh shrink-0 flex-col overflow-hidden bg-sidebar border-r border-sidebar-border transition-all duration-300",
         collapsed ? "w-16" : "w-64"
       )}
     >
-      <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border">
+      <div className="flex h-16 shrink-0 items-center justify-between px-4 border-b border-sidebar-border">
         {!collapsed && (
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
@@ -128,7 +128,7 @@ export function Sidebar() {
         </Button>
       </div>
 
-      <nav className="flex-1 p-2 space-y-1">
+      <nav className="min-h-0 flex-1 overflow-y-auto p-2 space-y-1">
         {visibleNavigation.map((item) => {
           // Comprobar si el ítem tiene subItems (menú desplegable)
           if (item.subItems) {
@@ -208,7 +208,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="p-2 border-t border-sidebar-border space-y-1">
+      <div className="shrink-0 p-2 border-t border-sidebar-border space-y-1">
         <Link
           href="/dashboard/settings"
           className={cn(

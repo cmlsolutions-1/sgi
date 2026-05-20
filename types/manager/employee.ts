@@ -81,8 +81,6 @@ export type EmployeeCertification = {
   issuer: string
   issuedAt: string
   expiresAt: string
-  credentialId: string
-  credentialUrl: string
   createdAt: string
 }
 
@@ -91,8 +89,6 @@ export type CreateEmployeeCertificationDto = {
   issuer: string
   issuedAt: string
   expiresAt: string
-  credentialId: string
-  credentialUrl: string
 }
 
 export type UpdateEmployeeCertificationDto = Partial<CreateEmployeeCertificationDto>
