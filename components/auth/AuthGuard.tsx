@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { tokenHasRole } from "@/lib/jwt";
+import { ensureFreshAccessToken } from "@/lib/apiClient";
 
 type AuthGuardProps = {
   children: React.ReactNode;
@@ -42,6 +43,41 @@ export default function AuthGuard({
       router.replace("/manager");
     }
   }, [hasHydrated, accessToken, isAdmin, requireAdmin, redirectAdminToManager, router, pathname]);
+
+  useEffect(() => {
+    if (!hasHydrated || !accessToken) return;
+
+    let active = true;
+
+    const refreshSession = async () => {
+      const token = await ensureFreshAccessToken();
+
+      if (!active) return;
+
+      if (!token) {
+        router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+      }
+    };
+
+    refreshSession();
+    const intervalId = window.setInterval(refreshSession, 60_000);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        refreshSession();
+      }
+    };
+
+    window.addEventListener("focus", refreshSession);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      active = false;
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", refreshSession);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [hasHydrated, accessToken, router, pathname]);
 
   if (!hasHydrated) {
     return (

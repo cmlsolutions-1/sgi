@@ -2,7 +2,7 @@
 
 import { use, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Download, Edit, Loader2, Plus, Trash2, Users } from "lucide-react"
+import { ArrowLeft, Download, Edit, FileText, Loader2, Plus, Trash2, Upload, Users } from "lucide-react"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -19,15 +20,20 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { listEmployees } from "@/services/employeeService"
 import {
   createTrainingAttendance,
   deleteTraining,
   deleteTrainingAttendance,
+  deleteTrainingDocument,
+  downloadTrainingDocumentFile,
   getTrainingById,
   listTrainingAttendances,
+  listTrainingDocuments,
   updateTrainingAttendance,
+  uploadTrainingDocument,
 } from "@/services/trainingService"
 import type { Employee } from "@/types/manager/employee"
 import type {
@@ -35,6 +41,7 @@ import type {
   Training,
   TrainingAttendance,
   TrainingAttendanceStatus,
+  TrainingDocument,
   UpdateTrainingAttendanceDto,
 } from "@/types/manager/training"
 
@@ -59,6 +66,12 @@ function getTrainingStatusLabel(status?: string | null) {
   if (status === "FINISHED") return "Finalizada"
   if (status === "CANCELLED") return "Cancelada"
   return status ?? "No registrada"
+}
+
+function formatFileSize(value?: number | null) {
+  if (!value) return "0 KB"
+  if (value < 1024 * 1024) return `${Math.max(1, Math.round(value / 1024))} KB`
+  return `${(value / (1024 * 1024)).toFixed(1)} MB`
 }
 
 type AttendanceFormState = CreateTrainingAttendanceDto
@@ -172,6 +185,162 @@ function AttendanceDialog({
         </form>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function TrainingDocuments({ trainingId }: { trainingId: string }) {
+  const [documents, setDocuments] = useState<TrainingDocument[]>([])
+  const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [file, setFile] = useState<File | null>(null)
+  const [type, setType] = useState("TRAINING_CERTIFICATE")
+  const [isConfirmed, setIsConfirmed] = useState(true)
+
+  async function loadDocuments() {
+    setLoading(true)
+    try {
+      const data = await listTrainingDocuments(trainingId)
+      setDocuments(data)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar los documentos")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadDocuments()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trainingId])
+
+  async function handleUpload(event: React.FormEvent) {
+    event.preventDefault()
+
+    if (!file) {
+      toast.error("Selecciona un archivo para subir")
+      return
+    }
+
+    if (!type.trim()) {
+      toast.error("Ingresa el tipo de documento")
+      return
+    }
+
+    setUploading(true)
+    try {
+      await uploadTrainingDocument(trainingId, {
+        file,
+        type: type.trim(),
+        isConfirmed,
+      })
+      setFile(null)
+      await loadDocuments()
+      toast.success("Documento subido correctamente")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo subir el documento")
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  async function handleView(document: TrainingDocument) {
+    if (!document.downloadUrl) return
+
+    try {
+      const blob = await downloadTrainingDocumentFile(document.downloadUrl)
+      const url = URL.createObjectURL(blob)
+      window.open(url, "_blank", "noopener,noreferrer")
+      window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo abrir el documento")
+    }
+  }
+
+  async function handleDelete(documentId: string) {
+    try {
+      await deleteTrainingDocument(trainingId, documentId)
+      setDocuments((current) => current.filter((document) => document.id !== documentId))
+      toast.success("Documento eliminado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar el documento")
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <FileText className="h-5 w-5" />
+          Documentos de la capacitacion
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleUpload} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_auto_auto] lg:items-end">
+          <div className="grid gap-2">
+            <Label>Archivo</Label>
+            <Input type="file" onChange={(event) => setFile(event.target.files?.[0] ?? null)} disabled={uploading} />
+          </div>
+          <div className="grid gap-2">
+            <Label>Tipo</Label>
+            <Input value={type} onChange={(event) => setType(event.target.value)} disabled={uploading} />
+          </div>
+          <label className="flex h-10 items-center gap-2 text-sm">
+            <Checkbox
+              checked={isConfirmed}
+              onCheckedChange={(checked) => setIsConfirmed(checked === true)}
+              disabled={uploading}
+            />
+            Confirmado
+          </label>
+          <Button type="submit" size="sm" className="gap-2" disabled={uploading}>
+            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+            Subir
+          </Button>
+        </form>
+
+        <div className="mt-4 space-y-2">
+          {loading ? (
+            <div className="flex justify-center py-4">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : documents.length === 0 ? (
+            <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">Sin documentos cargados.</p>
+          ) : (
+            documents.map((document) => (
+              <div
+                key={document.id}
+                className="flex flex-col gap-3 rounded-md border px-3 py-2 text-sm md:flex-row md:items-center md:justify-between"
+              >
+                <div className="min-w-0">
+                  <p className="truncate font-medium">{document.originalName || document.type}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {document.type} · {formatFileSize(document.size)} · {document.isConfirmed ? "Confirmado" : "Pendiente"}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  {document.downloadUrl && (
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => handleView(document)}>
+                      <Download className="h-4 w-4" />
+                      Ver
+                    </Button>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 text-destructive hover:text-destructive"
+                    onClick={() => handleDelete(document.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Eliminar
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -375,6 +544,8 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
           </Button>
         </CardContent>
       </Card>
+
+      <TrainingDocuments trainingId={training.id} />
 
       <Card>
         <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

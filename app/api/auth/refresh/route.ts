@@ -38,10 +38,15 @@ export async function POST(req: Request) {
       );
     }
 
-    const newAccess = backendJson?.data?.accesToken;
-    const newRefresh = backendJson?.data?.refreshToken;
+    const newAccess =
+      backendJson?.data?.accesToken ??
+      backendJson?.data?.accessToken ??
+      backendJson?.accesToken ??
+      backendJson?.accessToken ??
+      backendJson?.token;
+    const newRefresh = backendJson?.data?.refreshToken ?? backendJson?.refreshToken ?? refreshToken;
 
-    if (!newAccess || !newRefresh) {
+    if (!newAccess) {
       return NextResponse.json({ message: "Respuesta inválida del servidor" }, { status: 502 });
     }
 

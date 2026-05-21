@@ -5,12 +5,14 @@ import Link from "next/link"
 import {
   BriefcaseBusiness,
   Building2,
+  Calendar,
   Edit,
   Eye,
   Filter,
   Loader2,
   Search,
   Trash2,
+  TriangleAlert,
   UserCheck,
   Users,
 } from "lucide-react"
@@ -22,11 +24,28 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Textarea } from "@/components/ui/textarea"
 import { JobsManager } from "@/app/dashboard/jobs/page"
 import { WorkAreasManager } from "@/app/dashboard/work-areas/page"
+import {
+  activateIncident,
+  createIncident,
+  deleteIncident,
+  listIncidents,
+  updateIncident,
+} from "@/services/incidentService"
 import {
   activateEmployee,
   createEmployee,
@@ -38,6 +57,7 @@ import {
   updateEmployee,
 } from "@/services/employeeService"
 import { cn } from "@/lib/utils"
+import type { CreateIncidentDto, Incident, UpdateIncidentDto } from "@/types/manager/incident"
 import type {
   CreateEmployeeDto,
   Employee,
@@ -45,6 +65,335 @@ import type {
   UpdateEmployeeDto,
   UpsertEmployeeSgiResponsibleDto,
 } from "@/types/manager/employee"
+
+function formatDate(value?: string | null) {
+  if (!value) return "No registrada"
+  return value.slice(0, 10)
+}
+
+type IncidentFormState = CreateIncidentDto
+
+const emptyIncidentForm: IncidentFormState = {
+  employeeId: "",
+  date: "",
+  place: "",
+  description: "",
+  consequences: "",
+  correctiveActions: "",
+}
+
+function IncidentDialog({
+  incident,
+  employees,
+  onSave,
+}: {
+  incident?: Incident
+  employees: Employee[]
+  onSave: (payload: CreateIncidentDto | UpdateIncidentDto, incidentId?: string) => Promise<void>
+}) {
+  const [open, setOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState<IncidentFormState>(emptyIncidentForm)
+
+  useEffect(() => {
+    if (!open) return
+
+    setForm(
+      incident
+        ? {
+            employeeId: incident.employeeId ?? "",
+            date: formatDate(incident.date) === "No registrada" ? "" : formatDate(incident.date),
+            place: incident.place ?? "",
+            description: incident.description ?? "",
+            consequences: incident.consequences ?? "",
+            correctiveActions: incident.correctiveActions ?? "",
+          }
+        : emptyIncidentForm,
+    )
+  }, [incident, open])
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault()
+
+    if (!form.employeeId || !form.date || !form.place || !form.description) {
+      toast.error("Completa funcionario, fecha, lugar y descripcion")
+      return
+    }
+
+    setSaving(true)
+    try {
+      await onSave(form, incident?.id)
+      setOpen(false)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant={incident ? "outline" : "default"} size="sm" className="gap-2">
+          {incident ? <Edit className="h-4 w-4" /> : <TriangleAlert className="h-4 w-4" />}
+          {incident ? "Editar" : "Nuevo incidente"}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-card max-w-2xl">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>{incident ? "Editar incidente" : "Nuevo incidente laboral"}</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label>Funcionario</Label>
+                <Select value={form.employeeId} onValueChange={(value) => setForm((current) => ({ ...current, employeeId: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona un funcionario" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {employees.map((employee) => (
+                      <SelectItem key={employee.id} value={employee.id}>
+                        {`${employee.name ?? ""} ${employee.lastName ?? ""}`.trim() || employee.email || employee.id}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="incident-date">Fecha</Label>
+                <Input
+                  id="incident-date"
+                  type="date"
+                  value={form.date}
+                  onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="incident-place">Lugar</Label>
+              <Input
+                id="incident-place"
+                value={form.place}
+                onChange={(event) => setForm((current) => ({ ...current, place: event.target.value }))}
+                required
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="incident-description">Descripcion</Label>
+              <Textarea
+                id="incident-description"
+                value={form.description}
+                onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="incident-consequences">Consecuencias</Label>
+                <Textarea
+                  id="incident-consequences"
+                  value={form.consequences}
+                  onChange={(event) => setForm((current) => ({ ...current, consequences: event.target.value }))}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="incident-actions">Acciones correctivas</Label>
+                <Textarea
+                  id="incident-actions"
+                  value={form.correctiveActions}
+                  onChange={(event) => setForm((current) => ({ ...current, correctiveActions: event.target.value }))}
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Guardando..." : "Guardar"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function IncidentsManager({ employees }: { employees: Employee[] }) {
+  const [incidents, setIncidents] = useState<Incident[]>([])
+  const [loading, setLoading] = useState(true)
+  const [employeeFilter, setEmployeeFilter] = useState("all")
+
+  async function loadData(filter = employeeFilter) {
+    setLoading(true)
+    try {
+      const data = await listIncidents(filter === "all" ? undefined : filter)
+      setIncidents(data)
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo cargar los incidentes")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  async function handleFilterChange(value: string) {
+    setEmployeeFilter(value)
+    await loadData(value)
+  }
+
+  async function handleSaveIncident(payload: CreateIncidentDto | UpdateIncidentDto, incidentId?: string) {
+    try {
+      if (incidentId) {
+        await updateIncident(incidentId, payload as UpdateIncidentDto)
+        toast.success("Incidente actualizado")
+      } else {
+        await createIncident(payload as CreateIncidentDto)
+        toast.success("Incidente creado")
+      }
+      await loadData()
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo guardar el incidente")
+      throw error
+    }
+  }
+
+  async function handleDeleteIncident(incident: Incident) {
+    if (!window.confirm("Eliminar este incidente laboral?")) return
+
+    try {
+      await deleteIncident(incident.id)
+      toast.success("Incidente eliminado")
+      await loadData()
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo eliminar el incidente")
+    }
+  }
+
+  async function handleActivateIncident(incident: Incident) {
+    try {
+      await activateIncident(incident.id)
+      toast.success("Incidente activado")
+      await loadData()
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo activar el incidente")
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-foreground">Incidentes laborales</h2>
+          <p className="text-sm text-muted-foreground">Registra y consulta incidentes asociados a funcionarios.</p>
+        </div>
+        <IncidentDialog employees={employees} onSave={handleSaveIncident} />
+      </div>
+
+      <Card className="bg-card border-border">
+        <CardContent className="p-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center">
+            <div className="grid gap-1">
+              <Label>Funcionario</Label>
+              <Select value={employeeFilter} onValueChange={handleFilterChange}>
+                <SelectTrigger className="w-full bg-secondary border-0 md:w-[260px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los funcionarios</SelectItem>
+                  {employees.map((employee) => (
+                    <SelectItem key={employee.id} value={employee.id}>
+                      {`${employee.name ?? ""} ${employee.lastName ?? ""}`.trim() || employee.email || employee.id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {loading ? (
+        <div className="flex min-h-[260px] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      ) : incidents.length === 0 ? (
+        <Card className="bg-card border-border">
+          <CardContent className="p-10 text-center text-sm text-muted-foreground">
+            No hay incidentes registrados.
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {incidents.map((incident) => (
+            <Card key={incident.id} className="bg-card border-border">
+              <CardContent className="p-4">
+                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="font-medium">
+                        {incident.employee
+                          ? `${incident.employee.name ?? ""} ${incident.employee.lastName ?? ""}`.trim()
+                          : incident.employeeId}
+                      </h3>
+                      <Badge variant={incident.status === "ACTIVE" ? "default" : "secondary"}>{incident.status}</Badge>
+                    </div>
+                    <p className="mt-1 text-sm text-muted-foreground">Lugar: {incident.place}</p>
+                    <p className="mt-2 text-sm">{incident.description}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <IncidentDialog incident={incident} employees={employees} onSave={handleSaveIncident} />
+                    {incident.status === "ACTIVE" ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 text-destructive hover:text-destructive"
+                        onClick={() => handleDeleteIncident(incident)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Eliminar
+                      </Button>
+                    ) : (
+                      <Button variant="outline" size="sm" onClick={() => handleActivateIncident(incident)}>
+                        Activar
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <span>Fecha: {formatDate(incident.date)}</span>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Consecuencias</p>
+                    <p>{incident.consequences || "No registradas"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Acciones correctivas</p>
+                    <p>{incident.correctiveActions || "No registradas"}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function EmployeesPage() {
   const [search, setSearch] = useState("")
@@ -238,6 +587,10 @@ export default function EmployeesPage() {
           <TabsTrigger value="structure" className="gap-2">
             <Building2 className="h-4 w-4" />
             Estructura Organizacional
+          </TabsTrigger>
+          <TabsTrigger value="incidents" className="gap-2">
+            <TriangleAlert className="h-4 w-4" />
+            Incidentes
           </TabsTrigger>
         </TabsList>
 
@@ -457,6 +810,10 @@ export default function EmployeesPage() {
               <JobsManager />
             </TabsContent>
           </Tabs>
+        </TabsContent>
+
+        <TabsContent value="incidents" className="space-y-6">
+          <IncidentsManager employees={employees} />
         </TabsContent>
       </Tabs>
 

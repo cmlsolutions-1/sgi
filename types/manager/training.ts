@@ -79,6 +79,30 @@ export type EmployeeTraining = {
   training: Training
 }
 
+export type TrainingDocument = {
+  id: string
+  companyId: string
+  ownerType: string
+  ownerId: string
+  referenceType: string
+  referenceId: string
+  type: string
+  originalName: string
+  mimeType: string
+  size: number
+  storageProvider: string
+  isConfirmed: boolean
+  downloadUrl: string
+  createdAt: string
+  createdBy: string
+}
+
+export type UploadTrainingDocumentDto = {
+  file: File
+  type: string
+  isConfirmed: boolean
+}
+
 export type TopicTrainingResponse = ApiResponse<TopicTraining>
 export type TopicTrainingsResponse = ApiResponse<TopicTraining[]>
 export type TopicTrainingOptionsResponse = ApiResponse<TopicTrainingOption[]>
@@ -87,3 +111,5 @@ export type TrainingsResponse = ApiResponse<TrainingList>
 export type TrainingAttendanceResponse = ApiResponse<TrainingAttendance>
 export type TrainingAttendancesResponse = ApiResponse<TrainingAttendance[]>
 export type EmployeeTrainingsResponse = ApiResponse<EmployeeTraining[]>
+export type TrainingDocumentResponse = ApiResponse<TrainingDocument>
+export type TrainingDocumentsResponse = ApiResponse<TrainingDocument[]>

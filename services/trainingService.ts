@@ -14,6 +14,9 @@ import type {
   TrainingAttendance,
   TrainingAttendanceResponse,
   TrainingAttendancesResponse,
+  TrainingDocument,
+  TrainingDocumentResponse,
+  TrainingDocumentsResponse,
   TrainingList,
   TrainingResponse,
   TrainingsResponse,
@@ -21,6 +24,7 @@ import type {
   UpdateTopicTrainingDto,
   UpdateTrainingAttendanceDto,
   UpdateTrainingDto,
+  UploadTrainingDocumentDto,
 } from "@/types/manager/training"
 
 async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
@@ -33,6 +37,8 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
     | TrainingAttendanceResponse
     | TrainingAttendancesResponse
     | EmployeeTrainingsResponse
+    | TrainingDocumentResponse
+    | TrainingDocumentsResponse
     | null
 
   if (!res.ok || !json?.ok) {
@@ -40,6 +46,23 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
   }
 
   return json.data as T
+}
+
+function createDocumentFormData(dto: UploadTrainingDocumentDto) {
+  const formData = new FormData()
+  formData.append("file", dto.file)
+  formData.append("type", dto.type)
+  formData.append("isConfirmed", String(dto.isConfirmed))
+  return formData
+}
+
+async function parseFileOrThrow(res: Response, fallbackMsg: string): Promise<Blob> {
+  if (!res.ok) {
+    const json = (await res.json().catch(() => null)) as { message?: string } | null
+    throw new Error(json?.message ?? fallbackMsg)
+  }
+
+  return res.blob()
 }
 
 export async function createTopicTraining(dto: CreateTopicTrainingDto): Promise<TopicTraining> {
@@ -160,4 +183,30 @@ export async function listEmployeeTrainings(
   const query = status ? `?status=${encodeURIComponent(status)}` : ""
   const res = await apiFetch(`/api/employees/${employeeId}/trainings${query}`, { method: "GET" })
   return parseOrThrow<EmployeeTraining[]>(res, "No se pudo cargar las capacitaciones del funcionario")
+}
+
+export async function uploadTrainingDocument(
+  trainingId: string,
+  dto: UploadTrainingDocumentDto,
+): Promise<TrainingDocument> {
+  const res = await apiFetch(`/api/training/${trainingId}/documents`, {
+    method: "POST",
+    body: createDocumentFormData(dto),
+  })
+  return parseOrThrow<TrainingDocument>(res, "No se pudo subir el documento de la capacitacion")
+}
+
+export async function listTrainingDocuments(trainingId: string): Promise<TrainingDocument[]> {
+  const res = await apiFetch(`/api/training/${trainingId}/documents`, { method: "GET" })
+  return parseOrThrow<TrainingDocument[]>(res, "No se pudo cargar los documentos de la capacitacion")
+}
+
+export async function deleteTrainingDocument(trainingId: string, documentId: string): Promise<void> {
+  const res = await apiFetch(`/api/training/${trainingId}/documents/${documentId}`, { method: "DELETE" })
+  await parseOrThrow<Record<string, never>>(res, "No se pudo eliminar el documento de la capacitacion")
+}
+
+export async function downloadTrainingDocumentFile(downloadUrl: string): Promise<Blob> {
+  const res = await apiFetch(downloadUrl, { method: "GET" })
+  return parseFileOrThrow(res, "No se pudo descargar el documento de la capacitacion")
 }
