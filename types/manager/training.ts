@@ -21,7 +21,7 @@ export type CreateTopicTrainingDto = {
 
 export type UpdateTopicTrainingDto = Partial<CreateTopicTrainingDto>
 
-export type TrainingStatus = "ACTIVE" | "INACTIVE" | "FINISHED" | "CANCELLED" | string
+export type TrainingStatus = "ACTIVE" | "INACTIVE" | "FINALIZADA" | "CANCELADA" | string
 
 export type Training = {
   id: string
@@ -36,6 +36,7 @@ export type CreateTrainingDto = {
   topicId: string
   date: string
   durationHours: number
+  status?: TrainingStatus
 }
 
 export type UpdateTrainingDto = Partial<CreateTrainingDto> & {

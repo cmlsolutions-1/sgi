@@ -6,6 +6,8 @@ export type IncidentEmployee = {
   lastName: string
 }
 
+export type IncidentStatus = "ACTIVE" | "INACTIVE"
+
 export type Incident = {
   id: string
   employeeId: string
@@ -14,7 +16,7 @@ export type Incident = {
   description: string
   consequences: string
   correctiveActions: string
-  status: string
+  status: IncidentStatus
   employee: IncidentEmployee
 }
 
@@ -29,5 +31,31 @@ export type CreateIncidentDto = {
 
 export type UpdateIncidentDto = CreateIncidentDto
 
+export type IncidentDocument = {
+  id: string
+  companyId: string
+  ownerType: string
+  ownerId: string
+  referenceType: string
+  referenceId: string
+  type: string
+  originalName: string
+  mimeType: string
+  size: number
+  storageProvider: string
+  isConfirmed: boolean
+  downloadUrl: string
+  createdAt: string
+  createdBy: string
+}
+
+export type UploadIncidentDocumentDto = {
+  file: File
+  type: string
+  isConfirmed: boolean
+}
+
 export type IncidentResponse = ApiResponse<Incident>
 export type IncidentsResponse = ApiResponse<Incident[]>
+export type IncidentDocumentResponse = ApiResponse<IncidentDocument>
+export type IncidentDocumentsResponse = ApiResponse<IncidentDocument[]>

@@ -6,13 +6,16 @@ import {
   BriefcaseBusiness,
   Building2,
   Calendar,
+  Download,
   Edit,
   Eye,
+  FileText,
   Filter,
   Loader2,
   Search,
   Trash2,
   TriangleAlert,
+  Upload,
   UserCheck,
   Users,
 } from "lucide-react"
@@ -24,6 +27,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -43,8 +47,12 @@ import {
   activateIncident,
   createIncident,
   deleteIncident,
+  deleteIncidentDocument,
+  downloadIncidentDocumentFile,
+  listIncidentDocuments,
   listIncidents,
   updateIncident,
+  uploadIncidentDocument,
 } from "@/services/incidentService"
 import {
   activateEmployee,
@@ -57,7 +65,13 @@ import {
   updateEmployee,
 } from "@/services/employeeService"
 import { cn } from "@/lib/utils"
-import type { CreateIncidentDto, Incident, UpdateIncidentDto } from "@/types/manager/incident"
+import type {
+  CreateIncidentDto,
+  Incident,
+  IncidentDocument,
+  IncidentStatus,
+  UpdateIncidentDto,
+} from "@/types/manager/incident"
 import type {
   CreateEmployeeDto,
   Employee,
@@ -71,7 +85,22 @@ function formatDate(value?: string | null) {
   return value.slice(0, 10)
 }
 
-type IncidentFormState = CreateIncidentDto
+function formatFileSize(value?: number | null) {
+  if (!value) return "0 KB"
+  if (value < 1024) return `${value} B`
+  if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`
+  return `${(value / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function getIncidentStatusLabel(status?: string | null) {
+  if (status === "ACTIVE") return "Activo"
+  if (status === "INACTIVE") return "Inactivo"
+  return status ?? "No registrado"
+}
+
+type IncidentFormState = CreateIncidentDto & {
+  status: IncidentStatus
+}
 
 const emptyIncidentForm: IncidentFormState = {
   employeeId: "",
@@ -80,6 +109,7 @@ const emptyIncidentForm: IncidentFormState = {
   description: "",
   consequences: "",
   correctiveActions: "",
+  status: "ACTIVE",
 }
 
 function IncidentDialog({
@@ -89,7 +119,7 @@ function IncidentDialog({
 }: {
   incident?: Incident
   employees: Employee[]
-  onSave: (payload: CreateIncidentDto | UpdateIncidentDto, incidentId?: string) => Promise<void>
+  onSave: (payload: IncidentFormState, incidentId?: string) => Promise<void>
 }) {
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -107,6 +137,7 @@ function IncidentDialog({
             description: incident.description ?? "",
             consequences: incident.consequences ?? "",
             correctiveActions: incident.correctiveActions ?? "",
+            status: incident.status ?? "ACTIVE",
           }
         : emptyIncidentForm,
     )
@@ -210,6 +241,24 @@ function IncidentDialog({
                 />
               </div>
             </div>
+
+            {incident && (
+              <div className="grid gap-2">
+                <Label>Estado</Label>
+                <Select
+                  value={form.status}
+                  onValueChange={(value) => setForm((current) => ({ ...current, status: value as IncidentStatus }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ACTIVE">Activo</SelectItem>
+                    <SelectItem value="INACTIVE">Inactivo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           <DialogFooter>
@@ -223,6 +272,159 @@ function IncidentDialog({
         </form>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function IncidentDocuments({ incidentId }: { incidentId: string }) {
+  const [documents, setDocuments] = useState<IncidentDocument[]>([])
+  const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [file, setFile] = useState<File | null>(null)
+  const [type, setType] = useState("OTHER")
+  const [isConfirmed, setIsConfirmed] = useState(true)
+
+  async function loadDocuments() {
+    setLoading(true)
+    try {
+      const data = await listIncidentDocuments(incidentId)
+      setDocuments(data)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar los documentos del incidente")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadDocuments()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [incidentId])
+
+  async function handleUpload(event: React.FormEvent) {
+    event.preventDefault()
+
+    if (!file) {
+      toast.error("Selecciona un archivo para subir")
+      return
+    }
+
+    if (!type.trim()) {
+      toast.error("Ingresa el tipo de documento")
+      return
+    }
+
+    setUploading(true)
+    try {
+      await uploadIncidentDocument(incidentId, {
+        file,
+        type: type.trim(),
+        isConfirmed,
+      })
+      setFile(null)
+      await loadDocuments()
+      toast.success("Documento subido correctamente")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo subir el documento")
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  async function handleView(document: IncidentDocument) {
+    if (!document.downloadUrl) return
+
+    try {
+      const blob = await downloadIncidentDocumentFile(document.downloadUrl)
+      const url = URL.createObjectURL(blob)
+      window.open(url, "_blank", "noopener,noreferrer")
+      window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo abrir el documento")
+    }
+  }
+
+  async function handleDelete(documentId: string) {
+    try {
+      await deleteIncidentDocument(incidentId, documentId)
+      setDocuments((current) => current.filter((document) => document.id !== documentId))
+      toast.success("Documento eliminado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar el documento")
+    }
+  }
+
+  return (
+    <div className="mt-4 rounded-md border border-dashed p-3">
+      <div className="mb-3 flex items-center gap-2 text-sm font-medium">
+        <FileText className="h-4 w-4" />
+        Documentos
+      </div>
+
+      <form onSubmit={handleUpload} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_180px_auto_auto] lg:items-end">
+        <div className="grid gap-2">
+          <Label>Archivo</Label>
+          <Input type="file" onChange={(event) => setFile(event.target.files?.[0] ?? null)} disabled={uploading} />
+        </div>
+        <div className="grid gap-2">
+          <Label>Tipo</Label>
+          <Input value={type} onChange={(event) => setType(event.target.value)} disabled={uploading} />
+        </div>
+        <label className="flex h-10 items-center gap-2 text-sm">
+          <Checkbox
+            checked={isConfirmed}
+            onCheckedChange={(checked) => setIsConfirmed(checked === true)}
+            disabled={uploading}
+          />
+          Confirmado
+        </label>
+        <Button type="submit" size="sm" className="gap-2" disabled={uploading}>
+          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          Subir
+        </Button>
+      </form>
+
+      <div className="mt-3 space-y-2">
+        {loading ? (
+          <div className="flex justify-center py-3">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          </div>
+        ) : documents.length === 0 ? (
+          <p className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">Sin documentos cargados.</p>
+        ) : (
+          documents.map((document) => (
+            <div
+              key={document.id}
+              className="flex flex-col gap-3 rounded-md border px-3 py-2 text-sm md:flex-row md:items-center md:justify-between"
+            >
+              <div className="min-w-0">
+                <p className="truncate font-medium">{document.originalName || document.type}</p>
+                <p className="text-xs text-muted-foreground">
+                  {document.type} · {formatFileSize(document.size)} · {document.isConfirmed ? "Confirmado" : "Pendiente"}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {document.downloadUrl && (
+                  <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => handleView(document)}>
+                    <Download className="h-4 w-4" />
+                    Ver
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 text-destructive hover:text-destructive"
+                  onClick={() => handleDelete(document.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Eliminar
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
   )
 }
 
@@ -253,13 +455,24 @@ function IncidentsManager({ employees }: { employees: Employee[] }) {
     await loadData(value)
   }
 
-  async function handleSaveIncident(payload: CreateIncidentDto | UpdateIncidentDto, incidentId?: string) {
+  async function handleSaveIncident(payload: IncidentFormState, incidentId?: string) {
     try {
+      const { status, ...incidentPayload } = payload
+
       if (incidentId) {
-        await updateIncident(incidentId, payload as UpdateIncidentDto)
+        const currentIncident = incidents.find((incident) => incident.id === incidentId)
+        await updateIncident(incidentId, incidentPayload as UpdateIncidentDto)
+
+        if (status !== currentIncident?.status) {
+          if (status === "ACTIVE") {
+            await activateIncident(incidentId)
+          } else {
+            await deleteIncident(incidentId)
+          }
+        }
         toast.success("Incidente actualizado")
       } else {
-        await createIncident(payload as CreateIncidentDto)
+        await createIncident(incidentPayload as CreateIncidentDto)
         toast.success("Incidente creado")
       }
       await loadData()
@@ -347,7 +560,9 @@ function IncidentsManager({ employees }: { employees: Employee[] }) {
                           ? `${incident.employee.name ?? ""} ${incident.employee.lastName ?? ""}`.trim()
                           : incident.employeeId}
                       </h3>
-                      <Badge variant={incident.status === "ACTIVE" ? "default" : "secondary"}>{incident.status}</Badge>
+                      <Badge variant={incident.status === "ACTIVE" ? "default" : "secondary"}>
+                        {getIncidentStatusLabel(incident.status)}
+                      </Badge>
                     </div>
                     <p className="mt-1 text-sm text-muted-foreground">Lugar: {incident.place}</p>
                     <p className="mt-2 text-sm">{incident.description}</p>
@@ -386,6 +601,8 @@ function IncidentsManager({ employees }: { employees: Employee[] }) {
                     <p>{incident.correctiveActions || "No registradas"}</p>
                   </div>
                 </div>
+
+                <IncidentDocuments incidentId={incident.id} />
               </CardContent>
             </Card>
           ))}

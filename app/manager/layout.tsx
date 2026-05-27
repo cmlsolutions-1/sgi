@@ -21,5 +21,11 @@ export default function ManagerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <AuthGuard requireAdmin>{children}</AuthGuard>;
+  return (
+    <AuthGuard requireAdmin>
+      <div className="h-dvh overflow-y-auto overflow-x-hidden bg-background">
+        {children}
+      </div>
+    </AuthGuard>
+  );
 }

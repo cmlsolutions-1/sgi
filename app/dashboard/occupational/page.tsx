@@ -33,6 +33,28 @@ import {
   SheetTitle,
   SheetFooter,
 } from "@/components/ui/sheet"
+import { toast } from "sonner"
+import {
+  changeRiskStatus,
+  createRisk,
+  deleteRisk,
+  listConsequenceLevels,
+  listDeficiencyLevels,
+  listExposureLevels,
+  listHazardDescriptions,
+  listHazardTypes,
+  listRisks,
+  updateRisk,
+} from "@/services/riskService"
+import type {
+  CreateRiskDto,
+  Risk,
+  RiskCatalogItem,
+  RiskHazardDescription,
+  RiskStatus,
+  RiskValueCatalogItem,
+  UpdateRiskDto,
+} from "@/types/manager/risk"
 
 /* =========================================================
    1) CAPACITACIONES (original)
@@ -114,6 +136,7 @@ type MeasureControl = {
 
 type RiskRow = {
   id: string
+  status: RiskStatus
 
   proceso: string
   zonaLugar: string
@@ -344,6 +367,22 @@ function progressChipColor(state: RiskProgressState) {
 
 const steps = ["Contexto", "Peligro", "Controles", "Evaluación", "Medidas"]
 
+type RiskCatalogs = {
+  hazardTypes: RiskCatalogItem[]
+  hazardDescriptions: RiskHazardDescription[]
+  deficiencyLevels: RiskValueCatalogItem[]
+  exposureLevels: RiskValueCatalogItem[]
+  consequenceLevels: RiskValueCatalogItem[]
+}
+
+const emptyRiskCatalogs: RiskCatalogs = {
+  hazardTypes: [],
+  hazardDescriptions: [],
+  deficiencyLevels: [],
+  exposureLevels: [],
+  consequenceLevels: [],
+}
+
 const defaultMeasuresBase: Omit<MeasureControl, "id">[] = [
   {
     key: "ELIMINACION",
@@ -412,6 +451,104 @@ function todayYYYYMMDD() {
   const mm = String(d.getMonth() + 1).padStart(2, "0")
   const dd = String(d.getDate()).padStart(2, "0")
   return `${d.getFullYear()}-${mm}-${dd}`
+}
+
+function asNdKey(value?: string): RiskRow["ndKey"] {
+  return ND_OPTIONS.some((item) => item.value === value) ? (value as RiskRow["ndKey"]) : "B"
+}
+
+function asNeKey(value?: string): RiskRow["neKey"] {
+  return NE_OPTIONS.some((item) => item.value === value) ? (value as RiskRow["neKey"]) : "EE"
+}
+
+function asNcKey(value?: string): RiskRow["ncKey"] {
+  return NC_OPTIONS.some((item) => item.value === value) ? (value as RiskRow["ncKey"]) : "L"
+}
+
+function mergeLocalRiskState(row: RiskRow, localRows: RiskRow[]) {
+  const local = localRows.find((item) => item.id === row.id)
+
+  return {
+    ...row,
+    measures: local?.measures?.length ? local.measures : row.measures,
+    evidences: local?.evidences?.length ? local.evidences : row.evidences,
+  }
+}
+
+function persistLocalRiskExtras(id: string, row: Omit<RiskRow, "id">) {
+  if (typeof window === "undefined") return
+
+  const storedRows = JSON.parse(localStorage.getItem(LS_RISK_KEY) ?? "[]") as RiskRow[]
+  const localRow = { id, ...row }
+  const nextRows = storedRows.some((item) => item.id === id)
+    ? storedRows.map((item) => (item.id === id ? localRow : item))
+    : [...storedRows, localRow]
+
+  localStorage.setItem(LS_RISK_KEY, JSON.stringify(nextRows))
+}
+
+function riskToRow(risk: Risk): RiskRow {
+  return {
+    id: risk.id,
+    status: risk.status,
+    proceso: risk.process ?? "",
+    zonaLugar: risk.workZone ?? "",
+    actividades: risk.activity ?? "",
+    tareas: risk.task ?? "",
+    rutinario: risk.routine ? "SI" : "NO",
+    peligroClasificacion: risk.hazardTypeId ?? "",
+    peligroDescripcion: risk.hazardDescriptionId ?? "",
+    efectosPosibles: risk.possibleEffects ?? "",
+    controlesFuente: risk.sourceControls ?? "",
+    controlesMedio: risk.mediumControls ?? "",
+    controlesPersona: risk.personControls ?? "",
+    ndKey: asNdKey(risk.deficiencyLevel?.code),
+    neKey: asNeKey(risk.exposureLevel?.code),
+    ncKey: asNcKey(risk.consequenceLevel?.code),
+    np: Number(risk.probabilityLevel ?? 0),
+    npInterpretacion: risk.probabilityInterpretation ?? "",
+    nr: Number(risk.riskLevel ?? 0),
+    nrNivel: risk.riskLevelName ?? "",
+    nrInterpretacion: risk.riskInterpretation ?? "",
+    aceptabilidad: risk.acceptability ?? "",
+    numeroExpuestos: risk.exposedPeopleNumber ?? "",
+    peorConsecuencia: risk.worstConsequence ?? "",
+    requisitoLegal: risk.legalRequirement ? "SI" : "NO",
+    measures: makeDefaultMeasures(),
+    evidences: [],
+  }
+}
+
+function rowToRiskPayload(row: Omit<RiskRow, "id">, catalogs: RiskCatalogs): CreateRiskDto {
+  const deficiencyLevelId = catalogs.deficiencyLevels.find((item) => item.code === row.ndKey)?.id ?? ""
+  const exposureLevelId = catalogs.exposureLevels.find((item) => item.code === row.neKey)?.id ?? ""
+  const consequenceLevelId = catalogs.consequenceLevels.find((item) => item.code === row.ncKey)?.id ?? ""
+
+  return {
+    process: row.proceso.trim(),
+    workZone: row.zonaLugar.trim(),
+    activity: row.actividades.trim(),
+    task: row.tareas.trim(),
+    possibleEffects: row.efectosPosibles.trim(),
+    sourceControls: row.controlesFuente.trim(),
+    mediumControls: row.controlesMedio.trim(),
+    personControls: row.controlesPersona.trim(),
+    probabilityLevel: row.np,
+    probabilityInterpretation: row.npInterpretacion,
+    riskLevel: row.nr,
+    riskLevelName: row.nrNivel,
+    riskInterpretation: row.nrInterpretacion,
+    acceptability: row.aceptabilidad,
+    exposedPeopleNumber: row.numeroExpuestos.trim(),
+    worstConsequence: row.peorConsecuencia.trim(),
+    routine: row.rutinario === "SI",
+    legalRequirement: row.requisitoLegal === "SI",
+    hazardTypeId: row.peligroClasificacion,
+    hazardDescriptionId: row.peligroDescripcion,
+    deficiencyLevelId,
+    exposureLevelId,
+    consequenceLevelId,
+  }
 }
 
 /* =========================================================
@@ -491,11 +628,54 @@ const raw = stored ? (JSON.parse(stored) as any[]) : []
 return Array.isArray(raw)
   ? raw.map((r) => ({
       ...r,
+      status: r.status === "INACTIVE" ? "INACTIVE" : "ACTIVE",
       measures: Array.isArray(r.measures) ? r.measures : makeDefaultMeasures(),
       evidences: Array.isArray(r.evidences) ? r.evidences.map(normalizeEvidence) : [],
     }))
   : []
   })
+
+  const [riskCatalogs, setRiskCatalogs] = useState<RiskCatalogs>(emptyRiskCatalogs)
+  const [risksLoading, setRisksLoading] = useState(true)
+
+  async function loadRiskMatrix() {
+    setRisksLoading(true)
+    try {
+      const [riskData, hazardTypes, hazardDescriptions, deficiencyLevels, exposureLevels, consequenceLevels] =
+        await Promise.all([
+          listRisks(),
+          listHazardTypes(),
+          listHazardDescriptions(),
+          listDeficiencyLevels(),
+          listExposureLevels(),
+          listConsequenceLevels(),
+        ])
+
+      const storedRows = typeof window === "undefined" ? [] : (JSON.parse(localStorage.getItem(LS_RISK_KEY) ?? "[]") as RiskRow[])
+      const mappedRows = (riskData.items ?? []).map((risk) => mergeLocalRiskState(riskToRow(risk), storedRows))
+
+      setRiskRows(mappedRows)
+      setRiskCatalogs({
+        hazardTypes,
+        hazardDescriptions,
+        deficiencyLevels,
+        exposureLevels,
+        consequenceLevels,
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar la matriz de riesgos")
+    } finally {
+      setRisksLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadRiskMatrix()
+  }, [])
+
+  const getHazardTypeName = (id: string) => riskCatalogs.hazardTypes.find((item) => item.id === id)?.name ?? id
+  const getHazardDescriptionName = (id: string) =>
+    riskCatalogs.hazardDescriptions.find((item) => item.id === id)?.name ?? id
 
   useEffect(() => {
     localStorage.setItem(LS_RISK_KEY, JSON.stringify(riskRows))
@@ -516,6 +696,7 @@ return Array.isArray(raw)
   const [evidenceFiles, setEvidenceFiles] = useState<FileList | null>(null)
 
   const emptyForm: Omit<RiskRow, "id"> = {
+    status: "ACTIVE",
     proceso: "",
     zonaLugar: "",
     actividades: "",
@@ -553,8 +734,8 @@ return Array.isArray(raw)
 
   const peligroDescripcionOptions = useMemo(() => {
     if (!riskForm.peligroClasificacion) return []
-    return PELIGROS[riskForm.peligroClasificacion] ?? []
-  }, [riskForm.peligroClasificacion])
+    return riskCatalogs.hazardDescriptions.filter((item) => item.hazardTypeId === riskForm.peligroClasificacion)
+  }, [riskCatalogs.hazardDescriptions, riskForm.peligroClasificacion])
 
   useEffect(() => {
     const nd = ND_OPTIONS.find((x) => x.value === riskForm.ndKey)?.nd ?? 0
@@ -603,9 +784,12 @@ return Array.isArray(raw)
       riskForm.actividades.trim() &&
       riskForm.tareas.trim() &&
       riskForm.peligroClasificacion &&
-      riskForm.peligroDescripcion
+      riskForm.peligroDescripcion &&
+      riskCatalogs.deficiencyLevels.some((item) => item.code === riskForm.ndKey) &&
+      riskCatalogs.exposureLevels.some((item) => item.code === riskForm.neKey) &&
+      riskCatalogs.consequenceLevels.some((item) => item.code === riskForm.ncKey)
     )
-  }, [riskForm])
+  }, [riskCatalogs, riskForm])
 
   function openNewRiskDrawer() {
     setEditingId(null)
@@ -626,23 +810,45 @@ return Array.isArray(raw)
     setDrawerOpen(true)
   }
 
-  function saveRiskRow() {
+  async function saveRiskRow() {
     if (!canSaveRisk) return
 
-    if (editingId) {
-      setRiskRows((prev) =>
-        prev.map((r) => (r.id === editingId ? { id: editingId, ...riskForm } : r))
-      )
-    } else {
-      setRiskRows((prev) => [...prev, { id: Date.now().toString(), ...riskForm }])
-    }
+    try {
+      const payload = rowToRiskPayload(riskForm, riskCatalogs)
 
-    setDrawerOpen(false)
-    setEditingId(null)
+      if (editingId) {
+        const currentRisk = riskRows.find((row) => row.id === editingId)
+        await updateRisk(editingId, payload as UpdateRiskDto)
+        persistLocalRiskExtras(editingId, riskForm)
+
+        if (currentRisk && riskForm.status !== currentRisk.status) {
+          await changeRiskStatus(editingId, riskForm.status)
+        }
+        toast.success("Riesgo actualizado")
+      } else {
+        const createdRisk = await createRisk(payload)
+        persistLocalRiskExtras(createdRisk.id, { ...riskForm, status: createdRisk.status })
+        toast.success("Riesgo creado")
+      }
+
+      await loadRiskMatrix()
+      setDrawerOpen(false)
+      setEditingId(null)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar el riesgo")
+    }
   }
 
-  function deleteRiskRow(id: string) {
-    setRiskRows((prev) => prev.filter((r) => r.id !== id))
+  async function deleteRiskRow(id: string) {
+    if (!window.confirm("Eliminar este riesgo laboral?")) return
+
+    try {
+      await deleteRisk(id)
+      toast.success("Riesgo eliminado")
+      await loadRiskMatrix()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar el riesgo")
+    }
   }
 
   function openDetail(row: RiskRow) {
@@ -890,7 +1096,7 @@ return Array.isArray(raw)
 
                           <p className="text-sm">
                             <span className="font-medium">Peligro:</span>{" "}
-                            {r.peligroClasificacion} — {r.peligroDescripcion}
+                            {getHazardTypeName(r.peligroClasificacion)} — {getHazardDescriptionName(r.peligroDescripcion)}
                           </p>
 
                           <div className="flex flex-wrap gap-2">
@@ -1101,9 +1307,9 @@ return Array.isArray(raw)
                           <SelectValue placeholder="Selecciona clasificación" />
                         </SelectTrigger>
                         <SelectContent className="max-h-64">
-                          {Object.keys(PELIGROS).map((k) => (
-                            <SelectItem key={k} value={k}>
-                              {k}
+                          {riskCatalogs.hazardTypes.map((item) => (
+                            <SelectItem key={item.id} value={item.id}>
+                              {item.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -1121,9 +1327,9 @@ return Array.isArray(raw)
                           <SelectValue placeholder="Selecciona descripción" />
                         </SelectTrigger>
                         <SelectContent className="max-h-64">
-                          {peligroDescripcionOptions.map((d) => (
-                            <SelectItem key={d} value={d}>
-                              {d}
+                          {peligroDescripcionOptions.map((item) => (
+                            <SelectItem key={item.id} value={item.id}>
+                              {item.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -1173,9 +1379,9 @@ return Array.isArray(raw)
                           <SelectValue placeholder="ND" />
                         </SelectTrigger>
                         <SelectContent>
-                          {ND_OPTIONS.map((o) => (
-                            <SelectItem key={o.value} value={o.value}>
-                              {o.label}
+                          {riskCatalogs.deficiencyLevels.map((o) => (
+                            <SelectItem key={o.id} value={o.code}>
+                              {o.name} ({o.code}) - {o.value}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -1192,9 +1398,9 @@ return Array.isArray(raw)
                           <SelectValue placeholder="NE" />
                         </SelectTrigger>
                         <SelectContent>
-                          {NE_OPTIONS.map((o) => (
-                            <SelectItem key={o.value} value={o.value}>
-                              {o.label}
+                          {riskCatalogs.exposureLevels.map((o) => (
+                            <SelectItem key={o.id} value={o.code}>
+                              {o.name} ({o.code}) - {o.value}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -1211,9 +1417,9 @@ return Array.isArray(raw)
                           <SelectValue placeholder="NC" />
                         </SelectTrigger>
                         <SelectContent>
-                          {NC_OPTIONS.map((o) => (
-                            <SelectItem key={o.value} value={o.value}>
-                              {o.label}
+                          {riskCatalogs.consequenceLevels.map((o) => (
+                            <SelectItem key={o.id} value={o.code}>
+                              {o.name} ({o.code}) - {o.value}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -1494,10 +1700,10 @@ return Array.isArray(raw)
                       <CardContent className="p-4 space-y-2">
                         <p className="font-semibold">Peligro</p>
                         <p className="text-sm">
-                          <span className="font-medium">Clasificación:</span> {detailRow.peligroClasificacion}
+                          <span className="font-medium">Clasificación:</span> {getHazardTypeName(detailRow.peligroClasificacion)}
                         </p>
                         <p className="text-sm">
-                          <span className="font-medium">Descripción:</span> {detailRow.peligroDescripcion}
+                          <span className="font-medium">Descripción:</span> {getHazardDescriptionName(detailRow.peligroDescripcion)}
                         </p>
                         {detailRow.efectosPosibles ? (
                           <p className="text-sm">

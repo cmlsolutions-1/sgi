@@ -21,6 +21,7 @@ import type {
   TrainingResponse,
   TrainingsResponse,
   TrainingAttendanceStatus,
+  TrainingStatus,
   UpdateTopicTrainingDto,
   UpdateTrainingAttendanceDto,
   UpdateTrainingDto,
@@ -123,12 +124,23 @@ export async function getTrainingById(id: string): Promise<Training> {
 }
 
 export async function updateTraining(id: string, dto: UpdateTrainingDto): Promise<Training> {
+  const payload = { ...dto }
+  delete payload.status
   const res = await apiFetch(`/api/training/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dto),
+    body: JSON.stringify(payload),
   })
   return parseOrThrow<Training>(res, "No se pudo actualizar la capacitacion")
+}
+
+export async function changeTrainingStatus(id: string, status: TrainingStatus): Promise<Training> {
+  const res = await apiFetch(`/api/training/change-status/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status }),
+  })
+  return parseOrThrow<Training>(res, "No se pudo actualizar el estado de la capacitacion")
 }
 
 export async function deleteTraining(id: string): Promise<void> {

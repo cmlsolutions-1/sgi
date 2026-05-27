@@ -24,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea"
 import {
   activateTopicTraining,
   activateTraining,
+  changeTrainingStatus,
   createTopicTraining,
   createTraining,
   deleteTopicTraining,
@@ -40,6 +41,7 @@ import type {
   TopicTraining,
   TopicTrainingOption,
   Training,
+  TrainingStatus,
   UpdateTopicTrainingDto,
   UpdateTrainingDto,
 } from "@/types/manager/training"
@@ -67,10 +69,17 @@ function formatDate(value?: string | null) {
 function getTrainingStatusLabel(status?: string | null) {
   if (status === "ACTIVE") return "Activa"
   if (status === "INACTIVE") return "Inactiva"
-  if (status === "FINISHED") return "Finalizada"
-  if (status === "CANCELLED") return "Cancelada"
+  if (status === "FINALIZADA" || status === "FINISHED") return "Finalizada"
+  if (status === "CANCELADA" || status === "CANCELLED") return "Cancelada"
   return status ?? "No registrada"
 }
+
+const trainingStatusOptions = [
+  { value: "ACTIVE", label: "Activa" },
+  { value: "INACTIVE", label: "Inactiva" },
+  { value: "FINALIZADA", label: "Finalizada" },
+  { value: "CANCELADA", label: "Cancelada" },
+]
 
 type TopicFormState = CreateTopicTrainingDto
 
@@ -216,7 +225,7 @@ function TrainingDialog({
         topicId: form.topicId,
         date: form.date,
         durationHours,
-        ...(training ? { status: form.status } : {}),
+        status: form.status,
       }
       await onSave(payload, training?.id)
       setOpen(false)
@@ -281,22 +290,21 @@ function TrainingDialog({
               </div>
             </div>
 
-            {training && (
-              <div className="grid gap-2">
-                <Label>Estado</Label>
-                <Select value={form.status} onValueChange={(value) => setForm((current) => ({ ...current, status: value }))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ACTIVE">Activa</SelectItem>
-                    <SelectItem value="INACTIVE">Inactiva</SelectItem>
-                    <SelectItem value="FINISHED">Finalizada</SelectItem>
-                    <SelectItem value="CANCELLED">Cancelada</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+            <div className="grid gap-2">
+              <Label>Estado</Label>
+              <Select value={form.status} onValueChange={(value) => setForm((current) => ({ ...current, status: value }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {trainingStatusOptions.map((status) => (
+                    <SelectItem key={status.value} value={status.value}>
+                      {status.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <DialogFooter>
@@ -401,7 +409,11 @@ export default function TrainingPlanPage() {
   async function handleSaveTraining(payload: CreateTrainingDto | UpdateTrainingDto, trainingId?: string) {
     try {
       if (trainingId) {
-        await updateTraining(trainingId, payload)
+        const { status, ...trainingPayload } = payload
+        await updateTraining(trainingId, trainingPayload)
+        if (status) {
+          await changeTrainingStatus(trainingId, status as TrainingStatus)
+        }
         toast.success("Capacitacion actualizada")
       } else {
         await createTraining(payload as CreateTrainingDto)
@@ -454,7 +466,7 @@ export default function TrainingPlanPage() {
             <CardContent className="p-4">
               <div className="flex flex-wrap gap-4">
                 <div className="grid gap-1">
-                  <Label>Ano</Label>
+                  <Label>Año</Label>
                   <Select value={yearFilter} onValueChange={setYearFilter}>
                     <SelectTrigger className="w-36">
                       <SelectValue />
@@ -493,10 +505,11 @@ export default function TrainingPlanPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todos</SelectItem>
-                      <SelectItem value="ACTIVE">Activa</SelectItem>
-                      <SelectItem value="INACTIVE">Inactiva</SelectItem>
-                      <SelectItem value="FINISHED">Finalizada</SelectItem>
-                      <SelectItem value="CANCELLED">Cancelada</SelectItem>
+                      {trainingStatusOptions.map((status) => (
+                        <SelectItem key={status.value} value={status.value}>
+                          {status.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>

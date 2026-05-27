@@ -63,8 +63,8 @@ function getAttendanceStatusLabel(value?: string | null) {
 function getTrainingStatusLabel(status?: string | null) {
   if (status === "ACTIVE") return "Activa"
   if (status === "INACTIVE") return "Inactiva"
-  if (status === "FINISHED") return "Finalizada"
-  if (status === "CANCELLED") return "Cancelada"
+  if (status === "FINALIZADA" || status === "FINISHED") return "Finalizada"
+  if (status === "CANCELADA" || status === "CANCELLED") return "Cancelada"
   return status ?? "No registrada"
 }
 

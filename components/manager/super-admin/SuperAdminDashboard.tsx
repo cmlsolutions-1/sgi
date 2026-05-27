@@ -139,7 +139,7 @@ export default function SuperAdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-dvh bg-background p-6">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-4xl font-bold text-foreground mb-2 text-balance">
