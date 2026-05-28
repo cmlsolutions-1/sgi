@@ -98,6 +98,19 @@ function getIncidentStatusLabel(status?: string | null) {
   return status ?? "No registrado"
 }
 
+function hasIncidentDataChanges(current: Incident | undefined, payload: UpdateIncidentDto) {
+  if (!current) return true
+
+  return (
+    current.employeeId !== payload.employeeId ||
+    formatDate(current.date) !== payload.date ||
+    (current.place ?? "") !== payload.place ||
+    (current.description ?? "") !== payload.description ||
+    (current.consequences ?? "") !== payload.consequences ||
+    (current.correctiveActions ?? "") !== payload.correctiveActions
+  )
+}
+
 type IncidentFormState = CreateIncidentDto & {
   status: IncidentStatus
 }
@@ -461,15 +474,19 @@ function IncidentsManager({ employees }: { employees: Employee[] }) {
 
       if (incidentId) {
         const currentIncident = incidents.find((incident) => incident.id === incidentId)
-        await updateIncident(incidentId, incidentPayload as UpdateIncidentDto)
+        const hasStatusChange = status !== currentIncident?.status
+        const hasDataChanges = hasIncidentDataChanges(currentIncident, incidentPayload as UpdateIncidentDto)
 
-        if (status !== currentIncident?.status) {
+        if (hasStatusChange) {
           if (status === "ACTIVE") {
             await activateIncident(incidentId)
           } else {
             await deleteIncident(incidentId)
           }
+        } else if (hasDataChanges) {
+          await updateIncident(incidentId, incidentPayload as UpdateIncidentDto)
         }
+
         toast.success("Incidente actualizado")
       } else {
         await createIncident(incidentPayload as CreateIncidentDto)
