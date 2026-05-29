@@ -85,8 +85,34 @@ export type CreateRiskDto = {
 
 export type UpdateRiskDto = CreateRiskDto
 
+export type RiskDocument = {
+  id: string
+  companyId: string
+  ownerType: string
+  ownerId: string
+  referenceType: string
+  referenceId: string
+  type: string
+  originalName: string
+  mimeType: string
+  size: number
+  storageProvider: string
+  isConfirmed: boolean
+  downloadUrl: string
+  createdAt: string
+  createdBy: string
+}
+
+export type UploadRiskDocumentDto = {
+  file: File
+  type: string
+  isConfirmed: boolean
+}
+
 export type RiskResponse = ApiResponse<Risk>
 export type RisksResponse = ApiResponse<RiskList>
 export type RiskCatalogResponse = ApiResponse<RiskCatalogItem[]>
 export type RiskHazardDescriptionsResponse = ApiResponse<RiskHazardDescription[]>
 export type RiskValueCatalogResponse = ApiResponse<RiskValueCatalogItem[]>
+export type RiskDocumentResponse = ApiResponse<RiskDocument>
+export type RiskDocumentsResponse = ApiResponse<RiskDocument[]>

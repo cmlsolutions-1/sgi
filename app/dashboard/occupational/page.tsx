@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Eye, ClipboardList, Pencil, Trash2, UploadCloud } from "lucide-react"
+import { Plus, Eye, ClipboardList, Pencil, Trash2, UploadCloud, Power } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
@@ -38,18 +38,23 @@ import {
   changeRiskStatus,
   createRisk,
   deleteRisk,
+  deleteRiskDocument,
+  downloadRiskDocumentFile,
   listConsequenceLevels,
   listDeficiencyLevels,
   listExposureLevels,
   listHazardDescriptions,
   listHazardTypes,
+  listRiskDocuments,
   listRisks,
   updateRisk,
+  uploadRiskDocument,
 } from "@/services/riskService"
 import type {
   CreateRiskDto,
   Risk,
   RiskCatalogItem,
+  RiskDocument,
   RiskHazardDescription,
   RiskStatus,
   RiskValueCatalogItem,
@@ -107,10 +112,12 @@ type ControlStatus = "PENDING" | "DONE"
 
 type Evidence = {
   id: string
+  documentId?: string
   name: string
   mime: string
   size: number
   dataUrl: string
+  downloadUrl?: string
   //createdAt: string
   performedAt: string // fecha de realización (YYYY-MM-DD)
   uploadedAt: string  // fecha/hora subida (ISO)
@@ -487,6 +494,20 @@ function persistLocalRiskExtras(id: string, row: Omit<RiskRow, "id">) {
   localStorage.setItem(LS_RISK_KEY, JSON.stringify(nextRows))
 }
 
+function riskDocumentToEvidence(document: RiskDocument): Evidence {
+  return {
+    id: document.id,
+    documentId: document.id,
+    name: document.originalName || document.type,
+    mime: document.mimeType,
+    size: document.size,
+    dataUrl: "",
+    downloadUrl: document.downloadUrl,
+    performedAt: document.createdAt?.slice(0, 10) || todayYYYYMMDD(),
+    uploadedAt: document.createdAt || new Date().toISOString(),
+  }
+}
+
 function riskToRow(risk: Risk): RiskRow {
   return {
     id: risk.id,
@@ -615,10 +636,12 @@ const raw = stored ? (JSON.parse(stored) as any[]) : []
 // Migración: si venían evidencias viejas sin performedAt/uploadedAt, las normalizamos.
     const normalizeEvidence = (e: any): Evidence => ({
       id: String(e?.id ?? crypto.randomUUID?.() ?? Date.now()),
+      documentId: e?.documentId ? String(e.documentId) : undefined,
       name: String(e?.name ?? "archivo"),
       mime: String(e?.mime ?? "application/octet-stream"),
       size: Number(e?.size ?? 0),
       dataUrl: String(e?.dataUrl ?? ""),
+      downloadUrl: e?.downloadUrl ? String(e.downloadUrl) : undefined,
       performedAt: String(e?.performedAt ?? todayYYYYMMDD()),
       uploadedAt: String(e?.uploadedAt ?? e?.createdAt ?? new Date().toISOString()),
     })
@@ -652,7 +675,21 @@ return Array.isArray(raw)
         ])
 
       const storedRows = typeof window === "undefined" ? [] : (JSON.parse(localStorage.getItem(LS_RISK_KEY) ?? "[]") as RiskRow[])
-      const mappedRows = (riskData.items ?? []).map((risk) => mergeLocalRiskState(riskToRow(risk), storedRows))
+      const mappedRows = await Promise.all(
+        (riskData.items ?? []).map(async (risk) => {
+          const row = mergeLocalRiskState(riskToRow(risk), storedRows)
+
+          try {
+            const documents = await listRiskDocuments(risk.id)
+            return {
+              ...row,
+              evidences: documents.map(riskDocumentToEvidence),
+            }
+          } catch {
+            return row
+          }
+        }),
+      )
 
       setRiskRows(mappedRows)
       setRiskCatalogs({
@@ -856,6 +893,45 @@ return Array.isArray(raw)
     setDetailOpen(true)
   }
 
+  async function openEvidence(ev: Evidence) {
+    try {
+      if (ev.downloadUrl) {
+        const blob = await downloadRiskDocumentFile(ev.downloadUrl)
+        const url = URL.createObjectURL(blob)
+        window.open(url, "_blank", "noopener,noreferrer")
+        window.setTimeout(() => URL.revokeObjectURL(url), 60000)
+        return
+      }
+
+      if (ev.dataUrl) {
+        window.open(ev.dataUrl, "_blank", "noopener,noreferrer")
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo abrir la evidencia")
+    }
+  }
+
+  async function toggleRiskActiveState(row: RiskRow) {
+    try {
+      const nextStatus: RiskStatus = row.status === "ACTIVE" ? "INACTIVE" : "ACTIVE"
+      const updatedRisk = await changeRiskStatus(row.id, nextStatus)
+      const updatedRow = mergeLocalRiskState(riskToRow(updatedRisk), riskRows)
+
+      try {
+        const documents = await listRiskDocuments(row.id)
+        updatedRow.evidences = documents.map(riskDocumentToEvidence)
+      } catch {
+        updatedRow.evidences = row.evidences
+      }
+
+      setRiskRows((prev) => prev.map((item) => (item.id === row.id ? updatedRow : item)))
+      setDetailRow(updatedRow)
+      toast.success(updatedRisk.status === "ACTIVE" ? "Riesgo activado" : "Riesgo inactivado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cambiar el estado del riesgo")
+    }
+  }
+
   useEffect(() => {
     if (!detailOpen || !detailRow) return
     const updated = riskRows.find((r) => r.id === detailRow.id)
@@ -886,6 +962,25 @@ return Array.isArray(raw)
     const allowed = ["application/pdf"]
     const isImage = (m: string) => m.startsWith("image/")
 
+    if (editingId) {
+      try {
+        await Promise.all(
+          Array.from(files)
+            .filter((file) => isImage(file.type) || allowed.includes(file.type))
+            .map((file) => uploadRiskDocument(editingId, { file, type: "OTHER", isConfirmed: true })),
+        )
+        const documents = await listRiskDocuments(editingId)
+        const evidences = documents.map(riskDocumentToEvidence)
+
+        setRiskForm((p) => ({ ...p, evidences }))
+        setRiskRows((prev) => prev.map((row) => (row.id === editingId ? { ...row, evidences } : row)))
+        toast.success("Evidencia subida correctamente")
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "No se pudo subir la evidencia")
+      }
+      return
+    }
+
     const list: Evidence[] = []
     for (const file of Array.from(files)) {
       if (!isImage(file.type) && !allowed.includes(file.type)) continue
@@ -897,6 +992,7 @@ return Array.isArray(raw)
         mime: file.type,
         size: file.size,
         dataUrl,
+        downloadUrl: undefined,
         performedAt,
         uploadedAt: new Date().toISOString(),
       })
@@ -906,8 +1002,23 @@ return Array.isArray(raw)
   }
 
 
-  function removeEvidenceFromForm(id: string) {
+  async function removeEvidenceFromForm(id: string) {
+    const evidence = riskForm.evidences.find((item) => item.id === id)
+
+    if (editingId && evidence?.documentId) {
+      try {
+        await deleteRiskDocument(editingId, evidence.documentId)
+        toast.success("Evidencia eliminada")
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "No se pudo eliminar la evidencia")
+        return
+      }
+    }
+
     setRiskForm((p) => ({ ...p, evidences: p.evidences.filter((e) => e.id !== id) }))
+    setRiskRows((prev) =>
+      prev.map((row) => (row.id === editingId ? { ...row, evidences: row.evidences.filter((e) => e.id !== id) } : row)),
+    )
   }
 
   // NUEVO: abrir modal “Subir evidencia” desde una card
@@ -927,36 +1038,19 @@ return Array.isArray(raw)
     const allowed = ["application/pdf"]
     const isImage = (m: string) => m.startsWith("image/")
 
-    const list: Evidence[] = []
-    for (const file of Array.from(evidenceFiles)) {
-      if (!isImage(file.type) && !allowed.includes(file.type)) continue
-
-      const dataUrl = await readFileAsDataURL(file)
-      list.push({
-        id: crypto.randomUUID?.() ?? `${Date.now()}-${file.name}`,
-        name: file.name,
-        mime: file.type,
-        size: file.size,
-        dataUrl,
-        performedAt: evidencePerformedAt,
-        uploadedAt: new Date().toISOString(),
-      })
-    }
-
-    setRiskRows((prev) =>
-      prev.map((r) =>
-        r.id === uploadRiskId
-          ? { ...r, evidences: [...(Array.isArray(r.evidences) ? r.evidences : []), ...list] }
-          : r
+    try {
+      await Promise.all(
+        Array.from(evidenceFiles)
+          .filter((file) => isImage(file.type) || allowed.includes(file.type))
+          .map((file) => uploadRiskDocument(uploadRiskId, { file, type: "OTHER", isConfirmed: true })),
       )
-    )
 
-    setUploadOpen(false)
-
-    // Si el detalle está abierto en ese mismo riesgo, refrescamos visualmente
-    if (detailOpen && detailRow?.id === uploadRiskId) {
-      const updated = riskRows.find((rr) => rr.id === uploadRiskId)
-      if (updated) setDetailRow(updated)
+      toast.success("Evidencia subida correctamente")
+      setUploadOpen(false)
+      setEvidenceFiles(null)
+      await loadRiskMatrix()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo subir la evidencia")
     }
   }
 
@@ -1564,26 +1658,32 @@ return Array.isArray(raw)
                       <CardContent className="p-4 space-y-3">
                         <p className="font-semibold text-sm">Evidencias (fotos / PDF)</p>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">Fecha de realización</p>
-                            <Input
-                              type="date"
-                              value={evidencePerformedAt}
-                              onChange={(e) => setEvidencePerformedAt(e.target.value)}
-                            />
-                          </div>
+                        {editingId ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                              <p className="text-xs text-muted-foreground mb-1">Fecha de realización</p>
+                              <Input
+                                type="date"
+                                value={evidencePerformedAt}
+                                onChange={(e) => setEvidencePerformedAt(e.target.value)}
+                              />
+                            </div>
 
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">Archivos</p>
-                            <Input
-                              type="file"
-                              multiple
-                              accept="image/*,application/pdf"
-                              onChange={(e) => addEvidencesToForm(e.target.files, evidencePerformedAt)}
-                            />
+                            <div>
+                              <p className="text-xs text-muted-foreground mb-1">Archivos</p>
+                              <Input
+                                type="file"
+                                multiple
+                                accept="image/*,application/pdf"
+                                onChange={(e) => addEvidencesToForm(e.target.files, evidencePerformedAt)}
+                              />
+                            </div>
                           </div>
-                        </div>
+                        ) : (
+                          <p className="rounded-md border border-dashed p-3 text-xs text-muted-foreground">
+                            Primero guarda el riesgo; luego podrás subir la evidencia desde la tarjeta o al editarlo.
+                          </p>
+                        )}
 
                         {riskForm.evidences.length === 0 ? (
                           <p className="text-xs text-muted-foreground">Aún no hay evidencias.</p>
@@ -1598,7 +1698,7 @@ return Array.isArray(raw)
                                   </p>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <Button size="sm" variant="secondary" onClick={() => window.open(ev.dataUrl, "_blank")}>
+                                  <Button size="sm" variant="secondary" onClick={() => openEvidence(ev)}>
                                     Ver
                                   </Button>
                                   <Button size="sm" variant="destructive" onClick={() => removeEvidenceFromForm(ev.id)}>
@@ -1749,7 +1849,7 @@ return Array.isArray(raw)
 
                     <Card>
                       <CardContent className="p-4 space-y-3">
-                        <p className="font-semibold">Evidencias (timeline)</p>
+                        <p className="font-semibold">Evidencias (linea de tiempo)</p>
 
                         {detailRow.evidences.length === 0 ? (
                           <p className="text-sm text-muted-foreground">Sin evidencias.</p>
@@ -1780,12 +1880,12 @@ return Array.isArray(raw)
                                     </p>
 
                                     <div className="pt-2">
-                                      <Button size="sm" variant="secondary" onClick={() => window.open(ev.dataUrl, "_blank")}>
+                                      <Button size="sm" variant="secondary" onClick={() => openEvidence(ev)}>
                                         Ver evidencia
                                       </Button>
                                     </div>
 
-                                    {ev.mime.startsWith("image/") ? (
+                                    {ev.dataUrl && ev.mime.startsWith("image/") ? (
                                       <div className="pt-3">
                                         <img src={ev.dataUrl} alt={ev.name} className="w-full rounded-md border object-cover" />
                                       </div>
@@ -1831,6 +1931,15 @@ return Array.isArray(raw)
                         >
                           <Pencil className="h-4 w-4" />
                           Editar
+                        </Button>
+
+                        <Button
+                          variant={detailRow.status === "ACTIVE" ? "destructive" : "secondary"}
+                          onClick={() => toggleRiskActiveState(detailRow)}
+                          className="gap-2"
+                        >
+                          <Power className="h-4 w-4" />
+                          {detailRow.status === "ACTIVE" ? "Inactivar" : "Activar"}
                         </Button>
                       </>
                     ) : null}

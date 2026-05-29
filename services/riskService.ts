@@ -4,6 +4,9 @@ import type {
   Risk,
   RiskCatalogItem,
   RiskCatalogResponse,
+  RiskDocument,
+  RiskDocumentResponse,
+  RiskDocumentsResponse,
   RiskHazardDescription,
   RiskHazardDescriptionsResponse,
   RiskList,
@@ -13,6 +16,7 @@ import type {
   RiskValueCatalogItem,
   RiskValueCatalogResponse,
   UpdateRiskDto,
+  UploadRiskDocumentDto,
 } from "@/types/manager/risk"
 
 type ApiErrorResponse = {
@@ -29,6 +33,8 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
     | RiskCatalogResponse
     | RiskHazardDescriptionsResponse
     | RiskValueCatalogResponse
+    | RiskDocumentResponse
+    | RiskDocumentsResponse
     | ApiErrorResponse
     | null
 
@@ -42,6 +48,24 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
   }
 
   return "data" in json ? (json.data as T) : (json as T)
+}
+
+function createDocumentFormData(dto: UploadRiskDocumentDto) {
+  const formData = new FormData()
+  formData.append("file", dto.file)
+  formData.append("type", dto.type)
+  formData.append("isConfirmed", String(dto.isConfirmed))
+  return formData
+}
+
+async function parseFileOrThrow(res: Response, fallbackMsg: string): Promise<Blob> {
+  if (!res.ok) {
+    const json = (await res.json().catch(() => null)) as ApiErrorResponse | null
+    const detail = json?.errors?.find((error: { message?: string }) => error.message)?.message
+    throw new Error(detail ?? json?.message ?? fallbackMsg)
+  }
+
+  return res.blob()
 }
 
 export async function createRisk(dto: CreateRiskDto): Promise<Risk> {
@@ -114,4 +138,27 @@ export async function listExposureLevels(): Promise<RiskValueCatalogItem[]> {
 export async function listConsequenceLevels(): Promise<RiskValueCatalogItem[]> {
   const res = await apiFetch("/api/risks/catalogs/consequence-levels", { method: "GET" })
   return parseOrThrow<RiskValueCatalogItem[]>(res, "No se pudo cargar los niveles de consecuencia")
+}
+
+export async function uploadRiskDocument(riskId: string, dto: UploadRiskDocumentDto): Promise<RiskDocument> {
+  const res = await apiFetch(`/api/risks/${riskId}/documents`, {
+    method: "POST",
+    body: createDocumentFormData(dto),
+  })
+  return parseOrThrow<RiskDocument>(res, "No se pudo subir la evidencia del riesgo")
+}
+
+export async function listRiskDocuments(riskId: string): Promise<RiskDocument[]> {
+  const res = await apiFetch(`/api/risks/${riskId}/documents`, { method: "GET" })
+  return parseOrThrow<RiskDocument[]>(res, "No se pudo cargar las evidencias del riesgo")
+}
+
+export async function deleteRiskDocument(riskId: string, documentId: string): Promise<void> {
+  const res = await apiFetch(`/api/risks/${riskId}/documents/${documentId}`, { method: "DELETE" })
+  await parseOrThrow<Record<string, never>>(res, "No se pudo eliminar la evidencia del riesgo")
+}
+
+export async function downloadRiskDocumentFile(downloadUrl: string): Promise<Blob> {
+  const res = await apiFetch(downloadUrl, { method: "GET" })
+  return parseFileOrThrow(res, "No se pudo descargar la evidencia del riesgo")
 }
