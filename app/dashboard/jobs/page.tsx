@@ -321,12 +321,12 @@ export function JobsManager() {
                     <td className="px-2 py-3 text-sm">{job.workArea?.name ?? "Sin area"}</td>
                     <td className="px-2 py-3 text-sm text-muted-foreground">{job.description || "Sin descripcion"}</td>
                     <td className="px-2 py-3">
-                      <Badge variant={job.status === "ACTIVE" ? "default" : "secondary"}>{job.status}</Badge>
+                      <Badge variant={job.status === "ACTIVE" ? "accentActivd" : "destructive"}>{job.status}</Badge>
                     </td>
                     <td className="px-2 py-3">
                       <div className="flex justify-end gap-1">
                         {job.status !== "ACTIVE" && (
-                          <Button variant="ghost" size="sm" onClick={() => handleActivate(job)}>
+                          <Button variant="accentActivd" size="sm" onClick={() => handleActivate(job)}>
                             Activar
                           </Button>
                         )}

@@ -244,8 +244,8 @@ export function WorkAreasManager() {
                       </div>
                     </td>
                     <td className="px-2 py-3 text-sm text-muted-foreground">{area.description || "Sin descripcion"}</td>
-                    <td className="px-2 py-3">
-                      <Badge variant={area.status === "ACTIVE" ? "default" : "secondary"}>{area.status}</Badge>
+                    <td className="px-2 py-3 ">
+                      <Badge variant={area.status === "ACTIVE" ? "accentActivd" : "secondary"}>{area.status}</Badge>
                     </td>
                     <td className="px-2 py-3">
                       <div className="flex justify-end gap-1">

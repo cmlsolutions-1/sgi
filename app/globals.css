@@ -16,14 +16,14 @@
   --card-foreground: #000000;
 
   /* Popover (menús flotantes) */
-  --popover: #feffff;
+  --popover: #fffeff;
   --popover-foreground: #000000;
 
-  /* Colores principales (puedes ajustarlos si quieres) */
+  /* Colores principales botones azules y letra blanca */
   --primary: oklch(0.6 0.15 250);
   --primary-foreground: #ffffff;
 
-  /* Secundarios */
+  /* Secundarios (Finalizada | Detalle) */
   --secondary: oklch(0.9 0.02 250);
   --secondary-foreground: #000000;
 
@@ -35,8 +35,13 @@
   --accent: oklch(0.85 0.1 165);
   --accent-foreground: #000000;
 
+    /* Activos */
+  --accentActivd: oklch(67.83% 0.19578 146.997);
+  --accentActivd-foreground: #ffffff;
+
+
   /* Botón destructivo */
-  --destructive: oklch(0.65 0.2 25);
+  --destructive: oklch(61.273% 0.23313 27.677);
   --destructive-foreground: #ffffff;
 
   /* Bordes e inputs */
@@ -104,6 +109,9 @@
 
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+
+  --color-accentActivd: var(--accentActivd);
+  --color-accentActivd-foreground: var(--accentActivd-foreground);
 
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);

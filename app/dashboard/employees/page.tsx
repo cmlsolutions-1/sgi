@@ -813,16 +813,68 @@ export default function EmployeesPage() {
       </div>
 
       <Tabs defaultValue="officials" className="space-y-4">
-        <TabsList className="w-full justify-start overflow-x-auto">
-          <TabsTrigger value="officials" className="gap-2">
+        <TabsList className="
+              h-10
+              w-full
+              justify-start
+              overflow-x-auto
+              rounded-2xl
+              bg-slate-300
+              p-1
+            ">
+          <TabsTrigger
+            value="officials"
+            className="
+            gap-2
+            rounded-xl
+            px-4
+            py-2.5
+            font-medium
+            text-slate-600
+            transition-all
+            duration-200
+
+            hover:text-[#163947]
+
+            data-[state=active]:bg-[#163947]
+            data-[state=active]:text-white
+            data-[state=active]:shadow-md
+            "
+              >
             <Users className="h-4 w-4" />
             Funcionarios
           </TabsTrigger>
-          <TabsTrigger value="structure" className="gap-2">
+          <TabsTrigger
+            value="structure"
+            className="
+                gap-2 rounded-xl px-4 py-2.5
+                text-[#163947] font-medium
+                transition-all duration-200
+                hover:bg-[#4bbdbd]/20
+                hover:text-[#163947]
+                data-[state=active]:bg-[#163947]
+                data-[state=active]:text-white
+                data-[state=active]:shadow-lg
+                data-[state=active]:shadow-[#163947]/25
+              "
+            >
             <Building2 className="h-4 w-4" />
             Estructura Organizacional
           </TabsTrigger>
-          <TabsTrigger value="incidents" className="gap-2">
+          <TabsTrigger
+            value="incidents"
+            className="
+                gap-2 rounded-xl px-4 py-2.5
+                text-[#163947] font-medium
+                transition-all duration-200
+                hover:bg-[#4bbdbd]/20
+                hover:text-[#163947]
+                data-[state=active]:bg-[#163947]
+                data-[state=active]:text-white
+                data-[state=active]:shadow-lg
+                data-[state=active]:shadow-[#163947]/25
+              "
+            >
             <TriangleAlert className="h-4 w-4" />
             Incidentes
           </TabsTrigger>
@@ -948,7 +1000,7 @@ export default function EmployeesPage() {
                             variant="secondary"
                             className={cn(
                               "text-xs",
-                              employee.status ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground",
+                              employee.status ? "bg-accentActivd text-accentActivd-foreground" : "bg-muted text-muted-foreground",
                             )}
                           >
                             {employee.status ? "Activo" : "Inactivo"}
@@ -1027,16 +1079,51 @@ export default function EmployeesPage() {
           </div>
 
           <Tabs defaultValue="work-areas" className="space-y-4">
-            <TabsList className="w-full justify-start overflow-x-auto">
-              <TabsTrigger value="work-areas" className="gap-2">
-                <Users className="h-4 w-4" />
-                Areas de trabajo
-              </TabsTrigger>
-              <TabsTrigger value="jobs" className="gap-2">
-                <BriefcaseBusiness className="h-4 w-4" />
-                Puestos de trabajo
-              </TabsTrigger>
-            </TabsList>
+            <TabsList className="
+              h-10
+              w-full
+              justify-start
+              overflow-x-auto
+              rounded-2xl
+              bg-slate-300
+              p-1
+            ">
+            <TabsTrigger
+              value="work-areas"
+              className="
+                gap-2 rounded-xl px-4 py-2.5
+                text-[#163947] font-medium
+                transition-all duration-200
+                hover:bg-[#4bbdbd]/20
+                hover:text-[#163947]
+                data-[state=active]:bg-[#163947]
+                data-[state=active]:text-white
+                data-[state=active]:shadow-lg
+                data-[state=active]:shadow-[#163947]/25
+              "
+            >
+              <Users className="h-4 w-4" />
+              Áreas de trabajo
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="jobs"
+              className="
+                gap-2 rounded-xl px-4 py-2.5
+                text-[#163947] font-medium
+                transition-all duration-200
+                hover:bg-[#4bbdbd]/20
+                hover:text-[#163947]
+                data-[state=active]:bg-[#163947]
+                data-[state=active]:text-white
+                data-[state=active]:shadow-lg
+                data-[state=active]:shadow-[#163947]/25
+              "
+            >
+              <BriefcaseBusiness className="h-4 w-4" />
+              Puestos de trabajo
+            </TabsTrigger>
+          </TabsList>
             <TabsContent value="work-areas">
               <WorkAreasManager />
             </TabsContent>
