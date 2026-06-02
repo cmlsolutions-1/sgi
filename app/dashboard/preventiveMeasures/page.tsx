@@ -127,6 +127,9 @@ export default function PreventiveMeasuresPage() {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [sourceFilter, setSourceFilter] = useState<string>("all")
+  const [actionFilter, setActionFilter] = useState<string>("all")
+  const [keyFilter, setKeyFilter] = useState<string>("all")
+  const [typeFilter, setTypeFilter] = useState<string>("all")
 
   const [openModal, setOpenModal] = useState(false)
   const [editingMeasure, setEditingMeasure] = useState<PreventiveMeasure | null>(null)
@@ -135,7 +138,13 @@ export default function PreventiveMeasuresPage() {
   async function loadData() {
     setLoading(true)
     const [measureResult, riskResult] = await Promise.allSettled([
-      listPreventiveMeasures(),
+      listPreventiveMeasures({
+        ...(search.trim() ? { search: search.trim() } : {}),
+        ...(statusFilter !== "all" ? { status: statusFilter as PreventiveMeasureStatus } : {}),
+        ...(actionFilter !== "all" ? { accion: actionFilter as PreventiveMeasureAction } : {}),
+        ...(keyFilter !== "all" ? { key: keyFilter as PreventiveMeasureKey } : {}),
+        ...(typeFilter !== "all" ? { type: typeFilter as PreventiveMeasureType } : {}),
+      }),
       listRisks(),
     ])
 
@@ -161,7 +170,7 @@ export default function PreventiveMeasuresPage() {
 
   useEffect(() => {
     loadData()
-  }, [])
+  }, [search, statusFilter, actionFilter, keyFilter, typeFilter])
 
   const filtered = useMemo(() => {
     const query = search.toLowerCase()
@@ -176,14 +185,17 @@ export default function PreventiveMeasuresPage() {
         riskText.includes(query)
 
       const matchesStatus = statusFilter === "all" || measure.status === statusFilter
+      const matchesAction = actionFilter === "all" || measure.accion === actionFilter
+      const matchesKey = keyFilter === "all" || measure.key === keyFilter
+      const matchesType = typeFilter === "all" || measure.type === typeFilter
       const matchesSource =
         sourceFilter === "all" ||
         (sourceFilter === "RISK" && Boolean(measure.riskId)) ||
         (sourceFilter === "FREE" && !measure.riskId)
 
-      return matchesSearch && matchesStatus && matchesSource
+      return matchesSearch && matchesStatus && matchesAction && matchesKey && matchesType && matchesSource
     })
-  }, [measures, search, statusFilter, sourceFilter])
+  }, [measures, search, statusFilter, actionFilter, keyFilter, typeFilter, sourceFilter])
 
   const stats = useMemo(() => {
     return {
@@ -573,8 +585,8 @@ export default function PreventiveMeasuresPage() {
 
       <Card className="bg-card border-border">
         <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-4">
+            <div className="relative md:col-span-2 xl:col-span-2">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar por título, descripción o riesgo..."
@@ -585,7 +597,7 @@ export default function PreventiveMeasuresPage() {
             </div>
 
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full md:w-[180px] bg-secondary border-0">
+              <SelectTrigger className="w-full bg-secondary border-0">
                 <SelectValue placeholder="Estado" />
               </SelectTrigger>
               <SelectContent>
@@ -595,8 +607,45 @@ export default function PreventiveMeasuresPage() {
               </SelectContent>
             </Select>
 
+            <Select value={actionFilter} onValueChange={setActionFilter}>
+              <SelectTrigger className="w-full bg-secondary border-0">
+                <SelectValue placeholder="Acción" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas las acciones</SelectItem>
+                <SelectItem value="PREVENTIVA">Preventiva</SelectItem>
+                <SelectItem value="CORRECION">Corrección</SelectItem>
+                <SelectItem value="MEJORA">Mejora</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={keyFilter} onValueChange={setKeyFilter}>
+              <SelectTrigger className="w-full bg-secondary border-0">
+                <SelectValue placeholder="Jerarquía" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas las jerarquías</SelectItem>
+                <SelectItem value="ELIMINACION">Eliminación</SelectItem>
+                <SelectItem value="SUSTITUCION">Sustitución</SelectItem>
+                <SelectItem value="INGENIERIA">Ingeniería</SelectItem>
+                <SelectItem value="ADMINISTRATIVOS">Administrativos</SelectItem>
+                <SelectItem value="EPP">EPP</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-full bg-secondary border-0">
+                <SelectValue placeholder="Tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos los tipos</SelectItem>
+                <SelectItem value="DATE">Por fecha</SelectItem>
+                <SelectItem value="PERMANENT">Permanente</SelectItem>
+              </SelectContent>
+            </Select>
+
             <Select value={sourceFilter} onValueChange={setSourceFilter}>
-              <SelectTrigger className="w-full md:w-[190px] bg-secondary border-0">
+              <SelectTrigger className="w-full bg-secondary border-0">
                 <SelectValue placeholder="Origen" />
               </SelectTrigger>
               <SelectContent>

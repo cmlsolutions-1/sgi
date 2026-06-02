@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Eye, ClipboardList, Pencil, Trash2, UploadCloud, Power } from "lucide-react"
+import { Plus, Eye, ClipboardList, Pencil, Trash2, UploadCloud } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
@@ -372,6 +372,39 @@ function progressChipColor(state: RiskProgressState) {
   }
 }
 
+const RISK_STATUS_OPTIONS: Array<{ value: RiskStatus; label: string }> = [
+  { value: "ACTIVE", label: "Activo" },
+  { value: "INACTIVE", label: "Inactivo" },
+  { value: "EN_PROCESO", label: "En proceso" },
+  { value: "FINALIZADO", label: "Finalizado" },
+  { value: "CANCELADO", label: "Cancelado" },
+]
+
+function isRiskStatus(value: unknown): value is RiskStatus {
+  return RISK_STATUS_OPTIONS.some((option) => option.value === value)
+}
+
+function riskStatusLabel(status: RiskStatus) {
+  return RISK_STATUS_OPTIONS.find((option) => option.value === status)?.label ?? status
+}
+
+function riskStatusColor(status: RiskStatus) {
+  switch (status) {
+    case "ACTIVE":
+      return "bg-blue-600 text-white border-blue-700"
+    case "INACTIVE":
+      return "bg-muted text-foreground border-border"
+    case "EN_PROCESO":
+      return "bg-yellow-400 text-black border-yellow-500"
+    case "FINALIZADO":
+      return "bg-green-600 text-white border-green-700"
+    case "CANCELADO":
+      return "bg-red-600 text-white border-red-700"
+    default:
+      return "bg-muted text-foreground border-border"
+  }
+}
+
 const steps = ["Contexto", "Peligro", "Controles", "Evaluación", "Medidas"]
 
 type RiskCatalogs = {
@@ -651,7 +684,7 @@ const raw = stored ? (JSON.parse(stored) as any[]) : []
 return Array.isArray(raw)
   ? raw.map((r) => ({
       ...r,
-      status: r.status === "INACTIVE" ? "INACTIVE" : "ACTIVE",
+      status: isRiskStatus(r.status) ? r.status : "ACTIVE",
       measures: Array.isArray(r.measures) ? r.measures : makeDefaultMeasures(),
       evidences: Array.isArray(r.evidences) ? r.evidences.map(normalizeEvidence) : [],
     }))
@@ -911,9 +944,10 @@ return Array.isArray(raw)
     }
   }
 
-  async function toggleRiskActiveState(row: RiskRow) {
+  async function updateRiskStatus(row: RiskRow, nextStatus: RiskStatus) {
+    if (row.status === nextStatus) return
+
     try {
-      const nextStatus: RiskStatus = row.status === "ACTIVE" ? "INACTIVE" : "ACTIVE"
       const updatedRisk = await changeRiskStatus(row.id, nextStatus)
       const updatedRow = mergeLocalRiskState(riskToRow(updatedRisk), riskRows)
 
@@ -926,7 +960,7 @@ return Array.isArray(raw)
 
       setRiskRows((prev) => prev.map((item) => (item.id === row.id ? updatedRow : item)))
       setDetailRow(updatedRow)
-      toast.success(updatedRisk.status === "ACTIVE" ? "Riesgo activado" : "Riesgo inactivado")
+      toast.success(`Estado actualizado a ${riskStatusLabel(updatedRisk.status)}`)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo cambiar el estado del riesgo")
     }
@@ -1204,6 +1238,10 @@ return Array.isArray(raw)
 
                             <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", aceptabilidadColor(r.aceptabilidad))}>
                               {r.aceptabilidad || "Aceptabilidad —"}
+                            </span>
+
+                            <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", riskStatusColor(r.status))}>
+                              Estado: {riskStatusLabel(r.status)}
                             </span>
 
                             <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", progressChipColor(pr.state))}>
@@ -1756,6 +1794,9 @@ return Array.isArray(raw)
                         <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", aceptabilidadColor(detailRow.aceptabilidad))}>
                           {detailRow.aceptabilidad || "Aceptabilidad —"}
                         </span>
+                        <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", riskStatusColor(detailRow.status))}>
+                          Estado: {riskStatusLabel(detailRow.status)}
+                        </span>
                         {(() => {
                           const pr = getRiskProgress(detailRow.measures)
                           return (
@@ -1933,14 +1974,23 @@ return Array.isArray(raw)
                           Editar
                         </Button>
 
-                        <Button
-                          variant={detailRow.status === "ACTIVE" ? "destructive" : "secondary"}
-                          onClick={() => toggleRiskActiveState(detailRow)}
-                          className="gap-2"
-                        >
-                          <Power className="h-4 w-4" />
-                          {detailRow.status === "ACTIVE" ? "Inactivar" : "Activar"}
-                        </Button>
+                        <div className="w-[180px]">
+                          <Select
+                            value={detailRow.status}
+                            onValueChange={(value) => updateRiskStatus(detailRow, value as RiskStatus)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Cambiar estado" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {RISK_STATUS_OPTIONS.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </>
                     ) : null}
                   </div>

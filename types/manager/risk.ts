@@ -1,6 +1,6 @@
 import type { ApiResponse } from "./company"
 
-export type RiskStatus = "ACTIVE" | "INACTIVE"
+export type RiskStatus = "ACTIVE" | "INACTIVE" | "EN_PROCESO" | "FINALIZADO" | "CANCELADO"
 
 export type RiskCatalogItem = {
   id: string

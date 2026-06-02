@@ -28,7 +28,7 @@ const MODULE_DESCRIPTION_BY_ID: Record<string, string> = {
   riesgos: "Gestión de riesgos y medidas preventivas",
 }
 
-// ✅ EXPORTA la función
+
 export function getModulesFromSidebar(): Module[] {
   const TOP_LEVEL = navigation.filter((n) => n.name !== "Dashboard")
 
