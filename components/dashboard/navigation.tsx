@@ -105,6 +105,19 @@ function collectModuleCodes(modules: ModuleNode[]): Set<string> {
   return codes
 }
 
+const alwaysVisibleCodes = new Set(["DOCUMENTS"])
+
+const moduleCodeAliases: Record<string, string[]> = {
+  DOCUMENTS: ["DOCUMENTS", "DOCUMENT", "DOCUMENT_MANAGEMENT", "DOCUMENTAL_MANAGEMENT", "GESTION_DOCUMENTAL"],
+}
+
+function isCodeAllowed(code: string, allowedCodes: Set<string>) {
+  if (alwaysVisibleCodes.has(code)) return true
+
+  const aliases = moduleCodeAliases[code] ?? [code]
+  return aliases.some((alias) => allowedCodes.has(alias))
+}
+
 export function filterNavigationByModules(items: NavigationItem[], modules: ModuleNode[]): NavigationItem[] {
   const allowedCodes = collectModuleCodes(modules)
 
@@ -115,10 +128,10 @@ export function filterNavigationByModules(items: NavigationItem[], modules: Modu
     }
 
     if (hasSubItems(item)) {
-      const parentAllowed = allowedCodes.has(item.code)
+      const parentAllowed = isCodeAllowed(item.code, allowedCodes)
       const subItems = parentAllowed
         ? item.subItems
-        : item.subItems.filter((subItem) => !subItem.code || allowedCodes.has(subItem.code))
+        : item.subItems.filter((subItem) => !subItem.code || isCodeAllowed(subItem.code, allowedCodes))
 
       if (parentAllowed || subItems.length > 0) {
         filteredItems.push({ ...item, subItems })
@@ -127,7 +140,7 @@ export function filterNavigationByModules(items: NavigationItem[], modules: Modu
       return filteredItems
     }
 
-    if (allowedCodes.has(item.code)) {
+    if (isCodeAllowed(item.code, allowedCodes)) {
       filteredItems.push(item)
     }
 

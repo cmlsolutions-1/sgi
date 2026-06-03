@@ -13,6 +13,10 @@ wilson@alfonsilla.com
 
 SGI
 
+administrador super admin
+admin@safecloud.com
+123456
+
 alfonso@alfonso.com
 12345678
 userId": "30c2725f-c3bc-4c1d-b379-c961f85670e4",
@@ -26,36 +30,16 @@ alfonso@alfonso.com
 
 
 
-
-Risk
-
-POST /api/risks
+POST /api/document-management
 jwt  (http, Bearer)
 Request body
 {
-  "process": "string",
-  "workZone": "string",
-  "activity": "string",
-  "task": "string",
-  "possibleEffects": "string",
-  "sourceControls": "string",
-  "mediumControls": "string",
-  "personControls": "string",
-  "probabilityLevel": 0,
-  "probabilityInterpretation": "string",
-  "riskLevel": 0,
-  "riskLevelName": "string",
-  "riskInterpretation": "string",
-  "acceptability": "string",
-  "exposedPeopleNumber": "string",
-  "worstConsequence": "string",
-  "routine": true,
-  "legalRequirement": true,
-  "hazardTypeId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "hazardDescriptionId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "deficiencyLevelId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "exposureLevelId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "consequenceLevelId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  "name": "string",
+  "type": "PROCEDURE",
+  "version": "1.0",
+  "workAreaId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "consecutive": 1,
+  "code": "PR-LAB-001"
 }
 DA COMO RESPUESTA
 {
@@ -63,59 +47,16 @@ DA COMO RESPUESTA
   "message": "OK",
   "data": {
     "id": "string",
-    "companyId": "string",
-    "process": "string",
-    "workZone": "string",
-    "activity": "string",
-    "task": "string",
-    "possibleEffects": "string",
-    "sourceControls": "string",
-    "mediumControls": "string",
-    "personControls": "string",
-    "probabilityLevel": 0,
-    "probabilityInterpretation": "string",
-    "riskLevel": 0,
-    "riskLevelName": "string",
-    "riskInterpretation": "string",
-    "acceptability": "string",
-    "exposedPeopleNumber": "string",
-    "worstConsequence": "string",
-    "routine": true,
-    "legalRequirement": true,
+    "name": "string",
+    "type": "PROCEDURE",
+    "version": "string",
     "status": "ACTIVE",
-    "hazardTypeId": "string",
-    "hazardDescriptionId": "string",
-    "deficiencyLevelId": "string",
-    "exposureLevelId": "string",
-    "consequenceLevelId": "string",
-    "hazardType": {
+    "workAreaId": "string",
+    "consecutive": 0,
+    "code": "string",
+    "workArea": {
       "id": "string",
-      "code": "string",
       "name": "string"
-    },
-    "hazardDescription": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "hazardTypeId": "string"
-    },
-    "deficiencyLevel": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "value": 0
-    },
-    "exposureLevel": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "value": 0
-    },
-    "consequenceLevel": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "value": 0
     }
   },
   "errors": null,
@@ -128,76 +69,31 @@ DA COMO RESPUESTA
 }
 
 
-GET /api/risks
+GET /api/document-management
 jwt  (http, Bearer)
+PARAMETROS PARA FILTRAR
+Name workAreaId (string)
+Description Filtra por area de trabajo dentro de la misma empresa
 DA COMO RESPUESTA
 {
   "ok": true,
   "message": "OK",
-  "data": {
-    "items": [
-      {
+  "data": [
+    {
+      "id": "string",
+      "name": "string",
+      "type": "PROCEDURE",
+      "version": "string",
+      "status": "ACTIVE",
+      "workAreaId": "string",
+      "consecutive": 0,
+      "code": "string",
+      "workArea": {
         "id": "string",
-        "companyId": "string",
-        "process": "string",
-        "workZone": "string",
-        "activity": "string",
-        "task": "string",
-        "possibleEffects": "string",
-        "sourceControls": "string",
-        "mediumControls": "string",
-        "personControls": "string",
-        "probabilityLevel": 0,
-        "probabilityInterpretation": "string",
-        "riskLevel": 0,
-        "riskLevelName": "string",
-        "riskInterpretation": "string",
-        "acceptability": "string",
-        "exposedPeopleNumber": "string",
-        "worstConsequence": "string",
-        "routine": true,
-        "legalRequirement": true,
-        "status": "ACTIVE",
-        "hazardTypeId": "string",
-        "hazardDescriptionId": "string",
-        "deficiencyLevelId": "string",
-        "exposureLevelId": "string",
-        "consequenceLevelId": "string",
-        "hazardType": {
-          "id": "string",
-          "code": "string",
-          "name": "string"
-        },
-        "hazardDescription": {
-          "id": "string",
-          "code": "string",
-          "name": "string",
-          "hazardTypeId": "string"
-        },
-        "deficiencyLevel": {
-          "id": "string",
-          "code": "string",
-          "name": "string",
-          "value": 0
-        },
-        "exposureLevel": {
-          "id": "string",
-          "code": "string",
-          "name": "string",
-          "value": 0
-        },
-        "consequenceLevel": {
-          "id": "string",
-          "code": "string",
-          "name": "string",
-          "value": 0
-        }
+        "name": "string"
       }
-    ],
-    "total": 0,
-    "page": 0,
-    "limit": 0
-  },
+    }
+  ],
   "errors": null,
   "meta": {
     "path": "/api/user/123",
@@ -207,8 +103,7 @@ DA COMO RESPUESTA
   }
 }
 
-
-GET /api/risks/{id}
+GET /api/document-management/{id}
 jwt  (http, Bearer)
 id REQUERIDO
 DA COMO RESPUESTA
@@ -217,59 +112,16 @@ DA COMO RESPUESTA
   "message": "OK",
   "data": {
     "id": "string",
-    "companyId": "string",
-    "process": "string",
-    "workZone": "string",
-    "activity": "string",
-    "task": "string",
-    "possibleEffects": "string",
-    "sourceControls": "string",
-    "mediumControls": "string",
-    "personControls": "string",
-    "probabilityLevel": 0,
-    "probabilityInterpretation": "string",
-    "riskLevel": 0,
-    "riskLevelName": "string",
-    "riskInterpretation": "string",
-    "acceptability": "string",
-    "exposedPeopleNumber": "string",
-    "worstConsequence": "string",
-    "routine": true,
-    "legalRequirement": true,
+    "name": "string",
+    "type": "PROCEDURE",
+    "version": "string",
     "status": "ACTIVE",
-    "hazardTypeId": "string",
-    "hazardDescriptionId": "string",
-    "deficiencyLevelId": "string",
-    "exposureLevelId": "string",
-    "consequenceLevelId": "string",
-    "hazardType": {
+    "workAreaId": "string",
+    "consecutive": 0,
+    "code": "string",
+    "workArea": {
       "id": "string",
-      "code": "string",
       "name": "string"
-    },
-    "hazardDescription": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "hazardTypeId": "string"
-    },
-    "deficiencyLevel": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "value": 0
-    },
-    "exposureLevel": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "value": 0
-    },
-    "consequenceLevel": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "value": 0
     }
   },
   "errors": null,
@@ -282,34 +134,17 @@ DA COMO RESPUESTA
 }
 
 
-PUT /api/risks/{id}
+PUT /api/document-management/{id}
 jwt  (http, Bearer)
 id REQUERIDO
 Request body
 {
-  "process": "string",
-  "workZone": "string",
-  "activity": "string",
-  "task": "string",
-  "possibleEffects": "string",
-  "sourceControls": "string",
-  "mediumControls": "string",
-  "personControls": "string",
-  "probabilityLevel": 0,
-  "probabilityInterpretation": "string",
-  "riskLevel": 0,
-  "riskLevelName": "string",
-  "riskInterpretation": "string",
-  "acceptability": "string",
-  "exposedPeopleNumber": "string",
-  "worstConsequence": "string",
-  "routine": true,
-  "legalRequirement": true,
-  "hazardTypeId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "hazardDescriptionId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "deficiencyLevelId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "exposureLevelId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "consequenceLevelId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  "name": "string",
+  "type": "PROCEDURE",
+  "version": "1.0",
+  "workAreaId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "consecutive": 1,
+  "code": "PR-LAB-001"
 }
 DA COMO RESPUESTA
 {
@@ -317,59 +152,16 @@ DA COMO RESPUESTA
   "message": "OK",
   "data": {
     "id": "string",
-    "companyId": "string",
-    "process": "string",
-    "workZone": "string",
-    "activity": "string",
-    "task": "string",
-    "possibleEffects": "string",
-    "sourceControls": "string",
-    "mediumControls": "string",
-    "personControls": "string",
-    "probabilityLevel": 0,
-    "probabilityInterpretation": "string",
-    "riskLevel": 0,
-    "riskLevelName": "string",
-    "riskInterpretation": "string",
-    "acceptability": "string",
-    "exposedPeopleNumber": "string",
-    "worstConsequence": "string",
-    "routine": true,
-    "legalRequirement": true,
+    "name": "string",
+    "type": "PROCEDURE",
+    "version": "string",
     "status": "ACTIVE",
-    "hazardTypeId": "string",
-    "hazardDescriptionId": "string",
-    "deficiencyLevelId": "string",
-    "exposureLevelId": "string",
-    "consequenceLevelId": "string",
-    "hazardType": {
+    "workAreaId": "string",
+    "consecutive": 0,
+    "code": "string",
+    "workArea": {
       "id": "string",
-      "code": "string",
       "name": "string"
-    },
-    "hazardDescription": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "hazardTypeId": "string"
-    },
-    "deficiencyLevel": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "value": 0
-    },
-    "exposureLevel": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "value": 0
-    },
-    "consequenceLevel": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "value": 0
     }
   },
   "errors": null,
@@ -382,8 +174,7 @@ DA COMO RESPUESTA
 }
 
 
-
-DELETE /api/risks/{id}
+DELETE /api/document-management/{id}
 jwt  (http, Bearer)
 id REQUERIDO
 DA COMO RESPUESTA
@@ -401,71 +192,25 @@ DA COMO RESPUESTA
 }
 
 
-PUT /api/risks/change-status/{id}
+PUT /api/document-management/active/{id}
 jwt  (http, Bearer)
 id REQUERIDO
-{
-  "status": "ACTIVE"
-}
 DA COMO RESPUESTA
 {
   "ok": true,
   "message": "OK",
   "data": {
     "id": "string",
-    "companyId": "string",
-    "process": "string",
-    "workZone": "string",
-    "activity": "string",
-    "task": "string",
-    "possibleEffects": "string",
-    "sourceControls": "string",
-    "mediumControls": "string",
-    "personControls": "string",
-    "probabilityLevel": 0,
-    "probabilityInterpretation": "string",
-    "riskLevel": 0,
-    "riskLevelName": "string",
-    "riskInterpretation": "string",
-    "acceptability": "string",
-    "exposedPeopleNumber": "string",
-    "worstConsequence": "string",
-    "routine": true,
-    "legalRequirement": true,
+    "name": "string",
+    "type": "PROCEDURE",
+    "version": "string",
     "status": "ACTIVE",
-    "hazardTypeId": "string",
-    "hazardDescriptionId": "string",
-    "deficiencyLevelId": "string",
-    "exposureLevelId": "string",
-    "consequenceLevelId": "string",
-    "hazardType": {
+    "workAreaId": "string",
+    "consecutive": 0,
+    "code": "string",
+    "workArea": {
       "id": "string",
-      "code": "string",
       "name": "string"
-    },
-    "hazardDescription": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "hazardTypeId": "string"
-    },
-    "deficiencyLevel": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "value": 0
-    },
-    "exposureLevel": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "value": 0
-    },
-    "consequenceLevel": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "value": 0
     }
   },
   "errors": null,
@@ -476,616 +221,4 @@ DA COMO RESPUESTA
     "statusCode": 0
   }
 }
-
-
-
-PUT /api/risks/active/{id}
-jwt  (http, Bearer)
-id REQUERIDO
-DA COMO RESPUESTA
-{
-  "ok": true,
-  "message": "OK",
-  "data": {
-    "id": "string",
-    "companyId": "string",
-    "process": "string",
-    "workZone": "string",
-    "activity": "string",
-    "task": "string",
-    "possibleEffects": "string",
-    "sourceControls": "string",
-    "mediumControls": "string",
-    "personControls": "string",
-    "probabilityLevel": 0,
-    "probabilityInterpretation": "string",
-    "riskLevel": 0,
-    "riskLevelName": "string",
-    "riskInterpretation": "string",
-    "acceptability": "string",
-    "exposedPeopleNumber": "string",
-    "worstConsequence": "string",
-    "routine": true,
-    "legalRequirement": true,
-    "status": "ACTIVE",
-    "hazardTypeId": "string",
-    "hazardDescriptionId": "string",
-    "deficiencyLevelId": "string",
-    "exposureLevelId": "string",
-    "consequenceLevelId": "string",
-    "hazardType": {
-      "id": "string",
-      "code": "string",
-      "name": "string"
-    },
-    "hazardDescription": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "hazardTypeId": "string"
-    },
-    "deficiencyLevel": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "value": 0
-    },
-    "exposureLevel": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "value": 0
-    },
-    "consequenceLevel": {
-      "id": "string",
-      "code": "string",
-      "name": "string",
-      "value": 0
-    }
-  },
-  "errors": null,
-  "meta": {
-    "path": "/api/user/123",
-    "method": "GET",
-    "timestamp": "2026-01-19T12:34:56.000Z",
-    "statusCode": 0
-  }
-}
-
-
-Risk Catalogs
-GET /api/risks/catalogs/hazard-types
-jwt  (http, Bearer)
-DA COMO RESPUESTA
-{
-  "ok": true,
-  "message": "OK",
-  "data": [
-    {
-      "id": "1934cf95-1ce5-4334-b413-a2de503651a9",
-      "code": "BIOLOGICOS",
-      "name": "Biológicos"
-    },
-    {
-      "id": "048d7f1e-92ed-4bad-bdb2-bd5e42d634ee",
-      "code": "BIOMECANICOS",
-      "name": "Biomecánicos"
-    },
-    {
-      "id": "08549a26-b32a-470f-8649-948e70e5cd1e",
-      "code": "CONDICIONES_DE_SEGURIDAD",
-      "name": "Condiciones de seguridad"
-    },
-    {
-      "id": "436a7e17-7e2b-4ca4-973a-38632f8ccbe7",
-      "code": "FENOMENOS_NATURALES",
-      "name": "Fenómenos naturales"
-    },
-    {
-      "id": "c63de4f3-a7de-4bfd-adc7-b1443fdfd96d",
-      "code": "FISICOS",
-      "name": "Físicos"
-    },
-    {
-      "id": "140c0517-b746-49a3-bb75-3482063ef9e8",
-      "code": "PSICOSOCIALES",
-      "name": "Psicosociales"
-    },
-    {
-      "id": "bae7aee0-8aeb-4b16-b5ab-6116400fabe1",
-      "code": "QUIMICOS",
-      "name": "Químicos"
-    }
-  ],
-  "errors": null,
-  "meta": {
-    "path": "/api/risks/catalogs/hazard-types",
-    "method": "GET",
-    "timestamp": "2026-05-27T21:06:44.435Z",
-    "statusCode": 200
-  }
-}
-
-
-GET /api/risks/catalogs/hazard-descriptions
-jwt  (http, Bearer)
-DA COMO RESPUESTA
-{
-  "ok": true,
-  "message": "OK",
-  "data": [
-    {
-      "id": "b1de7017-88de-4d2b-8a06-002d0fc174f6",
-      "code": "ATROPELLO_O_GOLPE_DE_PERSONAS_CON_VEHICULO",
-      "name": "ATROPELLO O GOLPE DE PERSONAS CON VEHICULO",
-      "hazardTypeId": "08549a26-b32a-470f-8649-948e70e5cd1e"
-    },
-    {
-      "id": "ffffd312-0461-44c2-8713-360d098f0052",
-      "code": "BACTERIAS",
-      "name": "BACTERIAS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    },
-    {
-      "id": "33211257-062d-41c4-ac5f-d292ee70bf6d",
-      "code": "CARACTERISTICAS_DE_LA_ORGANIZACION_DEL_TRABAJO_COMUNICACION_TECNOLOGIA_ORGANIZACION_DEL_TRABAJO_DEMANDAS_CUALITATIVAS_Y_CUANTITATIVAS_DE_LA_LABOR",
-      "name": "CARACTERISTICAS DE LA ORGANIZACION DEL TRABAJO (COMUNICACION, TECNOLOGIA, ORGANIZACION DEL TRABAJO, DEMANDAS CUALITATIVAS Y CUANTITATIVAS DE LA LABOR)",
-      "hazardTypeId": "140c0517-b746-49a3-bb75-3482063ef9e8"
-    },
-    {
-      "id": "809f318d-271f-4c18-8c63-4b9ac65c0461",
-      "code": "CARACTERISTICAS_DEL_GRUPO_SOCIAL_DEL_TRABAJO_RELACIONES_COHESION_CALIDAD_DE_INTERACCION_TRABAJO_EN_EQUIPO",
-      "name": "CARACTERISTICAS DEL GRUPO SOCIAL DEL TRABAJO (RELACIONES, COHESION, CALIDAD DE INTERACCION, TRABAJO EN EQUIPO)",
-      "hazardTypeId": "140c0517-b746-49a3-bb75-3482063ef9e8"
-    },
-    {
-      "id": "31e60295-0dc6-4512-8235-a3024a602c6b",
-      "code": "CONDICIONES_DE_LA_TAREA_CARGA_MENTAL_CONTENIDO_DE_LA_TAREA_DEMANDAS_EMOCIONALES_SISTEMAS_DE_CONTROL_DEFINICION_DE_ROLES_MONOTONIA_ETC",
-      "name": "CONDICIONES DE LA TAREA (CARGA MENTAL, CONTENIDO DE LA TAREA, DEMANDAS EMOCIONALES, SISTEMAS DE CONTROL, DEFINICION DE ROLES, MONOTONIA, ETC.)",
-      "hazardTypeId": "140c0517-b746-49a3-bb75-3482063ef9e8"
-    },
-    {
-      "id": "4dc4c2b2-3a89-4b7c-80f9-1578c38be569",
-      "code": "CONTACTOS_TERMICOS",
-      "name": "CONTACTOS TERMICOS",
-      "hazardTypeId": "c63de4f3-a7de-4bfd-adc7-b1443fdfd96d"
-    },
-    {
-      "id": "76edbbe5-c0c4-4430-9923-e6806ae1ac2c",
-      "code": "DERRUMBE",
-      "name": "DERRUMBE",
-      "hazardTypeId": "436a7e17-7e2b-4ca4-973a-38632f8ccbe7"
-    },
-    {
-      "id": "e9acd68c-3aa6-476e-81ae-9bbc303326fd",
-      "code": "ELECTRICO_ALTA_Y_BAJA_TENSION_ESTATICA",
-      "name": "ELECTRICO (ALTA Y BAJA TENSION, ESTATICA)",
-      "hazardTypeId": "08549a26-b32a-470f-8649-948e70e5cd1e"
-    },
-    {
-      "id": "87b7bdf0-2e0b-4ac7-bba9-2e6654971573",
-      "code": "ESFUERZO",
-      "name": "ESFUERZO",
-      "hazardTypeId": "048d7f1e-92ed-4bad-bdb2-bd5e42d634ee"
-    },
-    {
-      "id": "0fd79394-fb8c-4cb7-822b-bcc5a0ec9631",
-      "code": "ESPACIOS_CONFINADOS",
-      "name": "ESPACIOS CONFINADOS",
-      "hazardTypeId": "08549a26-b32a-470f-8649-948e70e5cd1e"
-    },
-    {
-      "id": "c18fafe1-b240-4590-a349-8c234867d632",
-      "code": "EXPOSICION_TEMPERATURAS_EXTREMAS_FRIO_O_CALOR",
-      "name": "EXPOSICION TEMPERATURAS EXTREMAS (FRIO O CALOR)",
-      "hazardTypeId": "c63de4f3-a7de-4bfd-adc7-b1443fdfd96d"
-    },
-    {
-      "id": "17ad1d99-ae5b-4609-9716-6ed4ee99f3f8",
-      "code": "FLUIDOS_O_EXCREMENTOS",
-      "name": "FLUIDOS O EXCREMENTOS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    },
-    {
-      "id": "1507579f-dd6c-4db6-b991-270cc9698ea3",
-      "code": "GASES_Y_VAPORES",
-      "name": "GASES Y VAPORES",
-      "hazardTypeId": "bae7aee0-8aeb-4b16-b5ab-6116400fabe1"
-    },
-    {
-      "id": "9b7e6040-3d11-48fd-a63b-f76bb1fcaa0b",
-      "code": "GESTION_ORGANIZACIONAL_ESTILO_DE_MANDO_PAGO_BIENESTAR_SOCIAL_EVALUACION_DEL_DESEMPENO_MANEJO_DE_CAMBIOS",
-      "name": "GESTION ORGANIZACIONAL (ESTILO DE MANDO, PAGO, BIENESTAR SOCIAL, EVALUACION DEL DESEMPENO, MANEJO DE CAMBIOS)",
-      "hazardTypeId": "140c0517-b746-49a3-bb75-3482063ef9e8"
-    },
-    {
-      "id": "2a368408-d2b2-402d-a8bd-1ecfdf3bb04d",
-      "code": "HONGOS",
-      "name": "HONGOS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    },
-    {
-      "id": "b841afc8-13b4-4221-b345-cf8aa7c203d9",
-      "code": "ILUMINACION_LUZ_EN_EXCESO_O_AUSENCIA",
-      "name": "ILUMINACION (LUZ EN EXCESO O AUSENCIA)",
-      "hazardTypeId": "c63de4f3-a7de-4bfd-adc7-b1443fdfd96d"
-    },
-    {
-      "id": "cb67b59c-ba31-42f8-be69-06db942bafcd",
-      "code": "INTERFASE_PERSONA_TAREA_CONOCIMIENTOS_HABILIDAD_EN_RELACION_CON_LA_DEMANDA_DE_LA_TAREA_INICIATIVA_AUTONOMIA_Y_RECONOCIMIENTO_IDENTIFICACION_DE_LA_PERSONA_CON_LA_TAREA_Y_LA_ORGANIZACION",
-      "name": "INTERFASE PERSONA - TAREA (CONOCIMIENTOS, HABILIDAD EN RELACION CON LA DEMANDA DE LA TAREA, INICIATIVA, AUTONOMIA Y RECONOCIMIENTO, IDENTIFICACION DE LA PERSONA CON LA TAREA Y LA ORGANIZACION)",
-      "hazardTypeId": "140c0517-b746-49a3-bb75-3482063ef9e8"
-    },
-    {
-      "id": "5090ac1a-fd73-4951-8355-ce3e1f35712a",
-      "code": "INUNDACION",
-      "name": "INUNDACION",
-      "hazardTypeId": "436a7e17-7e2b-4ca4-973a-38632f8ccbe7"
-    },
-    {
-      "id": "f7c4c912-291e-4a3f-a4ca-d270e564e063",
-      "code": "JORNADA_DE_TRABAJO_PAUSAS_TRABAJO_NOCTURNO_ROTACION_HORAS_EXTRA_DESCANSO",
-      "name": "JORNADA DE TRABAJO (PAUSAS, TRABAJO NOCTURNO, ROTACION, HORAS EXTRA, DESCANSO)",
-      "hazardTypeId": "140c0517-b746-49a3-bb75-3482063ef9e8"
-    },
-    {
-      "id": "8eb26e99-35b8-4052-9f80-67489071f54d",
-      "code": "LIQUIDOS_NIEBLAS_Y_ROCIOS",
-      "name": "LIQUIDOS (NIEBLAS Y ROCIOS)",
-      "hazardTypeId": "bae7aee0-8aeb-4b16-b5ab-6116400fabe1"
-    },
-    {
-      "id": "4bf502c6-2626-4756-b47e-eec0780656b3",
-      "code": "LOCATIVO_SISTEMAS_Y_MEDIOS_DE_ALMACENAMIENTO_SUPERFICIES_DE_TRABAJO_IRREGULARIDAD_DESLIZANTE_CON_DIFERENCIA_DEL_NIVEL_CONDICIONES_DE_ORDEN_Y_ASEO_CAIDAS_DE_PERSONAS_AL_MISMO_U_OTRO_NIVEL",
-      "name": "LOCATIVO (SISTEMAS Y MEDIOS DE ALMACENAMIENTO) SUPERFICIES DE TRABAJO (IRREGULARIDAD, DESLIZANTE, CON DIFERENCIA DEL NIVEL) CONDICIONES DE ORDEN Y ASEO (CAIDAS DE PERSONAS AL MISMO U OTRO NIVEL)",
-      "hazardTypeId": "08549a26-b32a-470f-8649-948e70e5cd1e"
-    },
-    {
-      "id": "0bc62493-46aa-42ae-a633-315fa61a5e4a",
-      "code": "MANIPULACION_MANUAL_DE_CARGAS",
-      "name": "MANIPULACION MANUAL DE CARGAS",
-      "hazardTypeId": "048d7f1e-92ed-4bad-bdb2-bd5e42d634ee"
-    },
-    {
-      "id": "6b197913-3846-48dc-a6d3-b951701ebdea",
-      "code": "MATERIAL_PARTICULADO",
-      "name": "MATERIAL PARTICULADO",
-      "hazardTypeId": "bae7aee0-8aeb-4b16-b5ab-6116400fabe1"
-    },
-    {
-      "id": "05f26271-5da1-419f-a48c-0db856babaeb",
-      "code": "MECANICOS_ELEMENTOS_O_PARTES_DE_MAQUINAS_HERRAMIENTAS_EQUIPOS_PIEZAS_A_TRABAJAR_MATERIALES_PROYECTADOS_SOLIDOS_O_FLUIDOS",
-      "name": "MECANICOS (ELEMENTOS O PARTES DE MAQUINAS, HERRAMIENTAS, EQUIPOS, PIEZAS A TRABAJAR, MATERIALES PROYECTADOS SOLIDOS O FLUIDOS)",
-      "hazardTypeId": "08549a26-b32a-470f-8649-948e70e5cd1e"
-    },
-    {
-      "id": "27aef515-6114-4a41-b01b-9b4866b55430",
-      "code": "MORDEDURAS",
-      "name": "MORDEDURAS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    },
-    {
-      "id": "f4e968b0-1374-489b-86e1-0200b28b804f",
-      "code": "MOVIMIENTO_REPETITIVO",
-      "name": "MOVIMIENTO REPETITIVO",
-      "hazardTypeId": "048d7f1e-92ed-4bad-bdb2-bd5e42d634ee"
-    },
-    {
-      "id": "b8c83471-384c-4678-86b5-2b6a8122f684",
-      "code": "PARASITOS",
-      "name": "PARASITOS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    },
-    {
-      "id": "3225a406-fba7-40c7-af69-c3be278b15cb",
-      "code": "PICADURAS",
-      "name": "PICADURAS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    },
-    {
-      "id": "9b422865-dec3-4061-b269-05cd35350377",
-      "code": "POLVOS_ORGANICOS_O_INORGANICOS",
-      "name": "POLVOS ORGANICOS O INORGANICOS",
-      "hazardTypeId": "bae7aee0-8aeb-4b16-b5ab-6116400fabe1"
-    },
-    {
-      "id": "6ec580e1-e64a-478c-850f-1b4411d9fe65",
-      "code": "POSTURA_PROLONGADA_MANTENIDA_FORZADA_ANTIGRAVITACIONAL",
-      "name": "POSTURA (PROLONGADA, MANTENIDA, FORZADA, ANTIGRAVITACIONAL)",
-      "hazardTypeId": "048d7f1e-92ed-4bad-bdb2-bd5e42d634ee"
-    },
-    {
-      "id": "d0f3f7f9-3724-424e-8108-b04a3249eef9",
-      "code": "PRECIPITACIONES_LLUVIAS_GRANIZADAS_HELADAS",
-      "name": "PRECIPITACIONES (LLUVIAS, GRANIZADAS, HELADAS)",
-      "hazardTypeId": "436a7e17-7e2b-4ca4-973a-38632f8ccbe7"
-    },
-    {
-      "id": "b2dd407d-9f06-44f8-8885-6de763016259",
-      "code": "PRESIONES_EXTREMAS_ALTA_O_BAJA",
-      "name": "PRESIONES EXTREMAS (ALTA O BAJA)",
-      "hazardTypeId": "c63de4f3-a7de-4bfd-adc7-b1443fdfd96d"
-    },
-    {
-      "id": "c48e7d61-866c-4fab-b06a-870a9cb1e304",
-      "code": "PUBLICOS_ROBOS_ATRACOS_ASALTOS_ATENTADOS_DE_ORDEN_PUBLICO_ETC",
-      "name": "PUBLICOS (ROBOS, ATRACOS, ASALTOS, ATENTADOS, DE ORDEN PUBLICO, ETC.)",
-      "hazardTypeId": "08549a26-b32a-470f-8649-948e70e5cd1e"
-    },
-    {
-      "id": "f70f6d06-62f0-442b-8fc9-7c7459b4cca0",
-      "code": "RADIACION_IONIZANTE_RAYOS_X_GAMA",
-      "name": "RADIACION IONIZANTE (RAYOS X, GAMA)",
-      "hazardTypeId": "c63de4f3-a7de-4bfd-adc7-b1443fdfd96d"
-    },
-    {
-      "id": "9361363f-58a7-4a31-9852-8739f3010977",
-      "code": "RADIACION_NO_IONIZANTE_LASER_UV_IR",
-      "name": "RADIACION NO IONIZANTE (LASER, UV, IR)",
-      "hazardTypeId": "c63de4f3-a7de-4bfd-adc7-b1443fdfd96d"
-    },
-    {
-      "id": "9b66a4e8-66c5-451d-b1bb-bc7773459afb",
-      "code": "RICKTESIAS",
-      "name": "RICKTESIAS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    },
-    {
-      "id": "7de7a2c7-a482-46ca-bcad-4355a53507d3",
-      "code": "RUIDO_DE_IMPACTO_INTERMITENTE_O_CONTINUO",
-      "name": "RUIDO (DE IMPACTO, INTERMITENTE O CONTINUO)",
-      "hazardTypeId": "c63de4f3-a7de-4bfd-adc7-b1443fdfd96d"
-    },
-    {
-      "id": "22abe0f2-e253-4f79-bea1-f9587192352b",
-      "code": "SISMO",
-      "name": "SISMO",
-      "hazardTypeId": "436a7e17-7e2b-4ca4-973a-38632f8ccbe7"
-    },
-    {
-      "id": "1a6dde8f-66d3-4fea-bce0-01e4bc44eb3f",
-      "code": "TECNOLOGICO_EXPLOSION_FUGA_DERRAME_INCENDIO",
-      "name": "TECNOLOGICO (EXPLOSION, FUGA, DERRAME, INCENDIO)",
-      "hazardTypeId": "08549a26-b32a-470f-8649-948e70e5cd1e"
-    },
-    {
-      "id": "691f9945-e10f-4675-82ca-03a32d85250e",
-      "code": "TERREMOTO",
-      "name": "TERREMOTO",
-      "hazardTypeId": "436a7e17-7e2b-4ca4-973a-38632f8ccbe7"
-    },
-    {
-      "id": "64adfc55-86d3-4e27-b7df-2ecd33ba4bb6",
-      "code": "TRABAJO_EN_ALTURAS",
-      "name": "TRABAJO EN ALTURAS",
-      "hazardTypeId": "08549a26-b32a-470f-8649-948e70e5cd1e"
-    },
-    {
-      "id": "849b8369-94f6-439e-86f8-9a4481f4dab5",
-      "code": "VENDAVAL",
-      "name": "VENDAVAL",
-      "hazardTypeId": "436a7e17-7e2b-4ca4-973a-38632f8ccbe7"
-    },
-    {
-      "id": "793616a0-129f-4310-b0b9-4c0d7ce6b2ba",
-      "code": "VIBRACION_CUERPO_ENTERO_O_SEGMENTARIA",
-      "name": "VIBRACION (CUERPO ENTERO O SEGMENTARIA)",
-      "hazardTypeId": "c63de4f3-a7de-4bfd-adc7-b1443fdfd96d"
-    },
-    {
-      "id": "e28c6180-9f5f-41f5-9550-5215fe6cbd99",
-      "code": "VIRUS",
-      "name": "VIRUS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    }
-  ],
-  "errors": null,
-  "meta": {
-    "path": "/api/risks/catalogs/hazard-descriptions",
-    "method": "GET",
-    "timestamp": "2026-05-27T21:08:05.224Z",
-    "statusCode": 200
-  }
-}
-
-
-GET /api/risks/catalogs/hazard-types/{hazardTypeId}/descriptions
-jwt  (http, Bearer)
-hazardTypeId RQUERIDO
-DA COMO RESPUESTA
-{
-  "ok": true,
-  "message": "OK",
-  "data": [
-    {
-      "id": "ffffd312-0461-44c2-8713-360d098f0052",
-      "code": "BACTERIAS",
-      "name": "BACTERIAS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    },
-    {
-      "id": "17ad1d99-ae5b-4609-9716-6ed4ee99f3f8",
-      "code": "FLUIDOS_O_EXCREMENTOS",
-      "name": "FLUIDOS O EXCREMENTOS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    },
-    {
-      "id": "2a368408-d2b2-402d-a8bd-1ecfdf3bb04d",
-      "code": "HONGOS",
-      "name": "HONGOS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    },
-    {
-      "id": "27aef515-6114-4a41-b01b-9b4866b55430",
-      "code": "MORDEDURAS",
-      "name": "MORDEDURAS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    },
-    {
-      "id": "b8c83471-384c-4678-86b5-2b6a8122f684",
-      "code": "PARASITOS",
-      "name": "PARASITOS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    },
-    {
-      "id": "3225a406-fba7-40c7-af69-c3be278b15cb",
-      "code": "PICADURAS",
-      "name": "PICADURAS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    },
-    {
-      "id": "9b66a4e8-66c5-451d-b1bb-bc7773459afb",
-      "code": "RICKTESIAS",
-      "name": "RICKTESIAS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    },
-    {
-      "id": "e28c6180-9f5f-41f5-9550-5215fe6cbd99",
-      "code": "VIRUS",
-      "name": "VIRUS",
-      "hazardTypeId": "1934cf95-1ce5-4334-b413-a2de503651a9"
-    }
-  ],
-  "errors": null,
-  "meta": {
-    "path": "/api/risks/catalogs/hazard-types/1934cf95-1ce5-4334-b413-a2de503651a9/descriptions",
-    "method": "GET",
-    "timestamp": "2026-05-27T21:09:15.896Z",
-    "statusCode": 200
-  }
-}
-
-
-GET /api/risks/catalogs/deficiency-levels
-jwt  (http, Bearer)
-DA COMO RESPUESTA
-{
-  "ok": true,
-  "message": "OK",
-  "data": [
-    {
-      "id": "dda4af4c-704f-40da-ab80-664d33d16dc8",
-      "code": "MA",
-      "name": "Muy Alto",
-      "value": 10
-    },
-    {
-      "id": "55a05120-4eaa-4b01-a3af-13ffe19c0b15",
-      "code": "A",
-      "name": "Alto",
-      "value": 6
-    },
-    {
-      "id": "7fff3cc4-ee43-4999-84d3-2a1e03c6accb",
-      "code": "M",
-      "name": "Medio",
-      "value": 2
-    },
-    {
-      "id": "7242f79b-d6c3-4433-9275-416d57a36b96",
-      "code": "B",
-      "name": "Bajo",
-      "value": 0
-    }
-  ],
-  "errors": null,
-  "meta": {
-    "path": "/api/risks/catalogs/deficiency-levels",
-    "method": "GET",
-    "timestamp": "2026-05-27T21:09:33.190Z",
-    "statusCode": 200
-  }
-}
-
-
-GET /api/risks/catalogs/exposure-levels
-jwt  (http, Bearer)
-DA COMO RESPUESTA
-{
-  "ok": true,
-  "message": "OK",
-  "data": [
-    {
-      "id": "f490bec8-6bd4-4452-89aa-5abaecbe5661",
-      "code": "EC",
-      "name": "Continua",
-      "value": 4
-    },
-    {
-      "id": "6b5ecd69-37a3-4d13-b6a6-6967689a7380",
-      "code": "EF",
-      "name": "Frecuente",
-      "value": 3
-    },
-    {
-      "id": "0d70363b-8894-46c5-9b5e-e1e35fab31be",
-      "code": "EO",
-      "name": "Ocasional",
-      "value": 2
-    },
-    {
-      "id": "c9610595-239f-4519-85c1-eafd004efcab",
-      "code": "EE",
-      "name": "Esporadica",
-      "value": 1
-    }
-  ],
-  "errors": null,
-  "meta": {
-    "path": "/api/risks/catalogs/exposure-levels",
-    "method": "GET",
-    "timestamp": "2026-05-27T21:09:47.502Z",
-    "statusCode": 200
-  }
-}
-
-
-
-GET /api/risks/catalogs/consequence-levels
-jwt  (http, Bearer)
-DA COMO RESPUESTA
-{
-  "ok": true,
-  "message": "OK",
-  "data": [
-    {
-      "id": "5f07ab2b-0836-43e5-ae1c-652c22291c48",
-      "code": "M",
-      "name": "Mortal",
-      "value": 100
-    },
-    {
-      "id": "125495cb-25e4-4a3a-a8ac-656ebdaa62d0",
-      "code": "MG",
-      "name": "Muy grave",
-      "value": 60
-    },
-    {
-      "id": "15468fde-3de8-49f3-a1d3-6fd8f38e0ea4",
-      "code": "G",
-      "name": "Grave",
-      "value": 25
-    },
-    {
-      "id": "eb449f1f-fced-4458-a4dd-f274c30cf322",
-      "code": "L",
-      "name": "Leve",
-      "value": 10
-    }
-  ],
-  "errors": null,
-  "meta": {
-    "path": "/api/risks/catalogs/consequence-levels",
-    "method": "GET",
-    "timestamp": "2026-05-27T21:10:11.992Z",
-    "statusCode": 200
-  }
-}
-
-
-
-
-
-
-
 
