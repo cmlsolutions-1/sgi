@@ -1,4 +1,5 @@
 import type { ApiResponse } from "./company"
+import type { Job } from "./job"
 import type { WorkAreaOption } from "./work-area"
 
 export type ManagedDocumentType = "PROCEDURE" | "MANUAL" | "INSTRUCTIVE" | "OTHERS"
@@ -9,11 +10,23 @@ export type ManagedDocument = {
   name: string
   type: ManagedDocumentType
   version: string
+  objective: string
+  activities: string
+  resources: string
   status: ManagedDocumentStatus
   workAreaId: string
+  jobId: string
+  responsibleEmployeeId: string
   consecutive: number
   code: string
   workArea?: WorkAreaOption
+  job?: Pick<Job, "id" | "name" | "description">
+  responsibleEmployee?: {
+    id: string
+    name: string
+    lastName: string
+    email: string
+  }
 }
 
 export type ManagedDocumentFilters = {
@@ -24,7 +37,12 @@ export type UpsertManagedDocumentDto = {
   name: string
   type: ManagedDocumentType
   version: string
+  objective: string
+  activities: string
+  resources: string
   workAreaId: string
+  jobId: string
+  responsibleEmployeeId: string
   consecutive: number
   code: string
 }

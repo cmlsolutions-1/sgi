@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 import {
   activateManagedDocument,
   createManagedDocument,
@@ -25,8 +26,12 @@ import {
   listManagedDocuments,
   updateManagedDocument,
 } from "@/services/documentManagementService"
+import { listEmployees } from "@/services/employeeService"
+import { listJobs } from "@/services/jobService"
 import { listWorkAreaOptions } from "@/services/workAreaService"
 import type { ManagedDocument, ManagedDocumentType, UpsertManagedDocumentDto } from "@/types/manager/document-management"
+import type { Employee } from "@/types/manager/employee"
+import type { Job } from "@/types/manager/job"
 import type { WorkAreaOption } from "@/types/manager/work-area"
 
 type DocumentFormState = UpsertManagedDocumentDto & {
@@ -44,7 +49,12 @@ const emptyForm: DocumentFormState = {
   name: "",
   type: "PROCEDURE",
   version: "1.0",
+  objective: "",
+  activities: "",
+  resources: "",
   workAreaId: "",
+  jobId: "",
+  responsibleEmployeeId: "",
   consecutive: 1,
   code: "",
 }
@@ -64,6 +74,8 @@ function statusClass(status: ManagedDocument["status"]) {
 export default function DocumentsPage() {
   const [documents, setDocuments] = useState<ManagedDocument[]>([])
   const [workAreas, setWorkAreas] = useState<WorkAreaOption[]>([])
+  const [jobs, setJobs] = useState<Job[]>([])
+  const [employees, setEmployees] = useState<Employee[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -82,13 +94,25 @@ export default function DocumentsPage() {
         document.name.toLowerCase().includes(query) ||
         document.code.toLowerCase().includes(query) ||
         document.version.toLowerCase().includes(query) ||
-        document.workArea?.name?.toLowerCase().includes(query)
+        document.objective?.toLowerCase().includes(query) ||
+        document.activities?.toLowerCase().includes(query) ||
+        document.resources?.toLowerCase().includes(query) ||
+        document.workArea?.name?.toLowerCase().includes(query) ||
+        document.job?.name?.toLowerCase().includes(query) ||
+        document.responsibleEmployee?.name?.toLowerCase().includes(query) ||
+        document.responsibleEmployee?.lastName?.toLowerCase().includes(query) ||
+        document.responsibleEmployee?.email?.toLowerCase().includes(query)
       const matchesType = typeFilter === "all" || document.type === typeFilter
       const matchesStatus = statusFilter === "all" || document.status === statusFilter
 
       return matchesSearch && matchesType && matchesStatus
     })
   }, [documents, search, typeFilter, statusFilter])
+
+  const availableJobs = useMemo(() => {
+    if (!form.workAreaId) return jobs
+    return jobs.filter((job) => job.workAreaId === form.workAreaId)
+  }, [form.workAreaId, jobs])
 
   const stats = useMemo(
     () => ({
@@ -102,9 +126,11 @@ export default function DocumentsPage() {
 
   async function loadData() {
     setLoading(true)
-    const [documentResult, workAreaResult] = await Promise.allSettled([
+    const [documentResult, workAreaResult, jobResult, employeeResult] = await Promise.allSettled([
       listManagedDocuments(workAreaFilter === "all" ? {} : { workAreaId: workAreaFilter }),
       listWorkAreaOptions(),
+      listJobs(),
+      listEmployees(),
     ])
 
     if (documentResult.status === "fulfilled") {
@@ -124,6 +150,20 @@ export default function DocumentsPage() {
         workAreaResult.reason instanceof Error
           ? workAreaResult.reason.message
           : "No se pudo cargar las áreas de trabajo",
+      )
+    }
+
+    if (jobResult.status === "fulfilled") {
+      setJobs(jobResult.value.items ?? [])
+    } else {
+      toast.error(jobResult.reason instanceof Error ? jobResult.reason.message : "No se pudo cargar los puestos")
+    }
+
+    if (employeeResult.status === "fulfilled") {
+      setEmployees(employeeResult.value)
+    } else {
+      toast.error(
+        employeeResult.reason instanceof Error ? employeeResult.reason.message : "No se pudo cargar los funcionarios",
       )
     }
 
@@ -150,7 +190,12 @@ export default function DocumentsPage() {
       name: document.name,
       type: document.type,
       version: document.version,
+      objective: document.objective ?? "",
+      activities: document.activities ?? "",
+      resources: document.resources ?? "",
       workAreaId: document.workAreaId,
+      jobId: document.jobId ?? "",
+      responsibleEmployeeId: document.responsibleEmployeeId ?? "",
       consecutive: document.consecutive,
       code: document.code,
     })
@@ -168,8 +213,33 @@ export default function DocumentsPage() {
       return
     }
 
+    if (!form.objective.trim()) {
+      toast.error("Ingresa el objetivo del documento")
+      return
+    }
+
+    if (!form.activities.trim()) {
+      toast.error("Ingresa las actividades del documento")
+      return
+    }
+
+    if (!form.resources.trim()) {
+      toast.error("Ingresa los recursos del documento")
+      return
+    }
+
     if (!form.workAreaId) {
       toast.error("Selecciona un área de trabajo")
+      return
+    }
+
+    if (!form.jobId) {
+      toast.error("Selecciona un puesto de trabajo")
+      return
+    }
+
+    if (!form.responsibleEmployeeId) {
+      toast.error("Selecciona el funcionario responsable")
       return
     }
 
@@ -182,7 +252,12 @@ export default function DocumentsPage() {
       name: form.name.trim(),
       type: form.type,
       version: form.version.trim(),
+      objective: form.objective.trim(),
+      activities: form.activities.trim(),
+      resources: form.resources.trim(),
       workAreaId: form.workAreaId,
+      jobId: form.jobId,
+      responsibleEmployeeId: form.responsibleEmployeeId,
       consecutive: Number(form.consecutive),
       code: form.code.trim(),
     }
@@ -246,7 +321,7 @@ export default function DocumentsPage() {
               Nuevo documento
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{form.id ? "Editar documento" : "Nuevo documento"}</DialogTitle>
             </DialogHeader>
@@ -285,7 +360,7 @@ export default function DocumentsPage() {
                 <Label>Área de trabajo</Label>
                 <Select
                   value={form.workAreaId}
-                  onValueChange={(value) => setForm((current) => ({ ...current, workAreaId: value }))}
+                  onValueChange={(value) => setForm((current) => ({ ...current, workAreaId: value, jobId: "" }))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecciona un área" />
@@ -294,6 +369,44 @@ export default function DocumentsPage() {
                     {workAreas.map((area) => (
                       <SelectItem key={area.id} value={area.id}>
                         {area.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Puesto de trabajo</Label>
+                <Select
+                  value={form.jobId}
+                  onValueChange={(value) => setForm((current) => ({ ...current, jobId: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona un puesto" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableJobs.map((job) => (
+                      <SelectItem key={job.id} value={job.id}>
+                        {job.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Responsable</Label>
+                <Select
+                  value={form.responsibleEmployeeId}
+                  onValueChange={(value) => setForm((current) => ({ ...current, responsibleEmployeeId: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona un funcionario" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {employees.map((employee) => (
+                      <SelectItem key={employee.id} value={employee.id}>
+                        {employee.name} {employee.lastName}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -330,6 +443,39 @@ export default function DocumentsPage() {
                   value={form.code}
                   onChange={(event) => setForm((current) => ({ ...current, code: event.target.value }))}
                   placeholder="PR-LAB-001"
+                />
+              </div>
+
+              <div className="md:col-span-2 space-y-2">
+                <Label htmlFor="document-objective">Objetivo</Label>
+                <Textarea
+                  id="document-objective"
+                  value={form.objective}
+                  onChange={(event) => setForm((current) => ({ ...current, objective: event.target.value }))}
+                  placeholder="Describe el objetivo del documento"
+                  rows={3}
+                />
+              </div>
+
+              <div className="md:col-span-2 space-y-2">
+                <Label htmlFor="document-activities">Actividades</Label>
+                <Textarea
+                  id="document-activities"
+                  value={form.activities}
+                  onChange={(event) => setForm((current) => ({ ...current, activities: event.target.value }))}
+                  placeholder="Describe las actividades que componen el documento"
+                  rows={4}
+                />
+              </div>
+
+              <div className="md:col-span-2 space-y-2">
+                <Label htmlFor="document-resources">Recursos</Label>
+                <Textarea
+                  id="document-resources"
+                  value={form.resources}
+                  onChange={(event) => setForm((current) => ({ ...current, resources: event.target.value }))}
+                  placeholder="Indica recursos, herramientas o soportes necesarios"
+                  rows={3}
                 />
               </div>
             </div>
@@ -471,6 +617,29 @@ export default function DocumentsPage() {
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="secondary">{documentTypeLabel(document.type)}</Badge>
                   <Badge variant="outline">{document.workArea?.name ?? "Área no disponible"}</Badge>
+                  <Badge variant="outline">{document.job?.name ?? "Puesto no disponible"}</Badge>
+                  <Badge variant="outline">
+                    {document.responsibleEmployee
+                      ? `${document.responsibleEmployee.name} ${document.responsibleEmployee.lastName}`
+                      : "Responsable no disponible"}
+                  </Badge>
+                </div>
+
+                <div className="space-y-2 rounded-md border border-border bg-muted/30 p-3 text-xs">
+                  <div>
+                    <p className="font-medium text-foreground">Objetivo</p>
+                    <p className="line-clamp-2 text-muted-foreground">{document.objective || "Sin objetivo registrado"}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Actividades</p>
+                    <p className="line-clamp-2 text-muted-foreground">
+                      {document.activities || "Sin actividades registradas"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Recursos</p>
+                    <p className="line-clamp-2 text-muted-foreground">{document.resources || "Sin recursos registrados"}</p>
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
