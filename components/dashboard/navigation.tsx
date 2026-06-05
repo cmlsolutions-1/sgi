@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Users,
   FileText,
+  FileStack,
   TriangleAlert,
   UserCircle,
   ShieldCheck,
@@ -64,7 +65,7 @@ export const navigation: NavigationItem[] = [
       { code: "EMPLOYEE_MANAGEMENT", name: "Funcionarios", href: "/dashboard/employees", icon: UserCircle },
     ],
   },
-  { code: "DOCUMENTS", name: "Gestion Documental", href: "/dashboard/documents", icon: FileText },
+  
   {
     code: "PLANNING",
     name: "Planificacion",
@@ -87,6 +88,19 @@ export const navigation: NavigationItem[] = [
       },
     ],
   },
+  { 
+    code: "GESTION_DOCUMENTAL", 
+    name: "Gestion Documental", 
+    icon: FileStack,
+    subItems: [
+      {
+        code: "DOCUMENTS",
+        name: "Documentos",
+        href: "/dashboard/documents",
+        icon: FileText,
+      },
+    ],
+    },
 ]
 
 function collectModuleCodes(modules: ModuleNode[]): Set<string> {
