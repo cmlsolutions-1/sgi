@@ -4,6 +4,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] })
@@ -25,6 +26,7 @@ export default function RootLayout({
     <html lang="es" className="dark h-full overflow-hidden">
       <body className="h-full overflow-hidden font-sans antialiased">
         {children}
+        <Toaster richColors position="top-right" closeButton />
         <Analytics />
       </body>
     </html>

@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import {
-  BriefcaseBusiness,
   Building2,
   Calendar,
   Download,
@@ -41,8 +40,6 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
-import { JobsManager } from "@/app/dashboard/jobs/page"
-import { WorkAreasManager } from "@/app/dashboard/work-areas/page"
 import {
   activateIncident,
   createIncident,
@@ -845,23 +842,6 @@ export default function EmployeesPage() {
             Funcionarios
           </TabsTrigger>
           <TabsTrigger
-            value="structure"
-            className="
-                gap-2 rounded-xl px-4 py-2.5
-                text-[#163947] font-medium
-                transition-all duration-200
-                hover:bg-[#4bbdbd]/20
-                hover:text-[#163947]
-                data-[state=active]:bg-[#163947]
-                data-[state=active]:text-white
-                data-[state=active]:shadow-lg
-                data-[state=active]:shadow-[#163947]/25
-              "
-            >
-            <Building2 className="h-4 w-4" />
-            Estructura Organizacional
-          </TabsTrigger>
-          <TabsTrigger
             value="incidents"
             className="
                 gap-2 rounded-xl px-4 py-2.5
@@ -1068,69 +1048,6 @@ export default function EmployeesPage() {
               )}
             </div>
           )}
-        </TabsContent>
-
-        <TabsContent value="structure" className="space-y-6">
-          <div>
-            <h2 className="text-xl font-semibold text-foreground">Estructura Organizacional</h2>
-            <p className="text-sm text-muted-foreground">
-              Administra las areas y los puestos de trabajo que se usan en la vinculacion de funcionarios.
-            </p>
-          </div>
-
-          <Tabs defaultValue="work-areas" className="space-y-4">
-            <TabsList className="
-              h-10
-              w-full
-              justify-start
-              overflow-x-auto
-              rounded-2xl
-              bg-slate-300
-              p-1
-            ">
-            <TabsTrigger
-              value="work-areas"
-              className="
-                gap-2 rounded-xl px-4 py-2.5
-                text-[#163947] font-medium
-                transition-all duration-200
-                hover:bg-[#4bbdbd]/20
-                hover:text-[#163947]
-                data-[state=active]:bg-[#163947]
-                data-[state=active]:text-white
-                data-[state=active]:shadow-lg
-                data-[state=active]:shadow-[#163947]/25
-              "
-            >
-              <Users className="h-4 w-4" />
-              Áreas de trabajo
-            </TabsTrigger>
-
-            <TabsTrigger
-              value="jobs"
-              className="
-                gap-2 rounded-xl px-4 py-2.5
-                text-[#163947] font-medium
-                transition-all duration-200
-                hover:bg-[#4bbdbd]/20
-                hover:text-[#163947]
-                data-[state=active]:bg-[#163947]
-                data-[state=active]:text-white
-                data-[state=active]:shadow-lg
-                data-[state=active]:shadow-[#163947]/25
-              "
-            >
-              <BriefcaseBusiness className="h-4 w-4" />
-              Puestos de trabajo
-            </TabsTrigger>
-          </TabsList>
-            <TabsContent value="work-areas">
-              <WorkAreasManager />
-            </TabsContent>
-            <TabsContent value="jobs">
-              <JobsManager />
-            </TabsContent>
-          </Tabs>
         </TabsContent>
 
         <TabsContent value="incidents" className="space-y-6">

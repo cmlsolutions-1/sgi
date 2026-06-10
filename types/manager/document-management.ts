@@ -47,5 +47,31 @@ export type UpsertManagedDocumentDto = {
   code: string
 }
 
+export type ManagedDocumentFile = {
+  id: string
+  companyId: string
+  ownerType: string
+  ownerId: string
+  referenceType: "DOCUMENT_MANAGEMENT" | string
+  referenceId: string
+  type: "DOCUMENT_MANAGEMENT" | string
+  originalName: string
+  mimeType: string
+  size: number
+  storageProvider: string
+  isConfirmed: boolean
+  downloadUrl: string
+  createdAt: string
+  createdBy: string
+}
+
+export type UploadManagedDocumentFileDto = {
+  file: File
+  type?: string
+  isConfirmed?: boolean
+}
+
 export type ManagedDocumentResponse = ApiResponse<ManagedDocument>
 export type ManagedDocumentsResponse = ApiResponse<ManagedDocument[]>
+export type ManagedDocumentFileResponse = ApiResponse<ManagedDocumentFile>
+export type ManagedDocumentFilesResponse = ApiResponse<ManagedDocumentFile[]>

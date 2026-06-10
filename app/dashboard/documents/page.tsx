@@ -1,9 +1,11 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { BookOpen, Edit, FileText, Filter, Loader2, Plus, Power, Search, Trash2 } from "lucide-react"
+import { AlertCircle, BookOpen, Download, Edit, FileText, Filter, Loader2, Paperclip, Plus, Power, Search, Trash2, Upload } from "lucide-react"
+import jsPDF from "jspdf"
 import { toast } from "sonner"
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -22,14 +24,23 @@ import { Textarea } from "@/components/ui/textarea"
 import {
   activateManagedDocument,
   createManagedDocument,
+  deleteManagedDocumentFile,
   deleteManagedDocument,
+  downloadManagedDocumentFile,
+  listManagedDocumentFiles,
   listManagedDocuments,
   updateManagedDocument,
+  uploadManagedDocumentFile,
 } from "@/services/documentManagementService"
 import { listEmployees } from "@/services/employeeService"
 import { listJobs } from "@/services/jobService"
 import { listWorkAreaOptions } from "@/services/workAreaService"
-import type { ManagedDocument, ManagedDocumentType, UpsertManagedDocumentDto } from "@/types/manager/document-management"
+import type {
+  ManagedDocument,
+  ManagedDocumentFile,
+  ManagedDocumentType,
+  UpsertManagedDocumentDto,
+} from "@/types/manager/document-management"
 import type { Employee } from "@/types/manager/employee"
 import type { Job } from "@/types/manager/job"
 import type { WorkAreaOption } from "@/types/manager/work-area"
@@ -71,6 +82,89 @@ function statusClass(status: ManagedDocument["status"]) {
   return status === "ACTIVE" ? "bg-green-600 text-white border-green-700" : "bg-muted text-foreground border-border"
 }
 
+function formatFileSize(size: number) {
+  if (size < 1024) return `${size} B`
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function safeFilename(value: string) {
+  return value.replace(/[\\/:*?"<>|]+/g, "-").trim() || "documento"
+}
+
+function downloadPrintableDocument(document: ManagedDocument) {
+  const pdf = new jsPDF("p", "mm", "a4")
+  const pageHeight = pdf.internal.pageSize.getHeight()
+  const margin = 18
+  const width = pdf.internal.pageSize.getWidth() - margin * 2
+  let y = 20
+
+  const ensureSpace = (height: number) => {
+    if (y + height > pageHeight - margin) {
+      pdf.addPage()
+      y = 20
+    }
+  }
+
+  const writeLine = (label: string, value: string) => {
+    const lines = pdf.splitTextToSize(value || "No registrado", width - 40) as string[]
+    ensureSpace(Math.max(7, lines.length * 5))
+    pdf.setFont("helvetica", "bold")
+    pdf.text(`${label}:`, margin, y)
+    pdf.setFont("helvetica", "normal")
+    pdf.text(lines, margin + 38, y)
+    y += Math.max(7, lines.length * 5)
+  }
+
+  const writeSection = (title: string, value: string) => {
+    ensureSpace(14)
+    pdf.setFont("helvetica", "bold")
+    pdf.setFontSize(12)
+    pdf.text(title, margin, y)
+    y += 7
+    pdf.setFont("helvetica", "normal")
+    pdf.setFontSize(10)
+
+    const lines = pdf.splitTextToSize(value || "No registrado", width) as string[]
+    lines.forEach((line) => {
+      ensureSpace(5)
+      pdf.text(line, margin, y)
+      y += 5
+    })
+    y += 5
+  }
+
+  pdf.setFont("helvetica", "bold")
+  pdf.setFontSize(18)
+  const titleLines = pdf.splitTextToSize(document.name, width) as string[]
+  pdf.text(titleLines, margin, y)
+  y += titleLines.length * 8 + 2
+  pdf.setFontSize(10)
+  pdf.setFont("helvetica", "normal")
+  pdf.text(`${documentTypeLabel(document.type)} - Documento de gestión`, margin, y)
+  y += 10
+
+  writeLine("Código", document.code)
+  writeLine("Versión", document.version)
+  writeLine("Consecutivo", String(document.consecutive))
+  writeLine("Área", document.workArea?.name ?? "No registrada")
+  writeLine("Puesto", document.job?.name ?? "No registrado")
+  writeLine(
+    "Responsable",
+    document.responsibleEmployee
+      ? `${document.responsibleEmployee.name} ${document.responsibleEmployee.lastName}`
+      : "No registrado",
+  )
+  writeLine("Estado", statusLabel(document.status))
+  y += 4
+
+  writeSection("Objetivo", document.objective)
+  writeSection("Actividades", document.activities)
+  writeSection("Recursos", document.resources)
+
+  pdf.save(`${safeFilename(document.code || document.name)}-v${safeFilename(document.version)}.pdf`)
+}
+
 export default function DocumentsPage() {
   const [documents, setDocuments] = useState<ManagedDocument[]>([])
   const [workAreas, setWorkAreas] = useState<WorkAreaOption[]>([])
@@ -80,10 +174,19 @@ export default function DocumentsPage() {
   const [saving, setSaving] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [form, setForm] = useState<DocumentFormState>(emptyForm)
+  const [formError, setFormError] = useState<string | null>(null)
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [workAreaFilter, setWorkAreaFilter] = useState<string>("all")
+  const [fileDialogDocument, setFileDialogDocument] = useState<ManagedDocument | null>(null)
+  const [documentFiles, setDocumentFiles] = useState<ManagedDocumentFile[]>([])
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [fileInputKey, setFileInputKey] = useState(0)
+  const [loadingFiles, setLoadingFiles] = useState(false)
+  const [uploadingFile, setUploadingFile] = useState(false)
+  const [downloadingFileId, setDownloadingFileId] = useState<string | null>(null)
+  const [deletingFileId, setDeletingFileId] = useState<string | null>(null)
 
   const filteredDocuments = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -113,6 +216,8 @@ export default function DocumentsPage() {
     if (!form.workAreaId) return jobs
     return jobs.filter((job) => job.workAreaId === form.workAreaId)
   }, [form.workAreaId, jobs])
+
+  const consecutiveError = formError?.toLowerCase().includes("consecutivo") ? formError : null
 
   const stats = useMemo(
     () => ({
@@ -176,15 +281,18 @@ export default function DocumentsPage() {
 
   function resetForm() {
     setForm(emptyForm)
+    setFormError(null)
     setDialogOpen(false)
   }
 
   function openCreateDialog() {
     setForm(emptyForm)
+    setFormError(null)
     setDialogOpen(true)
   }
 
   function openEditDialog(document: ManagedDocument) {
+    setFormError(null)
     setForm({
       id: document.id,
       name: document.name,
@@ -203,6 +311,8 @@ export default function DocumentsPage() {
   }
 
   async function handleSave() {
+    setFormError(null)
+
     if (!form.name.trim()) {
       toast.error("Ingresa el nombre del documento")
       return
@@ -275,7 +385,9 @@ export default function DocumentsPage() {
       resetForm()
       await loadData()
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "No se pudo guardar el documento")
+      const message = error instanceof Error ? error.message : "No se pudo guardar el documento"
+      setFormError(message)
+      toast.error(message, { duration: 7000 })
     } finally {
       setSaving(false)
     }
@@ -301,6 +413,95 @@ export default function DocumentsPage() {
       await loadData()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo cambiar el estado del documento")
+    }
+  }
+
+  async function loadDocumentFiles(documentId: string) {
+    setLoadingFiles(true)
+    try {
+      setDocumentFiles(await listManagedDocumentFiles(documentId))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar los archivos")
+      setDocumentFiles([])
+    } finally {
+      setLoadingFiles(false)
+    }
+  }
+
+  async function openFileDialog(document: ManagedDocument) {
+    setFileDialogDocument(document)
+    setSelectedFile(null)
+    setFileInputKey((current) => current + 1)
+    await loadDocumentFiles(document.id)
+  }
+
+  function closeFileDialog() {
+    setFileDialogDocument(null)
+    setDocumentFiles([])
+    setSelectedFile(null)
+  }
+
+  async function handleUploadFile() {
+    if (!fileDialogDocument || !selectedFile) {
+      toast.error("Selecciona un archivo")
+      return
+    }
+
+    setUploadingFile(true)
+    try {
+      await uploadManagedDocumentFile(fileDialogDocument.id, {
+        file: selectedFile,
+        type: "DOCUMENT_MANAGEMENT",
+        isConfirmed: true,
+      })
+      toast.success("Archivo subido")
+      setSelectedFile(null)
+      setFileInputKey((current) => current + 1)
+      await loadDocumentFiles(fileDialogDocument.id)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo subir el archivo")
+    } finally {
+      setUploadingFile(false)
+    }
+  }
+
+  async function handleDownloadFile(document: ManagedDocumentFile) {
+    if (!document.downloadUrl) {
+      toast.error("El archivo no tiene una URL de descarga")
+      return
+    }
+
+    setDownloadingFileId(document.id)
+    try {
+      const blob = await downloadManagedDocumentFile(document.downloadUrl)
+      const url = URL.createObjectURL(blob)
+      const anchor = window.document.createElement("a")
+      anchor.href = url
+      anchor.download = document.originalName || "documento"
+      window.document.body.appendChild(anchor)
+      anchor.click()
+      anchor.remove()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar el archivo")
+    } finally {
+      setDownloadingFileId(null)
+    }
+  }
+
+  async function handleDeleteFile(document: ManagedDocumentFile) {
+    if (!fileDialogDocument) return
+    if (!window.confirm(`¿Eliminar el archivo "${document.originalName}"?`)) return
+
+    setDeletingFileId(document.id)
+    try {
+      await deleteManagedDocumentFile(fileDialogDocument.id, document.id)
+      toast.success("Archivo eliminado")
+      await loadDocumentFiles(fileDialogDocument.id)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar el archivo")
+    } finally {
+      setDeletingFileId(null)
     }
   }
 
@@ -430,10 +631,14 @@ export default function DocumentsPage() {
                   type="number"
                   min={1}
                   value={form.consecutive}
-                  onChange={(event) =>
+                  aria-invalid={Boolean(consecutiveError)}
+                  className={consecutiveError ? "border-destructive focus-visible:ring-destructive" : undefined}
+                  onChange={(event) => {
                     setForm((current) => ({ ...current, consecutive: Number(event.target.value) || 1 }))
-                  }
+                    setFormError(null)
+                  }}
                 />
+                {consecutiveError && <p className="text-xs text-destructive">{consecutiveError}</p>}
               </div>
 
               <div className="md:col-span-2 space-y-2">
@@ -480,6 +685,14 @@ export default function DocumentsPage() {
               </div>
             </div>
 
+            {formError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>No se pudo guardar el documento</AlertTitle>
+                <AlertDescription>{formError}</AlertDescription>
+              </Alert>
+            )}
+
             <DialogFooter>
               <Button variant="outline" onClick={resetForm} disabled={saving}>
                 Cancelar
@@ -491,6 +704,98 @@ export default function DocumentsPage() {
           </DialogContent>
         </Dialog>
       </div>
+
+      <Dialog open={Boolean(fileDialogDocument)} onOpenChange={(open) => !open && closeFileDialog()}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Archivo de {fileDialogDocument?.name}</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="rounded-md border border-dashed border-border p-4">
+              <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
+                <div className="space-y-2">
+                  <Label htmlFor="managed-document-file">Seleccionar archivo</Label>
+                  <Input
+                    key={fileInputKey}
+                    id="managed-document-file"
+                    type="file"
+                    onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
+                  />
+                </div>
+                <Button className="gap-2" onClick={handleUploadFile} disabled={!selectedFile || uploadingFile}>
+                  {uploadingFile ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                  Subir archivo
+                </Button>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                El archivo quedará asociado al registro y podrá descargarse para imprimir.
+              </p>
+            </div>
+
+            {loadingFiles ? (
+              <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Cargando archivos...
+              </div>
+            ) : documentFiles.length === 0 ? (
+              <div className="py-8 text-center text-sm text-muted-foreground">Aún no hay archivos asociados.</div>
+            ) : (
+              <div className="space-y-2">
+                {documentFiles.map((document) => (
+                  <div
+                    key={document.id}
+                    className="flex flex-col gap-3 rounded-md border border-border p-3 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{document.originalName}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {document.mimeType || "Archivo"} · {formatFileSize(document.size)}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => handleDownloadFile(document)}
+                        disabled={downloadingFileId === document.id}
+                      >
+                        {downloadingFileId === document.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Download className="h-4 w-4" />
+                        )}
+                        Descargar
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 text-destructive hover:text-destructive"
+                        onClick={() => handleDeleteFile(document)}
+                        disabled={deletingFileId === document.id}
+                      >
+                        {deletingFileId === document.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                        Eliminar
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={closeFileDialog}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -643,6 +948,22 @@ export default function DocumentsPage() {
                 </div>
 
                 <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
+                  {document.type === "OTHERS" ? (
+                    <Button variant="outline" size="sm" className="gap-2" onClick={() => openFileDialog(document)}>
+                      <Paperclip className="h-4 w-4" />
+                      Gestionar archivo
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                      onClick={() => downloadPrintableDocument(document)}
+                    >
+                      <Download className="h-4 w-4" />
+                      Descargar PDF
+                    </Button>
+                  )}
                   <Button variant="outline" size="sm" className="gap-2" onClick={() => openEditDialog(document)}>
                     <Edit className="h-4 w-4" />
                     Editar

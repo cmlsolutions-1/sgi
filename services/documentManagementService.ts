@@ -1,9 +1,13 @@
 import { apiFetch } from "@/lib/apiClient"
 import type {
   ManagedDocument,
+  ManagedDocumentFile,
+  ManagedDocumentFileResponse,
+  ManagedDocumentFilesResponse,
   ManagedDocumentFilters,
   ManagedDocumentResponse,
   ManagedDocumentsResponse,
+  UploadManagedDocumentFileDto,
   UpsertManagedDocumentDto,
 } from "@/types/manager/document-management"
 
@@ -18,6 +22,8 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
   const json = (await res.json().catch(() => null)) as
     | ManagedDocumentResponse
     | ManagedDocumentsResponse
+    | ManagedDocumentFileResponse
+    | ManagedDocumentFilesResponse
     | ApiErrorResponse
     | null
 
@@ -73,4 +79,51 @@ export async function deleteManagedDocument(id: string): Promise<void> {
 export async function activateManagedDocument(id: string): Promise<ManagedDocument> {
   const res = await apiFetch(`/api/document-management/active/${id}`, { method: "PUT" })
   return parseOrThrow<ManagedDocument>(res, "No se pudo activar el documento")
+}
+
+export async function uploadManagedDocumentFile(
+  documentManagementId: string,
+  dto: UploadManagedDocumentFileDto,
+): Promise<ManagedDocumentFile> {
+  const formData = new FormData()
+  formData.append("file", dto.file)
+  formData.append("type", dto.type ?? "DOCUMENT_MANAGEMENT")
+  formData.append("isConfirmed", String(dto.isConfirmed ?? true))
+
+  const res = await apiFetch(`/api/document-management/${documentManagementId}/documents`, {
+    method: "POST",
+    body: formData,
+  })
+  return parseOrThrow<ManagedDocumentFile>(res, "No se pudo subir el archivo")
+}
+
+export async function listManagedDocumentFiles(documentManagementId: string): Promise<ManagedDocumentFile[]> {
+  const res = await apiFetch(`/api/document-management/${documentManagementId}/documents`, { method: "GET" })
+  return parseOrThrow<ManagedDocumentFile[]>(res, "No se pudo cargar los archivos")
+}
+
+export async function getManagedDocumentFile(
+  documentManagementId: string,
+  documentId: string,
+): Promise<ManagedDocumentFile> {
+  const res = await apiFetch(`/api/document-management/${documentManagementId}/documents/${documentId}`, {
+    method: "GET",
+  })
+  return parseOrThrow<ManagedDocumentFile>(res, "No se pudo cargar el archivo")
+}
+
+export async function deleteManagedDocumentFile(documentManagementId: string, documentId: string): Promise<void> {
+  const res = await apiFetch(`/api/document-management/${documentManagementId}/documents/${documentId}`, {
+    method: "DELETE",
+  })
+  await parseOrThrow<Record<string, never>>(res, "No se pudo eliminar el archivo")
+}
+
+export async function downloadManagedDocumentFile(downloadUrl: string): Promise<Blob> {
+  const res = await apiFetch(downloadUrl, { method: "GET" })
+  if (!res.ok) {
+    const json = (await res.json().catch(() => null)) as ApiErrorResponse | null
+    throw new Error(json?.message ?? "No se pudo descargar el archivo")
+  }
+  return res.blob()
 }
