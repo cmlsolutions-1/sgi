@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { AlertCircle, BookOpen, Download, Edit, FileText, Filter, Loader2, Paperclip, Plus, Power, Search, Trash2, Upload } from "lucide-react"
+import { AlertCircle, BookOpen, Download, Edit, FileText, Filter, Loader2, MoreHorizontal, Paperclip, Plus, Power, Search, Trash2, Upload } from "lucide-react"
 import jsPDF from "jspdf"
 import { toast } from "sonner"
 
@@ -19,6 +19,13 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -896,89 +903,110 @@ export default function DocumentsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="overflow-hidden rounded-md border border-border bg-card">
+          <div className="hidden grid-cols-[minmax(240px,2fr)_minmax(120px,0.8fr)_minmax(180px,1fr)_minmax(180px,1fr)_100px_48px] gap-4 border-b border-border bg-muted/40 px-4 py-2.5 text-xs font-medium text-muted-foreground lg:grid">
+            <span>Documento</span>
+            <span>Tipo</span>
+            <span>Área y puesto</span>
+            <span>Responsable</span>
+            <span>Estado</span>
+            <span className="sr-only">Acciones</span>
+          </div>
+
           {filteredDocuments.map((document) => (
-            <Card key={document.id} className="border-border hover:border-primary/50 transition-colors">
-              <CardContent className="p-4 space-y-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3 min-w-0">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                      {document.type === "MANUAL" ? <BookOpen className="h-5 w-5" /> : <FileText className="h-5 w-5" />}
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="font-semibold text-sm truncate">{document.name}</h3>
-                      <p className="text-xs text-muted-foreground">
-                        {document.code} · Versión {document.version} · Consecutivo {document.consecutive}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{document.workArea?.name ?? "Sin área"}</p>
-                    </div>
-                  </div>
-
-                  <Badge variant="outline" className={statusClass(document.status)}>
-                    {statusLabel(document.status)}
-                  </Badge>
+            <div
+              key={document.id}
+              className="group grid gap-3 border-b border-border px-4 py-3 transition-colors last:border-b-0 hover:bg-muted/30 lg:grid-cols-[minmax(240px,2fr)_minmax(120px,0.8fr)_minmax(180px,1fr)_minmax(180px,1fr)_100px_48px] lg:items-center lg:gap-4"
+            >
+              <div className="flex min-w-0 items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                  {document.type === "MANUAL" ? <BookOpen className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
                 </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">{document.name}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {document.code} · Versión {document.version} · Consecutivo {document.consecutive}
+                  </p>
+                </div>
+              </div>
 
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">{documentTypeLabel(document.type)}</Badge>
-                  <Badge variant="outline">{document.workArea?.name ?? "Área no disponible"}</Badge>
-                  <Badge variant="outline">{document.job?.name ?? "Puesto no disponible"}</Badge>
-                  <Badge variant="outline">
+              <div className="flex items-center justify-between gap-3 lg:block">
+                <span className="text-xs font-medium text-muted-foreground lg:hidden">Tipo</span>
+                <Badge variant="secondary" className="font-normal">
+                  {documentTypeLabel(document.type)}
+                </Badge>
+              </div>
+
+              <div className="flex items-start justify-between gap-3 lg:block">
+                <span className="text-xs font-medium text-muted-foreground lg:hidden">Área y puesto</span>
+                <div className="min-w-0 text-right lg:text-left">
+                  <p className="truncate text-sm">{document.workArea?.name ?? "Área no disponible"}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {document.job?.name ?? "Puesto no disponible"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start justify-between gap-3 lg:block">
+                <span className="text-xs font-medium text-muted-foreground lg:hidden">Responsable</span>
+                <div className="min-w-0 text-right lg:text-left">
+                  <p className="truncate text-sm">
                     {document.responsibleEmployee
                       ? `${document.responsibleEmployee.name} ${document.responsibleEmployee.lastName}`
-                      : "Responsable no disponible"}
-                  </Badge>
+                      : "No disponible"}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {document.responsibleEmployee?.email ?? "Sin correo registrado"}
+                  </p>
                 </div>
+              </div>
 
-                <div className="space-y-2 rounded-md border border-border bg-muted/30 p-3 text-xs">
-                  <div>
-                    <p className="font-medium text-foreground">Objetivo</p>
-                    <p className="line-clamp-2 text-muted-foreground">{document.objective || "Sin objetivo registrado"}</p>
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">Actividades</p>
-                    <p className="line-clamp-2 text-muted-foreground">
-                      {document.activities || "Sin actividades registradas"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">Recursos</p>
-                    <p className="line-clamp-2 text-muted-foreground">{document.resources || "Sin recursos registrados"}</p>
-                  </div>
-                </div>
+              <div className="flex items-center justify-between gap-3 lg:block">
+                <span className="text-xs font-medium text-muted-foreground lg:hidden">Estado</span>
+                <Badge variant="outline" className={statusClass(document.status)}>
+                  {statusLabel(document.status)}
+                </Badge>
+              </div>
 
-                <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
-                  {document.type === "OTHERS" ? (
-                    <Button variant="outline" size="sm" className="gap-2" onClick={() => openFileDialog(document)}>
-                      <Paperclip className="h-4 w-4" />
-                      Gestionar archivo
+              <div className="flex justify-end">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Acciones de ${document.name}`}>
+                      <MoreHorizontal className="h-4 w-4" />
                     </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="gap-2"
-                      onClick={() => downloadPrintableDocument(document)}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    {document.type === "OTHERS" ? (
+                      <DropdownMenuItem onSelect={() => openFileDialog(document)}>
+                        <Paperclip className="mr-2 h-4 w-4" />
+                        Gestionar archivo
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem onSelect={() => downloadPrintableDocument(document)}>
+                        <Download className="mr-2 h-4 w-4" />
+                        Descargar PDF
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem onSelect={() => openEditDialog(document)}>
+                      <Edit className="mr-2 h-4 w-4" />
+                      Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => handleActivate(document)}>
+                      <Power className="mr-2 h-4 w-4" />
+                      {document.status === "ACTIVE" ? "Inactivar" : "Activar"}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="text-destructive focus:text-destructive"
+                      onSelect={() => handleDelete(document)}
                     >
-                      <Download className="h-4 w-4" />
-                      Descargar PDF
-                    </Button>
-                  )}
-                  <Button variant="outline" size="sm" className="gap-2" onClick={() => openEditDialog(document)}>
-                    <Edit className="h-4 w-4" />
-                    Editar
-                  </Button>
-                  <Button variant="outline" size="sm" className="gap-2" onClick={() => handleActivate(document)}>
-                    <Power className="h-4 w-4" />
-                    {document.status === "ACTIVE" ? "Inactivar" : "Activar"}
-                  </Button>
-                  <Button variant="outline" size="sm" className="gap-2" onClick={() => handleDelete(document)}>
-                    <Trash2 className="h-4 w-4" />
-                    Eliminar
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Eliminar
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
           ))}
         </div>
       )}

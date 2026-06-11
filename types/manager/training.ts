@@ -36,7 +36,6 @@ export type CreateTrainingDto = {
   topicId: string
   date: string
   durationHours: number
-  status?: TrainingStatus
 }
 
 export type UpdateTrainingDto = Partial<CreateTrainingDto> & {

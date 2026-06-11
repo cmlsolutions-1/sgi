@@ -221,12 +221,15 @@ function TrainingDialog({
 
     setSaving(true)
     try {
-      const payload = {
+      const trainingData: CreateTrainingDto = {
         topicId: form.topicId,
         date: form.date,
         durationHours,
-        status: form.status,
       }
+      const payload: CreateTrainingDto | UpdateTrainingDto = training
+        ? { ...trainingData, status: form.status }
+        : trainingData
+
       await onSave(payload, training?.id)
       setOpen(false)
     } finally {
@@ -409,7 +412,7 @@ export default function TrainingPlanPage() {
   async function handleSaveTraining(payload: CreateTrainingDto | UpdateTrainingDto, trainingId?: string) {
     try {
       if (trainingId) {
-        const { status, ...trainingPayload } = payload
+        const { status, ...trainingPayload } = payload as UpdateTrainingDto
         await updateTraining(trainingId, trainingPayload)
         if (status) {
           await changeTrainingStatus(trainingId, status as TrainingStatus)
