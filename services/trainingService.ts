@@ -110,7 +110,13 @@ export async function createTraining(dto: CreateTrainingDto): Promise<Training> 
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(dto),
   })
-  return parseOrThrow<Training>(res, "No se pudo crear la capacitacion")
+  const training = await parseOrThrow<Training>(res, "No se pudo crear la capacitacion")
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("notifications:refresh"))
+  }
+
+  return training
 }
 
 export async function listTraining(): Promise<TrainingList> {

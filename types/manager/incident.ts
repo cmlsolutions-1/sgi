@@ -10,6 +10,7 @@ export type IncidentStatus = "ACTIVE" | "INACTIVE"
 
 export type Incident = {
   id: string
+  consecutive: string
   employeeId: string
   date: string
   place: string
@@ -18,6 +19,12 @@ export type Incident = {
   correctiveActions: string
   status: IncidentStatus
   employee: IncidentEmployee
+}
+
+export type IncidentFilters = {
+  employeeId?: string
+  startDate?: string
+  endDate?: string
 }
 
 export type CreateIncidentDto = {

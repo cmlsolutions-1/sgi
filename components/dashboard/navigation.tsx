@@ -66,6 +66,7 @@ export const navigation: NavigationItem[] = [
       { code: "EMPLOYEE_MANAGEMENT", name: "Gestión Empleados", href: "/dashboard/employees", icon: UserCircle },
       { code: "WORKAREA", name: "Áreas de trabajo", href: "/dashboard/work-areas", icon: Users },
       { code: "JOBS", name: "Puestos de trabajo", href: "/dashboard/jobs", icon: BriefcaseBusiness },
+      { code: "LABOR", name: "Novedades Laborales", href: "/dashboard/labor", icon: TriangleAlert },
     ],
   },
   
@@ -82,7 +83,7 @@ export const navigation: NavigationItem[] = [
     name: "Riesgos",
     icon: TriangleAlert,
     subItems: [
-      { code: "LABOR", name: "Laborales", href: "/dashboard/occupational", icon: BrickWallIcon },
+      { code: "RISK_MATRIX", name: "Laborales", href: "/dashboard/occupational", icon: BrickWallIcon },
       {
         code: "PREVENTIVE_MEASURES",
         name: "Medidas de Prevencion",
@@ -145,12 +146,9 @@ export function filterNavigationByModules(items: NavigationItem[], modules: Modu
     }
 
     if (hasSubItems(item)) {
-      const parentAllowed = isCodeAllowed(item.code, allowedCodes)
-      const subItems = parentAllowed
-        ? item.subItems
-        : item.subItems.filter((subItem) => !subItem.code || isCodeAllowed(subItem.code, allowedCodes))
+      const subItems = item.subItems.filter((subItem) => !subItem.code || isCodeAllowed(subItem.code, allowedCodes))
 
-      if (parentAllowed || subItems.length > 0) {
+      if (subItems.length > 0) {
         filteredItems.push({ ...item, subItems })
       }
 

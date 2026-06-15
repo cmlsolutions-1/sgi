@@ -20,13 +20,13 @@ import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/store/auth.store"
 import {
   getUnreadNotificationsCount,
-  listNotifications,
+  listAllNotifications,
   markAllNotificationsAsRead,
   markNotificationAsRead,
 } from "@/services/notificationService"
 import type { NotificationItem, NotificationReferenceType, NotificationType } from "@/types/manager/notification"
 
-const NOTIFICATION_LIMIT = 8
+const NOTIFICATION_REFRESH_INTERVAL_MS = 15_000
 
 const notificationTypeLabels: Record<NotificationType, string> = {
   TRAINING_CREATED: "Capacitacion creada",
@@ -68,46 +68,72 @@ export function Header() {
   const hasUnread = unreadCount > 0
   const unreadLabel = useMemo(() => (unreadCount > 99 ? "99+" : String(unreadCount)), [unreadCount])
 
-  const refreshNotifications = useCallback(async () => {
+  const refreshNotifications = useCallback(async (showLoading = true) => {
     if (!hasHydrated || !accessToken) return
 
-    setIsLoading(true)
-    setError(null)
+    if (showLoading) {
+      setIsLoading(true)
+      setError(null)
+    }
 
     try {
-      const [page, count] = await Promise.all([
-        listNotifications({ page: 1, limit: NOTIFICATION_LIMIT }),
+      const [notifications, count] = await Promise.all([
+        listAllNotifications(),
         getUnreadNotificationsCount(),
       ])
-      setItems(page.items)
+      setItems(notifications)
       setUnreadCount(count)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudieron cargar las notificaciones")
+      if (showLoading) {
+        setError(err instanceof Error ? err.message : "No se pudieron cargar las notificaciones")
+      }
     } finally {
-      setIsLoading(false)
+      if (showLoading) {
+        setIsLoading(false)
+      }
     }
   }, [accessToken, hasHydrated])
 
   useEffect(() => {
-    refreshNotifications()
+    void refreshNotifications()
   }, [refreshNotifications])
 
   useEffect(() => {
     if (!hasHydrated || !accessToken) return
 
     const interval = window.setInterval(() => {
-      getUnreadNotificationsCount()
-        .then(setUnreadCount)
-        .catch(() => undefined)
-    }, 60_000)
+      if (document.visibilityState === "visible") {
+        void refreshNotifications(false)
+      }
+    }, NOTIFICATION_REFRESH_INTERVAL_MS)
 
     return () => window.clearInterval(interval)
-  }, [accessToken, hasHydrated])
+  }, [accessToken, hasHydrated, refreshNotifications])
+
+  useEffect(() => {
+    if (!hasHydrated || !accessToken) return
+
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") {
+        void refreshNotifications(false)
+      }
+    }
+
+    window.addEventListener("focus", refreshWhenVisible)
+    window.addEventListener("notifications:refresh", refreshWhenVisible)
+    document.addEventListener("visibilitychange", refreshWhenVisible)
+
+    return () => {
+      window.removeEventListener("focus", refreshWhenVisible)
+      window.removeEventListener("notifications:refresh", refreshWhenVisible)
+      document.removeEventListener("visibilitychange", refreshWhenVisible)
+    }
+  }, [accessToken, hasHydrated, refreshNotifications])
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen)
     if (nextOpen) {
-      refreshNotifications()
+      void refreshNotifications()
     }
   }
 
