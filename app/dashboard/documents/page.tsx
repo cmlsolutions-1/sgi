@@ -56,6 +56,9 @@ type DocumentFormState = UpsertManagedDocumentDto & {
   id?: string
 }
 
+const documentFieldControlClassName =
+  "w-full border-slate-400 bg-white shadow-sm hover:border-slate-500 focus-visible:border-primary focus-visible:ring-primary/25"
+
 const DOCUMENT_TYPES: Array<{ value: ManagedDocumentType; label: string }> = [
   { value: "PROCEDURE", label: "Procedimiento" },
   { value: "MANUAL", label: "Manual" },
@@ -529,7 +532,7 @@ export default function DocumentsPage() {
               Nuevo documento
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
             <DialogHeader>
               <DialogTitle>{form.id ? "Editar documento" : "Nuevo documento"}</DialogTitle>
             </DialogHeader>
@@ -539,6 +542,7 @@ export default function DocumentsPage() {
                 <Label htmlFor="document-name">Nombre</Label>
                 <Input
                   id="document-name"
+                  className={documentFieldControlClassName}
                   value={form.name}
                   onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
                   placeholder="Ej: Procedimiento de inspección de seguridad"
@@ -551,7 +555,7 @@ export default function DocumentsPage() {
                   value={form.type}
                   onValueChange={(value) => setForm((current) => ({ ...current, type: value as ManagedDocumentType }))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={documentFieldControlClassName}>
                     <SelectValue placeholder="Selecciona un tipo" />
                   </SelectTrigger>
                   <SelectContent>
@@ -570,7 +574,7 @@ export default function DocumentsPage() {
                   value={form.workAreaId}
                   onValueChange={(value) => setForm((current) => ({ ...current, workAreaId: value, jobId: "" }))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={documentFieldControlClassName}>
                     <SelectValue placeholder="Selecciona un área" />
                   </SelectTrigger>
                   <SelectContent>
@@ -589,7 +593,7 @@ export default function DocumentsPage() {
                   value={form.jobId}
                   onValueChange={(value) => setForm((current) => ({ ...current, jobId: value }))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={documentFieldControlClassName}>
                     <SelectValue placeholder="Selecciona un puesto" />
                   </SelectTrigger>
                   <SelectContent>
@@ -608,7 +612,7 @@ export default function DocumentsPage() {
                   value={form.responsibleEmployeeId}
                   onValueChange={(value) => setForm((current) => ({ ...current, responsibleEmployeeId: value }))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={documentFieldControlClassName}>
                     <SelectValue placeholder="Selecciona un funcionario" />
                   </SelectTrigger>
                   <SelectContent>
@@ -625,6 +629,7 @@ export default function DocumentsPage() {
                 <Label htmlFor="document-version">Versión</Label>
                 <Input
                   id="document-version"
+                  className={documentFieldControlClassName}
                   value={form.version}
                   onChange={(event) => setForm((current) => ({ ...current, version: event.target.value }))}
                   placeholder="1.0"
@@ -639,7 +644,9 @@ export default function DocumentsPage() {
                   min={1}
                   value={form.consecutive}
                   aria-invalid={Boolean(consecutiveError)}
-                  className={consecutiveError ? "border-destructive focus-visible:ring-destructive" : undefined}
+                  className={`${documentFieldControlClassName} ${
+                    consecutiveError ? "border-destructive focus-visible:ring-destructive" : ""
+                  }`}
                   onChange={(event) => {
                     setForm((current) => ({ ...current, consecutive: Number(event.target.value) || 1 }))
                     setFormError(null)
@@ -652,6 +659,7 @@ export default function DocumentsPage() {
                 <Label htmlFor="document-code">Código</Label>
                 <Input
                   id="document-code"
+                  className={documentFieldControlClassName}
                   value={form.code}
                   onChange={(event) => setForm((current) => ({ ...current, code: event.target.value }))}
                   placeholder="PR-LAB-001"
@@ -662,6 +670,7 @@ export default function DocumentsPage() {
                 <Label htmlFor="document-objective">Objetivo</Label>
                 <Textarea
                   id="document-objective"
+                  className={documentFieldControlClassName}
                   value={form.objective}
                   onChange={(event) => setForm((current) => ({ ...current, objective: event.target.value }))}
                   placeholder="Describe el objetivo del documento"
@@ -673,6 +682,7 @@ export default function DocumentsPage() {
                 <Label htmlFor="document-activities">Actividades</Label>
                 <Textarea
                   id="document-activities"
+                  className={documentFieldControlClassName}
                   value={form.activities}
                   onChange={(event) => setForm((current) => ({ ...current, activities: event.target.value }))}
                   placeholder="Describe las actividades que componen el documento"
@@ -684,6 +694,7 @@ export default function DocumentsPage() {
                 <Label htmlFor="document-resources">Recursos</Label>
                 <Textarea
                   id="document-resources"
+                  className={documentFieldControlClassName}
                   value={form.resources}
                   onChange={(event) => setForm((current) => ({ ...current, resources: event.target.value }))}
                   placeholder="Indica recursos, herramientas o soportes necesarios"

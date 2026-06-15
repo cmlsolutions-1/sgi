@@ -38,6 +38,9 @@ const emptyForm: FormState = {
   status: "ACTIVE",
 }
 
+const fieldControlClassName =
+  "w-full border-slate-400 bg-white shadow-sm hover:border-slate-500 focus-visible:border-primary focus-visible:ring-primary/25"
+
 export function JobsManager() {
   const [jobs, setJobs] = useState<Job[]>([])
   const [workAreas, setWorkAreas] = useState<WorkAreaOption[]>([])
@@ -189,6 +192,7 @@ export function JobsManager() {
                   <Label htmlFor="job-name">Nombre</Label>
                   <Input
                     id="job-name"
+                    className={fieldControlClassName}
                     value={form.name}
                     onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
                     placeholder="Ej: Analista SST"
@@ -201,7 +205,7 @@ export function JobsManager() {
                     value={form.workAreaId}
                     onValueChange={(value) => setForm((current) => ({ ...current, workAreaId: value }))}
                   >
-                    <SelectTrigger id="job-work-area">
+                    <SelectTrigger id="job-work-area" className={fieldControlClassName}>
                       <SelectValue placeholder="Selecciona un area" />
                     </SelectTrigger>
                     <SelectContent>
@@ -220,7 +224,7 @@ export function JobsManager() {
                       value={form.status}
                       onValueChange={(value: JobStatus) => setForm((current) => ({ ...current, status: value }))}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className={fieldControlClassName}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -234,6 +238,7 @@ export function JobsManager() {
                   <Label htmlFor="job-description">Descripcion</Label>
                   <Textarea
                     id="job-description"
+                    className={fieldControlClassName}
                     value={form.description}
                     onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
                     placeholder="Describe el puesto de trabajo"

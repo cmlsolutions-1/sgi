@@ -123,6 +123,9 @@ const emptyIncidentForm: IncidentFormState = {
   status: "ACTIVE",
 }
 
+const incidentFieldControlClassName =
+  "w-full border-slate-400 bg-white shadow-sm hover:border-slate-500 focus-visible:border-primary focus-visible:ring-primary/25"
+
 function IncidentDialog({
   incident,
   employees,
@@ -190,7 +193,7 @@ function IncidentDialog({
               <div className="grid gap-2">
                 <Label>Funcionario</Label>
                 <Select value={form.employeeId} onValueChange={(value) => setForm((current) => ({ ...current, employeeId: value }))}>
-                  <SelectTrigger>
+                  <SelectTrigger className={incidentFieldControlClassName}>
                     <SelectValue placeholder="Selecciona un funcionario" />
                   </SelectTrigger>
                   <SelectContent>
@@ -206,6 +209,7 @@ function IncidentDialog({
                 <Label htmlFor="incident-date">Fecha</Label>
                 <Input
                   id="incident-date"
+                  className={incidentFieldControlClassName}
                   type="date"
                   value={form.date}
                   onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))}
@@ -218,6 +222,7 @@ function IncidentDialog({
               <Label htmlFor="incident-place">Lugar</Label>
               <Input
                 id="incident-place"
+                className={incidentFieldControlClassName}
                 value={form.place}
                 onChange={(event) => setForm((current) => ({ ...current, place: event.target.value }))}
                 required
@@ -228,6 +233,7 @@ function IncidentDialog({
               <Label htmlFor="incident-description">Descripcion</Label>
               <Textarea
                 id="incident-description"
+                className={incidentFieldControlClassName}
                 value={form.description}
                 onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
                 required
@@ -239,6 +245,7 @@ function IncidentDialog({
                 <Label htmlFor="incident-consequences">Consecuencias</Label>
                 <Textarea
                   id="incident-consequences"
+                  className={incidentFieldControlClassName}
                   value={form.consequences}
                   onChange={(event) => setForm((current) => ({ ...current, consequences: event.target.value }))}
                 />
@@ -247,6 +254,7 @@ function IncidentDialog({
                 <Label htmlFor="incident-actions">Acciones correctivas</Label>
                 <Textarea
                   id="incident-actions"
+                  className={incidentFieldControlClassName}
                   value={form.correctiveActions}
                   onChange={(event) => setForm((current) => ({ ...current, correctiveActions: event.target.value }))}
                 />
@@ -260,7 +268,7 @@ function IncidentDialog({
                   value={form.status}
                   onValueChange={(value) => setForm((current) => ({ ...current, status: value as IncidentStatus }))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={incidentFieldControlClassName}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

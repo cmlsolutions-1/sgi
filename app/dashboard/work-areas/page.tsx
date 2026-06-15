@@ -37,6 +37,9 @@ const emptyForm: FormState = {
   description: "",
 }
 
+const fieldControlClassName =
+  "w-full border-slate-400 bg-white shadow-sm hover:border-slate-500 focus-visible:border-primary focus-visible:ring-primary/25"
+
 export function WorkAreasManager() {
   const [workAreas, setWorkAreas] = useState<WorkArea[]>([])
   const [search, setSearch] = useState("")
@@ -173,6 +176,7 @@ export function WorkAreasManager() {
                   <Label htmlFor="work-area-name">Nombre</Label>
                   <Input
                     id="work-area-name"
+                    className={fieldControlClassName}
                     value={form.name}
                     onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
                     placeholder="Ej: Produccion"
@@ -183,6 +187,7 @@ export function WorkAreasManager() {
                   <Label htmlFor="work-area-description">Descripcion</Label>
                   <Textarea
                     id="work-area-description"
+                    className={fieldControlClassName}
                     value={form.description}
                     onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
                     placeholder="Describe el area de trabajo"

@@ -183,6 +183,9 @@ const emptyTrainingForm: TrainingFormState = {
   status: "ACTIVE",
 }
 
+const trainingFieldControlClassName =
+  "w-full border-slate-400 bg-white shadow-sm hover:border-slate-500 focus-visible:border-primary focus-visible:ring-primary/25"
+
 function TrainingDialog({
   training,
   topics,
@@ -255,7 +258,7 @@ function TrainingDialog({
             <div className="grid gap-2">
               <Label>Tema</Label>
               <Select value={form.topicId} onValueChange={(value) => setForm((current) => ({ ...current, topicId: value }))}>
-                <SelectTrigger>
+                <SelectTrigger className={trainingFieldControlClassName}>
                   <SelectValue placeholder="Selecciona un tema" />
                 </SelectTrigger>
                 <SelectContent>
@@ -273,6 +276,7 @@ function TrainingDialog({
                 <Label htmlFor="training-date">Fecha</Label>
                 <Input
                   id="training-date"
+                  className={trainingFieldControlClassName}
                   type="date"
                   value={form.date}
                   onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))}
@@ -283,6 +287,7 @@ function TrainingDialog({
                 <Label htmlFor="training-duration">Duracion en horas</Label>
                 <Input
                   id="training-duration"
+                  className={trainingFieldControlClassName}
                   type="number"
                   min="0.5"
                   step="0.5"
@@ -296,7 +301,7 @@ function TrainingDialog({
             <div className="grid gap-2">
               <Label>Estado</Label>
               <Select value={form.status} onValueChange={(value) => setForm((current) => ({ ...current, status: value }))}>
-                <SelectTrigger>
+                <SelectTrigger className={trainingFieldControlClassName}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

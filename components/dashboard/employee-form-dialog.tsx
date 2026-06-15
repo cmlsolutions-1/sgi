@@ -55,6 +55,9 @@ const emptyForm: EmployeeFormValues = {
   status: true,
 }
 
+const fieldControlClassName =
+  "w-full border-slate-400 bg-white shadow-sm hover:border-slate-500 focus-visible:border-primary focus-visible:ring-primary/25"
+
 function toDateInput(value?: string | null) {
   if (!value) return ""
   return value.slice(0, 10)
@@ -183,6 +186,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                   <Label htmlFor="employee-name">Nombre</Label>
                   <Input
                     id="employee-name"
+                    className={fieldControlClassName}
                     value={formData.name}
                     onChange={(event) => updateField("name", event.target.value)}
                     placeholder="Nombre"
@@ -193,6 +197,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                   <Label htmlFor="employee-lastName">Apellido</Label>
                   <Input
                     id="employee-lastName"
+                    className={fieldControlClassName}
                     value={formData.lastName}
                     onChange={(event) => updateField("lastName", event.target.value)}
                     placeholder="Apellido"
@@ -203,6 +208,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                   <Label htmlFor="employee-phone">Telefono</Label>
                   <Input
                     id="employee-phone"
+                    className={fieldControlClassName}
                     value={formData.phone}
                     onChange={(event) => updateField("phone", event.target.value)}
                     placeholder="Telefono de contacto"
@@ -213,6 +219,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                   <Label htmlFor="employee-email">Correo</Label>
                   <Input
                     id="employee-email"
+                    className={fieldControlClassName}
                     type="email"
                     value={formData.email}
                     onChange={(event) => updateField("email", event.target.value)}
@@ -224,6 +231,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                   <Label htmlFor="employee-birthDate">Fecha de nacimiento</Label>
                   <Input
                     id="employee-birthDate"
+                    className={fieldControlClassName}
                     type="date"
                     value={formData.birthDate}
                     onChange={(event) => updateField("birthDate", event.target.value)}
@@ -233,7 +241,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                 <div className="space-y-2">
                   <Label>Estado</Label>
                   <Select value={String(formData.status)} onValueChange={(value) => updateField("status", value === "true")}>
-                    <SelectTrigger>
+                    <SelectTrigger className={fieldControlClassName}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -246,6 +254,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                   <Label htmlFor="employee-address">Direccion</Label>
                   <Input
                     id="employee-address"
+                    className={fieldControlClassName}
                     value={formData.address}
                     onChange={(event) => updateField("address", event.target.value)}
                     placeholder="Direccion de residencia"
@@ -258,7 +267,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                 <div className="space-y-2">
                   <Label>Area de trabajo</Label>
                   <Select value={formData.workAreaId} onValueChange={(value) => updateField("workAreaId", value)}>
-                    <SelectTrigger>
+                    <SelectTrigger className={fieldControlClassName}>
                       <SelectValue placeholder="Selecciona un area" />
                     </SelectTrigger>
                     <SelectContent>
@@ -277,7 +286,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                     onValueChange={(value) => updateField("jobId", value)}
                     disabled={!formData.workAreaId || availableJobs.length === 0}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className={fieldControlClassName}>
                       <SelectValue placeholder="Selecciona un puesto" />
                     </SelectTrigger>
                     <SelectContent>

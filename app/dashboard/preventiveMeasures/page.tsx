@@ -76,6 +76,9 @@ const emptyForm: MeasureForm = {
   accion: "PREVENTIVA",
 }
 
+const measureFieldControlClassName =
+  "mt-1 w-full border-slate-400 bg-white shadow-sm hover:border-slate-500 focus-visible:border-primary focus-visible:ring-primary/25"
+
 const statusConfig = {
   PENDING: { icon: Clock, color: "text-warning", label: "Pendiente" },
   DONE: { icon: CheckCircle, color: "text-accent", label: "Cumplida" },
@@ -344,7 +347,7 @@ export default function PreventiveMeasuresPage() {
             </Button>
           </DialogTrigger>
 
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl bg-white">
             <DialogHeader>
               <DialogTitle>{editingMeasure ? "Editar Medida de Prevención" : "Nueva Medida de Prevención"}</DialogTitle>
             </DialogHeader>
@@ -354,7 +357,7 @@ export default function PreventiveMeasuresPage() {
                 <div>
                   <label className="text-sm font-medium">Origen de la medida *</label>
                   <Select value={form.sourceType} onValueChange={(value) => handleSourceChange(value as SourceType)}>
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className={measureFieldControlClassName}>
                       <SelectValue placeholder="Selecciona el origen" />
                     </SelectTrigger>
                     <SelectContent>
@@ -373,7 +376,7 @@ export default function PreventiveMeasuresPage() {
                       setForm((current) => ({ ...current, accion: value as PreventiveMeasureAction }))
                     }
                   >
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className={measureFieldControlClassName}>
                       <SelectValue placeholder="Selecciona la acción" />
                     </SelectTrigger>
                     <SelectContent>
@@ -389,7 +392,7 @@ export default function PreventiveMeasuresPage() {
                 <div>
                   <label className="text-sm font-medium">Procedimiento diligenciado *</label>
                   <Select value={form.procedureId} onValueChange={handleProcedureChange}>
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className={measureFieldControlClassName}>
                       <SelectValue placeholder="Selecciona un procedimiento" />
                     </SelectTrigger>
                     <SelectContent>
@@ -416,7 +419,7 @@ export default function PreventiveMeasuresPage() {
                 <div>
                   <label className="text-sm font-medium">Riesgo laboral *</label>
                   <Select value={form.riskId} onValueChange={handleRiskChange}>
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className={measureFieldControlClassName}>
                       <SelectValue placeholder="Selecciona un riesgo" />
                     </SelectTrigger>
                     <SelectContent>
@@ -439,7 +442,7 @@ export default function PreventiveMeasuresPage() {
               <div>
                 <label className="text-sm font-medium">Título *</label>
                 <Input
-                  className="mt-1"
+                  className={measureFieldControlClassName}
                   value={form.title}
                   onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
                   placeholder="Ej: Instalar baranda en plataforma elevada"
@@ -449,7 +452,7 @@ export default function PreventiveMeasuresPage() {
               <div>
                 <label className="text-sm font-medium">Descripción *</label>
                 <Textarea
-                  className="mt-1"
+                  className={measureFieldControlClassName}
                   value={form.description}
                   onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
                   placeholder="Describe la medida, alcance y controles esperados."
@@ -463,7 +466,7 @@ export default function PreventiveMeasuresPage() {
                     value={form.key}
                     onValueChange={(value) => setForm((current) => ({ ...current, key: value as PreventiveMeasureKey }))}
                   >
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className={measureFieldControlClassName}>
                       <SelectValue placeholder="Selecciona" />
                     </SelectTrigger>
                     <SelectContent>
@@ -484,7 +487,7 @@ export default function PreventiveMeasuresPage() {
                       setForm((current) => ({ ...current, type: value as PreventiveMeasureType }))
                     }
                   >
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className={measureFieldControlClassName}>
                       <SelectValue placeholder="Selecciona" />
                     </SelectTrigger>
                     <SelectContent>
@@ -506,7 +509,7 @@ export default function PreventiveMeasuresPage() {
                       }))
                     }
                   >
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className={measureFieldControlClassName}>
                       <SelectValue placeholder="Selecciona" />
                     </SelectTrigger>
                     <SelectContent>
@@ -522,7 +525,7 @@ export default function PreventiveMeasuresPage() {
                   <div>
                     <label className="text-sm font-medium">Fecha límite *</label>
                     <Input
-                      className="mt-1"
+                      className={measureFieldControlClassName}
                       type="date"
                       value={form.dueDate}
                       onChange={(event) => setForm((current) => ({ ...current, dueDate: event.target.value }))}
@@ -534,7 +537,7 @@ export default function PreventiveMeasuresPage() {
                   <div>
                     <label className="text-sm font-medium">Fecha de cumplimiento</label>
                     <Input
-                      className="mt-1"
+                      className={measureFieldControlClassName}
                       type="date"
                       value={form.doneDate}
                       onChange={(event) => setForm((current) => ({ ...current, doneDate: event.target.value }))}
