@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { listJobs } from "@/services/jobService"
 import { listWorkAreaOptions } from "@/services/workAreaService"
-import type { CreateEmployeeDto, Employee, UpdateEmployeeDto } from "@/types/manager/employee"
+import type { CreateEmployeeDto, Employee, EmployeeGender, UpdateEmployeeDto } from "@/types/manager/employee"
 import type { Job } from "@/types/manager/job"
 import type { WorkAreaOption } from "@/types/manager/work-area"
 
@@ -30,6 +30,7 @@ type EmployeeFormValues = {
   email: string
   address: string
   birthDate: string
+  gender: EmployeeGender | ""
   workAreaId: string
   jobId: string
   status: boolean
@@ -50,10 +51,16 @@ const emptyForm: EmployeeFormValues = {
   email: "",
   address: "",
   birthDate: "",
+  gender: "",
   workAreaId: "",
   jobId: "",
   status: true,
 }
+
+const genderOptions: Array<{ value: EmployeeGender; label: string }> = [
+  { value: "MASCULINO", label: "Masculino" },
+  { value: "FEMENINO", label: "Femenino" },
+]
 
 const fieldControlClassName =
   "w-full border-slate-400 bg-white shadow-sm hover:border-slate-500 focus-visible:border-primary focus-visible:ring-primary/25"
@@ -73,6 +80,7 @@ function getInitialForm(employee?: Employee): EmployeeFormValues {
     email: employee.email ?? "",
     address: employee.address ?? "",
     birthDate: toDateInput(employee.birthDate),
+    gender: employee.gender ?? "",
     workAreaId: employee.workAreaId ?? "",
     jobId: employee.jobId ?? "",
     status: employee.status ?? true,
@@ -137,6 +145,11 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
       return
     }
 
+    if (!formData.gender) {
+      toast.error("Selecciona el genero")
+      return
+    }
+
     const payload: EmployeeFormPayload = {
       name: formData.name.trim(),
       lastName: formData.lastName.trim(),
@@ -144,6 +157,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
       email: formData.email.trim(),
       address: formData.address.trim(),
       birthDate: formData.birthDate,
+      gender: formData.gender,
       workAreaId: formData.workAreaId,
       jobId: formData.jobId,
       status: formData.status,
@@ -237,6 +251,21 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                     onChange={(event) => updateField("birthDate", event.target.value)}
                     required
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label>Genero</Label>
+                  <Select value={formData.gender} onValueChange={(value) => updateField("gender", value as EmployeeGender)}>
+                    <SelectTrigger className={fieldControlClassName}>
+                      <SelectValue placeholder="Selecciona el genero" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {genderOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Estado</Label>

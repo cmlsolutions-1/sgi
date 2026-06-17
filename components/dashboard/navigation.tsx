@@ -66,7 +66,7 @@ export const navigation: NavigationItem[] = [
       { code: "EMPLOYEE_MANAGEMENT", name: "Gestión Empleados", href: "/dashboard/employees", icon: UserCircle },
       { code: "WORKAREA", name: "Áreas de trabajo", href: "/dashboard/work-areas", icon: Users },
       { code: "JOBS", name: "Puestos de trabajo", href: "/dashboard/jobs", icon: BriefcaseBusiness },
-      { code: "LABOR", name: "Novedades Laborales", href: "/dashboard/labor", icon: TriangleAlert },
+      { code: "INCIDENTS", name: "Novedades Laborales", href: "/dashboard/incidents", icon: TriangleAlert },
     ],
   },
   
@@ -83,7 +83,7 @@ export const navigation: NavigationItem[] = [
     name: "Riesgos",
     icon: TriangleAlert,
     subItems: [
-      { code: "RISK_MATRIX", name: "Laborales", href: "/dashboard/occupational", icon: BrickWallIcon },
+      { code: "LABOR", name: "Laborales", href: "/dashboard/occupational", icon: BrickWallIcon },
       {
         code: "PREVENTIVE_MEASURES",
         name: "Medidas de Prevencion",
@@ -127,6 +127,7 @@ const alwaysVisibleCodes = new Set(["DOCUMENTS"])
 
 const moduleCodeAliases: Record<string, string[]> = {
   DOCUMENTS: ["DOCUMENTS", "DOCUMENT", "DOCUMENT_MANAGEMENT", "DOCUMENTAL_MANAGEMENT", "GESTION_DOCUMENTAL"],
+  INCIDENTS: ["INCIDENTS", "LABOR"],
 }
 
 function isCodeAllowed(code: string, allowedCodes: Set<string>) {
@@ -134,6 +135,54 @@ function isCodeAllowed(code: string, allowedCodes: Set<string>) {
 
   const aliases = moduleCodeAliases[code] ?? [code]
   return aliases.some((alias) => allowedCodes.has(alias))
+}
+
+function findModulesByCode(modules: ModuleNode[], code: string): ModuleNode[] {
+  const matches: ModuleNode[] = []
+  const aliases = moduleCodeAliases[code] ?? [code]
+
+  for (const module of modules) {
+    if (aliases.includes(module.code)) {
+      matches.push(module)
+    }
+
+    if (module.children?.length) {
+      matches.push(...findModulesByCode(module.children, code))
+    }
+  }
+
+  return matches
+}
+
+function getDirectChildCodesByParentCode(modules: ModuleNode[], parentCode: string): Set<string> {
+  const codes = new Set<string>()
+  const parents = findModulesByCode(modules, parentCode)
+
+  parents.forEach((parent) => {
+    parent.children?.forEach((child) => codes.add(child.code))
+  })
+
+  return codes
+}
+
+function isSubItemAllowed(
+  parentCode: string | undefined,
+  subItem: SubNavigationItem,
+  modules: ModuleNode[],
+  allowedCodes: Set<string>,
+) {
+  if (!subItem.code) return true
+  if (alwaysVisibleCodes.has(subItem.code)) return true
+  if (!parentCode) return isCodeAllowed(subItem.code, allowedCodes)
+
+  const parentChildCodes = getDirectChildCodesByParentCode(modules, parentCode)
+
+  if (parentChildCodes.size === 0) {
+    return isCodeAllowed(subItem.code, allowedCodes)
+  }
+
+  const aliases = moduleCodeAliases[subItem.code] ?? [subItem.code]
+  return aliases.some((alias) => parentChildCodes.has(alias))
 }
 
 export function filterNavigationByModules(items: NavigationItem[], modules: ModuleNode[]): NavigationItem[] {
@@ -146,7 +195,7 @@ export function filterNavigationByModules(items: NavigationItem[], modules: Modu
     }
 
     if (hasSubItems(item)) {
-      const subItems = item.subItems.filter((subItem) => !subItem.code || isCodeAllowed(subItem.code, allowedCodes))
+      const subItems = item.subItems.filter((subItem) => isSubItemAllowed(item.code, subItem, modules, allowedCodes))
 
       if (subItems.length > 0) {
         filteredItems.push({ ...item, subItems })

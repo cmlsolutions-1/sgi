@@ -25,6 +25,7 @@ import type {
   EmployeeEvaluation,
   EmployeeEvaluationResponse,
   EmployeeEvaluationsResponse,
+  EmployeeExportFilters,
   EmployeeMedicalEvaluation,
   EmployeeMedicalEvaluationResponse,
   EmployeeMedicalEvaluationsResponse,
@@ -104,6 +105,32 @@ function createDocumentFormData(dto: UploadEmployeeDocumentDto) {
   return formData
 }
 
+function buildEmployeeExportQuery(filters: EmployeeExportFilters = {}) {
+  const params = new URLSearchParams()
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      params.set(key, String(value))
+    }
+  })
+
+  const query = params.toString()
+  return query ? `?${query}` : ""
+}
+
+function getExportFilename(res: Response) {
+  const disposition = res.headers.get("content-disposition")
+  const match = disposition?.match(/filename="?([^"]+)"?/i)
+
+  if (!match?.[1]) return "funcionarios.csv"
+
+  try {
+    return decodeURIComponent(match[1])
+  } catch {
+    return match[1]
+  }
+}
+
 async function parseFileOrThrow(res: Response, fallbackMsg: string): Promise<Blob> {
   if (!res.ok) {
     const json = (await res.json().catch(() => null)) as { message?: string } | null
@@ -111,6 +138,24 @@ async function parseFileOrThrow(res: Response, fallbackMsg: string): Promise<Blo
   }
 
   return res.blob()
+}
+
+export async function exportEmployees(filters?: EmployeeExportFilters): Promise<{ blob: Blob; filename: string }> {
+  const res = await apiFetch(`/api/employee/export${buildEmployeeExportQuery(filters)}`, { method: "GET" })
+
+  if (!res.ok) {
+    const json = (await res.json().catch(() => null)) as { message?: string; errors?: Array<{ message?: string }> } | null
+    const detail = json?.errors?.find((error: { message?: string }) => error.message)?.message
+    throw new Error(detail ?? json?.message ?? "No se pudo exportar los funcionarios")
+  }
+
+  const csv = await res.text()
+  const content = csv.startsWith("\uFEFF") ? csv : `\uFEFF${csv}`
+
+  return {
+    blob: new Blob([content], { type: "text/csv;charset=utf-8" }),
+    filename: getExportFilename(res),
+  }
 }
 
 export async function createEmployee(dto: CreateEmployeeDto): Promise<Employee> {

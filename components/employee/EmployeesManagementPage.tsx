@@ -10,6 +10,8 @@ import {
   Eye,
   FileText,
   Filter,
+  LayoutGrid,
+  List,
   Loader2,
   Search,
   Trash2,
@@ -25,7 +27,7 @@ import { SgiResponsibleFormDialog } from "@/components/dashboard/SgiResponsibleF
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
@@ -56,6 +58,7 @@ import {
   createEmployee,
   createSgiResponsible,
   deleteEmployee,
+  exportEmployees,
   getSgiResponsible,
   listEmployees,
   updateSgiResponsible,
@@ -73,10 +76,35 @@ import type {
 import type {
   CreateEmployeeDto,
   Employee,
+  EmployeeArlRiskLevel,
+  EmployeeContractType,
+  EmployeeExportFilters,
+  EmployeeGender,
   EmployeeSgiResponsible,
   UpdateEmployeeDto,
   UpsertEmployeeSgiResponsibleDto,
 } from "@/types/manager/employee"
+
+type EmployeeViewMode = "cards" | "list"
+
+const employeeGenderOptions: Array<{ value: EmployeeGender; label: string }> = [
+  { value: "MASCULINO", label: "Masculino" },
+  { value: "FEMENINO", label: "Femenino" },
+]
+
+const employeeArlRiskLevelOptions: Array<{ value: EmployeeArlRiskLevel; label: string }> = [
+  { value: "RIESGO_I", label: "Riesgo I" },
+  { value: "RIESGO_II", label: "Riesgo II" },
+  { value: "RIESGO_III", label: "Riesgo III" },
+  { value: "RIESGO_IV", label: "Riesgo IV" },
+  { value: "RIESGO_V", label: "Riesgo V" },
+]
+
+const employeeContractTypeOptions: Array<{ value: EmployeeContractType; label: string }> = [
+  { value: "INDEFINIDO", label: "Indefinido" },
+  { value: "FIJO", label: "Fijo" },
+  { value: "SERVICIOS", label: "Servicios" },
+]
 
 function formatDate(value?: string | null) {
   if (!value) return "No registrada"
@@ -722,10 +750,20 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
 export default function EmployeesPage() {
   const [search, setSearch] = useState("")
   const [workAreaFilter, setWorkAreaFilter] = useState<string>("all")
+  const [jobFilter, setJobFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [viewMode, setViewMode] = useState<EmployeeViewMode>("cards")
+  const [reportGender, setReportGender] = useState<string>("all")
+  const [reportArlRiskLevel, setReportArlRiskLevel] = useState<string>("all")
+  const [reportMinAge, setReportMinAge] = useState("")
+  const [reportMaxAge, setReportMaxAge] = useState("")
+  const [reportContractType, setReportContractType] = useState<string>("all")
+  const [reportPage, setReportPage] = useState("")
+  const [reportLimit, setReportLimit] = useState("")
   const [employees, setEmployees] = useState<Employee[]>([])
   const [sgiResponsible, setSgiResponsible] = useState<EmployeeSgiResponsible | null>(null)
   const [loading, setLoading] = useState(true)
+  const [exportingEmployees, setExportingEmployees] = useState(false)
   const [sgiResponsibleDialogOpen, setSgiResponsibleDialogOpen] = useState(false)
 
   const workAreas = useMemo(() => {
@@ -734,6 +772,18 @@ export default function EmployeesPage() {
     employees.forEach((employee) => {
       if (employee.workAreaId) {
         unique.set(employee.workAreaId, employee.workArea?.name ?? "Area sin nombre")
+      }
+    })
+
+    return Array.from(unique, ([id, name]) => ({ id, name }))
+  }, [employees])
+
+  const jobs = useMemo(() => {
+    const unique = new Map<string, string>()
+
+    employees.forEach((employee) => {
+      if (employee.jobId) {
+        unique.set(employee.jobId, employee.job?.name ?? "Puesto sin nombre")
       }
     })
 
@@ -753,14 +803,15 @@ export default function EmployeesPage() {
         employee.job?.name?.toLowerCase().includes(query) ||
         employee.workArea?.name?.toLowerCase().includes(query)
       const matchesArea = workAreaFilter === "all" || employee.workAreaId === workAreaFilter
+      const matchesJob = jobFilter === "all" || employee.jobId === jobFilter
       const matchesStatus =
         statusFilter === "all" ||
         (statusFilter === "active" && employee.status) ||
         (statusFilter === "inactive" && !employee.status)
 
-      return matchesSearch && matchesArea && matchesStatus
+      return matchesSearch && matchesArea && matchesJob && matchesStatus
     })
-  }, [employees, search, statusFilter, workAreaFilter])
+  }, [employees, jobFilter, search, statusFilter, workAreaFilter])
 
   const stats = {
     total: employees.length,
@@ -772,6 +823,100 @@ export default function EmployeesPage() {
   const sgiResponsibleEmployee =
     sgiResponsible?.employee ??
     (sgiResponsible?.employeeId ? employees.find((employee) => employee.id === sgiResponsible.employeeId) : null)
+
+  function getEmployeeInitials(employee: Employee) {
+    return `${employee.name ?? ""} ${employee.lastName ?? ""}`
+      .trim()
+      .split(" ")
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase()
+  }
+
+  function getEmployeeExportFilters(): EmployeeExportFilters | null {
+    const minAge = reportMinAge ? Number(reportMinAge) : undefined
+    const maxAge = reportMaxAge ? Number(reportMaxAge) : undefined
+    const page = reportPage ? Number(reportPage) : undefined
+    const limit = reportLimit ? Number(reportLimit) : undefined
+
+    if (
+      (reportMinAge && Number.isNaN(minAge)) ||
+      (reportMaxAge && Number.isNaN(maxAge)) ||
+      (reportPage && Number.isNaN(page)) ||
+      (reportLimit && Number.isNaN(limit))
+    ) {
+      toast.error("Los valores numericos del reporte no son validos")
+      return null
+    }
+
+    if ((minAge !== undefined && minAge < 0) || (maxAge !== undefined && maxAge < 0)) {
+      toast.error("Las edades no pueden ser negativas")
+      return null
+    }
+
+    if ((page !== undefined && page < 1) || (limit !== undefined && limit < 1)) {
+      toast.error("Pagina y limite deben ser mayores a cero")
+      return null
+    }
+
+    if (minAge !== undefined && maxAge !== undefined && minAge > maxAge) {
+      toast.error("La edad minima no puede ser mayor que la edad maxima")
+      return null
+    }
+
+    return {
+      search: search.trim() || undefined,
+      workAreaId: workAreaFilter === "all" ? undefined : workAreaFilter,
+      jobId: jobFilter === "all" ? undefined : jobFilter,
+      status: statusFilter === "active" ? true : statusFilter === "inactive" ? false : undefined,
+      gender: reportGender === "all" ? undefined : (reportGender as EmployeeGender),
+      arlRiskLevel: reportArlRiskLevel === "all" ? undefined : (reportArlRiskLevel as EmployeeArlRiskLevel),
+      minAge,
+      maxAge,
+      contractType: reportContractType === "all" ? undefined : (reportContractType as EmployeeContractType),
+      page,
+      limit,
+    }
+  }
+
+  function clearEmployeeReportFilters() {
+    setSearch("")
+    setWorkAreaFilter("all")
+    setJobFilter("all")
+    setStatusFilter("all")
+    setReportGender("all")
+    setReportArlRiskLevel("all")
+    setReportMinAge("")
+    setReportMaxAge("")
+    setReportContractType("all")
+    setReportPage("")
+    setReportLimit("")
+  }
+
+  async function handleExportEmployees() {
+    const filters = getEmployeeExportFilters()
+    if (!filters) return
+
+    setExportingEmployees(true)
+    try {
+      const { blob, filename } = await exportEmployees(filters)
+      const url = URL.createObjectURL(blob)
+      const anchor = window.document.createElement("a")
+      anchor.href = url
+      anchor.download = filename
+      window.document.body.appendChild(anchor)
+      anchor.click()
+      anchor.remove()
+      URL.revokeObjectURL(url)
+      toast.success("Reporte CSV descargado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar el reporte")
+    } finally {
+      setExportingEmployees(false)
+    }
+  }
 
   async function loadEmployees() {
     setLoading(true)
@@ -951,6 +1096,12 @@ export default function EmployeesPage() {
           </div>
 
           <Card className="bg-card border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base font-medium">
+                <Filter className="h-5 w-5" />
+                Filtros
+              </CardTitle>
+            </CardHeader>
             <CardContent className="p-4">
               <div className="flex flex-col gap-4 md:flex-row">
                 <div className="relative flex-1">
@@ -962,7 +1113,7 @@ export default function EmployeesPage() {
                     className="pl-10 bg-secondary border-0"
                   />
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   <Select value={workAreaFilter} onValueChange={setWorkAreaFilter}>
                     <SelectTrigger className="w-[200px] bg-secondary border-0">
                       <Filter className="mr-2 h-4 w-4" />
@@ -977,6 +1128,19 @@ export default function EmployeesPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                  <Select value={jobFilter} onValueChange={setJobFilter}>
+                    <SelectTrigger className="w-[200px] bg-secondary border-0">
+                      <SelectValue placeholder="Puesto" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos los puestos</SelectItem>
+                      {jobs.map((job) => (
+                        <SelectItem key={job.id} value={job.id}>
+                          {job.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger className="w-[140px] bg-secondary border-0">
                       <SelectValue placeholder="Estado" />
@@ -987,16 +1151,173 @@ export default function EmployeesPage() {
                       <SelectItem value="inactive">Inactivo</SelectItem>
                     </SelectContent>
                   </Select>
+                  <div className="flex rounded-md border border-border bg-secondary p-1">
+                    <Button
+                      type="button"
+                      variant={viewMode === "cards" ? "default" : "ghost"}
+                      size="sm"
+                      className="h-8 gap-2"
+                      onClick={() => setViewMode("cards")}
+                    >
+                      <LayoutGrid className="h-4 w-4" />
+                      Tarjetas
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={viewMode === "list" ? "default" : "ghost"}
+                      size="sm"
+                      className="h-8 gap-2"
+                      onClick={() => setViewMode("list")}
+                    >
+                      <List className="h-4 w-4" />
+                      Lista
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
+          <Card className="bg-card border-border">
+            <CardHeader className="flex flex-col gap-3 pb-3 md:flex-row md:items-center md:justify-between">
+              <CardTitle className="flex items-center gap-2 text-base font-medium">
+                <Download className="h-5 w-5" />
+                Generar reporte de empleados
+              </CardTitle>
+              <div className="flex w-full flex-col gap-2 sm:flex-row md:w-auto">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={clearEmployeeReportFilters}
+                >
+                  Limpiar
+                </Button>
+                <Button
+                  type="button"
+                  className="w-full gap-2 sm:w-auto"
+                  onClick={handleExportEmployees}
+                  disabled={exportingEmployees}
+                >
+                  {exportingEmployees ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                  CSV
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
+                <div className="space-y-2">
+                  <Label>Genero</Label>
+                  <Select value={reportGender} onValueChange={setReportGender}>
+                    <SelectTrigger className="bg-secondary border-0">
+                      <SelectValue placeholder="Genero" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      {employeeGenderOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Nivel ARL</Label>
+                  <Select value={reportArlRiskLevel} onValueChange={setReportArlRiskLevel}>
+                    <SelectTrigger className="bg-secondary border-0">
+                      <SelectValue placeholder="Nivel ARL" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      {employeeArlRiskLevelOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="employee-report-min-age">Edad minima</Label>
+                  <Input
+                    id="employee-report-min-age"
+                    type="number"
+                    min="0"
+                    value={reportMinAge}
+                    onChange={(event) => setReportMinAge(event.target.value)}
+                    className="bg-secondary border-0"
+                    placeholder="Min."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="employee-report-max-age">Edad maxima</Label>
+                  <Input
+                    id="employee-report-max-age"
+                    type="number"
+                    min="0"
+                    value={reportMaxAge}
+                    onChange={(event) => setReportMaxAge(event.target.value)}
+                    className="bg-secondary border-0"
+                    placeholder="Max."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Tipo contrato</Label>
+                  <Select value={reportContractType} onValueChange={setReportContractType}>
+                    <SelectTrigger className="bg-secondary border-0">
+                      <SelectValue placeholder="Contrato" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      {employeeContractTypeOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="employee-report-page">Pagina</Label>
+                  <Input
+                    id="employee-report-page"
+                    type="number"
+                    min="1"
+                    value={reportPage}
+                    onChange={(event) => setReportPage(event.target.value)}
+                    className="bg-secondary border-0"
+                    placeholder="Pag."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="employee-report-limit">Limite</Label>
+                  <Input
+                    id="employee-report-limit"
+                    type="number"
+                    min="1"
+                    value={reportLimit}
+                    onChange={(event) => setReportLimit(event.target.value)}
+                    className="bg-secondary border-0"
+                    placeholder="Cant."
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Lista de empleados</h2>
+              <p className="text-sm text-muted-foreground">{filteredEmployees.length} funcionarios encontrados</p>
+            </div>
+          </div>
+
           {loading ? (
             <div className="flex min-h-[360px] items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
-          ) : (
+          ) : viewMode === "cards" ? (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredEmployees.map((employee) => (
                 <Card key={employee.id} className="bg-card border-border hover:border-primary/50 transition-colors">
@@ -1004,10 +1325,7 @@ export default function EmployeesPage() {
                     <div className="flex items-start gap-4">
                       <Avatar className="h-14 w-14">
                         <AvatarFallback className="bg-primary/10 text-primary text-lg">
-                          {employee.name
-                            .split(" ")
-                            .map((name) => name[0])
-                            .join("")}
+                          {getEmployeeInitials(employee)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
@@ -1089,6 +1407,81 @@ export default function EmployeesPage() {
                 </Card>
               )}
             </div>
+          ) : (
+            <Card className="bg-card border-border">
+              <CardContent className="p-0">
+                {filteredEmployees.length === 0 ? (
+                  <div className="p-10 text-center text-sm text-muted-foreground">No hay funcionarios para mostrar.</div>
+                ) : (
+                  <div className="divide-y divide-border">
+                    {filteredEmployees.map((employee) => (
+                      <div key={employee.id} className="grid gap-4 p-4 md:grid-cols-[minmax(220px,1.4fr)_1fr_1fr_auto] md:items-center">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarFallback className="bg-primary/10 text-sm text-primary">
+                              {getEmployeeInitials(employee)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <p className="truncate font-medium">
+                              {employee.name} {employee.lastName}
+                            </p>
+                            <p className="truncate text-sm text-muted-foreground">{employee.email || "No registrado"}</p>
+                          </div>
+                        </div>
+                        <div className="min-w-0 text-sm">
+                          <p className="truncate font-medium">{employee.job?.name ?? "Sin puesto"}</p>
+                          <p className="truncate text-muted-foreground">{employee.workArea?.name ?? "Sin area"}</p>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-3 text-sm">
+                          <Badge
+                            variant="secondary"
+                            className={cn(
+                              "text-xs",
+                              employee.status ? "bg-accentActivd text-accentActivd-foreground" : "bg-muted text-muted-foreground",
+                            )}
+                          >
+                            {employee.status ? "Activo" : "Inactivo"}
+                          </Badge>
+                          <span className="text-muted-foreground">{employee.phone || "Sin telefono"}</span>
+                        </div>
+                        <div className="flex items-center gap-2 md:justify-end">
+                          <Link href={`/dashboard/employees/${employee.id}`}>
+                            <Button variant="outline" size="sm" className="gap-2">
+                              <Eye className="h-4 w-4" />
+                              Ver
+                            </Button>
+                          </Link>
+                          <EmployeeFormDialog
+                            employee={employee}
+                            onSave={(payload) => handleUpdateEmployee(employee, payload)}
+                            trigger={
+                              <Button variant="outline" size="icon">
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            }
+                          />
+                          {employee.status ? (
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => handleDeleteEmployee(employee)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <Button variant="outline" size="sm" onClick={() => handleActivateEmployee(employee)}>
+                              Activar
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           )}
       </div>
 

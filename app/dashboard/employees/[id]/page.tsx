@@ -86,6 +86,7 @@ import type {
   CreateEmployeeEvaluationDto,
   CreateEmployeeMedicalEvaluationDto,
   Employee,
+  EmployeeArlRiskLevel,
   EmployeeCatalogOption,
   EmployeeCertification,
   EmployeeContract,
@@ -112,9 +113,26 @@ type SocialSecurityItem = {
   entityName?: string | null
   startDate?: string | null
   endDate?: string | null
+  arlRiskLevel?: EmployeeArlRiskLevel | null
   status?: boolean | null
   catalog: EmployeeCatalogOption[]
 }
+
+type SocialSecurityFormState = {
+  entityId: string
+  startDate: string
+  endDate: string
+  arlRiskLevel: EmployeeArlRiskLevel | ""
+  status: boolean
+}
+
+const ARL_RISK_LEVEL_OPTIONS: Array<{ value: EmployeeArlRiskLevel; label: string }> = [
+  { value: "RIESGO_I", label: "Riesgo I" },
+  { value: "RIESGO_II", label: "Riesgo II" },
+  { value: "RIESGO_III", label: "Riesgo III" },
+  { value: "RIESGO_IV", label: "Riesgo IV" },
+  { value: "RIESGO_V", label: "Riesgo V" },
+]
 
 function formatDate(value?: string | null) {
   if (!value) return "No registrada"
@@ -136,6 +154,10 @@ function getAttendanceStatusLabel(value?: string | null) {
   if (value === "ATTENDED") return "Asistio"
   if (value === "ABSENT") return "Ausente"
   return value ?? "No registrado"
+}
+
+function getArlRiskLevelLabel(value?: EmployeeArlRiskLevel | null) {
+  return ARL_RISK_LEVEL_OPTIONS.find((option) => option.value === value)?.label ?? "No registrado"
 }
 
 function formatFileSize(value?: number | null) {
@@ -178,7 +200,7 @@ function getEntityName(entity: Employee["eps"]) {
 
 function buildSocialSecurityPayload(
   key: SocialSecurityItem["key"],
-  form: { entityId: string; startDate: string; endDate: string; status: boolean },
+  form: SocialSecurityFormState,
 ): UpdateEmployeeSocialSecurityDto {
   if (key === "eps") {
     return {
@@ -194,6 +216,7 @@ function buildSocialSecurityPayload(
       arlId: form.entityId,
       startDateArl: form.startDate,
       endDateArl: form.endDate,
+      arlRiskLevel: form.arlRiskLevel || null,
       statusArl: form.status,
     }
   }
@@ -224,10 +247,11 @@ function SocialSecurityDialog({
 }) {
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<SocialSecurityFormState>({
     entityId: item.entityId ?? "",
     startDate: formatDate(item.startDate) === "No registrada" ? "" : formatDate(item.startDate),
     endDate: formatDate(item.endDate) === "No registrada" ? "" : formatDate(item.endDate),
+    arlRiskLevel: item.arlRiskLevel ?? "",
     status: item.status ?? true,
   })
 
@@ -238,6 +262,7 @@ function SocialSecurityDialog({
       entityId: item.entityId ?? "",
       startDate: formatDate(item.startDate) === "No registrada" ? "" : formatDate(item.startDate),
       endDate: formatDate(item.endDate) === "No registrada" ? "" : formatDate(item.endDate),
+      arlRiskLevel: item.arlRiskLevel ?? "",
       status: item.status ?? true,
     })
   }, [item, open])
@@ -252,6 +277,11 @@ function SocialSecurityDialog({
 
     if (!form.startDate) {
       toast.error("Selecciona la fecha de inicio")
+      return
+    }
+
+    if (item.key === "arl" && !form.arlRiskLevel) {
+      toast.error("Selecciona el nivel de riesgo ARL")
       return
     }
 
@@ -294,6 +324,29 @@ function SocialSecurityDialog({
                 </SelectContent>
               </Select>
             </div>
+
+            {item.key === "arl" && (
+              <div className="grid gap-2">
+                <Label>Nivel de riesgo ARL</Label>
+                <Select
+                  value={form.arlRiskLevel}
+                  onValueChange={(value) =>
+                    setForm((current) => ({ ...current, arlRiskLevel: value as EmployeeArlRiskLevel }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona el nivel de riesgo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ARL_RISK_LEVEL_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="grid gap-2">
@@ -1523,6 +1576,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       entityName: getEntityName(employee.arl),
       startDate: employee.startDateArl,
       endDate: employee.endDateArl,
+      arlRiskLevel: employee.arlRiskLevel,
       status: employee.statusArl,
       catalog: catalogs.arl,
     },
@@ -1922,6 +1976,12 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                           <Calendar className="h-4 w-4 text-muted-foreground" />
                           <span>Fin: {formatDate(item.endDate)}</span>
                         </div>
+                        {item.key === "arl" && (
+                          <div className="flex items-center gap-2 sm:col-span-2">
+                            <Activity className="h-4 w-4 text-muted-foreground" />
+                            <span>Nivel de riesgo: {getArlRiskLevelLabel(item.arlRiskLevel)}</span>
+                          </div>
+                        )}
                       </div>
 
                       {completed && (

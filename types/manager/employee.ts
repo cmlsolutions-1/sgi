@@ -13,6 +13,10 @@ export type EmployeeCatalogOption = {
   name: string
 }
 
+export type EmployeeArlRiskLevel = "RIESGO_I" | "RIESGO_II" | "RIESGO_III" | "RIESGO_IV" | "RIESGO_V"
+export type EmployeeGender = "MASCULINO" | "FEMENINO"
+export type EmployeeContractType = "INDEFINIDO" | "FIJO" | "SERVICIOS"
+
 export type Employee = {
   id: string
   name: string
@@ -21,6 +25,7 @@ export type Employee = {
   email: string
   address: string
   birthDate: string
+  gender?: EmployeeGender | null
   companyId: string
   workAreaId: string
   workArea?: WorkAreaOption
@@ -39,6 +44,7 @@ export type Employee = {
   statusEps?: boolean | null
   startDateArl?: string | null
   endDateArl?: string | null
+  arlRiskLevel?: EmployeeArlRiskLevel | null
   statusArl?: boolean | null
   startDatePension?: string | null
   endDatePension?: string | null
@@ -235,6 +241,7 @@ export type CreateEmployeeDto = {
   email: string
   address: string
   birthDate: string
+  gender: EmployeeGender
   workAreaId: string
   jobId: string
   epsId?: string
@@ -244,6 +251,7 @@ export type CreateEmployeeDto = {
   arlId?: string
   startDateArl?: string
   endDateArl?: string
+  arlRiskLevel?: EmployeeArlRiskLevel | null
   statusArl?: boolean
   pensionId?: string
   startDatePension?: string
@@ -263,6 +271,7 @@ export type UpdateEmployeeDto = {
   email: string
   address: string
   birthDate: string
+  gender: EmployeeGender
   workAreaId: string
   jobId: string
   status: boolean
@@ -278,6 +287,7 @@ export type UpdateEmployeeSocialSecurityDto = Partial<
     | "arlId"
     | "startDateArl"
     | "endDateArl"
+    | "arlRiskLevel"
     | "statusArl"
     | "pensionId"
     | "startDatePension"
@@ -289,6 +299,20 @@ export type UpdateEmployeeSocialSecurityDto = Partial<
     | "statusCompensation"
   >
 >
+
+export type EmployeeExportFilters = {
+  search?: string
+  workAreaId?: string
+  jobId?: string
+  status?: boolean
+  gender?: EmployeeGender
+  arlRiskLevel?: EmployeeArlRiskLevel
+  minAge?: number
+  maxAge?: number
+  contractType?: EmployeeContractType
+  page?: number
+  limit?: number
+}
 
 export type EmployeeResponse = ApiResponse<Employee>
 export type EmployeesResponse = ApiResponse<Employee[]>
