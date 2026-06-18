@@ -7,6 +7,7 @@ export type IncidentEmployee = {
 }
 
 export type IncidentStatus = "ACTIVE" | "INACTIVE"
+export type IncidentType = "INCIDENTE" | "ACCIDENTE" | "ENFERMEDAD_LABORAL"
 
 export type Incident = {
   id: string
@@ -15,6 +16,7 @@ export type Incident = {
   date: string
   place: string
   description: string
+  type?: IncidentType | null
   consequences: string
   correctiveActions: string
   status: IncidentStatus
@@ -32,6 +34,7 @@ export type CreateIncidentDto = {
   date: string
   place: string
   description: string
+  type: IncidentType
   consequences: string
   correctiveActions: string
 }

@@ -71,6 +71,7 @@ import type {
   IncidentDocument,
   IncidentFilters,
   IncidentStatus,
+  IncidentType,
   UpdateIncidentDto,
 } from "@/types/manager/incident"
 import type {
@@ -124,6 +125,13 @@ function getIncidentStatusLabel(status?: string | null) {
   return status ?? "No registrado"
 }
 
+function getIncidentTypeLabel(type?: string | null) {
+  if (type === "INCIDENTE") return "Incidente"
+  if (type === "ACCIDENTE") return "Accidente"
+  if (type === "ENFERMEDAD_LABORAL") return "Enfermedad laboral"
+  return "Tipo no registrado"
+}
+
 function hasIncidentDataChanges(current: Incident | undefined, payload: UpdateIncidentDto) {
   if (!current) return true
 
@@ -132,6 +140,7 @@ function hasIncidentDataChanges(current: Incident | undefined, payload: UpdateIn
     formatDate(current.date) !== payload.date ||
     (current.place ?? "") !== payload.place ||
     (current.description ?? "") !== payload.description ||
+    (current.type ?? "INCIDENTE") !== payload.type ||
     (current.consequences ?? "") !== payload.consequences ||
     (current.correctiveActions ?? "") !== payload.correctiveActions
   )
@@ -146,6 +155,7 @@ const emptyIncidentForm: IncidentFormState = {
   date: "",
   place: "",
   description: "",
+  type: "INCIDENTE",
   consequences: "",
   correctiveActions: "",
   status: "ACTIVE",
@@ -177,6 +187,7 @@ function IncidentDialog({
             date: formatDate(incident.date) === "No registrada" ? "" : formatDate(incident.date),
             place: incident.place ?? "",
             description: incident.description ?? "",
+            type: incident.type ?? "INCIDENTE",
             consequences: incident.consequences ?? "",
             correctiveActions: incident.correctiveActions ?? "",
             status: incident.status ?? "ACTIVE",
@@ -188,8 +199,8 @@ function IncidentDialog({
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
 
-    if (!form.employeeId || !form.date || !form.place || !form.description) {
-      toast.error("Completa funcionario, fecha, lugar y descripcion")
+    if (!form.employeeId || !form.date || !form.place || !form.description || !form.type) {
+      toast.error("Completa funcionario, fecha, lugar, descripcion y tipo de novedad")
       return
     }
 
@@ -255,6 +266,23 @@ function IncidentDialog({
                 onChange={(event) => setForm((current) => ({ ...current, place: event.target.value }))}
                 required
               />
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Tipo de novedad</Label>
+              <Select
+                value={form.type}
+                onValueChange={(value) => setForm((current) => ({ ...current, type: value as IncidentType }))}
+              >
+                <SelectTrigger className={incidentFieldControlClassName}>
+                  <SelectValue placeholder="Selecciona el tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="INCIDENTE">Incidente</SelectItem>
+                  <SelectItem value="ACCIDENTE">Accidente</SelectItem>
+                  <SelectItem value="ENFERMEDAD_LABORAL">Enfermedad laboral</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid gap-2">
@@ -695,6 +723,7 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
                           : incident.employeeId}
                       </h3>
                       <Badge variant="outline">{incident.consecutive || "Sin consecutivo"}</Badge>
+                      <Badge variant="secondary">{getIncidentTypeLabel(incident.type)}</Badge>
                       <Badge variant={incident.status === "ACTIVE" ? "default" : "secondary"}>
                         {getIncidentStatusLabel(incident.status)}
                       </Badge>
@@ -1041,7 +1070,7 @@ export default function EmployeesPage() {
             disabled={employees.length === 0}
           >
             <UserCheck className="h-4 w-4" />
-            {sgiResponsible ? "Actualizar Responsable SGI" : "Asignar Responsable SGI"}
+            {sgiResponsible ? "Gestionar Responsable SGI" : "Asignar Responsable SGI"}
           </Button>
           <EmployeeFormDialog onSave={handleCreateEmployee} />
         </div>

@@ -1,10 +1,12 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { type FormEvent, useEffect, useMemo, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
@@ -14,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
-import { Plus, Search, Clock, CheckCircle, Pencil, Trash2 } from "lucide-react"
+import { Plus, Search, Clock, CheckCircle, Pencil, Trash2, Upload, Download, FileText, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 import {
@@ -28,17 +30,20 @@ import {
 import {
   createPreventiveMeasure,
   deletePreventiveMeasure,
+  deletePreventiveMeasureDocument,
+  downloadPreventiveMeasureDocumentFile,
+  listPreventiveMeasureDocuments,
   listPreventiveMeasures,
   updatePreventiveMeasure,
+  uploadPreventiveMeasureDocument,
 } from "@/services/preventiveMeasureService"
 import { listRisks } from "@/services/riskService"
-import {
-  getPreventiveProceduresFilled,
-  type PreventiveProcedureFilled,
-} from "@/lib/preventive-procedure-storage"
+import { listManagedDocuments } from "@/services/documentManagementService"
 import type { Risk } from "@/types/manager/risk"
+import type { ManagedDocument } from "@/types/manager/document-management"
 import type {
   PreventiveMeasure,
+  PreventiveMeasureDocument,
   PreventiveMeasureAction,
   PreventiveMeasureKey,
   PreventiveMeasureStatus,
@@ -102,8 +107,14 @@ function riskLabel(risk: Risk) {
   return [risk.process, risk.activity, risk.task].filter(Boolean).join(" / ")
 }
 
-function procedureLabel(procedure: PreventiveProcedureFilled) {
-  return [procedure.documentName, procedure.department, procedure.workArea].filter(Boolean).join(" / ")
+function procedureLabel(procedure: ManagedDocument) {
+  return [procedure.code, procedure.name, procedure.workArea?.name].filter(Boolean).join(" / ")
+}
+
+function formatFileSize(size: number) {
+  if (size < 1024) return `${size} B`
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`
 }
 
 function buildPayload(form: MeasureForm): UpsertPreventiveMeasureDto {
@@ -120,10 +131,163 @@ function buildPayload(form: MeasureForm): UpsertPreventiveMeasureDto {
   }
 }
 
+function PreventiveMeasureDocuments({ measureId }: { measureId: string }) {
+  const [documents, setDocuments] = useState<PreventiveMeasureDocument[]>([])
+  const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [file, setFile] = useState<File | null>(null)
+  const [type, setType] = useState("OTHER")
+  const [isConfirmed, setIsConfirmed] = useState(true)
+
+  async function loadDocuments() {
+    setLoading(true)
+    try {
+      const data = await listPreventiveMeasureDocuments(measureId)
+      setDocuments(data)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar los documentos de la medida")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadDocuments()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [measureId])
+
+  async function handleUpload(event: FormEvent) {
+    event.preventDefault()
+
+    if (!file) {
+      toast.error("Selecciona un archivo para subir")
+      return
+    }
+
+    if (!type.trim()) {
+      toast.error("Ingresa el tipo de documento")
+      return
+    }
+
+    setUploading(true)
+    try {
+      await uploadPreventiveMeasureDocument(measureId, {
+        file,
+        type: type.trim(),
+        isConfirmed,
+      })
+      setFile(null)
+      await loadDocuments()
+      toast.success("Documento subido correctamente")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo subir el documento")
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  async function handleView(document: PreventiveMeasureDocument) {
+    if (!document.downloadUrl) return
+
+    try {
+      const blob = await downloadPreventiveMeasureDocumentFile(document.downloadUrl)
+      const url = URL.createObjectURL(blob)
+      window.open(url, "_blank", "noopener,noreferrer")
+      window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo abrir el documento")
+    }
+  }
+
+  async function handleDelete(documentId: string) {
+    try {
+      await deletePreventiveMeasureDocument(measureId, documentId)
+      setDocuments((current) => current.filter((document) => document.id !== documentId))
+      toast.success("Documento eliminado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar el documento")
+    }
+  }
+
+  return (
+    <div className="mt-4 rounded-md border border-dashed p-3">
+      <div className="mb-3 flex items-center gap-2 text-sm font-medium">
+        <FileText className="h-4 w-4" />
+        Documentos
+      </div>
+
+      <form onSubmit={handleUpload} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_180px_auto_auto] lg:items-end">
+        <div className="grid gap-2">
+          <Label>Archivo</Label>
+          <Input type="file" onChange={(event) => setFile(event.target.files?.[0] ?? null)} disabled={uploading} />
+        </div>
+        <div className="grid gap-2">
+          <Label>Tipo</Label>
+          <Input value={type} onChange={(event) => setType(event.target.value)} disabled={uploading} />
+        </div>
+        <label className="flex h-10 items-center gap-2 text-sm">
+          <Checkbox
+            checked={isConfirmed}
+            onCheckedChange={(checked) => setIsConfirmed(checked === true)}
+            disabled={uploading}
+          />
+          Confirmado
+        </label>
+        <Button type="submit" size="sm" className="gap-2" disabled={uploading}>
+          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          Subir
+        </Button>
+      </form>
+
+      <div className="mt-3 space-y-2">
+        {loading ? (
+          <div className="flex justify-center py-3">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          </div>
+        ) : documents.length === 0 ? (
+          <p className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">Sin documentos cargados.</p>
+        ) : (
+          documents.map((document) => (
+            <div
+              key={document.id}
+              className="flex flex-col gap-3 rounded-md border px-3 py-2 text-sm md:flex-row md:items-center md:justify-between"
+            >
+              <div className="min-w-0">
+                <p className="truncate font-medium">{document.originalName || document.type}</p>
+                <p className="text-xs text-muted-foreground">
+                  {document.type} · {formatFileSize(document.size)} · {document.isConfirmed ? "Confirmado" : "Pendiente"}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {document.downloadUrl && (
+                  <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => handleView(document)}>
+                    <Download className="h-4 w-4" />
+                    Ver
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 text-destructive hover:text-destructive"
+                  onClick={() => handleDelete(document.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Eliminar
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function PreventiveMeasuresPage() {
   const [measures, setMeasures] = useState<PreventiveMeasure[]>([])
   const [risks, setRisks] = useState<Risk[]>([])
-  const [procedures, setProcedures] = useState<PreventiveProcedureFilled[]>([])
+  const [procedures, setProcedures] = useState<ManagedDocument[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
@@ -140,7 +304,7 @@ export default function PreventiveMeasuresPage() {
 
   async function loadData() {
     setLoading(true)
-    const [measureResult, riskResult] = await Promise.allSettled([
+    const [measureResult, riskResult, procedureResult] = await Promise.allSettled([
       listPreventiveMeasures({
         ...(search.trim() ? { search: search.trim() } : {}),
         ...(statusFilter !== "all" ? { status: statusFilter as PreventiveMeasureStatus } : {}),
@@ -149,6 +313,7 @@ export default function PreventiveMeasuresPage() {
         ...(typeFilter !== "all" ? { type: typeFilter as PreventiveMeasureType } : {}),
       }),
       listRisks(),
+      listManagedDocuments(),
     ])
 
     if (measureResult.status === "fulfilled") {
@@ -167,7 +332,16 @@ export default function PreventiveMeasuresPage() {
       toast.error(riskResult.reason instanceof Error ? riskResult.reason.message : "No se pudo cargar los riesgos")
     }
 
-    setProcedures(getPreventiveProceduresFilled())
+    if (procedureResult.status === "fulfilled") {
+      setProcedures(procedureResult.value.filter((document) => document.type === "PROCEDURE"))
+    } else {
+      toast.error(
+        procedureResult.reason instanceof Error
+          ? procedureResult.reason.message
+          : "No se pudo cargar los procedimientos de gestión documental",
+      )
+    }
+
     setLoading(false)
   }
 
@@ -255,9 +429,9 @@ export default function PreventiveMeasuresPage() {
     setForm((current) => ({
       ...current,
       procedureId,
-      title: procedure?.documentName || "Procedimiento - Medidas de Prevención",
+      title: procedure?.name || "Procedimiento - Medidas de Prevención",
       description: procedure
-        ? `Procedimiento: ${procedureLabel(procedure)}. Actividades: ${procedure.activities}`
+        ? `Procedimiento: ${procedureLabel(procedure)}. Objetivo: ${procedure.objective}. Actividades: ${procedure.activities}`
         : current.description,
     }))
   }
@@ -271,6 +445,7 @@ export default function PreventiveMeasuresPage() {
       description: risk ? `Riesgo: ${riskLabel(risk)}. Efectos: ${risk.possibleEffects}` : current.description,
     }))
   }
+
 
   async function saveMeasure() {
     if (form.sourceType === "PROCEDURE" && !form.procedureId) {
@@ -312,6 +487,7 @@ export default function PreventiveMeasuresPage() {
       resetModal()
       await loadData()
     } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar la medida")
     } finally {
       setSaving(false)
     }
@@ -326,6 +502,7 @@ export default function PreventiveMeasuresPage() {
       toast.success("Medida eliminada")
       await loadData()
     } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar la medida")
     }
   }
 
@@ -347,7 +524,7 @@ export default function PreventiveMeasuresPage() {
             </Button>
           </DialogTrigger>
 
-          <DialogContent className="max-w-2xl bg-white">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white">
             <DialogHeader>
               <DialogTitle>{editingMeasure ? "Editar Medida de Prevención" : "Nueva Medida de Prevención"}</DialogTitle>
             </DialogHeader>
@@ -412,6 +589,7 @@ export default function PreventiveMeasuresPage() {
                   <p className="text-xs text-muted-foreground mt-1">
                     El backend no recibe un id de procedimiento; se conservará la trazabilidad en título y descripción.
                   </p>
+
                 </div>
               ) : null}
 
@@ -558,6 +736,7 @@ export default function PreventiveMeasuresPage() {
           </DialogContent>
         </Dialog>
       </div>
+
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-card border-border">
@@ -737,6 +916,8 @@ export default function PreventiveMeasuresPage() {
                       </Button>
                     </div>
                   </div>
+
+                  <PreventiveMeasureDocuments measureId={measure.id} />
                 </CardContent>
               </Card>
             )

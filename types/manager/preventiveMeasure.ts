@@ -27,6 +27,24 @@ export type PreventiveMeasure = {
   risk?: PreventiveMeasureRiskSummary | null
 }
 
+export type PreventiveMeasureDocument = {
+  id: string
+  companyId: string
+  ownerType: string
+  ownerId: string
+  referenceType: string
+  referenceId: string
+  type: string
+  originalName: string
+  mimeType: string
+  size: number
+  storageProvider: string
+  isConfirmed: boolean
+  downloadUrl: string
+  createdAt: string
+  createdBy: string
+}
+
 export type PreventiveMeasureList = {
   items: PreventiveMeasure[]
   total: number
@@ -57,5 +75,13 @@ export type UpsertPreventiveMeasureDto = {
   accion: PreventiveMeasureAction
 }
 
+export type UploadPreventiveMeasureDocumentDto = {
+  file: File
+  type?: string
+  isConfirmed?: boolean
+}
+
 export type PreventiveMeasureResponse = ApiResponse<PreventiveMeasure>
 export type PreventiveMeasuresResponse = ApiResponse<PreventiveMeasureList>
+export type PreventiveMeasureDocumentResponse = ApiResponse<PreventiveMeasureDocument>
+export type PreventiveMeasureDocumentsResponse = ApiResponse<PreventiveMeasureDocument[]>
