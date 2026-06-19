@@ -44,17 +44,20 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { EmployeeFormDialog } from "@/components/dashboard/employee-form-dialog"
 import {
   createEmployeeCertification,
   createEmployeeContract,
   createEmployeeEducation,
   createEmployeeEvaluation,
+  createEmployeeEppDelivery,
   createEmployeeMedicalEvaluation,
   deleteEmployeeCertification,
   deleteEmployeeContract,
   deleteEmployeeDocument,
   deleteEmployeeEducation,
   deleteEmployeeEvaluation,
+  deleteEmployeeEppDelivery,
   deleteEmployeeMedicalEvaluation,
   downloadEmployeeDocumentFile,
   getEmployeeById,
@@ -63,16 +66,19 @@ import {
   listEmployeeDocuments,
   listEmployeeEducation,
   listEmployeeEvaluations,
+  listEmployeeEppDeliveries,
   listEmployeeMedicalEvaluations,
   listEmployees,
   listArlCatalog,
   listCompensationCatalog,
   listEpsCatalog,
   listPensionCatalog,
+  updateEmployee,
   updateEmployeeCertification,
   updateEmployeeContract,
   updateEmployeeEducation,
   updateEmployeeEvaluation,
+  updateEmployeeEppDelivery,
   updateEmployeeMedicalEvaluation,
   updateEmployeeSocialSecurity,
   uploadEmployeeDocument,
@@ -84,6 +90,7 @@ import type {
   CreateEmployeeContractDto,
   CreateEmployeeEducationDto,
   CreateEmployeeEvaluationDto,
+  CreateEmployeeEppDeliveryDto,
   CreateEmployeeMedicalEvaluationDto,
   Employee,
   EmployeeArlRiskLevel,
@@ -94,11 +101,14 @@ import type {
   EmployeeDocumentContext,
   EmployeeEducation,
   EmployeeEvaluation,
+  EmployeeEppDelivery,
   EmployeeMedicalEvaluation,
   UpdateEmployeeCertificationDto,
   UpdateEmployeeContractDto,
+  UpdateEmployeeDto,
   UpdateEmployeeEducationDto,
   UpdateEmployeeEvaluationDto,
+  UpdateEmployeeEppDeliveryDto,
   UpdateEmployeeMedicalEvaluationDto,
   UpdateEmployeeSocialSecurityDto,
 } from "@/types/manager/employee"
@@ -172,6 +182,7 @@ function getDocumentContextKey(context: EmployeeDocumentContext) {
   if (context.kind === "contract") return `contract:${context.contractId}`
   if (context.kind === "evaluation") return `evaluation:${context.evaluationId}`
   if (context.kind === "medicalEvaluation") return `medicalEvaluation:${context.medicalEvaluationId}`
+  if (context.kind === "eppDelivery") return `eppDelivery:${context.eppDeliveryId}`
   return "employee"
 }
 
@@ -1454,6 +1465,125 @@ function MedicalEvaluationDialog({
   )
 }
 
+
+
+type EppDeliveryFormState = CreateEmployeeEppDeliveryDto
+
+const emptyEppDeliveryForm: EppDeliveryFormState = {
+  description: "",
+  deliveredItems: "",
+  date: "",
+}
+
+function EppDeliveryDialog({
+  delivery,
+  onSave,
+}: {
+  delivery?: EmployeeEppDelivery
+  onSave: (payload: CreateEmployeeEppDeliveryDto | UpdateEmployeeEppDeliveryDto, eppDeliveryId?: string) => Promise<void>
+}) {
+  const [open, setOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState<EppDeliveryFormState>(emptyEppDeliveryForm)
+
+  useEffect(() => {
+    if (!open) return
+
+    setForm(
+      delivery
+        ? {
+            description: delivery.description ?? "",
+            deliveredItems: delivery.deliveredItems ?? "",
+            date: formatDate(delivery.date) === "No registrada" ? "" : formatDate(delivery.date),
+          }
+        : emptyEppDeliveryForm,
+    )
+  }, [delivery, open])
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault()
+
+    if (!form.description.trim() || !form.deliveredItems.trim() || !form.date) {
+      toast.error("Completa descripcion, elementos entregados y fecha")
+      return
+    }
+
+    setSaving(true)
+    try {
+      await onSave(
+        {
+          description: form.description.trim(),
+          deliveredItems: form.deliveredItems.trim(),
+          date: form.date,
+        },
+        delivery?.id,
+      )
+      setOpen(false)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant={delivery ? "outline" : "default"} size="sm" className="gap-2">
+          {delivery ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          {delivery ? "Editar" : "Agregar entrega EPP"}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-card">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>{delivery ? "Editar entrega EPP" : "Nueva entrega EPP"}</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="epp-date">Fecha</Label>
+              <Input
+                id="epp-date"
+                type="date"
+                value={form.date}
+                onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="epp-description">Descripcion</Label>
+              <Textarea
+                id="epp-description"
+                value={form.description}
+                onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="epp-items">Elementos entregados</Label>
+              <Textarea
+                id="epp-items"
+                value={form.deliveredItems}
+                onChange={(event) => setForm((current) => ({ ...current, deliveredItems: event.target.value }))}
+                placeholder="Ej: casco, gafas, guantes, botas de seguridad"
+                required
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Guardando..." : "Guardar"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export default function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const [employee, setEmployee] = useState<Employee | null>(null)
@@ -1462,6 +1592,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const [contracts, setContracts] = useState<EmployeeContract[]>([])
   const [evaluations, setEvaluations] = useState<EmployeeEvaluation[]>([])
   const [medicalEvaluations, setMedicalEvaluations] = useState<EmployeeMedicalEvaluation[]>([])
+  const [eppDeliveries, setEppDeliveries] = useState<EmployeeEppDelivery[]>([])
   const [employeeTrainings, setEmployeeTrainings] = useState<EmployeeTraining[]>([])
   const [trainingStatusFilter, setTrainingStatusFilter] = useState<TrainingAttendanceStatus | "all">("all")
   const [evaluatorOptions, setEvaluatorOptions] = useState<EvaluatorOption[]>([])
@@ -1486,6 +1617,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           contractsData,
           evaluationsData,
           medicalEvaluationsData,
+          eppDeliveriesData,
           employeeTrainingsData,
           employeesData,
           eps,
@@ -1499,6 +1631,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           listEmployeeContracts(id),
           listEmployeeEvaluations(id),
           listEmployeeMedicalEvaluations(id),
+          listEmployeeEppDeliveries(id),
           listEmployeeTrainings(id),
           listEmployees(),
           listEpsCatalog(),
@@ -1512,6 +1645,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         if (mounted) setContracts(contractsData)
         if (mounted) setEvaluations(evaluationsData)
         if (mounted) setMedicalEvaluations(medicalEvaluationsData)
+        if (mounted) setEppDeliveries(eppDeliveriesData)
         if (mounted) setEmployeeTrainings(employeeTrainingsData)
         if (mounted) setEvaluatorOptions(employeesData.filter((item) => item.id !== id))
         if (mounted) setCatalogs({ eps, arl, pension, compensation })
@@ -1608,6 +1742,19 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     trainingStatusFilter === "all"
       ? employeeTrainings
       : employeeTrainings.filter((item) => item.status === trainingStatusFilter)
+
+  async function handleUpdatePersonalInfo(payload: UpdateEmployeeDto) {
+    if (!employee) return
+
+    try {
+      const updatedEmployee = await updateEmployee(employee.id, payload)
+      setEmployee(updatedEmployee)
+      toast.success("Informacion personal actualizada")
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo actualizar la informacion personal")
+      throw error
+    }
+  }
 
   async function handleSaveSocialSecurity(item: SocialSecurityItem, payload: UpdateEmployeeSocialSecurityDto) {
     if (!employee) return
@@ -1807,6 +1954,43 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     }
   }
 
+  async function handleSaveEppDelivery(
+    payload: CreateEmployeeEppDeliveryDto | UpdateEmployeeEppDeliveryDto,
+    eppDeliveryId?: string,
+  ) {
+    if (!employee) return
+
+    try {
+      if (eppDeliveryId) {
+        await updateEmployeeEppDelivery(employee.id, eppDeliveryId, payload)
+        toast.success("Entrega EPP actualizada")
+      } else {
+        await createEmployeeEppDelivery(employee.id, payload as CreateEmployeeEppDeliveryDto)
+        toast.success("Entrega EPP agregada")
+      }
+
+      const updatedEppDeliveries = await listEmployeeEppDeliveries(employee.id)
+      setEppDeliveries(updatedEppDeliveries)
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo guardar la entrega EPP")
+      throw error
+    }
+  }
+
+  async function handleDeleteEppDelivery(eppDeliveryId: string) {
+    if (!employee) return
+    if (!window.confirm("Eliminar esta entrega EPP?")) return
+
+    try {
+      await deleteEmployeeEppDelivery(employee.id, eppDeliveryId)
+      const updatedEppDeliveries = await listEmployeeEppDeliveries(employee.id)
+      setEppDeliveries(updatedEppDeliveries)
+      toast.success("Entrega EPP eliminada")
+    } catch (error: any) {
+      toast.error(error.message ?? "No se pudo eliminar la entrega EPP")
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -1886,15 +2070,28 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
           <TabsTrigger value="evaluations">Evaluaciones</TabsTrigger>
           <TabsTrigger value="medicalEvaluations">Evaluaciones medicas</TabsTrigger>
           <TabsTrigger value="trainings">Capacitaciones</TabsTrigger>
+          <TabsTrigger value="eppDeliveries">Entrega EPP</TabsTrigger>
         </TabsList>
 
         <TabsContent value="info">
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base font-medium">
-                <User className="h-5 w-5" />
-                Datos Personales
-              </CardTitle>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <CardTitle className="flex items-center gap-2 text-base font-medium">
+                  <User className="h-5 w-5" />
+                  Datos Personales
+                </CardTitle>
+                <EmployeeFormDialog
+                  employee={employee}
+                  onSave={(payload) => handleUpdatePersonalInfo(payload as UpdateEmployeeDto)}
+                  trigger={
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Edit className="h-4 w-4" />
+                      Editar informacion
+                    </Button>
+                  }
+                />
+              </div>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -2405,6 +2602,79 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                         employeeId={employee.id}
                         context={{ kind: "medicalEvaluation", medicalEvaluationId: item.id }}
                         defaultType="MEDICAL_EVALUATION"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+
+
+        <TabsContent value="eppDeliveries">
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <div className="flex items-center justify-between gap-4">
+                <CardTitle className="flex items-center gap-2 text-base font-medium">
+                  <ClipboardCheck className="h-5 w-5" />
+                  Entrega EPP
+                </CardTitle>
+                <EppDeliveryDialog onSave={handleSaveEppDelivery} />
+              </div>
+            </CardHeader>
+            <CardContent>
+              {eppDeliveries.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-border p-8 text-center">
+                  <ClipboardCheck className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm font-medium">Sin entregas EPP registradas</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Registra las entregas de elementos de proteccion personal del funcionario.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {eppDeliveries.map((item) => (
+                    <div key={item.id} className="rounded-lg border border-border p-4">
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="font-medium">{item.description}</h3>
+                            <Badge variant="secondary">{formatDate(item.date)}</Badge>
+                          </div>
+                          <p className="mt-1 text-sm text-muted-foreground">Elementos entregados</p>
+                          <p className="mt-1 whitespace-pre-line text-sm">{item.deliveredItems}</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <EppDeliveryDialog delivery={item} onSave={handleSaveEppDelivery} />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2 text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteEppDelivery(item.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Eliminar
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Fecha: {formatDate(item.date)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span>Creado: {formatDate(item.createdAt)}</span>
+                        </div>
+                      </div>
+
+                      <DocumentManager
+                        employeeId={employee.id}
+                        context={{ kind: "eppDelivery", eppDeliveryId: item.id }}
+                        defaultType="OTHER"
                       />
                     </div>
                   ))}

@@ -2,7 +2,7 @@ import type { ApiResponse } from "./company"
 import type { Job } from "./job"
 import type { WorkAreaOption } from "./work-area"
 
-export type ManagedDocumentType = "PROCEDURE" | "MANUAL" | "INSTRUCTIVE" | "OTHERS"
+export type ManagedDocumentType = "PROCEDURE" | "MANUAL" | "INSTRUCTIVE" | "OTHERS" | "POLICY"
 export type ManagedDocumentStatus = "ACTIVE" | "INACTIVE"
 
 export type ManagedDocument = {

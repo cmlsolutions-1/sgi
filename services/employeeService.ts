@@ -5,6 +5,7 @@ import type {
   CreateEmployeeDto,
   CreateEmployeeEducationDto,
   CreateEmployeeEvaluationDto,
+  CreateEmployeeEppDeliveryDto,
   CreateEmployeeMedicalEvaluationDto,
   Employee,
   EmployeeCatalogOption,
@@ -23,7 +24,10 @@ import type {
   EmployeeEducationResponse,
   EmployeeEducationsResponse,
   EmployeeEvaluation,
+  EmployeeEppDelivery,
   EmployeeEvaluationResponse,
+  EmployeeEppDeliveryResponse,
+  EmployeeEppDeliveriesResponse,
   EmployeeEvaluationsResponse,
   EmployeeExportFilters,
   EmployeeMedicalEvaluation,
@@ -38,6 +42,7 @@ import type {
   UpdateEmployeeDto,
   UpdateEmployeeEducationDto,
   UpdateEmployeeEvaluationDto,
+  UpdateEmployeeEppDeliveryDto,
   UpdateEmployeeMedicalEvaluationDto,
   UpdateEmployeeSocialSecurityDto,
   UploadEmployeeDocumentDto,
@@ -57,6 +62,8 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
     | EmployeeDocumentsResponse
     | EmployeeEducationResponse
     | EmployeeEducationsResponse
+    | EmployeeEppDeliveryResponse
+    | EmployeeEppDeliveriesResponse
     | EmployeeEvaluationResponse
     | EmployeeEvaluationsResponse
     | EmployeeMedicalEvaluationResponse
@@ -92,6 +99,10 @@ function getEmployeeDocumentPath(employeeId: string, context: EmployeeDocumentCo
 
   if (context.kind === "medicalEvaluation") {
     return `/api/employees/${employeeId}/medical-evaluations/${context.medicalEvaluationId}${suffix}`
+  }
+
+  if (context.kind === "eppDelivery") {
+    return `/api/employees/${employeeId}/epp-deliveries/${context.eppDeliveryId}${suffix}`
   }
 
   return `/api/employees/${employeeId}${suffix}`
@@ -486,6 +497,49 @@ export async function deleteEmployeeMedicalEvaluation(employeeId: string, medica
   await parseOrThrow<Record<string, never>>(res, "No se pudo eliminar la evaluacion medica")
 }
 
+
+export async function createEmployeeEppDelivery(
+  employeeId: string,
+  dto: CreateEmployeeEppDeliveryDto,
+): Promise<EmployeeEppDelivery> {
+  const res = await apiFetch(`/api/employees/${employeeId}/epp-deliveries`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dto),
+  })
+  return parseOrThrow<EmployeeEppDelivery>(res, "No se pudo crear la entrega EPP")
+}
+
+export async function listEmployeeEppDeliveries(employeeId: string): Promise<EmployeeEppDelivery[]> {
+  const res = await apiFetch(`/api/employees/${employeeId}/epp-deliveries`, { method: "GET" })
+  return parseOrThrow<EmployeeEppDelivery[]>(res, "No se pudo cargar las entregas EPP")
+}
+
+export async function getEmployeeEppDeliveryById(
+  employeeId: string,
+  eppDeliveryId: string,
+): Promise<EmployeeEppDelivery> {
+  const res = await apiFetch(`/api/employees/${employeeId}/epp-deliveries/${eppDeliveryId}`, { method: "GET" })
+  return parseOrThrow<EmployeeEppDelivery>(res, "No se pudo cargar la entrega EPP")
+}
+
+export async function updateEmployeeEppDelivery(
+  employeeId: string,
+  eppDeliveryId: string,
+  dto: UpdateEmployeeEppDeliveryDto,
+): Promise<EmployeeEppDelivery> {
+  const res = await apiFetch(`/api/employees/${employeeId}/epp-deliveries/${eppDeliveryId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dto),
+  })
+  return parseOrThrow<EmployeeEppDelivery>(res, "No se pudo actualizar la entrega EPP")
+}
+
+export async function deleteEmployeeEppDelivery(employeeId: string, eppDeliveryId: string): Promise<void> {
+  const res = await apiFetch(`/api/employees/${employeeId}/epp-deliveries/${eppDeliveryId}`, { method: "DELETE" })
+  await parseOrThrow<Record<string, never>>(res, "No se pudo eliminar la entrega EPP")
+}
 export async function createSgiResponsible(dto: UpsertEmployeeSgiResponsibleDto): Promise<EmployeeSgiResponsible> {
   const res = await apiFetch("/api/employee/sgi-responsible", {
     method: "POST",

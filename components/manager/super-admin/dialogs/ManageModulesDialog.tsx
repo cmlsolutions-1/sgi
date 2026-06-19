@@ -48,8 +48,10 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
     try {
       const data = await listModules()
       setModules(data)
-      const parentIds = new Set(data.map((module) => module.id))
-      setActiveModuleIds((currentIds) => currentIds.filter((moduleId) => parentIds.has(moduleId)))
+      const validModuleIds = new Set(
+        data.flatMap((module) => [module.id, ...(module.children?.map((child) => child.id) ?? [])]),
+      )
+      setActiveModuleIds((currentIds) => currentIds.filter((moduleId) => validModuleIds.has(moduleId)))
     } catch (err: any) {
       const message = err.message ?? "Error al cargar modulos"
       setError(message)
@@ -63,13 +65,15 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
     return activeModuleIds.includes(moduleId)
   }
 
-  const isChildActive = (parentId: string, childId: string): boolean => {
-    return isModuleActive(parentId) || isModuleActive(childId)
+  const isChildActive = (childId: string): boolean => {
+    return isModuleActive(childId)
   }
 
-  const getParentModuleIds = (moduleIds: string[]): string[] => {
-    const parentIds = new Set(modules.map((module) => module.id))
-    return moduleIds.filter((moduleId) => parentIds.has(moduleId))
+  const getModuleIdsToPersist = (moduleIds: string[]): string[] => {
+    const validModuleIds = new Set(
+      modules.flatMap((module) => [module.id, ...(module.children?.map((child) => child.id) ?? [])]),
+    )
+    return moduleIds.filter((moduleId) => validModuleIds.has(moduleId))
   }
 
   const handleToggle = async (moduleId: string, moduleName: string) => {
@@ -88,7 +92,7 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
     setActiveModuleIds(nextActiveIds)
 
     try {
-      const moduleIdsToPersist = getParentModuleIds(nextActiveIds)
+      const moduleIdsToPersist = getModuleIdsToPersist(nextActiveIds)
       const persistedActiveIds = await updateCompanyModules(
         company.id,
         moduleIdsToPersist,
@@ -196,7 +200,7 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
                     {module.children.length > 0 && (
                       <div className="border-t border-border bg-muted/30">
                         {module.children.map((child) => {
-                          const childActive = isChildActive(module.id, child.id)
+                          const childActive = isChildActive(child.id)
                           const childRequired = isRequiredModule(child)
 
                           return (
@@ -221,7 +225,7 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
 
                               <Switch
                                 checked={childActive}
-                                onCheckedChange={() => handleToggle(module.id, module.name)}
+                                onCheckedChange={() => handleToggle(child.id, child.name)}
                                 disabled={childRequired || activatingId === child.id}
                                 className="data-[state=checked]:bg-primary"
                               />

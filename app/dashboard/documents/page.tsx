@@ -64,6 +64,7 @@ const DOCUMENT_TYPES: Array<{ value: ManagedDocumentType; label: string }> = [
   { value: "MANUAL", label: "Manual" },
   { value: "INSTRUCTIVE", label: "Instructivo" },
   { value: "OTHERS", label: "Otros" },
+  { value: "POLICY", label: "Política" },
 ]
 
 const emptyForm: DocumentFormState = {

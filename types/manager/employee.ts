@@ -202,6 +202,23 @@ export type UpsertEmployeeSgiResponsibleDto = {
   signatureDate: string
 }
 
+
+export type EmployeeEppDelivery = {
+  id: string
+  employeeId: string
+  description: string
+  deliveredItems: string
+  date: string
+  createdAt: string
+}
+
+export type CreateEmployeeEppDeliveryDto = {
+  description: string
+  deliveredItems: string
+  date: string
+}
+
+export type UpdateEmployeeEppDeliveryDto = Partial<CreateEmployeeEppDeliveryDto>
 export type EmployeeDocument = {
   id: string
   companyId: string
@@ -233,6 +250,7 @@ export type EmployeeDocumentContext =
   | { kind: "contract"; contractId: string }
   | { kind: "evaluation"; evaluationId: string }
   | { kind: "medicalEvaluation"; medicalEvaluationId: string }
+  | { kind: "eppDelivery"; eppDeliveryId: string }
 
 export type CreateEmployeeDto = {
   name: string
@@ -328,5 +346,7 @@ export type EmployeeEvaluationsResponse = ApiResponse<EmployeeEvaluation[]>
 export type EmployeeMedicalEvaluationResponse = ApiResponse<EmployeeMedicalEvaluation>
 export type EmployeeMedicalEvaluationsResponse = ApiResponse<EmployeeMedicalEvaluation[]>
 export type EmployeeSgiResponsibleResponse = ApiResponse<EmployeeSgiResponsible>
+export type EmployeeEppDeliveryResponse = ApiResponse<EmployeeEppDelivery>
+export type EmployeeEppDeliveriesResponse = ApiResponse<EmployeeEppDelivery[]>
 export type EmployeeDocumentResponse = ApiResponse<EmployeeDocument>
 export type EmployeeDocumentsResponse = ApiResponse<EmployeeDocument[]>
