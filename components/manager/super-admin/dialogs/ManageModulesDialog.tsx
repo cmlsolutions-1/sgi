@@ -16,7 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { AlertTriangle, Loader2, Package } from "lucide-react"
-import { listModules, updateCompanyModules } from "@/services/modulesService"
+import { activateModule, deactivateModule, getModulesByCompany, listModules, updateCompanyModules } from "@/services/modulesService"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
@@ -25,6 +25,13 @@ type Props = {
   onOpenChange: (open: boolean) => void
   company: Company | null
   onRefresh: (activeModuleIds?: string[]) => Promise<void>
+}
+
+function collectModuleIds(modules: Module[]): string[] {
+  return modules.flatMap((module) => [
+    module.id,
+    ...(module.children?.map((child) => child.id) ?? []),
+  ])
 }
 
 export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: Props) {
@@ -69,11 +76,20 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
     return isModuleActive(childId)
   }
 
-  const getModuleIdsToPersist = (moduleIds: string[]): string[] => {
-    const validModuleIds = new Set(
-      modules.flatMap((module) => [module.id, ...(module.children?.map((child) => child.id) ?? [])]),
-    )
-    return moduleIds.filter((moduleId) => validModuleIds.has(moduleId))
+  const getParentModuleIds = (moduleIds: string[]): string[] => {
+    const parentIds = new Set(modules.map((module) => module.id))
+    return moduleIds.filter((moduleId) => parentIds.has(moduleId))
+  }
+
+  const isChildModule = (moduleId: string): boolean => {
+    return modules.some((module) => module.children?.some((child) => child.id === moduleId))
+  }
+
+  const refreshActiveModules = async (): Promise<string[]> => {
+    if (!company) return []
+
+    const modulesData = await getModulesByCompany(company.id)
+    return collectModuleIds(modulesData)
   }
 
   const handleToggle = async (moduleId: string, moduleName: string) => {
@@ -92,12 +108,25 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
     setActiveModuleIds(nextActiveIds)
 
     try {
-      const moduleIdsToPersist = getModuleIdsToPersist(nextActiveIds)
-      const persistedActiveIds = await updateCompanyModules(
-        company.id,
-        moduleIdsToPersist,
-        currentlyActive ? `Modulo "${moduleName}" desactivado desde panel` : "Actualizado desde panel"
-      )
+      const childModule = isChildModule(moduleId)
+      let persistedActiveIds: string[]
+
+      if (childModule) {
+        if (currentlyActive) {
+          await deactivateModule(company.id, moduleId)
+        } else {
+          await activateModule(company.id, moduleId)
+        }
+
+        persistedActiveIds = await refreshActiveModules()
+      } else {
+        const moduleIdsToPersist = getParentModuleIds(nextActiveIds)
+        persistedActiveIds = await updateCompanyModules(
+          company.id,
+          moduleIdsToPersist,
+          currentlyActive ? `Modulo "${moduleName}" desactivado desde panel` : "Actualizado desde panel"
+        )
+      }
 
       setActiveModuleIds(persistedActiveIds)
       toast.success(`Modulo "${moduleName}" ${currentlyActive ? "desactivado" : "activado"}`)
