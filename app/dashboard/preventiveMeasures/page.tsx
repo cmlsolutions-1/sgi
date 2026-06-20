@@ -82,7 +82,7 @@ const emptyForm: MeasureForm = {
 }
 
 const measureFieldControlClassName =
-  "mt-1 w-full border-slate-400 bg-white shadow-sm hover:border-slate-500 focus-visible:border-primary focus-visible:ring-primary/25"
+  "mt-1 w-full border-slate-300 bg-white shadow-sm hover:border-slate-400 focus-visible:border-primary focus-visible:ring-primary/25"
 
 const statusConfig = {
   PENDING: { icon: Clock, color: "text-warning", label: "Pendiente" },
@@ -774,12 +774,12 @@ export default function PreventiveMeasuresPage() {
                 placeholder="Buscar por título, descripción o riesgo..."
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                className="pl-10 bg-secondary border-0"
+                className="pl-10"
               />
             </div>
 
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full bg-secondary border-0">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Estado" />
               </SelectTrigger>
               <SelectContent>
@@ -790,7 +790,7 @@ export default function PreventiveMeasuresPage() {
             </Select>
 
             <Select value={actionFilter} onValueChange={setActionFilter}>
-              <SelectTrigger className="w-full bg-secondary border-0">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Acción" />
               </SelectTrigger>
               <SelectContent>
@@ -802,7 +802,7 @@ export default function PreventiveMeasuresPage() {
             </Select>
 
             <Select value={keyFilter} onValueChange={setKeyFilter}>
-              <SelectTrigger className="w-full bg-secondary border-0">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Jerarquía" />
               </SelectTrigger>
               <SelectContent>
@@ -816,7 +816,7 @@ export default function PreventiveMeasuresPage() {
             </Select>
 
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-full bg-secondary border-0">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>
@@ -827,7 +827,7 @@ export default function PreventiveMeasuresPage() {
             </Select>
 
             <Select value={sourceFilter} onValueChange={setSourceFilter}>
-              <SelectTrigger className="w-full bg-secondary border-0">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Origen" />
               </SelectTrigger>
               <SelectContent>

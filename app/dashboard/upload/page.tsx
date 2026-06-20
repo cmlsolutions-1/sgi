@@ -207,7 +207,7 @@ export default function UploadPage() {
                   value={formData.documentType}
                   onValueChange={(value) => setFormData({ ...formData, documentType: value })}
                 >
-                  <SelectTrigger className="bg-secondary border-0">
+                  <SelectTrigger>
                     <SelectValue placeholder="Seleccionar tipo" />
                   </SelectTrigger>
                   <SelectContent>
@@ -226,7 +226,7 @@ export default function UploadPage() {
                   value={formData.department}
                   onValueChange={(value) => setFormData({ ...formData, department: value })}
                 >
-                  <SelectTrigger className="bg-secondary border-0">
+                  <SelectTrigger>
                     <SelectValue placeholder="Seleccionar departamento" />
                   </SelectTrigger>
                   <SelectContent>
@@ -246,7 +246,6 @@ export default function UploadPage() {
                   placeholder="Ej: 1.0"
                   value={formData.version}
                   onChange={(e) => setFormData({ ...formData, version: e.target.value })}
-                  className="bg-secondary border-0"
                 />
               </div>
 
@@ -257,7 +256,7 @@ export default function UploadPage() {
                   placeholder="Descripción breve del documento..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="bg-secondary border-0 min-h-[100px]"
+                  className="min-h-[100px]"
                 />
               </div>
 

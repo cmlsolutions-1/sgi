@@ -63,7 +63,7 @@ const genderOptions: Array<{ value: EmployeeGender; label: string }> = [
 ]
 
 const fieldControlClassName =
-  "w-full border-slate-400 bg-white shadow-sm hover:border-slate-500 focus-visible:border-primary focus-visible:ring-primary/25"
+  "w-full border-slate-300 bg-white shadow-sm hover:border-slate-400 focus-visible:border-primary focus-visible:ring-primary/25"
 
 function toDateInput(value?: string | null) {
   if (!value) return ""

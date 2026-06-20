@@ -29,19 +29,19 @@ export default function SettingsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="company">Nombre de la Empresa</Label>
-              <Input id="company" defaultValue="Empresa S.A.S." className="bg-secondary border-0" />
+              <Input id="company" defaultValue="Empresa S.A.S." />
             </div>
             <div className="space-y-2">
               <Label htmlFor="nit">NIT</Label>
-              <Input id="nit" defaultValue="900.123.456-7" className="bg-secondary border-0" />
+              <Input id="nit" defaultValue="900.123.456-7" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="address">Dirección</Label>
-              <Input id="address" defaultValue="Calle 100 #15-20, Bogotá" className="bg-secondary border-0" />
+              <Input id="address" defaultValue="Calle 100 #15-20, Bogotá" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Teléfono</Label>
-              <Input id="phone" defaultValue="+57 1 234 5678" className="bg-secondary border-0" />
+              <Input id="phone" defaultValue="+57 1 234 5678" />
             </div>
           </div>
           <Button>Guardar Cambios</Button>
@@ -121,7 +121,7 @@ export default function SettingsPage() {
           <div className="space-y-2">
             <Label>Cambiar Contraseña</Label>
             <div className="flex gap-2">
-              <Input type="password" placeholder="Nueva contraseña" className="bg-secondary border-0" />
+              <Input type="password" placeholder="Nueva contraseña" />
               <Button variant="outline">Cambiar</Button>
             </div>
           </div>

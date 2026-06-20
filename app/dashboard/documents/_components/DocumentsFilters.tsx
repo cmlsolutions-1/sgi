@@ -42,13 +42,13 @@ export default function DocumentsFilters({
               placeholder="Buscar documentos..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 bg-secondary border-0"
+              className="pl-10"
             />
           </div>
 
           <div className="flex flex-wrap gap-3">
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-[150px] bg-secondary border-0">
+              <SelectTrigger className="w-[150px]">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
@@ -63,7 +63,7 @@ export default function DocumentsFilters({
             </Select>
 
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[150px] bg-secondary border-0">
+              <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Estado" />
               </SelectTrigger>
               <SelectContent>
@@ -76,7 +76,7 @@ export default function DocumentsFilters({
             </Select>
 
             <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-              <SelectTrigger className="w-[180px] bg-secondary border-0">
+              <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Departamento" />
               </SelectTrigger>
               <SelectContent>

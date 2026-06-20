@@ -162,7 +162,7 @@ const emptyIncidentForm: IncidentFormState = {
 }
 
 const incidentFieldControlClassName =
-  "w-full border-slate-400 bg-white shadow-sm hover:border-slate-500 focus-visible:border-primary focus-visible:ring-primary/25"
+  "w-full border-slate-300 bg-white shadow-sm hover:border-slate-400 focus-visible:border-primary focus-visible:ring-primary/25"
 
 function IncidentDialog({
   incident,
@@ -429,7 +429,7 @@ function IncidentDocuments({ incidentId }: { incidentId: string }) {
   }
 
   return (
-    <div className="mt-4 rounded-md border border-dashed p-3">
+    <div className="mt-4 rounded-md border border-slate-300 bg-white p-3 shadow-xs">
       <div className="mb-3 flex items-center gap-2 text-sm font-medium">
         <FileText className="h-4 w-4" />
         Documentos
@@ -438,11 +438,37 @@ function IncidentDocuments({ incidentId }: { incidentId: string }) {
       <form onSubmit={handleUpload} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_180px_auto_auto] lg:items-end">
         <div className="grid gap-2">
           <Label>Archivo</Label>
-          <Input type="file" onChange={(event) => setFile(event.target.files?.[0] ?? null)} disabled={uploading} />
+          <div className="flex min-h-9 items-center gap-2 rounded-md border border-slate-300 bg-white px-2 py-1 shadow-xs">
+            <Input
+              id={`incident-document-file-${incidentId}`}
+              className="sr-only"
+              type="file"
+              onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+              disabled={uploading}
+            />
+            <Label
+              htmlFor={`incident-document-file-${incidentId}`}
+              className={cn(
+                "inline-flex h-8 cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90",
+                uploading && "pointer-events-none opacity-50",
+              )}
+            >
+              <Upload className="h-3.5 w-3.5" />
+              Seleccionar archivo
+            </Label>
+            <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+              {file?.name ?? "Ningun archivo seleccionado"}
+            </span>
+          </div>
         </div>
         <div className="grid gap-2">
           <Label>Tipo</Label>
-          <Input value={type} onChange={(event) => setType(event.target.value)} disabled={uploading} />
+          <Input
+            className={incidentFieldControlClassName}
+            value={type}
+            onChange={(event) => setType(event.target.value)}
+            disabled={uploading}
+          />
         </div>
         <label className="flex h-10 items-center gap-2 text-sm">
           <Checkbox
@@ -464,12 +490,14 @@ function IncidentDocuments({ incidentId }: { incidentId: string }) {
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
         ) : documents.length === 0 ? (
-          <p className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">Sin documentos cargados.</p>
+          <p className="rounded-md border border-slate-300 bg-white p-3 text-sm text-muted-foreground shadow-xs">
+            Sin documentos cargados.
+          </p>
         ) : (
           documents.map((document) => (
             <div
               key={document.id}
-              className="flex flex-col gap-3 rounded-md border px-3 py-2 text-sm md:flex-row md:items-center md:justify-between"
+              className="flex flex-col gap-3 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs md:flex-row md:items-center md:justify-between"
             >
               <div className="min-w-0">
                 <p className="truncate font-medium">{document.originalName || document.type}</p>
@@ -651,7 +679,7 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
             <div className="grid gap-1">
               <Label>Funcionario</Label>
               <Select value={employeeFilter} onValueChange={setEmployeeFilter}>
-                <SelectTrigger className="w-full bg-secondary border-0">
+                <SelectTrigger className={incidentFieldControlClassName}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -668,6 +696,7 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
               <Label htmlFor="labor-start-date">Fecha inicial</Label>
               <Input
                 id="labor-start-date"
+                className={incidentFieldControlClassName}
                 type="date"
                 value={startDate}
                 max={endDate || undefined}
@@ -678,6 +707,7 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
               <Label htmlFor="labor-end-date">Fecha final</Label>
               <Input
                 id="labor-end-date"
+                className={incidentFieldControlClassName}
                 type="date"
                 value={endDate}
                 min={startDate || undefined}
@@ -1139,12 +1169,12 @@ export default function EmployeesPage() {
                     placeholder="Buscar por nombre, correo, area o puesto..."
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
-                    className="pl-10 bg-secondary border-0"
+                    className="pl-10"
                   />
                 </div>
                 <div className="flex flex-wrap gap-3">
                   <Select value={workAreaFilter} onValueChange={setWorkAreaFilter}>
-                    <SelectTrigger className="w-[200px] bg-secondary border-0">
+                    <SelectTrigger className="w-[200px]">
                       <Filter className="mr-2 h-4 w-4" />
                       <SelectValue placeholder="Area" />
                     </SelectTrigger>
@@ -1158,7 +1188,7 @@ export default function EmployeesPage() {
                     </SelectContent>
                   </Select>
                   <Select value={jobFilter} onValueChange={setJobFilter}>
-                    <SelectTrigger className="w-[200px] bg-secondary border-0">
+                    <SelectTrigger className="w-[200px]">
                       <SelectValue placeholder="Puesto" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1171,7 +1201,7 @@ export default function EmployeesPage() {
                     </SelectContent>
                   </Select>
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-[140px] bg-secondary border-0">
+                    <SelectTrigger className="w-[140px]">
                       <SelectValue placeholder="Estado" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1238,7 +1268,7 @@ export default function EmployeesPage() {
                 <div className="space-y-2">
                   <Label>Genero</Label>
                   <Select value={reportGender} onValueChange={setReportGender}>
-                    <SelectTrigger className="bg-secondary border-0">
+                    <SelectTrigger>
                       <SelectValue placeholder="Genero" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1254,7 +1284,7 @@ export default function EmployeesPage() {
                 <div className="space-y-2">
                   <Label>Nivel ARL</Label>
                   <Select value={reportArlRiskLevel} onValueChange={setReportArlRiskLevel}>
-                    <SelectTrigger className="bg-secondary border-0">
+                    <SelectTrigger>
                       <SelectValue placeholder="Nivel ARL" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1275,7 +1305,6 @@ export default function EmployeesPage() {
                     min="0"
                     value={reportMinAge}
                     onChange={(event) => setReportMinAge(event.target.value)}
-                    className="bg-secondary border-0"
                     placeholder="Min."
                   />
                 </div>
@@ -1287,14 +1316,13 @@ export default function EmployeesPage() {
                     min="0"
                     value={reportMaxAge}
                     onChange={(event) => setReportMaxAge(event.target.value)}
-                    className="bg-secondary border-0"
                     placeholder="Max."
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Tipo contrato</Label>
                   <Select value={reportContractType} onValueChange={setReportContractType}>
-                    <SelectTrigger className="bg-secondary border-0">
+                    <SelectTrigger>
                       <SelectValue placeholder="Contrato" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1315,7 +1343,6 @@ export default function EmployeesPage() {
                     min="1"
                     value={reportPage}
                     onChange={(event) => setReportPage(event.target.value)}
-                    className="bg-secondary border-0"
                     placeholder="Pag."
                   />
                 </div>
@@ -1327,7 +1354,6 @@ export default function EmployeesPage() {
                     min="1"
                     value={reportLimit}
                     onChange={(event) => setReportLimit(event.target.value)}
-                    className="bg-secondary border-0"
                     placeholder="Cant."
                   />
                 </div>

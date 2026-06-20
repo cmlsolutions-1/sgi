@@ -106,7 +106,6 @@ export function SocialSecurityFormDialog({
                 setFormData({ ...formData, entityName: e.target.value })
               }
               placeholder="Ingrese el nombre de la entidad"
-              className="bg-secondary border-border"
               required
             />
           </div>
@@ -121,7 +120,6 @@ export function SocialSecurityFormDialog({
                 onChange={(e) =>
                   setFormData({ ...formData, startDate: e.target.value })
                 }
-                className="bg-secondary border-border"
                 required
               />
             </div>
@@ -135,30 +133,31 @@ export function SocialSecurityFormDialog({
                 onChange={(e) =>
                   setFormData({ ...formData, endDate: e.target.value })
                 }
-                className="bg-secondary border-border"
               />
             </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="file">Documento (PDF, JPG, PNG)</Label>
-            <div className="flex items-center gap-2">
+            <div className="flex min-h-9 items-center gap-2 rounded-md border border-slate-300 bg-white px-2 py-1 shadow-xs">
               <Input
                 id="file"
+                className="sr-only"
                 type="file"
                 accept=".pdf,.jpg,.jpeg,.png"
                 onChange={handleFileChange}
-                className="bg-secondary border-border"
               />
-              <Button type="button" variant="outline" size="icon">
-                <Upload className="h-4 w-4" />
-              </Button>
+              <Label
+                htmlFor="file"
+                className="inline-flex h-8 cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+              >
+                <Upload className="h-3.5 w-3.5" />
+                Seleccionar archivo
+              </Label>
+              <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+                {file?.name ?? "Ningun archivo seleccionado"}
+              </span>
             </div>
-            {file && (
-              <p className="text-xs text-muted-foreground">
-                Archivo seleccionado: {file.name}
-              </p>
-            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-4">

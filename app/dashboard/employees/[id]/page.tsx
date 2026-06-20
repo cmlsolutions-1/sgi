@@ -1,6 +1,6 @@
 "use client"
 
-import { use, useEffect, useState } from "react"
+import { use, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import {
   Activity,
@@ -430,6 +430,7 @@ function DocumentManager({
   const [file, setFile] = useState<File | null>(null)
   const [type, setType] = useState(defaultType)
   const [isConfirmed, setIsConfirmed] = useState(true)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   async function loadDocuments() {
     setLoading(true)
@@ -516,14 +517,34 @@ function DocumentManager({
         {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
       </div>
 
-      <form onSubmit={handleUpload} className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_180px_auto_auto] lg:items-end">
+      <form onSubmit={handleUpload} className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_160px] md:items-end">
         <div className="grid gap-2">
           <Label>Archivo</Label>
-          <Input
-            type="file"
-            onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-            disabled={uploading}
-          />
+          <div className="flex min-h-9 items-center gap-2 overflow-hidden rounded-md border border-slate-300 bg-white px-2 py-1 shadow-xs">
+            <Input
+              ref={fileInputRef}
+              className="hidden"
+              type="file"
+              onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+              disabled={uploading}
+            />
+            <Button
+              type="button"
+              size="sm"
+              className={cn(
+                "h-8 shrink-0 gap-2 px-3 text-xs",
+                uploading && "pointer-events-none opacity-50"
+              )}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              <Upload className="h-3.5 w-3.5" />
+              Seleccionar
+            </Button>
+            <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+              {file?.name ?? "Ningun archivo seleccionado"}
+            </span>
+          </div>
         </div>
         <div className="grid gap-2">
           <Label>Tipo</Label>

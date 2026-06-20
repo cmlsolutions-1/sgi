@@ -39,7 +39,7 @@ const emptyForm: FormState = {
 }
 
 const fieldControlClassName =
-  "w-full border-slate-400 bg-white shadow-sm hover:border-slate-500 focus-visible:border-primary focus-visible:ring-primary/25"
+  "w-full border-slate-300 bg-white shadow-sm hover:border-slate-400 focus-visible:border-primary focus-visible:ring-primary/25"
 
 export function JobsManager() {
   const [jobs, setJobs] = useState<Job[]>([])

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { AlertCircle, BookOpen, Download, Edit, FileText, Filter, Loader2, MoreHorizontal, Paperclip, Plus, Power, Search, Trash2, Upload } from "lucide-react"
 import jsPDF from "jspdf"
 import { toast } from "sonner"
@@ -57,7 +57,7 @@ type DocumentFormState = UpsertManagedDocumentDto & {
 }
 
 const documentFieldControlClassName =
-  "w-full border-slate-400 bg-white shadow-sm hover:border-slate-500 focus-visible:border-primary focus-visible:ring-primary/25"
+  "w-full border-slate-300 bg-white shadow-sm hover:border-slate-400 focus-visible:border-primary focus-visible:ring-primary/25"
 
 const DOCUMENT_TYPES: Array<{ value: ManagedDocumentType; label: string }> = [
   { value: "PROCEDURE", label: "Procedimiento" },
@@ -193,7 +193,7 @@ export default function DocumentsPage() {
   const [fileDialogDocument, setFileDialogDocument] = useState<ManagedDocument | null>(null)
   const [documentFiles, setDocumentFiles] = useState<ManagedDocumentFile[]>([])
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [fileInputKey, setFileInputKey] = useState(0)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [loadingFiles, setLoadingFiles] = useState(false)
   const [uploadingFile, setUploadingFile] = useState(false)
   const [downloadingFileId, setDownloadingFileId] = useState<string | null>(null)
@@ -442,7 +442,7 @@ export default function DocumentsPage() {
   async function openFileDialog(document: ManagedDocument) {
     setFileDialogDocument(document)
     setSelectedFile(null)
-    setFileInputKey((current) => current + 1)
+    if (fileInputRef.current) fileInputRef.current.value = ""
     await loadDocumentFiles(document.id)
   }
 
@@ -450,6 +450,7 @@ export default function DocumentsPage() {
     setFileDialogDocument(null)
     setDocumentFiles([])
     setSelectedFile(null)
+    if (fileInputRef.current) fileInputRef.current.value = ""
   }
 
   async function handleUploadFile() {
@@ -467,7 +468,7 @@ export default function DocumentsPage() {
       })
       toast.success("Archivo subido")
       setSelectedFile(null)
-      setFileInputKey((current) => current + 1)
+      if (fileInputRef.current) fileInputRef.current.value = ""
       await loadDocumentFiles(fileDialogDocument.id)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo subir el archivo")
@@ -727,20 +728,30 @@ export default function DocumentsPage() {
       <Dialog open={Boolean(fileDialogDocument)} onOpenChange={(open) => !open && closeFileDialog()}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Archivo de {fileDialogDocument?.name}</DialogTitle>
+            <DialogTitle>Archivos de {fileDialogDocument?.name}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="rounded-md border border-dashed border-border p-4">
+            <div className="rounded-md border border-slate-300 bg-white p-4 shadow-xs">
               <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
                 <div className="space-y-2">
                   <Label htmlFor="managed-document-file">Seleccionar archivo</Label>
-                  <Input
-                    key={fileInputKey}
-                    id="managed-document-file"
-                    type="file"
-                    onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
-                  />
+                  <div className="flex min-h-9 items-center gap-2 overflow-hidden rounded-md border border-slate-300 bg-white px-2 py-1 shadow-xs">
+                    <Input
+                      ref={fileInputRef}
+                      id="managed-document-file"
+                      className="hidden"
+                      type="file"
+                      onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
+                    />
+                    <Button type="button" size="sm" className="h-8 shrink-0 gap-2 px-3 text-xs" onClick={() => fileInputRef.current?.click()}>
+                      <Upload className="h-3.5 w-3.5" />
+                      Seleccionar
+                    </Button>
+                    <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+                      {selectedFile?.name ?? "Ningun archivo seleccionado"}
+                    </span>
+                  </div>
                 </div>
                 <Button className="gap-2" onClick={handleUploadFile} disabled={!selectedFile || uploadingFile}>
                   {uploadingFile ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
@@ -758,13 +769,15 @@ export default function DocumentsPage() {
                 Cargando archivos...
               </div>
             ) : documentFiles.length === 0 ? (
-              <div className="py-8 text-center text-sm text-muted-foreground">Aún no hay archivos asociados.</div>
+              <div className="rounded-md border border-slate-300 bg-white p-4 text-center text-sm text-muted-foreground shadow-xs">
+                Aún no hay archivos asociados.
+              </div>
             ) : (
               <div className="space-y-2">
                 {documentFiles.map((document) => (
                   <div
                     key={document.id}
-                    className="flex flex-col gap-3 rounded-md border border-border p-3 sm:flex-row sm:items-center sm:justify-between"
+                    className="flex flex-col gap-3 rounded-md border border-slate-300 bg-white p-3 shadow-xs sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium">{document.originalName}</p>
@@ -988,12 +1001,11 @@ export default function DocumentsPage() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
-                    {document.type === "OTHERS" ? (
-                      <DropdownMenuItem onSelect={() => openFileDialog(document)}>
-                        <Paperclip className="mr-2 h-4 w-4" />
-                        Gestionar archivo
-                      </DropdownMenuItem>
-                    ) : (
+                    <DropdownMenuItem onSelect={() => openFileDialog(document)}>
+                      <Paperclip className="mr-2 h-4 w-4" />
+                      Subir documento
+                    </DropdownMenuItem>
+                    {document.type !== "OTHERS" && (
                       <DropdownMenuItem onSelect={() => downloadPrintableDocument(document)}>
                         <Download className="mr-2 h-4 w-4" />
                         Descargar PDF

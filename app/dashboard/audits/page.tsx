@@ -128,12 +128,12 @@ export default function AuditsPage() {
                 placeholder="Buscar hallazgos..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 bg-secondary border-0"
+                className="pl-10"
               />
             </div>
             <div className="flex gap-3">
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-[150px] bg-secondary border-0">
+                <SelectTrigger className="w-[150px]">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Tipo" />
                 </SelectTrigger>
@@ -146,7 +146,7 @@ export default function AuditsPage() {
                 </SelectContent>
               </Select>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[150px] bg-secondary border-0">
+                <SelectTrigger className="w-[150px]">
                   <SelectValue placeholder="Estado" />
                 </SelectTrigger>
                 <SelectContent>

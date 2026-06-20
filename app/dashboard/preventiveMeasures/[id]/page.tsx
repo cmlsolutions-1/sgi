@@ -148,7 +148,7 @@ export default function PreventiveMeasureDetailPage() {
 
           <div className="w-[200px]">
             <Select value={measure.status} onValueChange={(v) => onChangeStatus(v as PreventiveMeasure["status"])}>
-              <SelectTrigger className="bg-secondary border-0">
+              <SelectTrigger>
                 <SelectValue placeholder="Estado" />
               </SelectTrigger>
               <SelectContent>
