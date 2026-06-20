@@ -111,3 +111,15 @@ export async function updateCompanyModules(
   console.log("Modulos actualizados por backend:", data.activeModuleIds)
   return data.activeModuleIds ?? moduleIds
 }
+
+/**
+ * Sincronizar permisos del rol ADMIN_COMPANY con los módulos activos de la empresa
+ * POST /api/admin/companies/{companyId}/admin-company/sync-permissions
+ */
+export async function syncAdminCompanyPermissions(companyId: string): Promise<void> {
+  const res = await apiFetch(`/api/admin/companies/${companyId}/admin-company/sync-permissions`, {
+    method: "POST",
+  })
+
+  await parseOrThrow<Record<string, never>>(res, "No se pudieron sincronizar los permisos de ADMIN_COMPANY")
+}

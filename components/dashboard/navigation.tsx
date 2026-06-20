@@ -123,10 +123,10 @@ function collectModuleCodes(modules: ModuleNode[]): Set<string> {
   return codes
 }
 
-const alwaysVisibleCodes = new Set(["DOCUMENTS"])
+const alwaysVisibleCodes = new Set<string>()
 
 const moduleCodeAliases: Record<string, string[]> = {
-  DOCUMENTS: ["DOCUMENTS", "DOCUMENT", "DOCUMENT_MANAGEMENT", "DOCUMENTAL_MANAGEMENT", "GESTION_DOCUMENTAL"],
+  DOCUMENTS: ["DOCUMENTS", "DOCUMENT", "DOCUMENT_MANAGEMENT", "DOCUMENTAL_MANAGEMENT"],
   INCIDENTS: ["INCIDENTS", "LABOR"],
 }
 

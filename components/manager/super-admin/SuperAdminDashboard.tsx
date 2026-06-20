@@ -20,7 +20,7 @@ import { CiiuCard } from "@/components/manager/super-admin/dialogs/CiiuCard"
 import { CompaniesCard } from "@/components/manager/super-admin/dialogs/CompaniesCard"
 import { UsersCard } from "@/components/manager/super-admin/UsersCard"
 import { ManageModulesDialog } from "@/components/manager/super-admin/dialogs/ManageModulesDialog"
-import { getModulesByCompany } from "@/services/modulesService"
+import { getModulesByCompany, listModules, syncAdminCompanyPermissions } from "@/services/modulesService"
 import { listPermissions } from "@/services/permissionService"
 import { createRole, listRolesByCompany, updateRoleBySystemAdmin } from "@/services/roleService"
 import type { Company } from "@/types/manager/super-admin"
@@ -28,11 +28,18 @@ import type { Module } from "@/types/manager/module"
 import type { Permission } from "@/types/manager/permission"
 import type { Role } from "@/types/manager/role"
 
-function collectModuleIds(modules: Module[]): string[] {
-  return modules.flatMap((module) => [
-    module.id,
-    ...(module.children?.map((child) => child.id) ?? []),
-  ])
+function normalizeActiveModuleIds(activeModules: Module[], moduleCatalog: Module[]): string[] {
+  const childrenByParentId = new Map(moduleCatalog.map((module) => [module.id, module.children.map((child) => child.id)]))
+
+  return Array.from(new Set(activeModules.flatMap((module) => {
+    if (module.children?.length) {
+      return module.children.map((child) => child.id)
+    }
+
+    if (module.parentId) return [module.id]
+
+    return childrenByParentId.get(module.id) ?? []
+  })))
 }
 function getPermissionGroup(permissionName: string) {
   const [, ...rest] = permissionName.split(" ")
@@ -105,8 +112,8 @@ export default function SuperAdminDashboard() {
   // Esto evita dependencias circulares
   const fetchCompanyModules = useCallback(async (companyId: string): Promise<string[]> => {
     try {
-      const modulesData = await getModulesByCompany(companyId)
-      return collectModuleIds(modulesData)
+      const [moduleCatalog, modulesData] = await Promise.all([listModules(), getModulesByCompany(companyId)])
+      return normalizeActiveModuleIds(modulesData, moduleCatalog)
     } catch (err) {
       console.error("Error cargando módulos:", err)
       return []
@@ -162,6 +169,7 @@ export default function SuperAdminDashboard() {
     }
 
     await fetchUsers()
+    await loadAdminCompanyPermissions()
   }
 
   const hasActiveModules = selectedCompany
@@ -256,6 +264,18 @@ export default function SuperAdminDashboard() {
       toast.success("Permisos de ADMIN_COMPANY actualizados")
       await loadAdminCompanyPermissions()
     } catch (error: any) {
+      if (selectedCompany && String(error.message ?? "").includes("permisos no están permitidos")) {
+        try {
+          await syncAdminCompanyPermissions(selectedCompany.id)
+          toast.success("Permisos sincronizados con los modulos activos")
+          await loadAdminCompanyPermissions()
+          return
+        } catch (syncError: any) {
+          toast.error(syncError.message ?? "No se pudieron sincronizar los permisos")
+          return
+        }
+      }
+
       toast.error(error.message ?? "No se pudieron guardar los permisos")
     } finally {
       setSavingPermissions(false)

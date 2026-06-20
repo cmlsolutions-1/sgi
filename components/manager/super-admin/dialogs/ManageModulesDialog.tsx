@@ -16,7 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { AlertTriangle, Loader2, Package } from "lucide-react"
-import { activateModule, deactivateModule, getModulesByCompany, listModules, updateCompanyModules } from "@/services/modulesService"
+import { getModulesByCompany, listModules, syncAdminCompanyPermissions, updateCompanyModules } from "@/services/modulesService"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
@@ -27,11 +27,28 @@ type Props = {
   onRefresh: (activeModuleIds?: string[]) => Promise<void>
 }
 
-function collectModuleIds(modules: Module[]): string[] {
-  return modules.flatMap((module) => [
-    module.id,
-    ...(module.children?.map((child) => child.id) ?? []),
-  ])
+function normalizeActiveModuleIds(activeModules: Module[], moduleCatalog: Module[]): string[] {
+  const childrenByParentId = new Map(moduleCatalog.map((module) => [module.id, module.children.map((child) => child.id)]))
+
+  return Array.from(new Set(activeModules.flatMap((module) => {
+    if (module.children?.length) {
+      return module.children.map((child) => child.id)
+    }
+
+    if (module.parentId) return [module.id]
+
+    return childrenByParentId.get(module.id) ?? []
+  })))
+}
+
+function normalizeKnownModuleIds(moduleIds: string[], moduleCatalog: Module[]): string[] {
+  const childIds = new Set(moduleCatalog.flatMap((module) => module.children.map((child) => child.id)))
+  const childrenByParentId = new Map(moduleCatalog.map((module) => [module.id, module.children.map((child) => child.id)]))
+
+  return Array.from(new Set(moduleIds.flatMap((moduleId) => {
+    if (childIds.has(moduleId)) return [moduleId]
+    return childrenByParentId.get(moduleId) ?? []
+  })))
 }
 
 export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: Props) {
@@ -44,21 +61,23 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
   useEffect(() => {
     if (!open || !company) return
 
-    setActiveModuleIds(company.activeModules)
     fetchModules()
   }, [open, company?.id])
 
   const fetchModules = async () => {
+    if (!company) return
+
     setLoading(true)
     setError(null)
 
     try {
-      const data = await listModules()
+      const [data, activeModulesData] = await Promise.all([listModules(), getModulesByCompany(company.id)])
       setModules(data)
-      const validModuleIds = new Set(
-        data.flatMap((module) => [module.id, ...(module.children?.map((child) => child.id) ?? [])]),
-      )
-      setActiveModuleIds((currentIds) => currentIds.filter((moduleId) => validModuleIds.has(moduleId)))
+      const validModuleIds = new Set(data.flatMap((module) => module.children.map((child) => child.id)))
+      const activeIds = normalizeActiveModuleIds(activeModulesData, data).filter((moduleId) => validModuleIds.has(moduleId))
+      const fallbackActiveIds = normalizeKnownModuleIds(company.activeModules, data).filter((moduleId) => validModuleIds.has(moduleId))
+
+      setActiveModuleIds(activeIds.length > 0 ? activeIds : fallbackActiveIds)
     } catch (err: any) {
       const message = err.message ?? "Error al cargar modulos"
       setError(message)
@@ -76,20 +95,19 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
     return isModuleActive(childId)
   }
 
-  const getParentModuleIds = (moduleIds: string[]): string[] => {
-    const parentIds = new Set(modules.map((module) => module.id))
-    return moduleIds.filter((moduleId) => parentIds.has(moduleId))
-  }
-
-  const isChildModule = (moduleId: string): boolean => {
-    return modules.some((module) => module.children?.some((child) => child.id === moduleId))
-  }
-
   const refreshActiveModules = async (): Promise<string[]> => {
     if (!company) return []
 
     const modulesData = await getModulesByCompany(company.id)
-    return collectModuleIds(modulesData)
+    return normalizeActiveModuleIds(modulesData, modules)
+  }
+
+  const getParentIdsForActiveChildren = (childIds: string[]): string[] => {
+    const activeChildIds = new Set(childIds)
+
+    return modules
+      .filter((module) => module.children.some((child) => activeChildIds.has(child.id)))
+      .map((module) => module.id)
   }
 
   const handleToggle = async (moduleId: string, moduleName: string) => {
@@ -103,31 +121,26 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
     const nextActiveIds = currentlyActive
       ? previousActiveIds.filter((id) => id !== moduleId)
       : Array.from(new Set([...previousActiveIds, moduleId]))
+    const parentIdsToPersist = getParentIdsForActiveChildren(nextActiveIds)
 
     setActivatingId(moduleId)
     setActiveModuleIds(nextActiveIds)
 
     try {
-      const childModule = isChildModule(moduleId)
-      let persistedActiveIds: string[]
+      await updateCompanyModules(
+        company.id,
+        parentIdsToPersist,
+        currentlyActive ? `Modulo "${moduleName}" desactivado desde panel` : "Actualizado desde panel",
+      )
 
-      if (childModule) {
-        if (currentlyActive) {
-          await deactivateModule(company.id, moduleId)
-        } else {
-          await activateModule(company.id, moduleId)
-        }
-
-        persistedActiveIds = await refreshActiveModules()
-      } else {
-        const moduleIdsToPersist = getParentModuleIds(nextActiveIds)
-        persistedActiveIds = await updateCompanyModules(
-          company.id,
-          moduleIdsToPersist,
-          currentlyActive ? `Modulo "${moduleName}" desactivado desde panel` : "Actualizado desde panel"
-        )
+      if (parentIdsToPersist.length > 0) {
+        await syncAdminCompanyPermissions(company.id).catch((error: any) => {
+          toast.warning(error.message ?? "Los modulos se actualizaron, pero no se pudieron sincronizar los permisos")
+        })
       }
 
+      const refreshedActiveIds = await refreshActiveModules()
+      const persistedActiveIds = refreshedActiveIds.includes(moduleId) === !currentlyActive ? refreshedActiveIds : nextActiveIds
       setActiveModuleIds(persistedActiveIds)
       toast.success(`Modulo "${moduleName}" ${currentlyActive ? "desactivado" : "activado"}`)
       await onRefresh(persistedActiveIds)
@@ -178,15 +191,16 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
           ) : (
             <div className="space-y-4">
               {modules.map((module) => {
-                const isActive = isModuleActive(module.id)
-                const isRequired = isRequiredModule(module)
+                const activeChildren = module.children.filter((child) => isChildActive(child.id))
+                const hasActiveChildren = activeChildren.length > 0
+                const allChildrenActive = module.children.length > 0 && activeChildren.length === module.children.length
 
                 return (
                   <div
                     key={module.id}
                     className={cn(
                       "rounded-lg border border-border bg-white shadow-sm overflow-hidden",
-                      isActive && "border-primary/30"
+                      hasActiveChildren && "border-primary/30"
                     )}
                   >
                     <div className="flex items-center justify-between p-4">
@@ -194,7 +208,7 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
                         <div
                           className={cn(
                             "h-10 w-10 rounded-lg flex items-center justify-center transition-colors",
-                            isActive ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+                            hasActiveChildren ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
                           )}
                         >
                           <Package className="h-5 w-5" />
@@ -204,26 +218,17 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
                           <div className="flex items-center gap-2">
                             <h4 className="font-medium text-foreground">{module.name}</h4>
                             <span className="text-xs text-muted-foreground font-mono">{module.code}</span>
-                            {isRequired && (
-                              <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700">
-                                Requerido
-                              </Badge>
-                            )}
-                            {isActive && (
+                            <Badge variant="secondary" className="text-xs">
+                              Modulo padre
+                            </Badge>
+                            {hasActiveChildren && (
                               <Badge variant="default" className="text-xs bg-success/20 text-success">
-                                Activo
+                                {allChildrenActive ? "Hijos activos" : `${activeChildren.length}/${module.children.length} activos`}
                               </Badge>
                             )}
                           </div>
                         </div>
                       </div>
-
-                      <Switch
-                        checked={isActive}
-                        onCheckedChange={() => handleToggle(module.id, module.name)}
-                        disabled={isRequired || activatingId === module.id}
-                        className="data-[state=checked]:bg-primary"
-                      />
                     </div>
 
                     {module.children.length > 0 && (
@@ -231,6 +236,7 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
                         {module.children.map((child) => {
                           const childActive = isChildActive(child.id)
                           const childRequired = isRequiredModule(child)
+                          const disableChildSwitch = activatingId === child.id || (childRequired && childActive)
 
                           return (
                             <div
@@ -255,7 +261,7 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
                               <Switch
                                 checked={childActive}
                                 onCheckedChange={() => handleToggle(child.id, child.name)}
-                                disabled={childRequired || activatingId === child.id}
+                                disabled={disableChildSwitch}
                                 className="data-[state=checked]:bg-primary"
                               />
                             </div>
