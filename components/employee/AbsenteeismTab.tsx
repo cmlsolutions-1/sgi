@@ -437,7 +437,7 @@ export function AbsenteeismTab({ employee }: { employee: Employee }) {
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
-                        <Button variant="outline" size="sm" onClick={() => startEdit(r)} title="Editar">
+                        <Button variant="action" size="sm" onClick={() => startEdit(r)} title="Editar">
                             <Pencil className="h-4 w-4" />
                         </Button>
                       <Button variant="outline" size="sm" onClick={() => downloadRecordPDF(r)}>
@@ -456,7 +456,7 @@ export function AbsenteeismTab({ employee }: { employee: Employee }) {
                         </Button>
                       )}
 
-                      <Button variant="outline" size="sm" onClick={() => removeRecord(r.id)} title="Eliminar">
+                      <Button variant="destructive" size="sm" onClick={() => removeRecord(r.id)} title="Eliminar">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>

@@ -494,9 +494,9 @@ export function SgiResponsibleFormDialog({
                           )}
                           <Button
                             type="button"
-                            variant="outline"
+                            variant="destructive"
                             size="sm"
-                            className="gap-2 text-destructive hover:text-destructive"
+                            className="gap-2"
                             onClick={() => handleDeleteDocument(document.id)}
                           >
                             <Trash2 className="h-4 w-4" />

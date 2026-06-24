@@ -335,13 +335,13 @@ export function JobsManager() {
                             Activar
                           </Button>
                         )}
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEditDialog(job)}>
+                        <Button variant="action" size="icon" className="h-8 w-8" onClick={() => openEditDialog(job)}>
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
-                          variant="ghost"
+                          variant="destructive"
                           size="icon"
-                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          className="h-8 w-8"
                           onClick={() => handleDelete(job)}
                         >
                           <Trash2 className="h-4 w-4" />

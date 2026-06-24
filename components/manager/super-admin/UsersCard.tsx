@@ -60,11 +60,11 @@ export function UsersCard({
     const isActive = status === "ACTIVE"
     return (
       <Badge
-        variant={isActive ? "default" : "secondary"}
+        variant={isActive ? "accentActivd" : "destructive"}
         className={
           isActive
-            ? "bg-success/20 text-success border-success/30"
-            : "bg-muted text-muted-foreground"
+            ? "bg-accentActivd text-accentActivd-foreground"
+            : "bg-destructive text-white"
         }
       >
         {isActive ? "Activo" : "Inactivo"}
@@ -156,10 +156,10 @@ export function UsersCard({
 
                 <div className="flex items-center gap-2 ml-4">
                   <Button
-                    variant="ghost"
+                    variant="action"
                     size="icon"
                     onClick={() => {}}
-                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                    className="h-8 w-8"
                   >
                     <Edit2 className="h-4 w-4" />
                   </Button>
@@ -167,9 +167,9 @@ export function UsersCard({
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
-                        variant="ghost"
+                        variant="destructive"
                         size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        className="h-8 w-8"
                         disabled={deletingId === u.id}
                       >
                         {deletingId === u.id ? (

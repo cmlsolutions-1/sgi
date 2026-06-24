@@ -250,7 +250,7 @@ export function WorkAreasManager() {
                     </td>
                     <td className="px-2 py-3 text-sm text-muted-foreground">{area.description || "Sin descripcion"}</td>
                     <td className="px-2 py-3 ">
-                      <Badge variant={area.status === "ACTIVE" ? "accentActivd" : "secondary"}>{area.status}</Badge>
+                      <Badge variant={area.status === "ACTIVE" ? "accentActivd" : "destructive"}>{area.status}</Badge>
                     </td>
                     <td className="px-2 py-3">
                       <div className="flex justify-end gap-1">
@@ -259,13 +259,13 @@ export function WorkAreasManager() {
                             Activar
                           </Button>
                         )}
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEditDialog(area)}>
+                        <Button variant="action" size="icon" className="h-8 w-8" onClick={() => openEditDialog(area)}>
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
-                          variant="ghost"
+                          variant="destructive"
                           size="icon"
-                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          className="h-8 w-8"
                           onClick={() => handleDelete(area)}
                         >
                           <Trash2 className="h-4 w-4" />

@@ -216,7 +216,7 @@ function IncidentDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={incident ? "outline" : "default"} size="sm" className="gap-2">
+        <Button variant={incident ? "action" : "default"} size="sm" className="gap-2">
           {incident ? <Edit className="h-4 w-4" /> : <TriangleAlert className="h-4 w-4" />}
           {incident ? "Editar" : "Nueva novedad"}
         </Button>
@@ -514,9 +514,9 @@ function IncidentDocuments({ incidentId }: { incidentId: string }) {
                 )}
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="destructive"
                   size="sm"
-                  className="gap-2 text-destructive hover:text-destructive"
+                  className="gap-2"
                   onClick={() => handleDelete(document.id)}
                 >
                   <Trash2 className="h-4 w-4" />
@@ -754,7 +754,7 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
                       </h3>
                       <Badge variant="outline">{incident.consecutive || "Sin consecutivo"}</Badge>
                       <Badge variant="secondary">{getIncidentTypeLabel(incident.type)}</Badge>
-                      <Badge variant={incident.status === "ACTIVE" ? "default" : "secondary"}>
+                      <Badge variant={incident.status === "ACTIVE" ? "accentActivd" : "destructive"}>
                         {getIncidentStatusLabel(incident.status)}
                       </Badge>
                     </div>
@@ -765,9 +765,9 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
                     <IncidentDialog incident={incident} employees={employees} onSave={handleSaveIncident} />
                     {incident.status === "ACTIVE" ? (
                       <Button
-                        variant="outline"
+                        variant="destructive"
                         size="sm"
-                        className="gap-2 text-destructive hover:text-destructive"
+                        className="gap-2"
                         onClick={() => handleDeleteIncident(incident)}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -1395,7 +1395,7 @@ export default function EmployeesPage() {
                             variant="secondary"
                             className={cn(
                               "text-xs",
-                              employee.status ? "bg-accentActivd text-accentActivd-foreground" : "bg-muted text-muted-foreground",
+                              employee.status ? "bg-accentActivd text-accentActivd-foreground" : "bg-destructive text-white",
                             )}
                           >
                             {employee.status ? "Activo" : "Inactivo"}
@@ -1421,7 +1421,7 @@ export default function EmployeesPage() {
 
                     <div className="mt-4 flex items-center gap-2 border-t border-border pt-4">
                       <Link href={`/dashboard/employees/${employee.id}`} className="flex-1">
-                        <Button className="w-full gap-2">
+                        <Button variant="action" className="w-full gap-2">
                           <Eye className="h-4 w-4" />
                           Ver Hoja de Vida
                         </Button>
@@ -1430,16 +1430,15 @@ export default function EmployeesPage() {
                         employee={employee}
                         onSave={(payload) => handleUpdateEmployee(employee, payload)}
                         trigger={
-                          <Button variant="outline" size="icon">
+                          <Button variant="action" size="icon">
                             <Edit className="h-4 w-4" />
                           </Button>
                         }
                       />
                       {employee.status ? (
                         <Button
-                          variant="outline"
+                          variant="destructive"
                           size="icon"
-                          className="text-destructive hover:text-destructive"
                           onClick={() => handleDeleteEmployee(employee)}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -1493,7 +1492,7 @@ export default function EmployeesPage() {
                             variant="secondary"
                             className={cn(
                               "text-xs",
-                              employee.status ? "bg-accentActivd text-accentActivd-foreground" : "bg-muted text-muted-foreground",
+                              employee.status ? "bg-accentActivd text-accentActivd-foreground" : "bg-destructive text-white",
                             )}
                           >
                             {employee.status ? "Activo" : "Inactivo"}
@@ -1502,7 +1501,7 @@ export default function EmployeesPage() {
                         </div>
                         <div className="flex items-center gap-2 md:justify-end">
                           <Link href={`/dashboard/employees/${employee.id}`}>
-                            <Button variant="outline" size="sm" className="gap-2">
+                            <Button variant="action" size="sm" className="gap-2">
                               <Eye className="h-4 w-4" />
                               Ver
                             </Button>
@@ -1511,16 +1510,15 @@ export default function EmployeesPage() {
                             employee={employee}
                             onSave={(payload) => handleUpdateEmployee(employee, payload)}
                             trigger={
-                              <Button variant="outline" size="icon">
+                              <Button variant="action" size="icon">
                                 <Edit className="h-4 w-4" />
                               </Button>
                             }
                           />
                           {employee.status ? (
                             <Button
-                              variant="outline"
+                              variant="destructive"
                               size="icon"
-                              className="text-destructive hover:text-destructive"
                               onClick={() => handleDeleteEmployee(employee)}
                             >
                               <Trash2 className="h-4 w-4" />

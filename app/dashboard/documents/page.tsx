@@ -90,7 +90,9 @@ function statusLabel(status: ManagedDocument["status"]) {
 }
 
 function statusClass(status: ManagedDocument["status"]) {
-  return status === "ACTIVE" ? "bg-green-600 text-white border-green-700" : "bg-muted text-foreground border-border"
+  return status === "ACTIVE"
+    ? "bg-accentActivd text-accentActivd-foreground border-transparent"
+    : "bg-destructive text-white border-transparent"
 }
 
 function formatFileSize(size: number) {
@@ -801,9 +803,9 @@ export default function DocumentsPage() {
                         Descargar
                       </Button>
                       <Button
-                        variant="outline"
+                        variant="destructive"
                         size="sm"
-                        className="gap-2 text-destructive hover:text-destructive"
+                        className="gap-2"
                         onClick={() => handleDeleteFile(document)}
                         disabled={deletingFileId === document.id}
                       >

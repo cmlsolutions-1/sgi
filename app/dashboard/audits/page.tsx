@@ -197,7 +197,7 @@ export default function AuditsPage() {
                     </div>
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
                       <span className="text-xs text-muted-foreground">Fecha límite: {finding.dueDate}</span>
-                      <Button variant="outline" size="sm">
+                      <Button variant="action" size="sm">
                         Ver Detalles
                       </Button>
                     </div>

@@ -391,15 +391,15 @@ function riskStatusLabel(status: RiskStatus) {
 function riskStatusColor(status: RiskStatus) {
   switch (status) {
     case "ACTIVE":
-      return "bg-blue-600 text-white border-blue-700"
+      return "bg-accentActivd text-accentActivd-foreground border-transparent"
     case "INACTIVE":
-      return "bg-muted text-foreground border-border"
+      return "bg-destructive text-white border-transparent"
     case "EN_PROCESO":
       return "bg-yellow-400 text-black border-yellow-500"
     case "FINALIZADO":
-      return "bg-green-600 text-white border-green-700"
+      return "bg-blue-600 text-white border-transparent"
     case "CANCELADO":
-      return "bg-red-600 text-white border-red-700"
+      return "bg-destructive text-white border-transparent"
     default:
       return "bg-muted text-foreground border-border"
   }
@@ -1255,12 +1255,12 @@ return Array.isArray(raw)
                           </div>
 
                           <div className="flex flex-wrap gap-2 pt-2">
-                            <Button size="sm" variant="secondary" onClick={() => openDetail(r)} className="gap-2">
+                            <Button size="sm" variant="action" onClick={() => openDetail(r)} className="gap-2">
                               <Eye className="h-4 w-4" />
                               Ver detalle
                             </Button>
 
-                            <Button size="sm" variant="secondary" onClick={() => openEditRiskDrawer(r)} className="gap-2">
+                            <Button size="sm" variant="action" onClick={() => openEditRiskDrawer(r)} className="gap-2">
                               <Pencil className="h-4 w-4" />
                               Editar
                             </Button>
@@ -1862,7 +1862,16 @@ return Array.isArray(raw)
                             <div key={m.id} className="rounded-md border p-3 space-y-2">
                               <div className="flex items-start justify-between gap-2">
                                 <p className="text-sm font-medium">{m.title}</p>
-                                <Badge variant="outline">{m.status === "DONE" ? "Cumplido" : "Pendiente"}</Badge>
+                                <Badge
+                                  variant="outline"
+                                  className={
+                                    m.status === "DONE"
+                                      ? "bg-accentActivd text-accentActivd-foreground border-transparent"
+                                      : "bg-warning/10 text-warning border-warning/20"
+                                  }
+                                >
+                                  {m.status === "DONE" ? "Cumplido" : "Pendiente"}
+                                </Badge>
                               </div>
 
                               <p className="text-sm text-muted-foreground">{m.description || "—"}</p>
@@ -1954,7 +1963,7 @@ return Array.isArray(raw)
                     {detailRow ? (
                       <>
                         <Button
-                          variant="secondary"
+                          variant="action"
                           onClick={() => openUploadEvidence(detailRow.id)}
                           className="gap-2"
                         >
@@ -1963,7 +1972,7 @@ return Array.isArray(raw)
                         </Button>
 
                         <Button
-                          variant="secondary"
+                          variant="action"
                           onClick={() => {
                             setDetailOpen(false)
                             openEditRiskDrawer(detailRow)

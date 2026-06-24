@@ -74,6 +74,12 @@ function getTrainingStatusLabel(status?: string | null) {
   return status ?? "No registrada"
 }
 
+function getTrainingStatusBadgeClassName(status?: string | null) {
+  if (status === "FINALIZADA" || status === "FINISHED") return "bg-blue-600 text-white border-transparent"
+  if (status === "CANCELADA" || status === "CANCELLED") return "bg-destructive text-white border-transparent"
+  return undefined
+}
+
 const trainingStatusOptions = [
   { value: "ACTIVE", label: "Activa" },
   { value: "INACTIVE", label: "Inactiva" },
@@ -124,7 +130,7 @@ function TopicDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={topic ? "outline" : "default"} size="sm" className="gap-2">
+        <Button variant={topic ? "action" : "default"} size="sm" className="gap-2">
           {topic ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           {topic ? "Editar" : "Nuevo tema"}
         </Button>
@@ -243,7 +249,7 @@ function TrainingDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={training ? "outline" : "default"} size="sm" className="gap-2">
+        <Button variant={training ? "action" : "default"} size="sm" className="gap-2">
           {training ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           {training ? "Editar" : "Nueva capacitacion"}
         </Button>
@@ -545,7 +551,16 @@ export default function TrainingPlanPage() {
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="font-semibold">{training.topic?.name ?? training.topicId}</h3>
-                        <Badge variant={training.status === "ACTIVE" ? "default" : "secondary"}>
+                        <Badge
+                          variant={
+                            training.status === "ACTIVE"
+                              ? "accentActivd"
+                              : training.status === "INACTIVE"
+                                ? "destructive"
+                                : "secondary"
+                          }
+                          className={getTrainingStatusBadgeClassName(training.status)}
+                        >
                           {getTrainingStatusLabel(training.status)}
                         </Badge>
                       </div>
@@ -555,7 +570,7 @@ export default function TrainingPlanPage() {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <Link href={`/dashboard/trainingPlan/${training.id}`}>
-                        <Button variant="secondary" size="sm" className="gap-2">
+                        <Button variant="action" size="sm" className="gap-2">
                           <Eye className="h-4 w-4" />
                           Detalle
                         </Button>
@@ -563,9 +578,9 @@ export default function TrainingPlanPage() {
                       <TrainingDialog training={training} topics={topicOptions} onSave={handleSaveTraining} />
                       {training.status === "ACTIVE" ? (
                         <Button
-                          variant="outline"
+                          variant="destructive"
                           size="sm"
-                          className="gap-2 text-destructive hover:text-destructive"
+                          className="gap-2"
                           onClick={() => handleDeleteTraining(training.id)}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -603,7 +618,7 @@ export default function TrainingPlanPage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="font-medium">{topic.name}</h3>
-                          <Badge variant={topic.status === "ACTIVE" ? "default" : "secondary"}>{topic.status}</Badge>
+                          <Badge variant={topic.status === "ACTIVE" ? "accentActivd" : "destructive"}>{topic.status}</Badge>
                         </div>
                         <p className="mt-1 text-sm text-muted-foreground">{topic.description || "Sin descripcion"}</p>
                       </div>
@@ -611,9 +626,9 @@ export default function TrainingPlanPage() {
                         <TopicDialog topic={topic} onSave={handleSaveTopic} />
                         {topic.status === "ACTIVE" ? (
                           <Button
-                            variant="outline"
+                            variant="destructive"
                             size="sm"
-                            className="gap-2 text-destructive hover:text-destructive"
+                            className="gap-2"
                             onClick={() => handleDeleteTopic(topic.id)}
                           >
                             <Trash2 className="h-4 w-4" />

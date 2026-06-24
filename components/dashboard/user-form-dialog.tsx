@@ -237,7 +237,7 @@ export function EditUserButton({
       user={user}
       onSave={onSave}
       trigger={
-        <Button variant="ghost" size="icon" className="h-8 w-8">
+        <Button variant="action" size="icon" className="h-8 w-8">
           <Pencil className="h-4 w-4" />
         </Button>
       }

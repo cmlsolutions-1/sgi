@@ -59,11 +59,11 @@ export function CompaniesCard({ companies, selectedCompany, onSelect, onCreateCo
                       <h3 className="font-semibold text-foreground">{company.name}</h3>
 
                       <Badge
-                        variant={company.status === "active" ? "default" : "secondary"}
+                        variant={company.status === "active" ? "accentActivd" : "destructive"}
                         className={
                           company.status === "active"
-                            ? "bg-success/20 text-success border-success/30"
-                            : "bg-muted text-muted-foreground"
+                            ? "bg-accentActivd text-accentActivd-foreground"
+                            : "bg-destructive text-white"
                         }
                       >
                         {company.status === "active" ? (

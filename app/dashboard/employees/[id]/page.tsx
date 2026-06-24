@@ -308,7 +308,7 @@ function SocialSecurityDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={item.entityId ? "outline" : "default"} size="sm" className="gap-2">
+        <Button variant={item.entityId ? "action" : "default"} size="sm" className="gap-2">
           {item.entityId ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           {item.entityId ? "Editar" : "Agregar"}
         </Button>
@@ -588,9 +588,9 @@ function DocumentManager({
                 )}
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="destructive"
                   size="sm"
-                  className="gap-2 text-destructive hover:text-destructive"
+                  className="gap-2"
                   onClick={() => handleDelete(document.id)}
                 >
                   <Trash2 className="h-4 w-4" />
@@ -676,7 +676,7 @@ function EducationDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={education ? "outline" : "default"} size="sm" className="gap-2">
+        <Button variant={education ? "action" : "default"} size="sm" className="gap-2">
           {education ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           {education ? "Editar" : "Agregar educacion"}
         </Button>
@@ -848,7 +848,7 @@ function CertificationDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={certification ? "outline" : "default"} size="sm" className="gap-2">
+        <Button variant={certification ? "action" : "default"} size="sm" className="gap-2">
           {certification ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           {certification ? "Editar" : "Agregar certificacion"}
         </Button>
@@ -1000,7 +1000,7 @@ function ContractDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={contract ? "outline" : "default"} size="sm" className="gap-2">
+        <Button variant={contract ? "action" : "default"} size="sm" className="gap-2">
           {contract ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           {contract ? "Editar" : "Agregar contrato"}
         </Button>
@@ -1187,7 +1187,7 @@ function EvaluationDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={evaluation ? "outline" : "default"} size="sm" className="gap-2">
+        <Button variant={evaluation ? "action" : "default"} size="sm" className="gap-2">
           {evaluation ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           {evaluation ? "Editar" : "Agregar evaluacion"}
         </Button>
@@ -1375,7 +1375,7 @@ function MedicalEvaluationDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={medicalEvaluation ? "outline" : "default"} size="sm" className="gap-2">
+        <Button variant={medicalEvaluation ? "action" : "default"} size="sm" className="gap-2">
           {medicalEvaluation ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           {medicalEvaluation ? "Editar" : "Agregar evaluacion medica"}
         </Button>
@@ -1548,7 +1548,7 @@ function EppDeliveryDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={delivery ? "outline" : "default"} size="sm" className="gap-2">
+        <Button variant={delivery ? "action" : "default"} size="sm" className="gap-2">
           {delivery ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           {delivery ? "Editar" : "Agregar entrega EPP"}
         </Button>
@@ -2041,7 +2041,10 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                   <p className="text-muted-foreground">{employee.job?.name ?? "Sin puesto asignado"}</p>
                   <Badge
                     variant="secondary"
-                    className={cn("mt-2", employee.status ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground")}
+                    className={cn(
+                      "mt-2",
+                      employee.status ? "bg-accentActivd text-accentActivd-foreground" : "bg-destructive text-white",
+                    )}
                   >
                     {employee.status ? "Activo" : "Inactivo"}
                   </Badge>
@@ -2106,7 +2109,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                   employee={employee}
                   onSave={(payload) => handleUpdatePersonalInfo(payload as UpdateEmployeeDto)}
                   trigger={
-                    <Button variant="outline" size="sm" className="gap-2">
+                    <Button variant="action" size="sm" className="gap-2">
                       <Edit className="h-4 w-4" />
                       Editar informacion
                     </Button>
@@ -2138,7 +2141,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground">Estado</p>
-                  <p className="text-sm">{employee.status ? "Activo" : "Inactivo"}</p>
+                  <Badge variant={employee.status ? "accentActivd" : "destructive"}>
+                    {employee.status ? "Activo" : "Inactivo"}
+                  </Badge>
                 </div>
                 <div className="space-y-1 md:col-span-2">
                   <p className="text-xs text-muted-foreground">Direccion</p>
@@ -2203,9 +2208,12 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                       </div>
 
                       {completed && (
-                        <p className="mt-3 text-xs text-muted-foreground">
-                          Estado del aporte: {item.status === false ? "Inactivo" : "Activo"}
-                        </p>
+                        <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+                          <span>Estado del aporte:</span>
+                          <Badge variant={item.status === false ? "destructive" : "accentActivd"}>
+                            {item.status === false ? "Inactivo" : "Activo"}
+                          </Badge>
+                        </div>
                       )}
 
                       <div className="mt-4">
@@ -2269,9 +2277,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                         <div className="flex gap-2">
                           <EducationDialog education={item} onSave={handleSaveEducation} />
                           <Button
-                            variant="outline"
+                            variant="destructive"
                             size="sm"
-                            className="gap-2 text-destructive hover:text-destructive"
+                            className="gap-2"
                             onClick={() => handleDeleteEducation(item.id)}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -2346,9 +2354,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                         <div className="flex flex-wrap gap-2">
                           <CertificationDialog certification={item} onSave={handleSaveCertification} />
                           <Button
-                            variant="outline"
+                            variant="destructive"
                             size="sm"
-                            className="gap-2 text-destructive hover:text-destructive"
+                            className="gap-2"
                             onClick={() => handleDeleteCertification(item.id)}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -2412,7 +2420,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
                             <h3 className="font-medium">{item.type}</h3>
-                            <Badge variant={item.status === "ACTIVE" ? "default" : "secondary"}>
+                            <Badge variant={item.status === "ACTIVE" ? "accentActivd" : "destructive"}>
                               {item.status === "ACTIVE" ? "Activo" : item.status}
                             </Badge>
                           </div>
@@ -2422,9 +2430,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                         <div className="flex flex-wrap gap-2">
                           <ContractDialog contract={item} onSave={handleSaveContract} />
                           <Button
-                            variant="outline"
+                            variant="destructive"
                             size="sm"
-                            className="gap-2 text-destructive hover:text-destructive"
+                            className="gap-2"
                             onClick={() => handleDeleteContract(item.id)}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -2517,9 +2525,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                             onSave={handleSaveEvaluation}
                           />
                           <Button
-                            variant="outline"
+                            variant="destructive"
                             size="sm"
-                            className="gap-2 text-destructive hover:text-destructive"
+                            className="gap-2"
                             onClick={() => handleDeleteEvaluation(item.id)}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -2594,9 +2602,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                         <div className="flex flex-wrap gap-2">
                           <MedicalEvaluationDialog medicalEvaluation={item} onSave={handleSaveMedicalEvaluation} />
                           <Button
-                            variant="outline"
+                            variant="destructive"
                             size="sm"
-                            className="gap-2 text-destructive hover:text-destructive"
+                            className="gap-2"
                             onClick={() => handleDeleteMedicalEvaluation(item.id)}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -2670,9 +2678,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                         <div className="flex flex-wrap gap-2">
                           <EppDeliveryDialog delivery={item} onSave={handleSaveEppDelivery} />
                           <Button
-                            variant="outline"
+                            variant="destructive"
                             size="sm"
-                            className="gap-2 text-destructive hover:text-destructive"
+                            className="gap-2"
                             onClick={() => handleDeleteEppDelivery(item.id)}
                           >
                             <Trash2 className="h-4 w-4" />

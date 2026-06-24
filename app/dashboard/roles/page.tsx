@@ -320,7 +320,7 @@ export default function RolesPage() {
                         </p>
                       </div>
                     </div>
-                    <Badge variant={role.status === "ACTIVE" ? "default" : "secondary"}>{role.status}</Badge>
+                    <Badge variant={role.status === "ACTIVE" ? "accentActivd" : "destructive"}>{role.status}</Badge>
                   </div>
                 </CardContent>
               </Card>
@@ -338,11 +338,11 @@ export default function RolesPage() {
                     <CardDescription>{selectedRole.description || "Sin descripcion registrada"}</CardDescription>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => openEditDialog(selectedRole)}>
+                    <Button variant="action" size="sm" onClick={() => openEditDialog(selectedRole)}>
                       <Edit className="mr-2 h-4 w-4" />
                       Editar
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => handleDelete(selectedRole)}>
+                    <Button variant="destructive" size="sm" onClick={() => handleDelete(selectedRole)}>
                       <Trash2 className="mr-2 h-4 w-4" />
                       Eliminar
                     </Button>

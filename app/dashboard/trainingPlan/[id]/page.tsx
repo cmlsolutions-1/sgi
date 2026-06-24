@@ -68,6 +68,12 @@ function getTrainingStatusLabel(status?: string | null) {
   return status ?? "No registrada"
 }
 
+function getTrainingStatusBadgeClassName(status?: string | null) {
+  if (status === "FINALIZADA" || status === "FINISHED") return "bg-blue-600 text-white border-transparent"
+  if (status === "CANCELADA" || status === "CANCELLED") return "bg-destructive text-white border-transparent"
+  return undefined
+}
+
 function formatFileSize(value?: number | null) {
   if (!value) return "0 KB"
   if (value < 1024 * 1024) return `${Math.max(1, Math.round(value / 1024))} KB`
@@ -122,7 +128,7 @@ function AttendanceDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={attendance ? "outline" : "default"} size="sm" className="gap-2">
+        <Button variant={attendance ? "action" : "default"} size="sm" className="gap-2">
           {attendance ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           {attendance ? "Editar" : "Asignar asistente"}
         </Button>
@@ -326,9 +332,9 @@ function TrainingDocuments({ trainingId }: { trainingId: string }) {
                   )}
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="destructive"
                     size="sm"
-                    className="gap-2 text-destructive hover:text-destructive"
+                    className="gap-2"
                     onClick={() => handleDelete(document.id)}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -525,7 +531,16 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
               {formatDate(training.date)} · {training.durationHours} horas
             </p>
           </div>
-          <Badge variant={training.status === "ACTIVE" ? "default" : "secondary"}>
+          <Badge
+            variant={
+              training.status === "ACTIVE"
+                ? "accentActivd"
+                : training.status === "INACTIVE"
+                  ? "destructive"
+                  : "secondary"
+            }
+            className={getTrainingStatusBadgeClassName(training.status)}
+          >
             {getTrainingStatusLabel(training.status)}
           </Badge>
         </CardHeader>
@@ -535,8 +550,8 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
             Descargar acta
           </Button>
           <Button
-            variant="outline"
-            className="gap-2 text-destructive hover:text-destructive"
+            variant="destructive"
+            className="gap-2"
             onClick={handleDeleteTraining}
           >
             <Trash2 className="h-4 w-4" />
@@ -605,9 +620,9 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
                     <div className="flex flex-wrap gap-2">
                       <AttendanceDialog attendance={attendance} employees={employeeOptions} onSave={handleSaveAttendance} />
                       <Button
-                        variant="outline"
+                        variant="destructive"
                         size="sm"
-                        className="gap-2 text-destructive hover:text-destructive"
+                        className="gap-2"
                         onClick={() => handleDeleteAttendance(attendance.id)}
                       >
                         <Trash2 className="h-4 w-4" />

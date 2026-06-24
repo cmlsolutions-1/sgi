@@ -247,7 +247,7 @@ export default function PreventiveMeasureDetailPage() {
                     </Button>
 
                     <Button
-                      variant="outline"
+                      variant="destructive"
                       size="sm"
                       className="gap-2"
                       onClick={() => onDeleteEvidence(ev.id)}

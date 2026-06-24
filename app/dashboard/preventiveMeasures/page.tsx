@@ -85,9 +85,9 @@ const measureFieldControlClassName =
   "mt-1 w-full border-slate-300 bg-white shadow-sm hover:border-slate-400 focus-visible:border-primary focus-visible:ring-primary/25"
 
 const statusConfig = {
-  PENDING: { icon: Clock, color: "text-warning", label: "Pendiente" },
-  DONE: { icon: CheckCircle, color: "text-accent", label: "Cumplida" },
-} satisfies Record<PreventiveMeasureStatus, { icon: typeof Clock; color: string; label: string }>
+  PENDING: { icon: Clock, color: "text-warning", badge: "bg-warning/10 text-warning border-warning/20", label: "Pendiente" },
+  DONE: { icon: CheckCircle, color: "text-accentActivd", badge: "bg-accentActivd text-accentActivd-foreground border-transparent", label: "Cumplida" },
+} satisfies Record<PreventiveMeasureStatus, { icon: typeof Clock; color: string; badge: string; label: string }>
 
 const keyLabels: Record<PreventiveMeasureKey, string> = {
   ELIMINACION: "Eliminación",
@@ -267,9 +267,9 @@ function PreventiveMeasureDocuments({ measureId }: { measureId: string }) {
                 )}
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="destructive"
                   size="sm"
-                  className="gap-2 text-destructive hover:text-destructive"
+                  className="gap-2"
                   onClick={() => handleDelete(document.id)}
                 >
                   <Trash2 className="h-4 w-4" />
@@ -893,7 +893,7 @@ export default function PreventiveMeasuresPage() {
 
                     <div className="flex items-center gap-2 shrink-0">
                       <StatusIcon className={cn("h-4 w-4", status.color)} />
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="outline" className={cn("text-xs", status.badge)}>
                         {status.label}
                       </Badge>
                     </div>
@@ -906,11 +906,11 @@ export default function PreventiveMeasuresPage() {
                     </span>
 
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" className="gap-2" onClick={() => openEditModal(measure)}>
+                      <Button variant="action" size="sm" className="gap-2" onClick={() => openEditModal(measure)}>
                         <Pencil className="h-4 w-4" />
                         Editar
                       </Button>
-                      <Button variant="outline" size="sm" className="gap-2" onClick={() => removeMeasure(measure)}>
+                      <Button variant="destructive" size="sm" className="gap-2" onClick={() => removeMeasure(measure)}>
                         <Trash2 className="h-4 w-4" />
                         Eliminar
                       </Button>

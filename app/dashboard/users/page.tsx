@@ -385,7 +385,7 @@ export default function UsersPage() {
                         variant="secondary"
                         className={cn(
                           "text-xs",
-                          user.status === "ACTIVE" ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground"
+                          user.status === "ACTIVE" ? "bg-accentActivd text-accentActivd-foreground" : "bg-destructive text-white"
                         )}
                       >
                         {user.status === "ACTIVE" ? "Activo" : "Inactivo"}
@@ -393,13 +393,13 @@ export default function UsersPage() {
                     </td>
                     <td className="px-2 py-3">
                       <div className="flex items-center justify-end gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEditDialog(user)}>
+                        <Button variant="action" size="icon" className="h-8 w-8" onClick={() => openEditDialog(user)}>
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
-                          variant="ghost"
+                          variant="destructive"
                           size="icon"
-                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          className="h-8 w-8"
                           onClick={() => handleDelete(user)}
                         >
                           <Trash2 className="h-4 w-4" />

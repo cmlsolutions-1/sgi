@@ -179,9 +179,9 @@ export default function UploadPage() {
                       {file.status === "uploading" && <Progress value={file.progress} className="h-1 mt-2" />}
                     </div>
                     <Button
-                      variant="ghost"
+                      variant="destructive"
                       size="icon"
-                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      className="h-8 w-8"
                       onClick={() => removeFile(file.id)}
                     >
                       <X className="h-4 w-4" />
