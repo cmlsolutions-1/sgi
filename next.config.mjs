@@ -7,10 +7,14 @@ const nextConfig = {
     unoptimized: true,
   },
   async rewrites() {
+    if (!process.env.API_URL) {
+      return [];
+    }
+
     return [
       {
         source: "/api/:path*",
-        destination: "http://localhost:3000/api/:path*",
+        destination: `${process.env.API_URL}/api/:path*`,
       },
     ];
   },

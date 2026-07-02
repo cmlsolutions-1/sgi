@@ -1,0 +1,12 @@
+.git
+.next
+node_modules
+.env
+.env.*
+!.env.example
+.gitignore
+*.log
+npm-debug.log*
+pnpm-debug.log*
+tsconfig.tsbuildinfo
+Thumbs.db
