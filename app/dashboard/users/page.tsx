@@ -52,6 +52,14 @@ function getInitials(name: string) {
     .toUpperCase()
 }
 
+function sanitizePhone(value: string) {
+  return value.replace(/\D/g, "").slice(0, 10)
+}
+
+function isValidPhone(value: string) {
+  return /^\d{10}$/.test(value)
+}
+
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [roles, setRoles] = useState<Role[]>([])
@@ -104,7 +112,7 @@ export default function UsersPage() {
       id: user.id,
       name: user.name,
       email: user.email,
-      phone: user.phone ?? "",
+      phone: sanitizePhone(user.phone ?? ""),
       password: "",
       rolesIds: user.roles.map((role) => role.id),
     })
@@ -135,12 +143,18 @@ export default function UsersPage() {
       return
     }
 
+    const phone = sanitizePhone(form.phone)
+    if (!isValidPhone(phone)) {
+      toast.error("El telefono debe tener exactamente 10 digitos")
+      return
+    }
+
     setSaving(true)
     try {
       if (form.id) {
         await updateUser(form.id, {
           name: form.name.trim(),
-          phone: form.phone.trim(),
+          phone,
           rolesIds: form.rolesIds,
         })
         toast.success("Usuario actualizado")
@@ -148,7 +162,7 @@ export default function UsersPage() {
         await createUser({
           name: form.name.trim(),
           email: form.email.trim(),
-          phone: form.phone.trim(),
+          phone,
           password: form.password,
           rolesIds: form.rolesIds,
         })
@@ -222,8 +236,14 @@ export default function UsersPage() {
                     <Label htmlFor="user-phone">Telefono</Label>
                     <Input
                       id="user-phone"
+                      type="tel"
+                      inputMode="numeric"
+                      maxLength={10}
+                      pattern="[0-9]{10}"
                       value={form.phone}
-                      onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))}
+                      onChange={(event) =>
+                        setForm((current) => ({ ...current, phone: sanitizePhone(event.target.value) }))
+                      }
                       placeholder="3000000000"
                       required
                     />

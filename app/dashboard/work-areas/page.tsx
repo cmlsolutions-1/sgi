@@ -255,7 +255,7 @@ export function WorkAreasManager() {
                     <td className="px-2 py-3">
                       <div className="flex justify-end gap-1">
                         {area.status !== "ACTIVE" && (
-                          <Button variant="ghost" size="sm" onClick={() => handleActivate(area)}>
+                          <Button variant="accentActivd" size="sm" onClick={() => handleActivate(area)}>
                             Activar
                           </Button>
                         )}

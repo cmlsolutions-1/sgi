@@ -43,6 +43,30 @@ function getPermissionGroup(permissionName: string) {
   return rest.join(" ") || "Otros"
 }
 
+function normalizeText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+}
+
+function capitalizeFirst(value: string) {
+  const normalized = value.trim()
+  if (!normalized) return "Otros"
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1)
+}
+
+function isSuperAdminPermission(permission: Permission) {
+  const name = normalizeText(permission.name)
+
+  return (
+    name.includes("administrador de la plataforma") ||
+    name.includes("empresas") ||
+    name.includes("modulos para empresa")
+  )
+}
+
 function normalizeRolePermissionIds(role: Role, permissions: Permission[]): string[] {
   const permissionById = new Map(permissions.map((permission) => [permission.id, permission]))
   const permissionByName = new Map(permissions.map((permission) => [permission.name.toLowerCase(), permission]))
@@ -80,7 +104,7 @@ export default function RolesPage() {
 
   const groupedPermissions = useMemo(() => {
     return permissions.reduce<Record<string, Permission[]>>((groups, permission) => {
-      const group = getPermissionGroup(permission.name)
+      const group = capitalizeFirst(getPermissionGroup(permission.name))
       groups[group] = groups[group] ?? []
       groups[group].push(permission)
       return groups
@@ -92,7 +116,7 @@ export default function RolesPage() {
     try {
       const [rolesData, permissionsData] = await Promise.all([listRoles(), listPermissions()])
       setRoles(rolesData)
-      setPermissions(permissionsData)
+      setPermissions(permissionsData.filter((permission) => !isSuperAdminPermission(permission)))
       setSelectedRoleId((current) => current ?? rolesData[0]?.id ?? null)
     } catch (error: any) {
       toast.error(error.message ?? "No se pudo cargar roles y permisos")
@@ -210,7 +234,7 @@ export default function RolesPage() {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Gestion de Roles</h1>
-          <p className="text-muted-foreground">Crea roles y asigna permisos para los usuarios de la empresa.</p>
+          <p className="text-muted-foreground">Crea roles, visualiza y asigna permisos para los usuarios de la empresa.</p>
         </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
@@ -220,7 +244,7 @@ export default function RolesPage() {
               Nuevo rol
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-3xl bg-card">
+          <DialogContent className="max-h-[90dvh] w-[calc(100vw-2rem)] max-w-3xl overflow-y-auto bg-card p-4 sm:p-6">
             <form onSubmit={handleSubmit}>
               <DialogHeader>
                 <DialogTitle>{form.id ? "Editar rol" : "Crear rol"}</DialogTitle>
@@ -253,7 +277,7 @@ export default function RolesPage() {
                     <Label>Permisos</Label>
                     <Badge variant="secondary">{form.permissionIds.length} seleccionados</Badge>
                   </div>
-                  <div className="max-h-[360px] overflow-y-auto rounded-lg border border-border">
+                  <div className="max-h-[min(360px,45vh)] overflow-y-auto rounded-lg border border-border">
                     {Object.entries(groupedPermissions).map(([group, items]) => (
                       <div key={group} className="border-b border-border last:border-0 p-4">
                         <h3 className="mb-3 text-sm font-semibold text-foreground">{group}</h3>

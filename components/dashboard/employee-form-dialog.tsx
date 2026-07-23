@@ -2,9 +2,10 @@
 
 import type React from "react"
 import { useEffect, useMemo, useState } from "react"
-import { Loader2, Pencil, Plus } from "lucide-react"
+import { Info, Loader2, Pencil, Plus } from "lucide-react"
 import { toast } from "sonner"
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -95,6 +96,9 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
   const [loadingOptions, setLoadingOptions] = useState(false)
   const [saving, setSaving] = useState(false)
 
+  const isCreateMode = !employee
+  const missingSetup = isCreateMode && !loadingOptions && (workAreas.length === 0 || jobs.length === 0)
+
   const availableJobs = useMemo(() => {
     if (!formData.workAreaId) return jobs
     return jobs.filter((job) => job.workAreaId === formData.workAreaId)
@@ -117,6 +121,12 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
       .finally(() => setLoadingOptions(false))
   }, [employee, open])
 
+  useEffect(() => {
+    if (!open || !isCreateMode) return
+
+    toast.info("Recuerda que debes tener creadas las areas y puestos de trabajo para enlazarlos al funcionario.")
+  }, [isCreateMode, open])
+
   function updateField<K extends keyof EmployeeFormValues>(field: K, value: EmployeeFormValues[K]) {
     setFormData((current) => {
       if (field === "workAreaId" && current.workAreaId !== value) {
@@ -132,6 +142,11 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
 
     if (!formData.name.trim() || !formData.lastName.trim()) {
       toast.error("Nombre y apellido son requeridos")
+      return
+    }
+
+    if (missingSetup) {
+      toast.error("Primero crea al menos un area de trabajo y un puesto de trabajo")
       return
     }
 
@@ -195,6 +210,26 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
             </div>
           ) : (
             <div className="grid gap-4 py-4">
+              {isCreateMode && (
+                <Alert className="border-primary/30 bg-primary/5">
+                  <Info className="h-4 w-4" />
+                  <AlertTitle>Antes de crear el funcionario</AlertTitle>
+                  <AlertDescription>
+                    Recuerda que debes tener creadas las areas de trabajo y los puestos de trabajo para poder enlazarlos al funcionario.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {missingSetup && (
+                <Alert variant="destructive">
+                  <Info className="h-4 w-4" />
+                  <AlertTitle>Configuracion requerida</AlertTitle>
+                  <AlertDescription>
+                    Crea primero {workAreas.length === 0 ? "un area de trabajo" : "un puesto de trabajo"} en el modulo Empleados.
+                  </AlertDescription>
+                </Alert>
+              )}
+
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="employee-name">Nombre</Label>
@@ -335,7 +370,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={saving || loadingOptions}>
+            <Button type="submit" disabled={saving || loadingOptions || missingSetup}>
               {saving ? "Guardando..." : employee ? "Guardar cambios" : "Crear funcionario"}
             </Button>
           </DialogFooter>

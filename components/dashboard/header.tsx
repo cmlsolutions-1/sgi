@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Bell, CheckCheck, Loader2, Search } from "lucide-react"
+import { Bell, CheckCheck, Loader2, LogOut, Search, Settings, UserCircle } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +18,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
+import { doLogout } from "@/lib/auth/logout"
+import { decodeJwt, tokenHasRole } from "@/lib/jwt"
 import { useAuthStore } from "@/store/auth.store"
 import {
   getUnreadNotificationsCount,
@@ -24,6 +27,7 @@ import {
   markAllNotificationsAsRead,
   markNotificationAsRead,
 } from "@/services/notificationService"
+import { getUserById } from "@/services/userService"
 import type { NotificationItem, NotificationReferenceType, NotificationType } from "@/types/manager/notification"
 
 const NOTIFICATION_REFRESH_INTERVAL_MS = 15_000
@@ -53,6 +57,17 @@ function formatNotificationDate(value: string | null) {
   }).format(date)
 }
 
+function getInitials(name: string) {
+  return (
+    name
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "US"
+  )
+}
+
 export function Header() {
   const router = useRouter()
   const accessToken = useAuthStore((state) => state.accessToken)
@@ -64,9 +79,51 @@ export function Header() {
   const [isMarkingAll, setIsMarkingAll] = useState(false)
   const [readingId, setReadingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [profileOpen, setProfileOpen] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
+  const [currentUser, setCurrentUser] = useState<{ name: string; email?: string; roleLabel: string }>({
+    name: "Usuario",
+    roleLabel: "Usuario",
+  })
 
   const hasUnread = unreadCount > 0
   const unreadLabel = useMemo(() => (unreadCount > 99 ? "99+" : String(unreadCount)), [unreadCount])
+
+  useEffect(() => {
+    if (!hasHydrated || !accessToken) return
+
+    let mounted = true
+    const payload = decodeJwt(accessToken)
+    const userId = typeof payload?.sub === "string" ? payload.sub : null
+    const roleLabel = tokenHasRole(accessToken, "ADMIN") ? "Administrador" : "Administrador empresa"
+
+    setCurrentUser((current) => ({ ...current, roleLabel }))
+
+    if (!userId) return
+
+    getUserById(userId)
+      .then((user) => {
+        if (!mounted) return
+
+        setCurrentUser({
+          name: user.name || user.email || userId,
+          email: user.email,
+          roleLabel,
+        })
+      })
+      .catch(() => {
+        if (!mounted) return
+
+        setCurrentUser({
+          name: roleLabel,
+          roleLabel,
+        })
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [accessToken, hasHydrated])
 
   const refreshNotifications = useCallback(async (showLoading = true) => {
     if (!hasHydrated || !accessToken) return
@@ -183,6 +240,15 @@ export function Header() {
     }
   }
 
+  const handleLogout = async () => {
+    setLoggingOut(true)
+    try {
+      await doLogout()
+    } finally {
+      router.replace("/login")
+    }
+  }
+
   return (
     <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-6">
       <div className="flex items-center gap-4 flex-1">
@@ -280,27 +346,82 @@ export function Header() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-primary text-primary-foreground text-xs">CR</AvatarFallback>
+        <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center gap-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                    {getInitials(currentUser.name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="text-left hidden md:block">
+                  <p className="text-sm font-medium">{currentUser.name}</p>
+                  <p className="text-xs text-muted-foreground">{currentUser.roleLabel}</p>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuLabel>
+                <div className="space-y-1">
+                  <p>Mi Cuenta</p>
+                  <p className="truncate text-xs font-normal text-muted-foreground">
+                    {currentUser.email || currentUser.roleLabel}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => setProfileOpen(true)} className="gap-2">
+                <UserCircle className="h-4 w-4" />
+                Perfil
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => router.push("/dashboard/settings")} className="gap-2">
+                <Settings className="h-4 w-4" />
+                Configuracion
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onSelect={(event) => {
+                  event.preventDefault()
+                  void handleLogout()
+                }}
+                disabled={loggingOut}
+                className="gap-2 text-destructive focus:text-destructive"
+              >
+                {loggingOut ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
+                {loggingOut ? "Cerrando..." : "Cerrar Sesion"}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DialogContent className="bg-card">
+            <DialogHeader>
+              <DialogTitle>Perfil de usuario</DialogTitle>
+              <DialogDescription>Informacion basica de la sesion actual.</DialogDescription>
+            </DialogHeader>
+            <div className="flex items-start gap-4 rounded-lg border border-border p-4">
+              <Avatar className="h-12 w-12">
+                <AvatarFallback className="bg-primary text-primary-foreground">
+                  {getInitials(currentUser.name)}
+                </AvatarFallback>
               </Avatar>
-              <div className="text-left hidden md:block">
-                <p className="text-sm font-medium">Carlos Rodríguez</p>
-                <p className="text-xs text-muted-foreground">Administrador</p>
+              <div className="min-w-0 space-y-2">
+                <div>
+                  <p className="text-xs text-muted-foreground">Nombre</p>
+                  <p className="font-medium">{currentUser.name}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Correo</p>
+                  <p className="break-all text-sm">{currentUser.email || "No registrado"}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Rol</p>
+                  <p className="text-sm">{currentUser.roleLabel}</p>
+                </div>
               </div>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Perfil</DropdownMenuItem>
-            <DropdownMenuItem>Configuración</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">Cerrar Sesión</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </header>
   )
