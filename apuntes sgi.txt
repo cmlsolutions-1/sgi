@@ -1,7 +1,7 @@
 API_URL=http://localhost:3000
 
 
-url alfonsilla 
+url alfonsilla
 
 alfonsilla@alfonsilla.com
 123456
@@ -16,209 +16,76 @@ SGI
 administrador super admin
 admin@safecloud.com
 123456
+"userId": "2b236f82-ece0-4190-a357-173a22df9c84"
 
+(todos los modulos completos)
 alfonso@alfonso.com
 12345678
 userId": "30c2725f-c3bc-4c1d-b379-c961f85670e4",
 
+(todos los modulos completos)
 wilson@wilson.com
 12345678
 userId": "249f7cdc-d4b3-4d1a-b4c0-98e30c8ebedb",
+
+
+tomas@tomas.com
+12345678
+userId 6ef499ac-d33d-4e57-82f2-299c67bdc165
+"companyId": 198edf2b-d697-485d-832f-15d11a54038b
+
 
 alfonso@alfonso.com
 12345678
 
 
-
-POST /api/document-management
-jwt  (http, Bearer)
-Request body
-{
-  "name": "string",
-  "type": "PROCEDURE",
-  "version": "1.0",
-  "workAreaId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "consecutive": 1,
-  "code": "PR-LAB-001"
-}
-DA COMO RESPUESTA
-{
-  "ok": true,
-  "message": "OK",
-  "data": {
-    "id": "string",
-    "name": "string",
-    "type": "PROCEDURE",
-    "version": "string",
-    "status": "ACTIVE",
-    "workAreaId": "string",
-    "consecutive": 0,
-    "code": "string",
-    "workArea": {
-      "id": "string",
-      "name": "string"
-    }
-  },
-  "errors": null,
-  "meta": {
-    "path": "/api/user/123",
-    "method": "GET",
-    "timestamp": "2026-01-19T12:34:56.000Z",
-    "statusCode": 0
-  }
-}
+tomi@tomi.com
+12345678
 
 
-GET /api/document-management
-jwt  (http, Bearer)
-PARAMETROS PARA FILTRAR
-Name workAreaId (string)
-Description Filtra por area de trabajo dentro de la misma empresa
-DA COMO RESPUESTA
-{
-  "ok": true,
-  "message": "OK",
-  "data": [
-    {
-      "id": "string",
-      "name": "string",
-      "type": "PROCEDURE",
-      "version": "string",
-      "status": "ACTIVE",
-      "workAreaId": "string",
-      "consecutive": 0,
-      "code": "string",
-      "workArea": {
-        "id": "string",
-        "name": "string"
-      }
-    }
-  ],
-  "errors": null,
-  "meta": {
-    "path": "/api/user/123",
-    "method": "GET",
-    "timestamp": "2026-01-19T12:34:56.000Z",
-    "statusCode": 0
-  }
-}
 
-GET /api/document-management/{id}
-jwt  (http, Bearer)
-id REQUERIDO
-DA COMO RESPUESTA
-{
-  "ok": true,
-  "message": "OK",
-  "data": {
-    "id": "string",
-    "name": "string",
-    "type": "PROCEDURE",
-    "version": "string",
-    "status": "ACTIVE",
-    "workAreaId": "string",
-    "consecutive": 0,
-    "code": "string",
-    "workArea": {
-      "id": "string",
-      "name": "string"
-    }
-  },
-  "errors": null,
-  "meta": {
-    "path": "/api/user/123",
-    "method": "GET",
-    "timestamp": "2026-01-19T12:34:56.000Z",
-    "statusCode": 0
-  }
-}
+entidades caja de compensación
 
-
-PUT /api/document-management/{id}
-jwt  (http, Bearer)
-id REQUERIDO
-Request body
-{
-  "name": "string",
-  "type": "PROCEDURE",
-  "version": "1.0",
-  "workAreaId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "consecutive": 1,
-  "code": "PR-LAB-001"
-}
-DA COMO RESPUESTA
-{
-  "ok": true,
-  "message": "OK",
-  "data": {
-    "id": "string",
-    "name": "string",
-    "type": "PROCEDURE",
-    "version": "string",
-    "status": "ACTIVE",
-    "workAreaId": "string",
-    "consecutive": 0,
-    "code": "string",
-    "workArea": {
-      "id": "string",
-      "name": "string"
-    }
-  },
-  "errors": null,
-  "meta": {
-    "path": "/api/user/123",
-    "method": "GET",
-    "timestamp": "2026-01-19T12:34:56.000Z",
-    "statusCode": 0
-  }
-}
-
-
-DELETE /api/document-management/{id}
-jwt  (http, Bearer)
-id REQUERIDO
-DA COMO RESPUESTA
-{
-  "ok": true,
-  "message": "OK",
-  "data": {},
-  "errors": null,
-  "meta": {
-    "path": "/api/user/123",
-    "method": "GET",
-    "timestamp": "2026-01-19T12:34:56.000Z",
-    "statusCode": 0
-  }
-}
-
-
-PUT /api/document-management/active/{id}
-jwt  (http, Bearer)
-id REQUERIDO
-DA COMO RESPUESTA
-{
-  "ok": true,
-  "message": "OK",
-  "data": {
-    "id": "string",
-    "name": "string",
-    "type": "PROCEDURE",
-    "version": "string",
-    "status": "ACTIVE",
-    "workAreaId": "string",
-    "consecutive": 0,
-    "code": "string",
-    "workArea": {
-      "id": "string",
-      "name": "string"
-    }
-  },
-  "errors": null,
-  "meta": {
-    "path": "/api/user/123",
-    "method": "GET",
-    "timestamp": "2026-01-19T12:34:56.000Z",
-    "statusCode": 0
-  }
-}
+COLSUBSIDIO
+COMFAMA
+COMFABOY
+COMBARRANQUILLA
+COMFENALCO CARTAGENA
+COMFENALCO
+COMFAGUAJIRA
+COMFAMILIAR RISARALDA
+COMFACA
+CAFAM
+CAJACOPI ATLÁNTICO
+COMFAMILIAR ATLÁNTICO
+COMFENALCO ANTIOQUIA
+COFREM
+COMPENSAR
+COMFENALCO SANTANDER
+CONFA
+COMCAJA
+COMFIAR
+CAFABA
+COMFAMILIAR
+COMFACUNDI
+COMFACOR
+COMFENALCO QUINDÍO
+COMFAMILIAR
+CAJASAI
+COMFASUCRE
+CAFAMAZ
+COMFACASANARE
+COMFACAUCA
+COMFACESAR
+COMFACHOCÓ
+COMFAMILIAR
+CAJAMAG
+COMFANORTE
+COMFAORIENTE
+COMFAMILIAR PUTUMAYO
+CAFASUR
+COMFATOLIMA
+COMFENALCO VALLE DELAGENTE
+COMFANDI
+CAJASAN
 

@@ -13,8 +13,10 @@ import {
   ClipboardCheck,
   Download,
   Edit,
+  ExternalLink,
   FileText,
   GraduationCap,
+  Eye,
   Loader2,
   Mail,
   MapPin,
@@ -134,6 +136,12 @@ type SocialSecurityFormState = {
   endDate: string
   arlRiskLevel: EmployeeArlRiskLevel | ""
   status: boolean
+}
+
+type DocumentPreviewState = {
+  document: EmployeeDocument
+  url: string
+  mimeType: string
 }
 
 const ARL_RISK_LEVEL_OPTIONS: Array<{ value: EmployeeArlRiskLevel; label: string }> = [
@@ -428,8 +436,10 @@ function DocumentManager({
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [file, setFile] = useState<File | null>(null)
-  const [type, setType] = useState(defaultType)
+  const [type] = useState(defaultType)
   const [isConfirmed, setIsConfirmed] = useState(true)
+  const [preview, setPreview] = useState<DocumentPreviewState | null>(null)
+  const [previewLoadingId, setPreviewLoadingId] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   async function loadDocuments() {
@@ -448,6 +458,12 @@ function DocumentManager({
     loadDocuments()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [employeeId, contextKey, defaultType, filterType])
+
+  useEffect(() => {
+    return () => {
+      if (preview?.url) URL.revokeObjectURL(preview.url)
+    }
+  }, [preview?.url])
 
   async function handleUpload(event: React.FormEvent) {
     event.preventDefault()
@@ -492,14 +508,34 @@ function DocumentManager({
   async function handleView(document: EmployeeDocument) {
     if (!document.downloadUrl) return
 
+    setPreviewLoadingId(document.id)
     try {
       const blob = await downloadEmployeeDocumentFile(document.downloadUrl)
       const url = URL.createObjectURL(blob)
-      window.open(url, "_blank", "noopener,noreferrer")
-      window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
+      setPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return {
+          document,
+          url,
+          mimeType: blob.type || document.mimeType || "",
+        }
+      })
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo abrir el documento")
+    } finally {
+      setPreviewLoadingId(null)
     }
+  }
+
+  function closePreview() {
+    setPreview((current) => {
+      if (current?.url) URL.revokeObjectURL(current.url)
+      return null
+    })
+  }
+
+  function canEmbedPreview(mimeType: string) {
+    return mimeType.startsWith("application/pdf") || mimeType.startsWith("image/")
   }
 
   return (
@@ -517,7 +553,7 @@ function DocumentManager({
         {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
       </div>
 
-      <form onSubmit={handleUpload} className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_160px] md:items-end">
+      <form onSubmit={handleUpload} className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-end">
         <div className="grid gap-2">
           <Label>Archivo</Label>
           <div className="flex min-h-9 items-center gap-2 overflow-hidden rounded-md border border-slate-300 bg-white px-2 py-1 shadow-xs">
@@ -546,10 +582,6 @@ function DocumentManager({
             </span>
           </div>
         </div>
-        <div className="grid gap-2">
-          <Label>Tipo</Label>
-          <Input value={type} onChange={(event) => setType(event.target.value)} disabled={uploading || filterType} />
-        </div>
         <label className="flex h-10 items-center gap-2 text-sm">
           <Checkbox
             checked={isConfirmed}
@@ -576,14 +608,25 @@ function DocumentManager({
               <div className="min-w-0">
                 <p className="truncate font-medium">{document.originalName || document.type}</p>
                 <p className="text-xs text-muted-foreground">
-                  {document.type} · {formatFileSize(document.size)} · {document.isConfirmed ? "Confirmado" : "Pendiente"}
+                  {formatFileSize(document.size)} - {document.isConfirmed ? "Confirmado" : "Pendiente"}
                 </p>
               </div>
               <div className="flex gap-2">
                 {document.downloadUrl && (
-                  <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => handleView(document)}>
-                    <Download className="h-4 w-4" />
-                    Ver
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                    onClick={() => handleView(document)}
+                    disabled={previewLoadingId === document.id}
+                  >
+                    {previewLoadingId === document.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                    {previewLoadingId === document.id ? "Cargando" : "Ver"}
                   </Button>
                 )}
                 <Button
@@ -601,6 +644,63 @@ function DocumentManager({
           ))
         )}
       </div>
+
+      <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && closePreview()}>
+        <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">
+          <DialogHeader className="border-b border-border px-4 py-3">
+            <DialogTitle className="truncate text-base">
+              {preview?.document.originalName || preview?.document.type || "Documento"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="min-h-0 flex-1 p-4">
+            {preview && canEmbedPreview(preview.mimeType) ? (
+              preview.mimeType.startsWith("image/") ? (
+                <div className="flex max-h-[70dvh] items-center justify-center overflow-auto rounded-md bg-secondary/40 p-2">
+                  <img
+                    src={preview.url}
+                    alt={preview.document.originalName || "Documento"}
+                    className="max-h-[68dvh] max-w-full rounded-md object-contain"
+                  />
+                </div>
+              ) : (
+                <iframe
+                  title={preview.document.originalName || "Documento"}
+                  src={preview.url}
+                  className="h-[70dvh] w-full rounded-md border border-border bg-white"
+                />
+              )
+            ) : (
+              <div className="flex min-h-[280px] flex-col items-center justify-center gap-3 rounded-md border border-dashed border-border bg-secondary/30 p-6 text-center">
+                <FileText className="h-10 w-10 text-muted-foreground" />
+                <div>
+                  <p className="font-medium">Vista previa no disponible</p>
+                  <p className="text-sm text-muted-foreground">
+                    Este tipo de archivo se puede abrir o descargar desde una pestana nueva.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="border-t border-border px-4 py-3">
+            {preview && (
+              <Button
+                type="button"
+                variant="outline"
+                className="gap-2"
+                onClick={() => window.open(preview.url, "_blank", "noopener,noreferrer")}
+              >
+                <ExternalLink className="h-4 w-4" />
+                Abrir en pestana
+              </Button>
+            )}
+            <Button type="button" onClick={closePreview}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -1084,7 +1184,7 @@ function ContractDialog({
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="contract-salary">Salario</Label>
+              <Label htmlFor="contract-salary">Salario Básico</Label>
               <Input
                 id="contract-salary"
                 type="number"
