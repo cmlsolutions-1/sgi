@@ -4,6 +4,7 @@ import { use, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import {
   Activity,
+  AlertTriangle,
   Award,
   ArrowLeft,
   Brain,
@@ -17,6 +18,8 @@ import {
   FileText,
   GraduationCap,
   Eye,
+  LayoutGrid,
+  List,
   Loader2,
   Mail,
   MapPin,
@@ -30,6 +33,7 @@ import {
 import { toast } from "sonner"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -155,6 +159,38 @@ const ARL_RISK_LEVEL_OPTIONS: Array<{ value: EmployeeArlRiskLevel; label: string
 function formatDate(value?: string | null) {
   if (!value) return "No registrada"
   return value.slice(0, 10)
+}
+
+function isPastDate(value?: string | null) {
+  if (!value) return false
+
+  const date = new Date(formatDate(value))
+  if (Number.isNaN(date.getTime())) return false
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  date.setHours(0, 0, 0, 0)
+
+  return date < today
+}
+
+function addYears(value: string, years: number) {
+  const date = new Date(value)
+  date.setFullYear(date.getFullYear() + years)
+  return date
+}
+
+function isAnnualEvaluationExpired(value?: string | null) {
+  if (!value) return false
+
+  const expirationDate = addYears(formatDate(value), 1)
+  if (Number.isNaN(expirationDate.getTime())) return false
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  expirationDate.setHours(0, 0, 0, 0)
+
+  return expirationDate <= today
 }
 
 function formatCurrency(value?: number | null) {
@@ -692,7 +728,7 @@ function DocumentManager({
                 onClick={() => window.open(preview.url, "_blank", "noopener,noreferrer")}
               >
                 <ExternalLink className="h-4 w-4" />
-                Abrir en pestana
+                Abrir en pestaña
               </Button>
             )}
             <Button type="button" onClick={closePreview}>
@@ -891,6 +927,7 @@ function EducationDialog({
 }
 
 type CertificationFormState = CreateEmployeeCertificationDto
+type CertificationFormErrors = Partial<Record<keyof CertificationFormState, string>>
 
 const emptyCertificationForm: CertificationFormState = {
   name: "",
@@ -912,6 +949,7 @@ function CertificationDialog({
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<CertificationFormState>(emptyCertificationForm)
+  const [errors, setErrors] = useState<CertificationFormErrors>({})
 
   useEffect(() => {
     if (!open) return
@@ -926,19 +964,48 @@ function CertificationDialog({
           }
         : emptyCertificationForm,
     )
+    setErrors({})
   }, [certification, open])
+
+  function updateField(field: keyof CertificationFormState, value: string) {
+    setForm((current) => ({ ...current, [field]: value }))
+    setErrors((current) => ({ ...current, [field]: undefined }))
+  }
+
+  function validateForm() {
+    const nextErrors: CertificationFormErrors = {}
+
+    if (!form.name.trim()) nextErrors.name = "Ingresa el nombre de la certificacion."
+    if (!form.issuer.trim()) nextErrors.issuer = "Ingresa la entidad que emite la certificacion."
+    if (!form.issuedAt) nextErrors.issuedAt = "Selecciona la fecha de expedicion."
+    if (!form.expiresAt) {
+      nextErrors.expiresAt = "Selecciona la fecha de vencimiento."
+    } else if (form.issuedAt && new Date(form.expiresAt) < new Date(form.issuedAt)) {
+      nextErrors.expiresAt = "La fecha de vencimiento no puede ser anterior a la expedicion."
+    }
+
+    setErrors(nextErrors)
+    return Object.keys(nextErrors).length === 0
+  }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
 
-    if (!form.name || !form.issuer || !form.issuedAt) {
-      toast.error("Completa nombre, entidad emisora y fecha de expedicion")
+    if (!validateForm()) {
+      toast.error("Revisa los campos marcados antes de guardar la certificacion")
       return
+    }
+
+    const payload: CertificationFormState = {
+      name: form.name.trim(),
+      issuer: form.issuer.trim(),
+      issuedAt: form.issuedAt,
+      expiresAt: form.expiresAt,
     }
 
     setSaving(true)
     try {
-      await onSave(form, certification?.id)
+      await onSave(payload, certification?.id)
       setOpen(false)
     } finally {
       setSaving(false)
@@ -966,20 +1033,22 @@ function CertificationDialog({
                 <Input
                   id="certification-name"
                   value={form.name}
-                  onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+                  onChange={(event) => updateField("name", event.target.value)}
                   placeholder="Ej: Trabajo seguro en alturas"
-                  required
+                  className={cn(errors.name && "border-destructive focus-visible:ring-destructive/25")}
                 />
+                {errors.name ? <p className="text-xs text-destructive">{errors.name}</p> : null}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="certification-issuer">Entidad emisora</Label>
                 <Input
                   id="certification-issuer"
                   value={form.issuer}
-                  onChange={(event) => setForm((current) => ({ ...current, issuer: event.target.value }))}
+                  onChange={(event) => updateField("issuer", event.target.value)}
                   placeholder="Ej: SENA"
-                  required
+                  className={cn(errors.issuer && "border-destructive focus-visible:ring-destructive/25")}
                 />
+                {errors.issuer ? <p className="text-xs text-destructive">{errors.issuer}</p> : null}
               </div>
             </div>
 
@@ -990,9 +1059,10 @@ function CertificationDialog({
                   id="certification-issued"
                   type="date"
                   value={form.issuedAt}
-                  onChange={(event) => setForm((current) => ({ ...current, issuedAt: event.target.value }))}
-                  required
+                  onChange={(event) => updateField("issuedAt", event.target.value)}
+                  className={cn(errors.issuedAt && "border-destructive focus-visible:ring-destructive/25")}
                 />
+                {errors.issuedAt ? <p className="text-xs text-destructive">{errors.issuedAt}</p> : null}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="certification-expires">Fecha vencimiento</Label>
@@ -1000,8 +1070,10 @@ function CertificationDialog({
                   id="certification-expires"
                   type="date"
                   value={form.expiresAt}
-                  onChange={(event) => setForm((current) => ({ ...current, expiresAt: event.target.value }))}
+                  onChange={(event) => updateField("expiresAt", event.target.value)}
+                  className={cn(errors.expiresAt && "border-destructive focus-visible:ring-destructive/25")}
                 />
+                {errors.expiresAt ? <p className="text-xs text-destructive">{errors.expiresAt}</p> : null}
               </div>
             </div>
 
@@ -1213,10 +1285,11 @@ function ContractDialog({
 }
 
 type EvaluationFormState = CreateEmployeeEvaluationDto
+type EvaluationFormErrors = Partial<Record<keyof EvaluationFormState, string>>
 type EvaluatorOption = Pick<Employee, "id" | "name" | "lastName" | "email">
 
 const evaluationTypeOptions = [
-  { value: "PERFORMANCE", label: "Desempeno" },
+  { value: "PERFORMANCE", label: "Desempeño" },
   { value: "SKILLS", label: "Habilidades" },
 ]
 
@@ -1249,6 +1322,7 @@ function EvaluationDialog({
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<EvaluationFormState>(emptyEvaluationForm)
+  const [errors, setErrors] = useState<EvaluationFormErrors>({})
 
   useEffect(() => {
     if (!open) return
@@ -1265,19 +1339,48 @@ function EvaluationDialog({
           }
         : emptyEvaluationForm,
     )
+    setErrors({})
   }, [evaluation, open])
+
+  function updateField(field: keyof EvaluationFormState, value: string) {
+    setForm((current) => ({ ...current, [field]: value }))
+    setErrors((current) => ({ ...current, [field]: undefined }))
+  }
+
+  function validateForm() {
+    const nextErrors: EvaluationFormErrors = {}
+
+    if (!form.evaluatorId) nextErrors.evaluatorId = "Selecciona el evaluador."
+    if (!form.type) nextErrors.type = "Selecciona el tipo de evaluacion."
+    if (!form.startDate) nextErrors.startDate = "Selecciona la fecha de inicio."
+    if (!form.endDate) {
+      nextErrors.endDate = "Selecciona la fecha de fin."
+    } else if (form.startDate && new Date(form.endDate) < new Date(form.startDate)) {
+      nextErrors.endDate = "La fecha fin no puede ser anterior a la fecha de inicio."
+    }
+    if (!form.score.trim()) nextErrors.score = "Ingresa el puntaje de la evaluacion."
+
+    setErrors(nextErrors)
+    return Object.keys(nextErrors).length === 0
+  }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
 
-    if (!form.evaluatorId || !form.startDate || !form.endDate || !form.score || !form.type) {
-      toast.error("Completa evaluador, fechas, puntaje y tipo")
+    if (!validateForm()) {
+      toast.error("Revisa los campos marcados antes de guardar la evaluacion")
       return
+    }
+
+    const payload: EvaluationFormState = {
+      ...form,
+      score: form.score.trim(),
+      comment: form.comment.trim(),
     }
 
     setSaving(true)
     try {
-      await onSave(form, evaluation?.id)
+      await onSave(payload, evaluation?.id)
       setOpen(false)
     } finally {
       setSaving(false)
@@ -1304,9 +1407,9 @@ function EvaluationDialog({
                 <Label>Evaluador</Label>
                 <Select
                   value={form.evaluatorId}
-                  onValueChange={(value) => setForm((current) => ({ ...current, evaluatorId: value }))}
+                  onValueChange={(value) => updateField("evaluatorId", value)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={cn(errors.evaluatorId && "border-destructive focus-visible:ring-destructive/25")}>
                     <SelectValue placeholder="Selecciona un evaluador" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1317,14 +1420,15 @@ function EvaluationDialog({
                     ))}
                   </SelectContent>
                 </Select>
+                {errors.evaluatorId ? <p className="text-xs text-destructive">{errors.evaluatorId}</p> : null}
               </div>
               <div className="grid gap-2">
                 <Label>Tipo</Label>
                 <Select
                   value={form.type}
-                  onValueChange={(value) => setForm((current) => ({ ...current, type: value }))}
+                  onValueChange={(value) => updateField("type", value)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={cn(errors.type && "border-destructive focus-visible:ring-destructive/25")}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -1335,6 +1439,7 @@ function EvaluationDialog({
                     ))}
                   </SelectContent>
                 </Select>
+                {errors.type ? <p className="text-xs text-destructive">{errors.type}</p> : null}
               </div>
             </div>
 
@@ -1345,9 +1450,10 @@ function EvaluationDialog({
                   id="evaluation-start"
                   type="date"
                   value={form.startDate}
-                  onChange={(event) => setForm((current) => ({ ...current, startDate: event.target.value }))}
-                  required
+                  onChange={(event) => updateField("startDate", event.target.value)}
+                  className={cn(errors.startDate && "border-destructive focus-visible:ring-destructive/25")}
                 />
+                {errors.startDate ? <p className="text-xs text-destructive">{errors.startDate}</p> : null}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="evaluation-end">Fecha fin</Label>
@@ -1355,19 +1461,21 @@ function EvaluationDialog({
                   id="evaluation-end"
                   type="date"
                   value={form.endDate}
-                  onChange={(event) => setForm((current) => ({ ...current, endDate: event.target.value }))}
-                  required
+                  onChange={(event) => updateField("endDate", event.target.value)}
+                  className={cn(errors.endDate && "border-destructive focus-visible:ring-destructive/25")}
                 />
+                {errors.endDate ? <p className="text-xs text-destructive">{errors.endDate}</p> : null}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="evaluation-score">Puntaje</Label>
                 <Input
                   id="evaluation-score"
                   value={form.score}
-                  onChange={(event) => setForm((current) => ({ ...current, score: event.target.value }))}
+                  onChange={(event) => updateField("score", event.target.value)}
                   placeholder="Ej: 95"
-                  required
+                  className={cn(errors.score && "border-destructive focus-visible:ring-destructive/25")}
                 />
+                {errors.score ? <p className="text-xs text-destructive">{errors.score}</p> : null}
               </div>
             </div>
 
@@ -1376,7 +1484,7 @@ function EvaluationDialog({
               <Textarea
                 id="evaluation-comment"
                 value={form.comment}
-                onChange={(event) => setForm((current) => ({ ...current, comment: event.target.value }))}
+                onChange={(event) => updateField("comment", event.target.value)}
                 placeholder="Observaciones de la evaluacion"
               />
             </div>
@@ -1398,6 +1506,29 @@ function EvaluationDialog({
 
 type MedicalEvaluationFormState = Omit<CreateEmployeeMedicalEvaluationDto, "nextEvaluationDate"> & {
   nextEvaluationDate: string
+}
+type MedicalEvaluationFormErrors = Partial<Record<keyof MedicalEvaluationFormState, string>>
+
+const medicalEvaluationTypeOptions = [
+  { value: "INCOME", label: "Ingreso" },
+  { value: "PERIODIC", label: "Periodica" },
+  { value: "RETIREMENT", label: "Retiro" },
+  { value: "POST_INCAPACITY", label: "Post incapacidad" },
+]
+
+const medicalEvaluationResultOptions = [
+  { value: "APT", label: "Apto" },
+  { value: "APT_WITH_RESTRICTIONS", label: "Apto con restricciones" },
+  { value: "NOT_APT", label: "No apto" },
+  { value: "PENDING", label: "Pendiente" },
+]
+
+function getMedicalEvaluationTypeLabel(value?: string | null) {
+  return medicalEvaluationTypeOptions.find((option) => option.value === value)?.label ?? value ?? "No registrado"
+}
+
+function getMedicalEvaluationResultLabel(value?: string | null) {
+  return medicalEvaluationResultOptions.find((option) => option.value === value)?.label ?? value ?? "No registrado"
 }
 
 const emptyMedicalEvaluationForm: MedicalEvaluationFormState = {
@@ -1423,6 +1554,7 @@ function MedicalEvaluationDialog({
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<MedicalEvaluationFormState>(emptyMedicalEvaluationForm)
+  const [errors, setErrors] = useState<MedicalEvaluationFormErrors>({})
 
   useEffect(() => {
     if (!open) return
@@ -1443,13 +1575,35 @@ function MedicalEvaluationDialog({
           }
         : emptyMedicalEvaluationForm,
     )
+    setErrors({})
   }, [medicalEvaluation, open])
+
+  function updateField(field: keyof MedicalEvaluationFormState, value: string) {
+    setForm((current) => ({ ...current, [field]: value }))
+    setErrors((current) => ({ ...current, [field]: undefined }))
+  }
+
+  function validateForm() {
+    const nextErrors: MedicalEvaluationFormErrors = {}
+
+    if (!form.type) nextErrors.type = "Selecciona el tipo de evaluacion medica."
+    if (!form.result) nextErrors.result = "Selecciona el resultado."
+    if (!form.date) nextErrors.date = "Selecciona la fecha de evaluacion."
+    if (form.nextEvaluationDate && form.date && new Date(form.nextEvaluationDate) < new Date(form.date)) {
+      nextErrors.nextEvaluationDate = "La proxima evaluacion no puede ser anterior a la fecha de evaluacion."
+    }
+    if (!form.medicalProfessional.trim()) nextErrors.medicalProfessional = "Ingresa el profesional medico."
+    if (!form.institution.trim()) nextErrors.institution = "Ingresa la institucion."
+
+    setErrors(nextErrors)
+    return Object.keys(nextErrors).length === 0
+  }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
 
-    if (!form.type || !form.date || !form.result || !form.medicalProfessional || !form.institution) {
-      toast.error("Completa tipo, fecha, resultado, profesional e institucion")
+    if (!validateForm()) {
+      toast.error("Revisa los campos marcados antes de guardar la evaluacion medica")
       return
     }
 
@@ -1457,9 +1611,9 @@ function MedicalEvaluationDialog({
       type: form.type,
       date: form.date,
       result: form.result,
-      observations: form.observations,
-      medicalProfessional: form.medicalProfessional,
-      institution: form.institution,
+      observations: form.observations.trim(),
+      medicalProfessional: form.medicalProfessional.trim(),
+      institution: form.institution.trim(),
       ...(form.nextEvaluationDate ? { nextEvaluationDate: form.nextEvaluationDate } : {}),
     }
 
@@ -1490,31 +1644,35 @@ function MedicalEvaluationDialog({
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="grid gap-2">
                 <Label>Tipo</Label>
-                <Select value={form.type} onValueChange={(value) => setForm((current) => ({ ...current, type: value }))}>
-                  <SelectTrigger>
+                <Select value={form.type} onValueChange={(value) => updateField("type", value)}>
+                  <SelectTrigger className={cn(errors.type && "border-destructive focus-visible:ring-destructive/25")}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="INCOME">Ingreso</SelectItem>
-                    <SelectItem value="PERIODIC">Periodica</SelectItem>
-                    <SelectItem value="RETIREMENT">Retiro</SelectItem>
-                    <SelectItem value="POST_INCAPACITY">Post incapacidad</SelectItem>
+                    {medicalEvaluationTypeOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
+                {errors.type ? <p className="text-xs text-destructive">{errors.type}</p> : null}
               </div>
               <div className="grid gap-2">
                 <Label>Resultado</Label>
-                <Select value={form.result} onValueChange={(value) => setForm((current) => ({ ...current, result: value }))}>
-                  <SelectTrigger>
+                <Select value={form.result} onValueChange={(value) => updateField("result", value)}>
+                  <SelectTrigger className={cn(errors.result && "border-destructive focus-visible:ring-destructive/25")}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="APT">Apto</SelectItem>
-                    <SelectItem value="APT_WITH_RESTRICTIONS">Apto con restricciones</SelectItem>
-                    <SelectItem value="NOT_APT">No apto</SelectItem>
-                    <SelectItem value="PENDING">Pendiente</SelectItem>
+                    {medicalEvaluationResultOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
+                {errors.result ? <p className="text-xs text-destructive">{errors.result}</p> : null}
               </div>
             </div>
 
@@ -1525,9 +1683,10 @@ function MedicalEvaluationDialog({
                   id="medical-evaluation-date"
                   type="date"
                   value={form.date}
-                  onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))}
-                  required
+                  onChange={(event) => updateField("date", event.target.value)}
+                  className={cn(errors.date && "border-destructive focus-visible:ring-destructive/25")}
                 />
+                {errors.date ? <p className="text-xs text-destructive">{errors.date}</p> : null}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="medical-next-date">Proxima evaluacion</Label>
@@ -1535,8 +1694,12 @@ function MedicalEvaluationDialog({
                   id="medical-next-date"
                   type="date"
                   value={form.nextEvaluationDate}
-                  onChange={(event) => setForm((current) => ({ ...current, nextEvaluationDate: event.target.value }))}
+                  onChange={(event) => updateField("nextEvaluationDate", event.target.value)}
+                  className={cn(errors.nextEvaluationDate && "border-destructive focus-visible:ring-destructive/25")}
                 />
+                {errors.nextEvaluationDate ? (
+                  <p className="text-xs text-destructive">{errors.nextEvaluationDate}</p>
+                ) : null}
               </div>
             </div>
 
@@ -1546,18 +1709,22 @@ function MedicalEvaluationDialog({
                 <Input
                   id="medical-professional"
                   value={form.medicalProfessional}
-                  onChange={(event) => setForm((current) => ({ ...current, medicalProfessional: event.target.value }))}
-                  required
+                  onChange={(event) => updateField("medicalProfessional", event.target.value)}
+                  className={cn(errors.medicalProfessional && "border-destructive focus-visible:ring-destructive/25")}
                 />
+                {errors.medicalProfessional ? (
+                  <p className="text-xs text-destructive">{errors.medicalProfessional}</p>
+                ) : null}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="medical-institution">Institucion</Label>
                 <Input
                   id="medical-institution"
                   value={form.institution}
-                  onChange={(event) => setForm((current) => ({ ...current, institution: event.target.value }))}
-                  required
+                  onChange={(event) => updateField("institution", event.target.value)}
+                  className={cn(errors.institution && "border-destructive focus-visible:ring-destructive/25")}
                 />
+                {errors.institution ? <p className="text-xs text-destructive">{errors.institution}</p> : null}
               </div>
             </div>
 
@@ -1566,7 +1733,7 @@ function MedicalEvaluationDialog({
               <Textarea
                 id="medical-observations"
                 value={form.observations}
-                onChange={(event) => setForm((current) => ({ ...current, observations: event.target.value }))}
+                onChange={(event) => updateField("observations", event.target.value)}
                 placeholder="Observaciones y restricciones medicas"
               />
             </div>
@@ -1589,6 +1756,7 @@ function MedicalEvaluationDialog({
 
 
 type EppDeliveryFormState = CreateEmployeeEppDeliveryDto
+type EppDeliveryFormErrors = Partial<Record<keyof EppDeliveryFormState, string>>
 
 const emptyEppDeliveryForm: EppDeliveryFormState = {
   description: "",
@@ -1606,6 +1774,7 @@ function EppDeliveryDialog({
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<EppDeliveryFormState>(emptyEppDeliveryForm)
+  const [errors, setErrors] = useState<EppDeliveryFormErrors>({})
 
   useEffect(() => {
     if (!open) return
@@ -1619,13 +1788,30 @@ function EppDeliveryDialog({
           }
         : emptyEppDeliveryForm,
     )
+    setErrors({})
   }, [delivery, open])
+
+  function updateField(field: keyof EppDeliveryFormState, value: string) {
+    setForm((current) => ({ ...current, [field]: value }))
+    setErrors((current) => ({ ...current, [field]: undefined }))
+  }
+
+  function validateForm() {
+    const nextErrors: EppDeliveryFormErrors = {}
+
+    if (!form.date) nextErrors.date = "Selecciona la fecha de entrega."
+    if (!form.description.trim()) nextErrors.description = "Ingresa la descripcion de la entrega."
+    if (!form.deliveredItems.trim()) nextErrors.deliveredItems = "Ingresa los elementos entregados."
+
+    setErrors(nextErrors)
+    return Object.keys(nextErrors).length === 0
+  }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
 
-    if (!form.description.trim() || !form.deliveredItems.trim() || !form.date) {
-      toast.error("Completa descripcion, elementos entregados y fecha")
+    if (!validateForm()) {
+      toast.error("Revisa los campos marcados antes de guardar la entrega EPP")
       return
     }
 
@@ -1666,28 +1852,31 @@ function EppDeliveryDialog({
                 id="epp-date"
                 type="date"
                 value={form.date}
-                onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))}
-                required
+                onChange={(event) => updateField("date", event.target.value)}
+                className={cn(errors.date && "border-destructive focus-visible:ring-destructive/25")}
               />
+              {errors.date ? <p className="text-xs text-destructive">{errors.date}</p> : null}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="epp-description">Descripcion</Label>
               <Textarea
                 id="epp-description"
                 value={form.description}
-                onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
-                required
+                onChange={(event) => updateField("description", event.target.value)}
+                className={cn(errors.description && "border-destructive focus-visible:ring-destructive/25")}
               />
+              {errors.description ? <p className="text-xs text-destructive">{errors.description}</p> : null}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="epp-items">Elementos entregados</Label>
               <Textarea
                 id="epp-items"
                 value={form.deliveredItems}
-                onChange={(event) => setForm((current) => ({ ...current, deliveredItems: event.target.value }))}
+                onChange={(event) => updateField("deliveredItems", event.target.value)}
                 placeholder="Ej: casco, gafas, guantes, botas de seguridad"
-                required
+                className={cn(errors.deliveredItems && "border-destructive focus-visible:ring-destructive/25")}
               />
+              {errors.deliveredItems ? <p className="text-xs text-destructive">{errors.deliveredItems}</p> : null}
             </div>
           </div>
 
@@ -1717,6 +1906,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const [employeeTrainings, setEmployeeTrainings] = useState<EmployeeTraining[]>([])
   const [trainingStatusFilter, setTrainingStatusFilter] = useState<TrainingAttendanceStatus | "all">("all")
   const [evaluatorOptions, setEvaluatorOptions] = useState<EvaluatorOption[]>([])
+  const [activeResumeTab, setActiveResumeTab] = useState("info")
+  const [resumeNavigationMode, setResumeNavigationMode] = useState<"cards" | "tabs">("cards")
+  const resumeContentRef = useRef<HTMLDivElement | null>(null)
   const [catalogs, setCatalogs] = useState({
     eps: [] as EmployeeCatalogOption[],
     arl: [] as EmployeeCatalogOption[],
@@ -1859,10 +2051,83 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     },
   ]
 
+  const resumeSections = [
+    {
+      value: "info",
+      label: "Informacion Personal",
+      description: "Datos basicos y cargo",
+      icon: User,
+    },
+    {
+      value: "socialSecurity",
+      label: "Seguridad Social",
+      description: "EPS, ARL, pension y caja",
+      icon: Activity,
+    },
+    {
+      value: "education",
+      label: "Educacion",
+      description: `${education.length} registros`,
+      icon: GraduationCap,
+    },
+    {
+      value: "certifications",
+      label: "Certificaciones",
+      description: `${certifications.length} registros`,
+      icon: Award,
+    },
+    {
+      value: "contracts",
+      label: "Contrato",
+      description: `${contracts.length} registros`,
+      icon: BriefcaseBusiness,
+    },
+    {
+      value: "evaluations",
+      label: "Evaluaciones",
+      description: `${evaluations.length} registros`,
+      icon: ClipboardCheck,
+    },
+    {
+      value: "medicalEvaluations",
+      label: "Evaluaciones medicas",
+      description: `${medicalEvaluations.length} registros`,
+      icon: Stethoscope,
+    },
+    {
+      value: "trainings",
+      label: "Capacitaciones",
+      description: `${employeeTrainings.length} registros`,
+      icon: Brain,
+    },
+    {
+      value: "eppDeliveries",
+      label: "Entrega EPP",
+      description: `${eppDeliveries.length} registros`,
+      icon: ClipboardCheck,
+    },
+  ]
+
   const filteredEmployeeTrainings =
     trainingStatusFilter === "all"
       ? employeeTrainings
       : employeeTrainings.filter((item) => item.status === trainingStatusFilter)
+
+  function handleResumeSectionChange(value: string) {
+    setActiveResumeTab(value)
+    window.requestAnimationFrame(() => {
+      const target = resumeContentRef.current
+      const scroller = target?.closest("main")
+
+      if (!target || !scroller) return
+
+      const targetRect = target.getBoundingClientRect()
+      const scrollerRect = scroller.getBoundingClientRect()
+      const top = scroller.scrollTop + targetRect.top - scrollerRect.top - 16
+
+      scroller.scrollTo({ top: Math.max(0, top), behavior: "smooth" })
+    })
+  }
 
   async function handleUpdatePersonalInfo(payload: UpdateEmployeeDto) {
     if (!employee) return
@@ -2184,18 +2449,89 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="info" className="space-y-4">
-        <TabsList className="bg-secondary">
-          <TabsTrigger value="info">Informacion Personal</TabsTrigger>
-          <TabsTrigger value="socialSecurity">Seguridad Social</TabsTrigger>
-          <TabsTrigger value="education">Educacion</TabsTrigger>
-          <TabsTrigger value="certifications">Certificaciones</TabsTrigger>
-          <TabsTrigger value="contracts">Contrato</TabsTrigger>
-          <TabsTrigger value="evaluations">Evaluaciones</TabsTrigger>
-          <TabsTrigger value="medicalEvaluations">Evaluaciones medicas</TabsTrigger>
-          <TabsTrigger value="trainings">Capacitaciones</TabsTrigger>
-          <TabsTrigger value="eppDeliveries">Entrega EPP</TabsTrigger>
-        </TabsList>
+      <Tabs value={activeResumeTab} onValueChange={handleResumeSectionChange} className="space-y-4">
+        <div className="rounded-lg border border-border bg-card p-3 shadow-sm">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-sm font-semibold text-foreground">Secciones de la hoja de vida</h2>
+              <p className="text-xs text-muted-foreground">Elige como quieres navegar la informacion del funcionario.</p>
+            </div>
+            <div className="inline-flex w-fit rounded-md border border-border bg-background p-1">
+              <Button
+                type="button"
+                size="sm"
+                variant={resumeNavigationMode === "cards" ? "default" : "ghost"}
+                className="h-8 gap-2"
+                onClick={() => setResumeNavigationMode("cards")}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Tarjetas
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={resumeNavigationMode === "tabs" ? "default" : "ghost"}
+                className="h-8 gap-2"
+                onClick={() => setResumeNavigationMode("tabs")}
+              >
+                <List className="h-4 w-4" />
+                Pestañas
+              </Button>
+            </div>
+          </div>
+
+          {resumeNavigationMode === "cards" ? (
+            <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9">
+              {resumeSections.map((section) => {
+                const SectionIcon = section.icon
+                const isActive = activeResumeTab === section.value
+
+                return (
+                  <button
+                    key={section.value}
+                    type="button"
+                    onClick={() => handleResumeSectionChange(section.value)}
+                    className={cn(
+                      "flex min-h-[70px] flex-col items-center justify-center gap-2 rounded-lg border px-2 py-3 text-center transition hover:border-primary/60 hover:bg-primary/5",
+                      isActive
+                        ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                        : "border-border bg-background text-foreground",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "flex h-8 w-8 shrink-0 items-center justify-center rounded-md",
+                        isActive ? "bg-white/15 text-white" : "bg-primary/10 text-primary",
+                      )}
+                    >
+                      <SectionIcon className="h-4 w-4" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-xs font-semibold leading-tight">{section.label}</span>
+                      <span className={cn("mt-1 block text-[11px] leading-tight", isActive ? "text-white/80" : "text-muted-foreground")}>
+                        {section.description}
+                      </span>
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          ) : (
+            <TabsList className="mt-4 flex h-auto flex-wrap justify-start gap-1 border border-border bg-background p-1">
+              {resumeSections.map((section) => (
+                <TabsTrigger
+                  key={section.value}
+                  value={section.value}
+                  className="text-foreground hover:bg-primary/5 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground data-[state=active]:border-primary"
+                >
+                  {section.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          )}
+        </div>
+
+        <div ref={resumeContentRef} className="scroll-mt-6" />
 
         <TabsContent value="info">
           <Card className="bg-card border-border">
@@ -2437,55 +2773,69 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {certifications.map((item) => (
-                    <div key={item.id} className="rounded-lg border border-border p-4">
-                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                        <div>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="font-medium">{item.name}</h3>
-                            {item.expiresAt ? (
-                              <Badge variant="secondary">Vence: {formatDate(item.expiresAt)}</Badge>
-                            ) : (
-                              <Badge variant="outline">Sin vencimiento</Badge>
-                            )}
-                          </div>
-                          <p className="mt-1 text-sm text-muted-foreground">Emitido por: {item.issuer}</p>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          <CertificationDialog certification={item} onSave={handleSaveCertification} />
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="gap-2"
-                            onClick={() => handleDeleteCertification(item.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Eliminar
-                          </Button>
-                        </div>
-                      </div>
+                  {certifications.map((item) => {
+                    const isExpired = isPastDate(item.expiresAt)
 
-                      <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>Expedicion: {formatDate(item.issuedAt)}</span>
+                    return (
+                      <div key={item.id} className="rounded-lg border border-border p-4">
+                        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                          <div>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="font-medium">{item.name}</h3>
+                              {isExpired ? <Badge variant="destructive">Vencido</Badge> : null}
+                              {item.expiresAt ? (
+                                <Badge variant="secondary">Vence: {formatDate(item.expiresAt)}</Badge>
+                              ) : (
+                                <Badge variant="outline">Sin vencimiento</Badge>
+                              )}
+                            </div>
+                            <p className="mt-1 text-sm text-muted-foreground">Emitido por: {item.issuer}</p>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <CertificationDialog certification={item} onSave={handleSaveCertification} />
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="gap-2"
+                              onClick={() => handleDeleteCertification(item.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              Eliminar
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>Vencimiento: {formatDate(item.expiresAt)}</span>
+
+                        <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <span>Expedicion: {formatDate(item.issuedAt)}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <span>Vencimiento: {formatDate(item.expiresAt)}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <span>Creado: {formatDate(item.createdAt)}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>Creado: {formatDate(item.createdAt)}</span>
-                        </div>
+                        {isExpired ? (
+                          <Alert variant="destructive" className="mt-4">
+                            <AlertTriangle className="h-4 w-4" />
+                            <AlertTitle>Certificado vencido</AlertTitle>
+                            <AlertDescription>
+                              Este certificado vencio el {formatDate(item.expiresAt)}. Revisa si debe renovarse.
+                            </AlertDescription>
+                          </Alert>
+                        ) : null}
+                        <DocumentManager
+                          employeeId={employee.id}
+                          context={{ kind: "certification", certificationId: item.id }}
+                          defaultType="CERTIFICATION"
+                        />
                       </div>
-                      <DocumentManager
-                        employeeId={employee.id}
-                        context={{ kind: "certification", certificationId: item.id }}
-                        defaultType="CERTIFICATION"
-                      />
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </CardContent>
@@ -2590,73 +2940,89 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {evaluations.map((item) => (
-                    <div key={item.id} className="rounded-lg border border-border p-4">
-                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                        <div>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="font-medium">{getEvaluationTypeLabel(item.type)}</h3>
-                            <Badge variant="secondary">Puntaje: {item.score}</Badge>
-                          </div>
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            Evaluador:{" "}
-                            {item.evaluator
-                              ? `${item.evaluator.name ?? ""} ${item.evaluator.lastName ?? ""}`.trim()
-                              : item.evaluatorId}
-                          </p>
-                          {item.comment && <p className="mt-1 text-sm text-muted-foreground">{item.comment}</p>}
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          <EvaluationDialog
-                            evaluation={item}
-                            evaluators={
-                              item.evaluatorId && !evaluatorOptions.some((option) => option.id === item.evaluatorId) && item.evaluator
-                                ? [
-                                    {
-                                      id: item.evaluatorId,
-                                      name: item.evaluator.name,
-                                      lastName: item.evaluator.lastName,
-                                      email: "",
-                                    },
-                                    ...evaluatorOptions,
-                                  ]
-                                : evaluatorOptions
-                            }
-                            onSave={handleSaveEvaluation}
-                          />
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="gap-2"
-                            onClick={() => handleDeleteEvaluation(item.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Eliminar
-                          </Button>
-                        </div>
-                      </div>
+                  {evaluations.map((item) => {
+                    const isExpired = isAnnualEvaluationExpired(item.endDate)
 
-                      <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>Inicio: {formatDate(item.startDate)}</span>
+                    return (
+                      <div key={item.id} className="rounded-lg border border-border p-4">
+                        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                          <div>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="font-medium">{getEvaluationTypeLabel(item.type)}</h3>
+                              {isExpired ? <Badge variant="destructive">Vencida</Badge> : null}
+                              <Badge variant="secondary">Puntaje: {item.score}</Badge>
+                            </div>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                              Evaluador:{" "}
+                              {item.evaluator
+                                ? `${item.evaluator.name ?? ""} ${item.evaluator.lastName ?? ""}`.trim()
+                                : item.evaluatorId}
+                            </p>
+                            {item.comment && <p className="mt-1 text-sm text-muted-foreground">{item.comment}</p>}
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <EvaluationDialog
+                              evaluation={item}
+                              evaluators={
+                                item.evaluatorId &&
+                                !evaluatorOptions.some((option) => option.id === item.evaluatorId) &&
+                                item.evaluator
+                                  ? [
+                                      {
+                                        id: item.evaluatorId,
+                                        name: item.evaluator.name,
+                                        lastName: item.evaluator.lastName,
+                                        email: "",
+                                      },
+                                      ...evaluatorOptions,
+                                    ]
+                                  : evaluatorOptions
+                              }
+                              onSave={handleSaveEvaluation}
+                            />
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="gap-2"
+                              onClick={() => handleDeleteEvaluation(item.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              Eliminar
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>Fin: {formatDate(item.endDate)}</span>
+
+                        <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <span>Inicio: {formatDate(item.startDate)}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <span>Fin: {formatDate(item.endDate)}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <span>Creado: {formatDate(item.createdAt)}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>Creado: {formatDate(item.createdAt)}</span>
-                        </div>
+                        {isExpired ? (
+                          <Alert variant="destructive" className="mt-4">
+                            <AlertTriangle className="h-4 w-4" />
+                            <AlertTitle>Evaluacion vencida</AlertTitle>
+                            <AlertDescription>
+                              Esta evaluacion cumplio un año desde su fecha fin. Programa una nueva evaluacion.
+                            </AlertDescription>
+                          </Alert>
+                        ) : null}
+                        <DocumentManager
+                          employeeId={employee.id}
+                          context={{ kind: "evaluation", evaluationId: item.id }}
+                          defaultType="EVALUATION"
+                        />
                       </div>
-                      <DocumentManager
-                        employeeId={employee.id}
-                        context={{ kind: "evaluation", evaluationId: item.id }}
-                        defaultType="EVALUATION"
-                      />
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </CardContent>
@@ -2690,8 +3056,10 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="font-medium">{item.type}</h3>
-                            <Badge variant={item.result === "APT" ? "default" : "secondary"}>{item.result}</Badge>
+                            <h3 className="font-medium">{getMedicalEvaluationTypeLabel(item.type)}</h3>
+                            <Badge variant={item.result === "APT" ? "default" : "secondary"}>
+                              {getMedicalEvaluationResultLabel(item.result)}
+                            </Badge>
                           </div>
                           <p className="mt-1 text-sm text-muted-foreground">Institucion: {item.institution}</p>
                           <p className="mt-1 text-sm text-muted-foreground">
