@@ -77,6 +77,8 @@ import {
   listEmployees,
   listArlCatalog,
   listCompensationCatalog,
+  listDepartmentCatalog,
+  listDepartmentCitiesCatalog,
   listEpsCatalog,
   listPensionCatalog,
   updateEmployee,
@@ -101,6 +103,7 @@ import type {
   Employee,
   EmployeeArlRiskLevel,
   EmployeeCatalogOption,
+  EmployeeCityOption,
   EmployeeCertification,
   EmployeeContract,
   EmployeeDocument,
@@ -159,6 +162,31 @@ const ARL_RISK_LEVEL_OPTIONS: Array<{ value: EmployeeArlRiskLevel; label: string
 function formatDate(value?: string | null) {
   if (!value) return "No registrada"
   return value.slice(0, 10)
+}
+
+function getEducationCreatedAt(value: EmployeeEducation): string | null {
+  const record = value as EmployeeEducation & Record<string, unknown>
+  const createdAtKeys = [
+    "createdAt",
+    "createAt",
+    "created_at",
+    "createdDate",
+    "createDate",
+    "creationDate",
+    "creation_date",
+    "registeredAt",
+    "registered_at",
+    "fechaCreacion",
+  ]
+
+  for (const key of createdAtKeys) {
+    const date = record[key]
+
+    if (typeof date === "string" && date) return date
+    if (date instanceof Date) return date.toISOString()
+  }
+
+  return null
 }
 
 function isPastDate(value?: string | null) {
@@ -742,6 +770,7 @@ function DocumentManager({
 }
 
 type EducationFormState = CreateEmployeeEducationDto
+type EducationFormErrors = Partial<Record<keyof EducationFormState | "departmentId", string>>
 
 const educationLevelOptions = [
   { value: "BACHILLER", label: "Bachiller" },
@@ -756,6 +785,7 @@ const educationLevelOptions = [
 const emptyEducationForm: EducationFormState = {
   level: "",
   institution: "",
+  institutionCityId: "",
   degree: "",
   fieldOfStudy: "",
   startDate: "",
@@ -773,15 +803,24 @@ function EducationDialog({
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<EducationFormState>(emptyEducationForm)
+  const [errors, setErrors] = useState<EducationFormErrors>({})
+  const [departments, setDepartments] = useState<EmployeeCatalogOption[]>([])
+  const [cities, setCities] = useState<EmployeeCityOption[]>([])
+  const [departmentId, setDepartmentId] = useState("")
+  const [loadingDepartments, setLoadingDepartments] = useState(false)
+  const [loadingCities, setLoadingCities] = useState(false)
 
   useEffect(() => {
     if (!open) return
+
+    const initialDepartmentId = education?.institutionCity?.departmentId ?? ""
 
     setForm(
       education
         ? {
             level: education.level ?? "",
             institution: education.institution ?? "",
+            institutionCityId: education.institutionCityId ?? "",
             degree: education.degree ?? "",
             fieldOfStudy: education.fieldOfStudy ?? "",
             startDate: formatDate(education.startDate) === "No registrada" ? "" : formatDate(education.startDate),
@@ -790,19 +829,107 @@ function EducationDialog({
           }
         : emptyEducationForm,
     )
+    setDepartmentId(initialDepartmentId)
+    setErrors({})
   }, [education, open])
+
+  useEffect(() => {
+    if (!open) return
+
+    let mounted = true
+    setLoadingDepartments(true)
+
+    listDepartmentCatalog()
+      .then((items) => {
+        if (mounted) setDepartments(items)
+      })
+      .catch((error: any) => {
+        toast.error(error.message ?? "No se pudo cargar los departamentos")
+      })
+      .finally(() => {
+        if (mounted) setLoadingDepartments(false)
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [open])
+
+  useEffect(() => {
+    if (!open || !departmentId) {
+      setCities([])
+      return
+    }
+
+    let mounted = true
+    setLoadingCities(true)
+
+    listDepartmentCitiesCatalog(departmentId)
+      .then((items) => {
+        if (mounted) setCities(items)
+      })
+      .catch((error: any) => {
+        toast.error(error.message ?? "No se pudo cargar las ciudades")
+      })
+      .finally(() => {
+        if (mounted) setLoadingCities(false)
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [departmentId, open])
+
+  function updateField(field: keyof EducationFormState, value: string | boolean) {
+    setForm((current) => ({ ...current, [field]: value }))
+    setErrors((current) => ({ ...current, [field]: undefined }))
+  }
+
+  function handleDepartmentChange(value: string) {
+    setDepartmentId(value)
+    setForm((current) => ({ ...current, institutionCityId: "" }))
+    setErrors((current) => ({ ...current, departmentId: undefined, institutionCityId: undefined }))
+  }
+
+  function validateForm() {
+    const nextErrors: EducationFormErrors = {}
+
+    if (!form.level) nextErrors.level = "Selecciona el nivel educativo."
+    if (!form.institution.trim()) nextErrors.institution = "Ingresa el nombre de la institucion."
+    if (!departmentId) nextErrors.departmentId = "Selecciona el departamento de la institucion."
+    if (!form.institutionCityId) nextErrors.institutionCityId = "Selecciona la ciudad de la institucion."
+    if (!form.degree.trim()) nextErrors.degree = "Ingresa el titulo obtenido."
+    if (!form.startDate) nextErrors.startDate = "Selecciona la fecha de inicio."
+    if (!form.endDate) {
+      nextErrors.endDate = form.isCompleted
+        ? "Selecciona la fecha fin."
+        : "Selecciona una fecha tentativa de finalizacion para este estudio en curso."
+    } else if (form.startDate && new Date(form.endDate) < new Date(form.startDate)) {
+      nextErrors.endDate = "La fecha fin no puede ser anterior a la fecha de inicio."
+    }
+
+    setErrors(nextErrors)
+    return Object.keys(nextErrors).length === 0
+  }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
 
-    if (!form.level || !form.institution || !form.degree || !form.startDate) {
-      toast.error("Completa nivel, institucion, titulo y fecha de inicio")
+    if (!validateForm()) {
+      toast.error("Revisa los campos marcados antes de guardar la educacion")
       return
+    }
+
+    const payload: EducationFormState = {
+      ...form,
+      institution: form.institution.trim(),
+      degree: form.degree.trim(),
+      fieldOfStudy: form.fieldOfStudy.trim(),
     }
 
     setSaving(true)
     try {
-      await onSave(form, education?.id)
+      await onSave(payload, education?.id)
       setOpen(false)
     } finally {
       setSaving(false)
@@ -827,8 +954,8 @@ function EducationDialog({
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="grid gap-2">
                 <Label>Nivel</Label>
-                <Select value={form.level} onValueChange={(value) => setForm((current) => ({ ...current, level: value }))}>
-                  <SelectTrigger>
+                <Select value={form.level} onValueChange={(value) => updateField("level", value)}>
+                  <SelectTrigger className={cn("w-full min-w-0", errors.level && "border-destructive focus-visible:ring-destructive/25")}>
                     <SelectValue placeholder="Selecciona un nivel" />
                   </SelectTrigger>
                   <SelectContent>
@@ -839,16 +966,65 @@ function EducationDialog({
                     ))}
                   </SelectContent>
                 </Select>
+                {errors.level ? <p className="text-xs text-destructive">{errors.level}</p> : null}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="education-institution">Institucion</Label>
                 <Input
                   id="education-institution"
                   value={form.institution}
-                  onChange={(event) => setForm((current) => ({ ...current, institution: event.target.value }))}
+                  onChange={(event) => updateField("institution", event.target.value)}
                   placeholder="Nombre de la institucion"
-                  required
+                  className={cn(errors.institution && "border-destructive focus-visible:ring-destructive/25")}
                 />
+                {errors.institution ? <p className="text-xs text-destructive">{errors.institution}</p> : null}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label>Departamento de la institucion</Label>
+                <Select value={departmentId} onValueChange={handleDepartmentChange} disabled={loadingDepartments}>
+                  <SelectTrigger className={cn("w-full min-w-0", errors.departmentId && "border-destructive focus-visible:ring-destructive/25")}>
+                    <SelectValue placeholder={loadingDepartments ? "Cargando departamentos..." : "Selecciona un departamento"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {departments.map((item) => (
+                      <SelectItem key={item.id} value={item.id} className="max-w-[min(26rem,calc(100vw-3rem))]">
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.departmentId ? <p className="text-xs text-destructive">{errors.departmentId}</p> : null}
+              </div>
+              <div className="grid gap-2">
+                <Label>Ciudad de la institucion</Label>
+                <Select
+                  value={form.institutionCityId}
+                  onValueChange={(value) => updateField("institutionCityId", value)}
+                  disabled={!departmentId || loadingCities}
+                >
+                  <SelectTrigger className={cn("w-full min-w-0", errors.institutionCityId && "border-destructive focus-visible:ring-destructive/25")}>
+                    <SelectValue
+                      placeholder={
+                        !departmentId
+                          ? "Selecciona primero un departamento"
+                          : loadingCities
+                            ? "Cargando ciudades..."
+                            : "Selecciona una ciudad"
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cities.map((item) => (
+                      <SelectItem key={item.id} value={item.id} className="max-w-[min(26rem,calc(100vw-3rem))]">
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.institutionCityId ? <p className="text-xs text-destructive">{errors.institutionCityId}</p> : null}
               </div>
             </div>
 
@@ -858,17 +1034,18 @@ function EducationDialog({
                 <Input
                   id="education-degree"
                   value={form.degree}
-                  onChange={(event) => setForm((current) => ({ ...current, degree: event.target.value }))}
+                  onChange={(event) => updateField("degree", event.target.value)}
                   placeholder="Ej: Ingeniero Industrial"
-                  required
+                  className={cn(errors.degree && "border-destructive focus-visible:ring-destructive/25")}
                 />
+                {errors.degree ? <p className="text-xs text-destructive">{errors.degree}</p> : null}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="education-field">Area de estudio</Label>
                 <Input
                   id="education-field"
                   value={form.fieldOfStudy}
-                  onChange={(event) => setForm((current) => ({ ...current, fieldOfStudy: event.target.value }))}
+                  onChange={(event) => updateField("fieldOfStudy", event.target.value)}
                   placeholder="Ej: Seguridad y salud"
                 />
               </div>
@@ -881,26 +1058,31 @@ function EducationDialog({
                   id="education-start"
                   type="date"
                   value={form.startDate}
-                  onChange={(event) => setForm((current) => ({ ...current, startDate: event.target.value }))}
-                  required
+                  onChange={(event) => updateField("startDate", event.target.value)}
+                  className={cn(errors.startDate && "border-destructive focus-visible:ring-destructive/25")}
                 />
+                {errors.startDate ? <p className="text-xs text-destructive">{errors.startDate}</p> : null}
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="education-end">Fecha fin</Label>
+                <Label htmlFor="education-end">
+                  {form.isCompleted ? "Fecha fin" : "Fecha tentativa de finalizacion"}
+                </Label>
                 <Input
                   id="education-end"
                   type="date"
                   value={form.endDate}
-                  onChange={(event) => setForm((current) => ({ ...current, endDate: event.target.value }))}
+                  onChange={(event) => updateField("endDate", event.target.value)}
+                  className={cn(errors.endDate && "border-destructive focus-visible:ring-destructive/25")}
                 />
+                {errors.endDate ? <p className="text-xs text-destructive">{errors.endDate}</p> : null}
               </div>
               <div className="grid gap-2">
                 <Label>Estado</Label>
                 <Select
                   value={String(form.isCompleted)}
-                  onValueChange={(value) => setForm((current) => ({ ...current, isCompleted: value === "true" }))}
+                  onValueChange={(value) => updateField("isCompleted", value === "true")}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full min-w-0">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -910,6 +1092,11 @@ function EducationDialog({
                 </Select>
               </div>
             </div>
+            {!form.isCompleted ? (
+              <p className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-muted-foreground">
+                Indica una fecha tentativa para orientar el seguimiento del estudio en curso.
+              </p>
+            ) : null}
           </div>
 
           <DialogFooter>
@@ -2706,6 +2893,11 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                           <p className="mt-1 text-sm text-muted-foreground">
                             {item.level} - {item.institution}
                           </p>
+                          {item.institutionCity ? (
+                            <p className="mt-1 text-sm text-muted-foreground">
+                              Ciudad: {item.institutionCity.name}
+                            </p>
+                          ) : null}
                           {item.fieldOfStudy && (
                             <p className="mt-1 text-sm text-muted-foreground">Area: {item.fieldOfStudy}</p>
                           )}
@@ -2735,7 +2927,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                         </div>
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>Creado: {formatDate(item.createdAt)}</span>
+                          <span>Creado: {formatDate(getEducationCreatedAt(item))}</span>
                         </div>
                       </div>
                       <DocumentManager

@@ -13,6 +13,10 @@ export type EmployeeCatalogOption = {
   name: string
 }
 
+export type EmployeeCityOption = EmployeeCatalogOption & {
+  departmentId: string
+}
+
 export type EmployeeArlRiskLevel = "RIESGO_I" | "RIESGO_II" | "RIESGO_III" | "RIESGO_IV" | "RIESGO_V"
 export type EmployeeGender = "MASCULINO" | "FEMENINO"
 export type EmployeeContractType = "INDEFINIDO" | "FIJO" | "SERVICIOS"
@@ -60,6 +64,8 @@ export type EmployeeEducation = {
   employeeId: string
   level: string
   institution: string
+  institutionCityId?: string | null
+  institutionCity?: EmployeeCityOption | null
   degree: string
   fieldOfStudy: string
   startDate: string
@@ -71,6 +77,7 @@ export type EmployeeEducation = {
 export type CreateEmployeeEducationDto = {
   level: string
   institution: string
+  institutionCityId: string
   degree: string
   fieldOfStudy: string
   startDate: string

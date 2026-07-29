@@ -10,6 +10,7 @@ import type {
   Employee,
   EmployeeCatalogOption,
   EmployeeCatalogResponse,
+  EmployeeCityOption,
   EmployeeCertification,
   EmployeeCertificationResponse,
   EmployeeCertificationsResponse,
@@ -289,6 +290,16 @@ export async function listPensionCatalog(): Promise<EmployeeCatalogOption[]> {
 export async function listCompensationCatalog(): Promise<EmployeeCatalogOption[]> {
   const res = await apiFetch("/api/employees/catalogs/compensations", { method: "GET" })
   return parseOrThrow<EmployeeCatalogOption[]>(res, "No se pudo cargar el catalogo de cajas de compensacion")
+}
+
+export async function listDepartmentCatalog(): Promise<EmployeeCatalogOption[]> {
+  const res = await apiFetch("/api/employees/catalogs/departments", { method: "GET" })
+  return parseOrThrow<EmployeeCatalogOption[]>(res, "No se pudo cargar el catalogo de departamentos")
+}
+
+export async function listDepartmentCitiesCatalog(departmentId: string): Promise<EmployeeCityOption[]> {
+  const res = await apiFetch(`/api/employees/catalogs/departments/${departmentId}/cities`, { method: "GET" })
+  return parseOrThrow<EmployeeCityOption[]>(res, "No se pudo cargar el catalogo de ciudades")
 }
 
 export async function createEmployeeEducation(
