@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,8 @@ import {
   updateTopicTraining,
   updateTraining,
 } from "@/services/trainingService"
+import { listEmployees } from "@/services/employeeService"
+import type { Employee } from "@/types/manager/employee"
 import type {
   CreateTopicTrainingDto,
   CreateTrainingDto,
@@ -42,6 +45,7 @@ import type {
   TopicTrainingOption,
   Training,
   TrainingStatus,
+  TrainingType,
   UpdateTopicTrainingDto,
   UpdateTrainingDto,
 } from "@/types/manager/training"
@@ -66,6 +70,16 @@ function formatDate(value?: string | null) {
   return value.slice(0, 10)
 }
 
+function getEmployeeFullName(employee: Employee) {
+  return `${employee.name ?? ""} ${employee.lastName ?? ""}`.trim() || employee.email || employee.id
+}
+
+function getTrainingTypeLabel(type?: string | null) {
+  if (type === "INDUCCION") return "Induccion"
+  if (type === "REINDUCCION") return "Reinduccion"
+  return "Capacitacion"
+}
+
 function getTrainingStatusLabel(status?: string | null) {
   if (status === "ACTIVE") return "Activa"
   if (status === "INACTIVE") return "Inactiva"
@@ -85,6 +99,12 @@ const trainingStatusOptions = [
   { value: "INACTIVE", label: "Inactiva" },
   { value: "FINALIZADA", label: "Finalizada" },
   { value: "CANCELADA", label: "Cancelada" },
+]
+
+const trainingTypeOptions: Array<{ value: TrainingType; label: string }> = [
+  { value: "CAPACITACION", label: "Capacitacion" },
+  { value: "INDUCCION", label: "Induccion" },
+  { value: "REINDUCCION", label: "Reinduccion" },
 ]
 
 type TopicFormState = CreateTopicTrainingDto
@@ -179,6 +199,12 @@ type TrainingFormState = {
   topicId: string
   date: string
   durationHours: string
+  type: TrainingType
+  employeeIds: string[]
+  entryDate: string
+  inductionDate: string
+  responsibleEmployeeId: string
+  modality: string
   status: string
 }
 
@@ -186,6 +212,12 @@ const emptyTrainingForm: TrainingFormState = {
   topicId: "",
   date: "",
   durationHours: "",
+  type: "CAPACITACION",
+  employeeIds: [],
+  entryDate: "",
+  inductionDate: "",
+  responsibleEmployeeId: "",
+  modality: "",
   status: "ACTIVE",
 }
 
@@ -195,15 +227,39 @@ const trainingFieldControlClassName =
 function TrainingDialog({
   training,
   topics,
+  employees,
   onSave,
 }: {
   training?: Training
   topics: TopicTrainingOption[]
+  employees: Employee[]
   onSave: (payload: CreateTrainingDto | UpdateTrainingDto, trainingId?: string) => Promise<void>
 }) {
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<TrainingFormState>(emptyTrainingForm)
+  const requiresInductionFields = form.type !== "CAPACITACION"
+
+  function toggleEmployee(employeeId: string, checked: boolean) {
+    setForm((current) => ({
+      ...current,
+      employeeIds: checked
+        ? Array.from(new Set([...current.employeeIds, employeeId]))
+        : current.employeeIds.filter((id) => id !== employeeId),
+    }))
+  }
+
+  function handleTypeChange(value: TrainingType) {
+    setForm((current) => ({
+      ...current,
+      type: value,
+      employeeIds: value === "CAPACITACION" ? [] : current.employeeIds,
+      entryDate: value === "CAPACITACION" ? "" : current.entryDate,
+      inductionDate: value === "CAPACITACION" ? "" : current.inductionDate,
+      responsibleEmployeeId: value === "CAPACITACION" ? "" : current.responsibleEmployeeId,
+      modality: value === "CAPACITACION" ? "" : current.modality,
+    }))
+  }
 
   useEffect(() => {
     if (!open) return
@@ -213,6 +269,12 @@ function TrainingDialog({
             topicId: training.topicId ?? "",
             date: formatDate(training.date) === "No registrada" ? "" : formatDate(training.date),
             durationHours: String(training.durationHours ?? ""),
+            type: (training.type as TrainingType | null) ?? "CAPACITACION",
+            employeeIds: training.employeeIds ?? [],
+            entryDate: formatDate(training.entryDate) === "No registrada" ? "" : formatDate(training.entryDate),
+            inductionDate: formatDate(training.inductionDate) === "No registrada" ? "" : formatDate(training.inductionDate),
+            responsibleEmployeeId: training.responsibleEmployeeId ?? "",
+            modality: training.modality ?? "",
             status: training.status ?? "ACTIVE",
           }
         : emptyTrainingForm,
@@ -228,13 +290,38 @@ function TrainingDialog({
       return
     }
 
+    if (
+      requiresInductionFields &&
+      (form.employeeIds.length === 0 || !form.entryDate || !form.inductionDate || !form.responsibleEmployeeId || !form.modality.trim())
+    ) {
+      toast.error("Completa asistentes, fechas, responsable y modalidad")
+      return
+    }
+
+    if (requiresInductionFields && form.entryDate > form.inductionDate) {
+      toast.error("La fecha de ingreso no puede ser posterior a la fecha de induccion")
+      return
+    }
+
     setSaving(true)
     try {
-      const trainingData: CreateTrainingDto = {
+      const baseTrainingData: CreateTrainingDto = {
         topicId: form.topicId,
         date: form.date,
         durationHours,
+        type: form.type,
       }
+      const trainingData: CreateTrainingDto =
+        form.type === "CAPACITACION"
+          ? baseTrainingData
+          : {
+              ...baseTrainingData,
+              employeeIds: form.employeeIds,
+              entryDate: form.entryDate,
+              inductionDate: form.inductionDate,
+              responsibleEmployeeId: form.responsibleEmployeeId,
+              modality: form.modality.trim(),
+            }
       const payload: CreateTrainingDto | UpdateTrainingDto = training
         ? { ...trainingData, status: form.status }
         : trainingData
@@ -254,13 +341,13 @@ function TrainingDialog({
           {training ? "Editar" : "Nueva capacitacion"}
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-card max-w-xl">
+      <DialogContent className="max-h-[90vh] max-w-3xl overflow-hidden bg-card p-0">
         <form onSubmit={handleSubmit}>
-          <DialogHeader>
+          <DialogHeader className="border-b border-border px-6 py-4">
             <DialogTitle>{training ? "Editar capacitacion" : "Nueva capacitacion"}</DialogTitle>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
+          <div className="grid max-h-[calc(90vh-140px)] gap-4 overflow-y-auto px-6 py-4">
             <div className="grid gap-2">
               <Label>Tema</Label>
               <Select value={form.topicId} onValueChange={(value) => setForm((current) => ({ ...current, topicId: value }))}>
@@ -271,6 +358,22 @@ function TrainingDialog({
                   {topics.map((topic) => (
                     <SelectItem key={topic.id} value={topic.id}>
                       {topic.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Tipo</Label>
+              <Select value={form.type} onValueChange={(value) => handleTypeChange(value as TrainingType)}>
+                <SelectTrigger className={trainingFieldControlClassName}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {trainingTypeOptions.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -304,6 +407,90 @@ function TrainingDialog({
               </div>
             </div>
 
+            {requiresInductionFields && (
+              <div className="grid gap-4 rounded-md border border-border bg-secondary/20 p-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="grid gap-2">
+                    <Label htmlFor="training-entry-date">Fecha de ingreso</Label>
+                    <Input
+                      id="training-entry-date"
+                      className={trainingFieldControlClassName}
+                      type="date"
+                      value={form.entryDate}
+                      max={form.inductionDate || undefined}
+                      onChange={(event) => setForm((current) => ({ ...current, entryDate: event.target.value }))}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="training-induction-date">Fecha de induccion</Label>
+                    <Input
+                      id="training-induction-date"
+                      className={trainingFieldControlClassName}
+                      type="date"
+                      value={form.inductionDate}
+                      min={form.entryDate || undefined}
+                      onChange={(event) => setForm((current) => ({ ...current, inductionDate: event.target.value }))}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="grid gap-2">
+                    <Label>Responsable</Label>
+                    <Select
+                      value={form.responsibleEmployeeId}
+                      onValueChange={(value) => setForm((current) => ({ ...current, responsibleEmployeeId: value }))}
+                    >
+                      <SelectTrigger className={trainingFieldControlClassName}>
+                        <SelectValue placeholder="Selecciona responsable" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {employees.map((employee) => (
+                          <SelectItem key={employee.id} value={employee.id}>
+                            {getEmployeeFullName(employee)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="training-modality">Modalidad</Label>
+                    <Input
+                      id="training-modality"
+                      className={trainingFieldControlClassName}
+                      value={form.modality}
+                      placeholder="Presencial"
+                      onChange={(event) => setForm((current) => ({ ...current, modality: event.target.value }))}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label>Funcionarios</Label>
+                  <div className="max-h-48 overflow-y-auto rounded-md border border-border bg-white p-2">
+                    {employees.length === 0 ? (
+                      <p className="p-2 text-sm text-muted-foreground">No hay funcionarios disponibles.</p>
+                    ) : (
+                      <div className="grid gap-1">
+                        {employees.map((employee) => (
+                          <label
+                            key={employee.id}
+                            className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-secondary"
+                          >
+                            <Checkbox
+                              checked={form.employeeIds.includes(employee.id)}
+                              onCheckedChange={(checked) => toggleEmployee(employee.id, checked === true)}
+                            />
+                            <span className="min-w-0 flex-1 truncate">{getEmployeeFullName(employee)}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="grid gap-2">
               <Label>Estado</Label>
               <Select value={form.status} onValueChange={(value) => setForm((current) => ({ ...current, status: value }))}>
@@ -321,7 +508,7 @@ function TrainingDialog({
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="border-t border-border px-6 py-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
@@ -340,6 +527,7 @@ export default function TrainingPlanPage() {
   const [topics, setTopics] = useState<TopicTraining[]>([])
   const [topicOptions, setTopicOptions] = useState<TopicTrainingOption[]>([])
   const [trainings, setTrainings] = useState<Training[]>([])
+  const [employees, setEmployees] = useState<Employee[]>([])
   const [yearFilter, setYearFilter] = useState("all")
   const [monthFilter, setMonthFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -347,14 +535,16 @@ export default function TrainingPlanPage() {
   async function loadData() {
     setLoading(true)
     try {
-      const [topicsData, topicOptionsData, trainingsData] = await Promise.all([
+      const [topicsData, topicOptionsData, trainingsData, employeesData] = await Promise.all([
         listTopicTraining(),
         listTopicTrainingOptions(),
         listTraining(),
+        listEmployees(),
       ])
       setTopics(topicsData)
       setTopicOptions(topicOptionsData)
       setTrainings(trainingsData.items ?? [])
+      setEmployees(employeesData)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo cargar capacitaciones")
     } finally {
@@ -466,7 +656,7 @@ export default function TrainingPlanPage() {
           <h1 className="text-2xl font-bold">Plan Anual de Capacitaciones</h1>
           <p className="text-muted-foreground">Planifica temas, fechas y asistentes de capacitacion.</p>
         </div>
-        <TrainingDialog topics={topicOptions} onSave={handleSaveTraining} />
+        <TrainingDialog topics={topicOptions} employees={employees} onSave={handleSaveTraining} />
       </div>
 
       <Tabs defaultValue="trainings" className="space-y-4">
@@ -551,6 +741,7 @@ export default function TrainingPlanPage() {
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="font-semibold">{training.topic?.name ?? training.topicId}</h3>
+                        <Badge variant="outline">{getTrainingTypeLabel(training.type)}</Badge>
                         <Badge
                           variant={
                             training.status === "ACTIVE"
@@ -575,7 +766,7 @@ export default function TrainingPlanPage() {
                           Detalle
                         </Button>
                       </Link>
-                      <TrainingDialog training={training} topics={topicOptions} onSave={handleSaveTraining} />
+                      <TrainingDialog training={training} topics={topicOptions} employees={employees} onSave={handleSaveTraining} />
                       {training.status === "ACTIVE" ? (
                         <Button
                           variant="destructive"

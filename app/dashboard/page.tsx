@@ -424,7 +424,7 @@ export default function DashboardPage() {
           </div>
         </DashboardSection>
 
-        <DashboardSection title="Responsable SGI">
+        <DashboardSection title="Responsable SG-SST">
           <div className="space-y-2">
             {data.sgiResponsible ? (
               <>

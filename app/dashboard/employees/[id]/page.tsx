@@ -18,6 +18,7 @@ import {
   FileText,
   GraduationCap,
   Eye,
+  IdCardIcon,
   LayoutGrid,
   List,
   Loader2,
@@ -49,6 +50,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { EmployeeFormDialog } from "@/components/dashboard/employee-form-dialog"
 import {
@@ -162,6 +164,14 @@ const ARL_RISK_LEVEL_OPTIONS: Array<{ value: EmployeeArlRiskLevel; label: string
 function formatDate(value?: string | null) {
   if (!value) return "No registrada"
   return value.slice(0, 10)
+}
+
+function formatIdentificationDocument(employee: Employee) {
+  const documentType = employee.documentType?.trim()
+  const documentNumber = employee.documentNumber?.trim()
+
+  if (documentType && documentNumber) return `${documentType} ${documentNumber}`
+  return documentNumber || documentType || "No registrado"
 }
 
 function getEducationCreatedAt(value: EmployeeEducation): string | null {
@@ -1699,15 +1709,14 @@ type MedicalEvaluationFormErrors = Partial<Record<keyof MedicalEvaluationFormSta
 const medicalEvaluationTypeOptions = [
   { value: "INCOME", label: "Ingreso" },
   { value: "PERIODIC", label: "Periodica" },
-  { value: "RETIREMENT", label: "Retiro" },
   { value: "POST_INCAPACITY", label: "Post incapacidad" },
+  { value: "EXIT", label: "Retiro" },
 ]
 
 const medicalEvaluationResultOptions = [
   { value: "APT", label: "Apto" },
   { value: "APT_WITH_RESTRICTIONS", label: "Apto con restricciones" },
   { value: "NOT_APT", label: "No apto" },
-  { value: "PENDING", label: "Pendiente" },
 ]
 
 function getMedicalEvaluationTypeLabel(value?: string | null) {
@@ -1726,6 +1735,8 @@ const emptyMedicalEvaluationForm: MedicalEvaluationFormState = {
   nextEvaluationDate: "",
   medicalProfessional: "",
   institution: "",
+  jobProfileSentToDoctor: false,
+  jobProfileSentDate: "",
 }
 
 function MedicalEvaluationDialog({
@@ -1759,13 +1770,18 @@ function MedicalEvaluationDialog({
                 : formatDate(medicalEvaluation.nextEvaluationDate),
             medicalProfessional: medicalEvaluation.medicalProfessional ?? "",
             institution: medicalEvaluation.institution ?? "",
+            jobProfileSentToDoctor: Boolean(medicalEvaluation.jobProfileSentToDoctor),
+            jobProfileSentDate:
+              formatDate(medicalEvaluation.jobProfileSentDate) === "No registrada"
+                ? ""
+                : formatDate(medicalEvaluation.jobProfileSentDate),
           }
         : emptyMedicalEvaluationForm,
     )
     setErrors({})
   }, [medicalEvaluation, open])
 
-  function updateField(field: keyof MedicalEvaluationFormState, value: string) {
+  function updateField(field: keyof MedicalEvaluationFormState, value: string | boolean) {
     setForm((current) => ({ ...current, [field]: value }))
     setErrors((current) => ({ ...current, [field]: undefined }))
   }
@@ -1781,6 +1797,12 @@ function MedicalEvaluationDialog({
     }
     if (!form.medicalProfessional.trim()) nextErrors.medicalProfessional = "Ingresa el profesional medico."
     if (!form.institution.trim()) nextErrors.institution = "Ingresa la institucion."
+    if (form.jobProfileSentToDoctor && !form.jobProfileSentDate) {
+      nextErrors.jobProfileSentDate = "Selecciona la fecha de remision al medico."
+    }
+    if (form.jobProfileSentToDoctor && form.jobProfileSentDate && form.date && new Date(form.jobProfileSentDate) > new Date(form.date)) {
+      nextErrors.jobProfileSentDate = "La fecha de remision no puede ser posterior a la evaluacion."
+    }
 
     setErrors(nextErrors)
     return Object.keys(nextErrors).length === 0
@@ -1801,7 +1823,9 @@ function MedicalEvaluationDialog({
       observations: form.observations.trim(),
       medicalProfessional: form.medicalProfessional.trim(),
       institution: form.institution.trim(),
+      jobProfileSentToDoctor: form.jobProfileSentToDoctor,
       ...(form.nextEvaluationDate ? { nextEvaluationDate: form.nextEvaluationDate } : {}),
+      ...(form.jobProfileSentToDoctor && form.jobProfileSentDate ? { jobProfileSentDate: form.jobProfileSentDate } : {}),
     }
 
     setSaving(true)
@@ -1923,6 +1947,43 @@ function MedicalEvaluationDialog({
                 onChange={(event) => updateField("observations", event.target.value)}
                 placeholder="Observaciones y restricciones medicas"
               />
+            </div>
+
+            <div className="grid gap-3 rounded-md border border-border bg-secondary/20 p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <Label htmlFor="medical-job-profile-sent">Se remitio el perfil del cargo al medico?</Label>
+                  <p className="text-sm text-muted-foreground">Marca si el medico recibio el perfil del cargo evaluado.</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium">{form.jobProfileSentToDoctor ? "Si" : "No"}</span>
+                  <Switch
+                    id="medical-job-profile-sent"
+                    checked={form.jobProfileSentToDoctor}
+                    onCheckedChange={(checked) => {
+                      updateField("jobProfileSentToDoctor", checked)
+                      if (!checked) updateField("jobProfileSentDate", "")
+                    }}
+                  />
+                </div>
+              </div>
+
+              {form.jobProfileSentToDoctor && (
+                <div className="grid gap-2">
+                  <Label htmlFor="medical-job-profile-date">Fecha de remision</Label>
+                  <Input
+                    id="medical-job-profile-date"
+                    type="date"
+                    value={form.jobProfileSentDate}
+                    max={form.date || undefined}
+                    onChange={(event) => updateField("jobProfileSentDate", event.target.value)}
+                    className={cn(errors.jobProfileSentDate && "border-destructive focus-visible:ring-destructive/25")}
+                  />
+                  {errors.jobProfileSentDate ? (
+                    <p className="text-xs text-destructive">{errors.jobProfileSentDate}</p>
+                  ) : null}
+                </div>
+              )}
             </div>
           </div>
 
@@ -2613,7 +2674,11 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                 </div>
               </div>
 
-              <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+                <div className="flex items-center gap-2 text-sm">
+                  <IdCardIcon className="h-4 w-4 text-muted-foreground" />
+                  <span className="truncate">{formatIdentificationDocument(employee)}</span>
+                </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="h-4 w-4 text-muted-foreground" />
                   <span className="truncate">{employee.email || "No registrado"}</span>
@@ -2763,18 +2828,25 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                   <p className="text-sm">{employee.phone || "No registrado"}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">Estado</p>
-                  <Badge variant={employee.status ? "accentActivd" : "destructive"}>
-                    {employee.status ? "Activo" : "Inactivo"}
-                  </Badge>
+                  <p className="text-xs text-muted-foreground">Documento de identificacion</p>
+                  <p className="text-sm">{formatIdentificationDocument(employee)}</p>
                 </div>
-                <div className="space-y-1 md:col-span-2">
+
+                <div className="space-y-1 ">
                   <p className="text-xs text-muted-foreground">Direccion</p>
                   <div className="flex items-center gap-2 text-sm">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
                     <span>{employee.address || "No registrada"}</span>
                   </div>
                 </div>
+
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">Estado</p>
+                  <Badge variant={employee.status ? "accentActivd" : "destructive"}>
+                    {employee.status ? "Activo" : "Inactivo"}
+                  </Badge>
+                </div>
+
               </div>
             </CardContent>
           </Card>
@@ -3083,7 +3155,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                         </div>
                       </div>
 
-                      <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+                      <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2 xl:grid-cols-4">
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
                           <span>Inicio: {formatDate(item.startDate)}</span>
@@ -3273,7 +3345,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                         </div>
                       </div>
 
-                      <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+                      <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2 xl:grid-cols-4">
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
                           <span>Fecha: {formatDate(item.date)}</span>
@@ -3285,6 +3357,12 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
                           <span>Creado: {formatDate(item.createdAt)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-muted-foreground" />
+                          <span>
+                            Perfil al medico: {item.jobProfileSentToDoctor ? `Si · ${formatDate(item.jobProfileSentDate)}` : "No"}
+                          </span>
                         </div>
                       </div>
                       <DocumentManager

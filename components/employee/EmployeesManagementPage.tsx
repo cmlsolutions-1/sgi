@@ -1,18 +1,21 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, type ReactNode } from "react"
 import Link from "next/link"
 import {
   Building2,
   Calendar,
   Download,
   Edit,
+  ExternalLink,
   Eye,
   FileText,
   Filter,
+  IdCardIcon,
   LayoutGrid,
   List,
   Loader2,
+  MoreHorizontal,
   Search,
   Trash2,
   TriangleAlert,
@@ -23,7 +26,6 @@ import {
 import { toast } from "sonner"
 
 import { EmployeeFormDialog } from "@/components/dashboard/employee-form-dialog"
-import { SgiResponsibleFormDialog } from "@/components/dashboard/SgiResponsibleFormDialog"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -37,9 +39,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import {
   activateIncident,
@@ -56,20 +66,20 @@ import {
 import {
   activateEmployee,
   createEmployee,
-  createSgiResponsible,
   deleteEmployee,
   exportEmployees,
-  getSgiResponsible,
   listEmployees,
-  updateSgiResponsible,
   updateEmployee,
 } from "@/services/employeeService"
 import { cn } from "@/lib/utils"
 import type {
   CreateIncidentDto,
   Incident,
+  IncidentCaseStatus,
   IncidentDocument,
   IncidentFilters,
+  IncidentHazardOrigin,
+  IncidentIncapacityOrigin,
   IncidentStatus,
   IncidentType,
   UpdateIncidentDto,
@@ -81,12 +91,25 @@ import type {
   EmployeeContractType,
   EmployeeExportFilters,
   EmployeeGender,
-  EmployeeSgiResponsible,
   UpdateEmployeeDto,
-  UpsertEmployeeSgiResponsibleDto,
 } from "@/types/manager/employee"
 
 type EmployeeViewMode = "cards" | "list"
+type LaborNewsViewMode = "cards" | "list"
+
+type IncidentDocumentPreviewState = {
+  document: IncidentDocument
+  url: string
+  mimeType: string
+}
+
+function formatEmployeeDocument(employee: Employee) {
+  const documentType = employee.documentType?.trim()
+  const documentNumber = employee.documentNumber?.trim()
+
+  if (documentType && documentNumber) return `${documentType} ${documentNumber}`
+  return documentNumber || documentType || "No registrado"
+}
 
 const employeeGenderOptions: Array<{ value: EmployeeGender; label: string }> = [
   { value: "MASCULINO", label: "Masculino" },
@@ -112,6 +135,21 @@ function formatDate(value?: string | null) {
   return value.slice(0, 10)
 }
 
+function formatFormDate(value?: string | null) {
+  if (!value) return ""
+  return value.slice(0, 10)
+}
+
+function calculateInclusiveDays(startDate?: string, endDate?: string) {
+  if (!startDate || !endDate || startDate > endDate) return 0
+
+  const start = new Date(`${startDate}T00:00:00Z`).getTime()
+  const end = new Date(`${endDate}T00:00:00Z`).getTime()
+  const dayMs = 24 * 60 * 60 * 1000
+
+  return Math.floor((end - start) / dayMs) + 1
+}
+
 function formatFileSize(value?: number | null) {
   if (!value) return "0 KB"
   if (value < 1024) return `${value} B`
@@ -129,21 +167,90 @@ function getIncidentTypeLabel(type?: string | null) {
   if (type === "INCIDENTE") return "Incidente"
   if (type === "ACCIDENTE") return "Accidente"
   if (type === "ENFERMEDAD_LABORAL") return "Enfermedad laboral"
+  if (type === "INCAPACIDAD_MEDICA") return "Incapacidad medica"
+  if (type === "REVISION_POR_LA_DIRECCION") return "Revision por la direccion"
+  if (type === "REQUERIMIENTO_DE_AUTORIDAD_ADMINISTRATIVA") return "Requerimiento de autoridad administrativa"
+  if (type === "RECOMENDACION_DE_LA_ARL") return "Recomendacion de la ARL"
   return "Tipo no registrado"
+}
+
+function formatIncidentConsecutive(consecutive?: string | null) {
+  if (!consecutive) return "Sin consecutivo"
+
+  const match = consecutive.match(/(\d+)$/)
+  if (match) return `Novedad laboral No. ${match[1]}`
+
+  return `Consecutivo ${consecutive}`
+}
+
+function getHazardOriginLabel(value?: string | null) {
+  if (value === "FISICO") return "Fisico"
+  if (value === "QUIMICO") return "Quimico"
+  if (value === "BIOLOGICO") return "Biologico"
+  if (value === "SEGURIDAD") return "Seguridad"
+  if (value === "PUBLICO") return "Publico"
+  if (value === "PSICOSOCIAL") return "Psicosocial"
+  return "Origen no registrado"
+}
+
+function getIncapacityOriginLabel(value?: string | null) {
+  if (value === "COMUN") return "Comun"
+  if (value === "LABORAL") return "Laboral"
+  return "No registrado"
+}
+
+function getCaseStatusLabel(value?: string | null) {
+  if (value === "ABIERTO") return "Abierto"
+  if (value === "EN_INVESTIGACION") return "En investigacion"
+  if (value === "CERRADO") return "Cerrado"
+  return "No registrado"
 }
 
 function hasIncidentDataChanges(current: Incident | undefined, payload: UpdateIncidentDto) {
   if (!current) return true
 
+  const compareIncapacityFields =
+    current.type === "INCAPACIDAD_MEDICA" || payload.type === "INCAPACIDAD_MEDICA"
+
   return (
     current.employeeId !== payload.employeeId ||
     formatDate(current.date) !== payload.date ||
+    (current.workAreaId ?? "") !== payload.workAreaId ||
+    (current.jobId ?? "") !== payload.jobId ||
     (current.place ?? "") !== payload.place ||
     (current.description ?? "") !== payload.description ||
+    (current.hazardOrigin ?? "FISICO") !== payload.hazardOrigin ||
     (current.type ?? "INCIDENTE") !== payload.type ||
     (current.consequences ?? "") !== payload.consequences ||
-    (current.correctiveActions ?? "") !== payload.correctiveActions
+    (current.correctiveActions ?? "") !== payload.correctiveActions ||
+    (compareIncapacityFields &&
+      ((current.incapacityDays ?? 0) !== payload.incapacityDays ||
+        (current.incapacityOrigin ?? "COMUN") !== (payload.incapacityOrigin ?? "COMUN") ||
+        formatFormDate(current.incapacityStartDate) !== (payload.incapacityStartDate ?? "") ||
+        formatFormDate(current.incapacityEndDate) !== (payload.incapacityEndDate ?? ""))) ||
+    Boolean(current.isFatal) !== payload.isFatal ||
+    (current.caseStatus ?? "ABIERTO") !== payload.caseStatus
   )
+}
+
+function sanitizeIncidentPayload(payload: IncidentFormState): CreateIncidentDto {
+  const { status: _status, ...incidentPayload } = payload
+
+  if (incidentPayload.type !== "INCAPACIDAD_MEDICA") {
+    return {
+      ...incidentPayload,
+      incapacityDays: 0,
+      incapacityOrigin: undefined,
+      incapacityStartDate: undefined,
+      incapacityEndDate: undefined,
+    }
+  }
+
+  return {
+    ...incidentPayload,
+    incapacityDays: calculateInclusiveDays(incidentPayload.incapacityStartDate, incidentPayload.incapacityEndDate),
+    incapacityOrigin: incidentPayload.incapacityOrigin ?? "COMUN",
+  }
 }
 
 type IncidentFormState = CreateIncidentDto & {
@@ -153,13 +260,52 @@ type IncidentFormState = CreateIncidentDto & {
 const emptyIncidentForm: IncidentFormState = {
   employeeId: "",
   date: "",
+  workAreaId: "",
+  jobId: "",
   place: "",
   description: "",
+  hazardOrigin: "FISICO",
   type: "INCIDENTE",
   consequences: "",
   correctiveActions: "",
+  incapacityDays: 0,
+  incapacityOrigin: undefined,
+  incapacityStartDate: undefined,
+  incapacityEndDate: undefined,
+  isFatal: false,
+  caseStatus: "ABIERTO",
   status: "ACTIVE",
 }
+
+const incidentHazardOriginOptions: Array<{ value: IncidentHazardOrigin; label: string }> = [
+  { value: "FISICO", label: "Fisico" },
+  { value: "QUIMICO", label: "Quimico" },
+  { value: "BIOLOGICO", label: "Biologico" },
+  { value: "SEGURIDAD", label: "Seguridad" },
+  { value: "PUBLICO", label: "Publico" },
+  { value: "PSICOSOCIAL", label: "Psicosocial" },
+]
+
+const incidentTypeOptions: Array<{ value: IncidentType; label: string }> = [
+  { value: "INCIDENTE", label: "Incidente" },
+  { value: "ACCIDENTE", label: "Accidente" },
+  { value: "ENFERMEDAD_LABORAL", label: "Enfermedad laboral" },
+  { value: "INCAPACIDAD_MEDICA", label: "Incapacidad medica" },
+  { value: "REVISION_POR_LA_DIRECCION", label: "Revision por la direccion" },
+  { value: "REQUERIMIENTO_DE_AUTORIDAD_ADMINISTRATIVA", label: "Requerimiento de autoridad administrativa" },
+  { value: "RECOMENDACION_DE_LA_ARL", label: "Recomendacion de la ARL" },
+]
+
+const incidentIncapacityOriginOptions: Array<{ value: IncidentIncapacityOrigin; label: string }> = [
+  { value: "COMUN", label: "Comun" },
+  { value: "LABORAL", label: "Laboral" },
+]
+
+const incidentCaseStatusOptions: Array<{ value: IncidentCaseStatus; label: string }> = [
+  { value: "ABIERTO", label: "Abierto" },
+  { value: "EN_INVESTIGACION", label: "En investigacion" },
+  { value: "CERRADO", label: "Cerrado" },
+]
 
 const incidentFieldControlClassName =
   "w-full border-slate-300 bg-white shadow-sm hover:border-slate-400 focus-visible:border-primary focus-visible:ring-primary/25"
@@ -168,14 +314,75 @@ function IncidentDialog({
   incident,
   employees,
   onSave,
+  trigger,
 }: {
   incident?: Incident
   employees: Employee[]
   onSave: (payload: IncidentFormState, incidentId?: string) => Promise<void>
+  trigger?: ReactNode
 }) {
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<IncidentFormState>(emptyIncidentForm)
+  const isMedicalIncapacity = form.type === "INCAPACIDAD_MEDICA"
+
+  const workAreaOptions = useMemo(() => {
+    const unique = new Map<string, string>()
+
+    employees.forEach((employee) => {
+      if (employee.workAreaId) unique.set(employee.workAreaId, employee.workArea?.name ?? "Area sin nombre")
+    })
+
+    return Array.from(unique, ([id, name]) => ({ id, name }))
+  }, [employees])
+
+  const jobOptions = useMemo(() => {
+    const unique = new Map<string, string>()
+
+    employees.forEach((employee) => {
+      if (employee.jobId) unique.set(employee.jobId, employee.job?.name ?? "Puesto sin nombre")
+    })
+
+    return Array.from(unique, ([id, name]) => ({ id, name }))
+  }, [employees])
+
+  function handleEmployeeChange(employeeId: string) {
+    const selectedEmployee = employees.find((employee) => employee.id === employeeId)
+
+    setForm((current) => ({
+      ...current,
+      employeeId,
+      workAreaId: selectedEmployee?.workAreaId ?? current.workAreaId,
+      jobId: selectedEmployee?.jobId ?? current.jobId,
+    }))
+  }
+
+  function handleIncidentTypeChange(value: IncidentType) {
+    setForm((current) => ({
+      ...current,
+      type: value,
+      incapacityDays: value === "INCAPACIDAD_MEDICA" ? current.incapacityDays : 0,
+      incapacityOrigin: value === "INCAPACIDAD_MEDICA" ? (current.incapacityOrigin ?? "COMUN") : undefined,
+      incapacityStartDate: value === "INCAPACIDAD_MEDICA" ? current.incapacityStartDate : undefined,
+      incapacityEndDate: value === "INCAPACIDAD_MEDICA" ? current.incapacityEndDate : undefined,
+    }))
+  }
+
+  function handleIncapacityStartDateChange(value: string) {
+    setForm((current) => ({
+      ...current,
+      incapacityStartDate: value,
+      incapacityDays: calculateInclusiveDays(value, current.incapacityEndDate),
+    }))
+  }
+
+  function handleIncapacityEndDateChange(value: string) {
+    setForm((current) => ({
+      ...current,
+      incapacityEndDate: value,
+      incapacityDays: calculateInclusiveDays(current.incapacityStartDate, value),
+    }))
+  }
 
   useEffect(() => {
     if (!open) return
@@ -185,11 +392,20 @@ function IncidentDialog({
         ? {
             employeeId: incident.employeeId ?? "",
             date: formatDate(incident.date) === "No registrada" ? "" : formatDate(incident.date),
+            workAreaId: incident.workAreaId ?? "",
+            jobId: incident.jobId ?? "",
             place: incident.place ?? "",
             description: incident.description ?? "",
+            hazardOrigin: incident.hazardOrigin ?? "FISICO",
             type: incident.type ?? "INCIDENTE",
             consequences: incident.consequences ?? "",
             correctiveActions: incident.correctiveActions ?? "",
+            incapacityDays: incident.incapacityDays ?? 0,
+            incapacityOrigin: incident.incapacityOrigin ?? (incident.type === "INCAPACIDAD_MEDICA" ? "COMUN" : undefined),
+            incapacityStartDate: formatFormDate(incident.incapacityStartDate) || undefined,
+            incapacityEndDate: formatFormDate(incident.incapacityEndDate) || undefined,
+            isFatal: Boolean(incident.isFatal),
+            caseStatus: incident.caseStatus ?? "ABIERTO",
             status: incident.status ?? "ACTIVE",
           }
         : emptyIncidentForm,
@@ -199,8 +415,23 @@ function IncidentDialog({
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
 
-    if (!form.employeeId || !form.date || !form.place || !form.description || !form.type) {
-      toast.error("Completa funcionario, fecha, lugar, descripcion y tipo de novedad")
+    if (!form.employeeId || !form.date || !form.workAreaId || !form.jobId || !form.place || !form.description || !form.type) {
+      toast.error("Completa funcionario, fecha, area, puesto, lugar, descripcion y tipo de novedad")
+      return
+    }
+
+    if (
+      isMedicalIncapacity &&
+      form.incapacityStartDate &&
+      form.incapacityEndDate &&
+      form.incapacityStartDate > form.incapacityEndDate
+    ) {
+      toast.error("La fecha inicial de incapacidad no puede ser posterior a la fecha final")
+      return
+    }
+
+    if (isMedicalIncapacity && (!form.incapacityOrigin || !form.incapacityStartDate || !form.incapacityEndDate)) {
+      toast.error("Registra origen, fecha inicial y fecha final de la incapacidad")
       return
     }
 
@@ -216,22 +447,26 @@ function IncidentDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={incident ? "action" : "default"} size="sm" className="gap-2">
-          {incident ? <Edit className="h-4 w-4" /> : <TriangleAlert className="h-4 w-4" />}
-          {incident ? "Editar" : "Nueva novedad"}
-        </Button>
+        {trigger ?? (
+          <Button variant={incident ? "action" : "default"} size="sm" className="gap-2">
+            {incident ? <Edit className="h-4 w-4" /> : <TriangleAlert className="h-4 w-4" />}
+            {incident ? "Editar" : "Nueva novedad"}
+          </Button>
+        )}
       </DialogTrigger>
-      <DialogContent className="bg-card max-w-2xl">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
+      <DialogContent className="max-h-[90vh] max-w-4xl overflow-hidden bg-card p-0">
+        <form className="flex max-h-[90vh] flex-col" onSubmit={handleSubmit}>
+          <DialogHeader className="border-b border-border px-6 py-4">
             <DialogTitle>{incident ? "Editar novedad laboral" : "Nueva novedad laboral"}</DialogTitle>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-5 overflow-y-auto px-6 py-4">
+            <section className="grid gap-4">
+              <h3 className="text-sm font-semibold text-foreground">Datos principales</h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="grid gap-2">
                 <Label>Funcionario</Label>
-                <Select value={form.employeeId} onValueChange={(value) => setForm((current) => ({ ...current, employeeId: value }))}>
+                <Select value={form.employeeId} onValueChange={handleEmployeeChange}>
                   <SelectTrigger className={incidentFieldControlClassName}>
                     <SelectValue placeholder="Selecciona un funcionario" />
                   </SelectTrigger>
@@ -257,6 +492,42 @@ function IncidentDialog({
               </div>
             </div>
 
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label>Area de trabajo</Label>
+                <Select value={form.workAreaId} onValueChange={(value) => setForm((current) => ({ ...current, workAreaId: value }))}>
+                  <SelectTrigger className={incidentFieldControlClassName}>
+                    <SelectValue placeholder="Selecciona un area" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {workAreaOptions.map((area) => (
+                      <SelectItem key={area.id} value={area.id}>
+                        {area.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Puesto de trabajo</Label>
+                <Select value={form.jobId} onValueChange={(value) => setForm((current) => ({ ...current, jobId: value }))}>
+                  <SelectTrigger className={incidentFieldControlClassName}>
+                    <SelectValue placeholder="Selecciona un puesto" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {jobOptions.map((job) => (
+                      <SelectItem key={job.id} value={job.id}>
+                        {job.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            </section>
+
+            <section className="grid gap-4">
+              <h3 className="text-sm font-semibold text-foreground">Clasificacion del caso</h3>
             <div className="grid gap-2">
               <Label htmlFor="incident-place">Lugar</Label>
               <Input
@@ -272,19 +543,63 @@ function IncidentDialog({
               <Label>Tipo de novedad</Label>
               <Select
                 value={form.type}
-                onValueChange={(value) => setForm((current) => ({ ...current, type: value as IncidentType }))}
+                onValueChange={(value) => handleIncidentTypeChange(value as IncidentType)}
               >
                 <SelectTrigger className={incidentFieldControlClassName}>
                   <SelectValue placeholder="Selecciona el tipo" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="INCIDENTE">Incidente</SelectItem>
-                  <SelectItem value="ACCIDENTE">Accidente</SelectItem>
-                  <SelectItem value="ENFERMEDAD_LABORAL">Enfermedad laboral</SelectItem>
+                  {incidentTypeOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label>Origen del peligro</Label>
+                <Select
+                  value={form.hazardOrigin}
+                  onValueChange={(value) => setForm((current) => ({ ...current, hazardOrigin: value as IncidentHazardOrigin }))}
+                >
+                  <SelectTrigger className={incidentFieldControlClassName}>
+                    <SelectValue placeholder="Selecciona el origen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {incidentHazardOriginOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Estado del caso</Label>
+                <Select
+                  value={form.caseStatus}
+                  onValueChange={(value) => setForm((current) => ({ ...current, caseStatus: value as IncidentCaseStatus }))}
+                >
+                  <SelectTrigger className={incidentFieldControlClassName}>
+                    <SelectValue placeholder="Selecciona el estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {incidentCaseStatusOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            </section>
+
+            <section className="grid gap-4">
+              <h3 className="text-sm font-semibold text-foreground">Detalle y seguimiento</h3>
             <div className="grid gap-2">
               <Label htmlFor="incident-description">Descripcion</Label>
               <Textarea
@@ -317,6 +632,83 @@ function IncidentDialog({
               </div>
             </div>
 
+            <div className="flex flex-col gap-3 rounded-md border border-slate-300 bg-white p-3 shadow-xs sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <Label htmlFor="incident-is-fatal">El caso fue fatal?</Label>
+                <p className="text-sm text-muted-foreground">Selecciona si la novedad termino en fallecimiento.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium">{form.isFatal ? "Si" : "No"}</span>
+                <Switch
+                  id="incident-is-fatal"
+                  checked={form.isFatal}
+                  onCheckedChange={(checked) => setForm((current) => ({ ...current, isFatal: checked }))}
+                />
+              </div>
+            </div>
+            </section>
+
+            {isMedicalIncapacity && (
+              <section className="grid gap-4">
+                <h3 className="text-sm font-semibold text-foreground">Incapacidad medica</h3>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                  <div className="grid gap-2">
+                    <Label>Origen incapacidad</Label>
+                    <Select
+                      value={form.incapacityOrigin ?? "COMUN"}
+                      onValueChange={(value) =>
+                        setForm((current) => ({ ...current, incapacityOrigin: value as IncidentIncapacityOrigin }))
+                      }
+                    >
+                      <SelectTrigger className={incidentFieldControlClassName}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {incidentIncapacityOriginOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="incident-incapacity-start">Inicio incapacidad</Label>
+                    <Input
+                      id="incident-incapacity-start"
+                      className={incidentFieldControlClassName}
+                      type="date"
+                      value={form.incapacityStartDate ?? ""}
+                      max={form.incapacityEndDate || undefined}
+                      onChange={(event) => handleIncapacityStartDateChange(event.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="incident-incapacity-end">Fin incapacidad</Label>
+                    <Input
+                      id="incident-incapacity-end"
+                      className={incidentFieldControlClassName}
+                      type="date"
+                      value={form.incapacityEndDate ?? ""}
+                      min={form.incapacityStartDate || undefined}
+                      onChange={(event) => handleIncapacityEndDateChange(event.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="incident-incapacity-days">Dias incapacidad</Label>
+                    <Input
+                      id="incident-incapacity-days"
+                      className={incidentFieldControlClassName}
+                      type="number"
+                      min="0"
+                      value={form.incapacityDays}
+                      readOnly
+                    />
+                  </div>
+                </div>
+              </section>
+            )}
+
             {incident && (
               <div className="grid gap-2">
                 <Label>Estado</Label>
@@ -336,7 +728,7 @@ function IncidentDialog({
             )}
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="border-t border-border bg-card px-6 py-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
@@ -350,13 +742,14 @@ function IncidentDialog({
   )
 }
 
-function IncidentDocuments({ incidentId }: { incidentId: string }) {
+function IncidentDocuments({ incidentId, compact = false }: { incidentId: string; compact?: boolean }) {
   const [documents, setDocuments] = useState<IncidentDocument[]>([])
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [file, setFile] = useState<File | null>(null)
-  const [type, setType] = useState("OTHER")
   const [isConfirmed, setIsConfirmed] = useState(true)
+  const [preview, setPreview] = useState<IncidentDocumentPreviewState | null>(null)
+  const [previewLoadingId, setPreviewLoadingId] = useState<string | null>(null)
 
   async function loadDocuments() {
     setLoading(true)
@@ -375,6 +768,12 @@ function IncidentDocuments({ incidentId }: { incidentId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [incidentId])
 
+  useEffect(() => {
+    return () => {
+      if (preview?.url) URL.revokeObjectURL(preview.url)
+    }
+  }, [preview?.url])
+
   async function handleUpload(event: React.FormEvent) {
     event.preventDefault()
 
@@ -383,16 +782,11 @@ function IncidentDocuments({ incidentId }: { incidentId: string }) {
       return
     }
 
-    if (!type.trim()) {
-      toast.error("Ingresa el tipo de documento")
-      return
-    }
-
     setUploading(true)
     try {
       await uploadIncidentDocument(incidentId, {
         file,
-        type: type.trim(),
+        type: "OTHER",
         isConfirmed,
       })
       setFile(null)
@@ -408,14 +802,34 @@ function IncidentDocuments({ incidentId }: { incidentId: string }) {
   async function handleView(document: IncidentDocument) {
     if (!document.downloadUrl) return
 
+    setPreviewLoadingId(document.id)
     try {
       const blob = await downloadIncidentDocumentFile(document.downloadUrl)
       const url = URL.createObjectURL(blob)
-      window.open(url, "_blank", "noopener,noreferrer")
-      window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
+      setPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return {
+          document,
+          url,
+          mimeType: blob.type || document.mimeType || "",
+        }
+      })
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo abrir el documento")
+    } finally {
+      setPreviewLoadingId(null)
     }
+  }
+
+  function closePreview() {
+    setPreview((current) => {
+      if (current?.url) URL.revokeObjectURL(current.url)
+      return null
+    })
+  }
+
+  function canEmbedPreview(mimeType: string) {
+    return mimeType.startsWith("application/pdf") || mimeType.startsWith("image/")
   }
 
   async function handleDelete(documentId: string) {
@@ -429,105 +843,161 @@ function IncidentDocuments({ incidentId }: { incidentId: string }) {
   }
 
   return (
-    <div className="mt-4 rounded-md border border-slate-300 bg-white p-3 shadow-xs">
-      <div className="mb-3 flex items-center gap-2 text-sm font-medium">
-        <FileText className="h-4 w-4" />
-        Documentos
-      </div>
-
-      <form onSubmit={handleUpload} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_180px_auto_auto] lg:items-end">
-        <div className="grid gap-2">
-          <Label>Archivo</Label>
-          <div className="flex min-h-9 items-center gap-2 rounded-md border border-slate-300 bg-white px-2 py-1 shadow-xs">
-            <Input
-              id={`incident-document-file-${incidentId}`}
-              className="sr-only"
-              type="file"
-              onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-              disabled={uploading}
-            />
-            <Label
-              htmlFor={`incident-document-file-${incidentId}`}
-              className={cn(
-                "inline-flex h-8 cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90",
-                uploading && "pointer-events-none opacity-50",
-              )}
-            >
-              <Upload className="h-3.5 w-3.5" />
-              Seleccionar archivo
-            </Label>
-            <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
-              {file?.name ?? "Ningun archivo seleccionado"}
-            </span>
-          </div>
+    <>
+      <div className={cn("rounded-md border border-slate-300 bg-white p-3 shadow-xs", !compact && "mt-4")}>
+        <div className="mb-3 flex items-center gap-2 text-sm font-medium">
+          <FileText className="h-4 w-4" />
+          Documentos
         </div>
-        <div className="grid gap-2">
-          <Label>Tipo</Label>
-          <Input
-            className={incidentFieldControlClassName}
-            value={type}
-            onChange={(event) => setType(event.target.value)}
-            disabled={uploading}
-          />
-        </div>
-        <label className="flex h-10 items-center gap-2 text-sm">
-          <Checkbox
-            checked={isConfirmed}
-            onCheckedChange={(checked) => setIsConfirmed(checked === true)}
-            disabled={uploading}
-          />
-          Confirmado
-        </label>
-        <Button type="submit" size="sm" className="gap-2" disabled={uploading}>
-          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-          Subir
-        </Button>
-      </form>
 
-      <div className="mt-3 space-y-2">
-        {loading ? (
-          <div className="flex justify-center py-3">
-            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-          </div>
-        ) : documents.length === 0 ? (
-          <p className="rounded-md border border-slate-300 bg-white p-3 text-sm text-muted-foreground shadow-xs">
-            Sin documentos cargados.
-          </p>
-        ) : (
-          documents.map((document) => (
-            <div
-              key={document.id}
-              className="flex flex-col gap-3 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs md:flex-row md:items-center md:justify-between"
-            >
-              <div className="min-w-0">
-                <p className="truncate font-medium">{document.originalName || document.type}</p>
-                <p className="text-xs text-muted-foreground">
-                  {document.type} · {formatFileSize(document.size)} · {document.isConfirmed ? "Confirmado" : "Pendiente"}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                {document.downloadUrl && (
-                  <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => handleView(document)}>
-                    <Download className="h-4 w-4" />
-                    Ver
-                  </Button>
+        <form onSubmit={handleUpload} className="grid gap-3">
+          <div className="grid gap-2">
+            <Label>Archivo</Label>
+            <div className="flex min-h-10 flex-col gap-2 rounded-md border border-slate-300 bg-white px-2 py-2 shadow-xs sm:flex-row sm:items-center">
+              <Input
+                id={`incident-document-file-${incidentId}`}
+                className="sr-only"
+                type="file"
+                onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+                disabled={uploading}
+              />
+              <Label
+                htmlFor={`incident-document-file-${incidentId}`}
+                className={cn(
+                  "inline-flex h-8 w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 sm:w-auto",
+                  uploading && "pointer-events-none opacity-50",
                 )}
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  className="gap-2"
-                  onClick={() => handleDelete(document.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Eliminar
-                </Button>
-              </div>
+              >
+                <Upload className="h-3.5 w-3.5" />
+                Seleccionar archivo
+              </Label>
+              <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+                {file?.name ?? "Ningun archivo seleccionado"}
+              </span>
             </div>
-          ))
-        )}
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <label className="flex h-10 items-center gap-2 text-sm">
+              <Checkbox
+                checked={isConfirmed}
+                onCheckedChange={(checked) => setIsConfirmed(checked === true)}
+                disabled={uploading}
+              />
+              Confirmado
+            </label>
+            <Button type="submit" size="sm" className="w-full gap-2 sm:w-auto" disabled={uploading}>
+              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+              Subir
+            </Button>
+          </div>
+        </form>
+
+        <div className="mt-3 space-y-2">
+          {loading ? (
+            <div className="flex justify-center py-3">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : documents.length === 0 ? (
+            <p className="rounded-md border border-slate-300 bg-white p-3 text-sm text-muted-foreground shadow-xs">
+              Sin documentos cargados.
+            </p>
+          ) : (
+            documents.map((document) => (
+              <div
+                key={document.id}
+                className="flex flex-col gap-3 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs md:flex-row md:items-center md:justify-between"
+              >
+                <div className="min-w-0">
+                  <p className="truncate font-medium">{document.originalName || "Documento"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatFileSize(document.size)} · {document.isConfirmed ? "Confirmado" : "Pendiente"}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  {document.downloadUrl && (
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => handleView(document)}>
+                      {previewLoadingId === document.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                      {previewLoadingId === document.id ? "Cargando" : "Ver"}
+                    </Button>
+                  )}
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="gap-2"
+                    onClick={() => handleDelete(document.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Eliminar
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
-    </div>
+
+      <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && closePreview()}>
+        <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">
+          <DialogHeader className="border-b border-border px-4 py-3">
+            <DialogTitle className="truncate text-base">
+              {preview?.document.originalName || preview?.document.type || "Documento"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="min-h-0 flex-1 p-4">
+            {preview && canEmbedPreview(preview.mimeType) ? (
+              preview.mimeType.startsWith("image/") ? (
+                <div className="flex max-h-[70dvh] items-center justify-center overflow-auto rounded-md bg-secondary/40 p-2">
+                  <img
+                    src={preview.url}
+                    alt={preview.document.originalName || "Documento"}
+                    className="max-h-[68dvh] max-w-full rounded-md object-contain"
+                  />
+                </div>
+              ) : (
+                <iframe
+                  title={preview.document.originalName || "Documento"}
+                  src={preview.url}
+                  className="h-[70dvh] w-full rounded-md border border-border bg-white"
+                />
+              )
+            ) : (
+              <div className="flex min-h-[280px] flex-col items-center justify-center gap-3 rounded-md border border-dashed border-border bg-secondary/30 p-6 text-center">
+                <FileText className="h-10 w-10 text-muted-foreground" />
+                <div>
+                  <p className="font-medium">Vista previa no disponible</p>
+                  <p className="text-sm text-muted-foreground">
+                    Este tipo de archivo se puede abrir desde una pestana nueva.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="border-t border-border px-4 py-3">
+            {preview && (
+              <Button
+                type="button"
+                variant="outline"
+                className="gap-2"
+                onClick={() => window.open(preview.url, "_blank", "noopener,noreferrer")}
+              >
+                <ExternalLink className="h-4 w-4" />
+                Abrir en pestana
+              </Button>
+            )}
+            <Button type="button" onClick={closePreview}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 
@@ -535,6 +1005,8 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
   const [incidents, setIncidents] = useState<Incident[]>([])
   const [loading, setLoading] = useState(true)
   const [exporting, setExporting] = useState(false)
+  const [viewMode, setViewMode] = useState<LaborNewsViewMode>("cards")
+  const [documentsIncident, setDocumentsIncident] = useState<Incident | null>(null)
   const [employeeFilter, setEmployeeFilter] = useState("all")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
@@ -612,12 +1084,13 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
 
   async function handleSaveIncident(payload: IncidentFormState, incidentId?: string) {
     try {
-      const { status, ...incidentPayload } = payload
+      const { status } = payload
+      const incidentPayload = sanitizeIncidentPayload(payload)
 
       if (incidentId) {
         const currentIncident = incidents.find((incident) => incident.id === incidentId)
         const hasStatusChange = status !== currentIncident?.status
-        const hasDataChanges = hasIncidentDataChanges(currentIncident, incidentPayload as UpdateIncidentDto)
+        const hasDataChanges = hasIncidentDataChanges(currentIncident, incidentPayload)
 
         if (hasStatusChange) {
           if (status === "ACTIVE") {
@@ -626,12 +1099,12 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
             await deleteIncident(incidentId)
           }
         } else if (hasDataChanges) {
-          await updateIncident(incidentId, incidentPayload as UpdateIncidentDto)
+          await updateIncident(incidentId, incidentPayload)
         }
 
         toast.success("Novedad laboral actualizada")
       } else {
-        await createIncident(incidentPayload as CreateIncidentDto)
+        await createIncident(incidentPayload)
         toast.success("Novedad laboral creada")
       }
       await loadData()
@@ -729,6 +1202,35 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
         </CardContent>
       </Card>
 
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Lista de novedades laborales</h2>
+          <p className="text-sm text-muted-foreground">{incidents.length} novedades encontradas</p>
+        </div>
+        <div className="flex w-fit rounded-md border border-border bg-secondary p-1">
+          <Button
+            type="button"
+            variant={viewMode === "cards" ? "default" : "ghost"}
+            size="sm"
+            className="h-8 gap-2"
+            onClick={() => setViewMode("cards")}
+          >
+            <LayoutGrid className="h-4 w-4" />
+            Tarjetas
+          </Button>
+          <Button
+            type="button"
+            variant={viewMode === "list" ? "default" : "ghost"}
+            size="sm"
+            className="h-8 gap-2"
+            onClick={() => setViewMode("list")}
+          >
+            <List className="h-4 w-4" />
+            Lista
+          </Button>
+        </div>
+      </div>
+
       {loading ? (
         <div className="flex min-h-[260px] items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -739,7 +1241,7 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
             No hay novedades laborales registradas.
           </CardContent>
         </Card>
-      ) : (
+      ) : viewMode === "cards" ? (
         <div className="space-y-4">
           {incidents.map((incident) => (
             <Card key={incident.id} className="bg-card border-border">
@@ -752,7 +1254,7 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
                           ? `${incident.employee.name ?? ""} ${incident.employee.lastName ?? ""}`.trim()
                           : incident.employeeId}
                       </h3>
-                      <Badge variant="outline">{incident.consecutive || "Sin consecutivo"}</Badge>
+                      <Badge variant="outline">{formatIncidentConsecutive(incident.consecutive)}</Badge>
                       <Badge variant="secondary">{getIncidentTypeLabel(incident.type)}</Badge>
                       <Badge variant={incident.status === "ACTIVE" ? "accentActivd" : "destructive"}>
                         {getIncidentStatusLabel(incident.status)}
@@ -787,6 +1289,42 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
                     <span>Fecha: {formatDate(incident.date)}</span>
                   </div>
                   <div>
+                    <p className="text-xs text-muted-foreground">Area</p>
+                    <p>{incident.workArea?.name ?? "No registrada"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Puesto</p>
+                    <p>{incident.job?.name ?? "No registrado"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Origen del peligro</p>
+                    <p>{getHazardOriginLabel(incident.hazardOrigin)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Estado del caso</p>
+                    <p>{getCaseStatusLabel(incident.caseStatus)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Fatal</p>
+                    <p>{incident.isFatal ? "Si" : "No"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Incapacidad</p>
+                    <p>
+                      {incident.type === "INCAPACIDAD_MEDICA"
+                        ? `${incident.incapacityDays ?? 0} dias · ${getIncapacityOriginLabel(incident.incapacityOrigin)}`
+                        : "No aplica"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Inicio incapacidad</p>
+                    <p>{incident.type === "INCAPACIDAD_MEDICA" ? formatDate(incident.incapacityStartDate) : "No aplica"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Fin incapacidad</p>
+                    <p>{incident.type === "INCAPACIDAD_MEDICA" ? formatDate(incident.incapacityEndDate) : "No aplica"}</p>
+                  </div>
+                  <div>
                     <p className="text-xs text-muted-foreground">Consecuencias</p>
                     <p>{incident.consequences || "No registradas"}</p>
                   </div>
@@ -801,7 +1339,102 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
             </Card>
           ))}
         </div>
+      ) : (
+        <div className="overflow-x-auto rounded-md border border-border bg-card">
+          <table className="w-full min-w-[980px] text-sm">
+            <thead className="border-b border-border bg-secondary text-left text-xs font-medium uppercase text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3 font-medium">Funcionario</th>
+                <th className="px-4 py-3 font-medium">Novedad</th>
+                <th className="px-4 py-3 font-medium">Fecha</th>
+                <th className="px-4 py-3 font-medium">Area / Puesto</th>
+                <th className="px-4 py-3 font-medium">Estado</th>
+                <th className="px-4 py-3 text-right font-medium">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {incidents.map((incident) => (
+                <tr key={incident.id} className="align-middle">
+                  <td className="px-4 py-3">
+                    <p className="font-medium">
+                      {incident.employee
+                        ? `${incident.employee.name ?? ""} ${incident.employee.lastName ?? ""}`.trim()
+                        : incident.employeeId}
+                    </p>
+                    <p className="text-sm text-muted-foreground">{formatIncidentConsecutive(incident.consecutive)}</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge variant="secondary">{getIncidentTypeLabel(incident.type)}</Badge>
+                    <p className="mt-1 max-w-[220px] truncate text-muted-foreground">{incident.place || "Lugar no registrado"}</p>
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">{formatDate(incident.date)}</td>
+                  <td className="px-4 py-3">
+                    <p className="max-w-[220px] truncate">{incident.workArea?.name ?? "No registrada"}</p>
+                    <p className="max-w-[220px] truncate text-muted-foreground">{incident.job?.name ?? "No registrado"}</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col items-start gap-1">
+                      <Badge variant={incident.status === "ACTIVE" ? "accentActivd" : "destructive"}>
+                        {getIncidentStatusLabel(incident.status)}
+                      </Badge>
+                      <span className="text-muted-foreground">{getCaseStatusLabel(incident.caseStatus)}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-52">
+                        <IncidentDialog
+                          incident={incident}
+                          employees={employees}
+                          onSave={handleSaveIncident}
+                          trigger={
+                            <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+                              <Edit className="h-4 w-4" />
+                              Editar
+                            </DropdownMenuItem>
+                          }
+                        />
+                        <DropdownMenuItem onSelect={() => setDocumentsIncident(incident)}>
+                          <Upload className="h-4 w-4" />
+                          Cargar / ver archivos
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        {incident.status === "ACTIVE" ? (
+                          <DropdownMenuItem variant="destructive" onSelect={() => handleDeleteIncident(incident)}>
+                            <Trash2 className="h-4 w-4" />
+                            Eliminar
+                          </DropdownMenuItem>
+                        ) : (
+                          <DropdownMenuItem onSelect={() => handleActivateIncident(incident)}>
+                            <UserCheck className="h-4 w-4" />
+                            Activar
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
+
+      <Dialog open={Boolean(documentsIncident)} onOpenChange={(open) => !open && setDocumentsIncident(null)}>
+        <DialogContent className="max-h-[88vh] w-[calc(100vw-2rem)] max-w-4xl overflow-hidden bg-card p-0">
+          <DialogHeader className="border-b border-border px-6 py-4">
+            <DialogTitle>Documentos de la novedad laboral</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto px-6 py-4">
+            {documentsIncident && <IncidentDocuments incidentId={documentsIncident.id} compact />}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -820,10 +1453,8 @@ export default function EmployeesPage() {
   const [reportPage, setReportPage] = useState("")
   const [reportLimit, setReportLimit] = useState("")
   const [employees, setEmployees] = useState<Employee[]>([])
-  const [sgiResponsible, setSgiResponsible] = useState<EmployeeSgiResponsible | null>(null)
   const [loading, setLoading] = useState(true)
   const [exportingEmployees, setExportingEmployees] = useState(false)
-  const [sgiResponsibleDialogOpen, setSgiResponsibleDialogOpen] = useState(false)
 
   const workAreas = useMemo(() => {
     const unique = new Map<string, string>()
@@ -857,6 +1488,7 @@ export default function EmployeesPage() {
       const matchesSearch =
         !query ||
         fullName.includes(query) ||
+        formatEmployeeDocument(employee).toLowerCase().includes(query) ||
         employee.email?.toLowerCase().includes(query) ||
         employee.phone?.toLowerCase().includes(query) ||
         employee.job?.name?.toLowerCase().includes(query) ||
@@ -878,10 +1510,6 @@ export default function EmployeesPage() {
     inactive: employees.filter((employee) => !employee.status).length,
     workAreas: workAreas.length,
   }
-
-  const sgiResponsibleEmployee =
-    sgiResponsible?.employee ??
-    (sgiResponsible?.employeeId ? employees.find((employee) => employee.id === sgiResponsible.employeeId) : null)
 
   function getEmployeeInitials(employee: Employee) {
     return `${employee.name ?? ""} ${employee.lastName ?? ""}`
@@ -989,18 +1617,8 @@ export default function EmployeesPage() {
     }
   }
 
-  async function loadSgiResponsible() {
-    try {
-      const data = await getSgiResponsible()
-      setSgiResponsible(data)
-    } catch {
-      setSgiResponsible(null)
-    }
-  }
-
   useEffect(() => {
     loadEmployees()
-    loadSgiResponsible()
   }, [])
 
   async function handleCreateEmployee(payload: CreateEmployeeDto | UpdateEmployeeDto) {
@@ -1047,61 +1665,15 @@ export default function EmployeesPage() {
     }
   }
 
-  async function handleSaveSgiResponsible(data: UpsertEmployeeSgiResponsibleDto) {
-    try {
-      const saved = sgiResponsible ? await updateSgiResponsible(data) : await createSgiResponsible(data)
-      const selectedEmployee = employees.find((employee) => employee.id === data.employeeId)
-
-      setSgiResponsible({
-        ...saved,
-        employeeId: data.employeeId,
-        signatureDate: data.signatureDate,
-        employee: selectedEmployee
-          ? {
-              id: selectedEmployee.id,
-              name: selectedEmployee.name,
-              lastName: selectedEmployee.lastName,
-              email: selectedEmployee.email,
-              phone: selectedEmployee.phone,
-            }
-          : saved.employee,
-      })
-      toast.success(sgiResponsible ? "Responsable SGI actualizado" : "Responsable SGI asignado")
-    } catch (error: any) {
-      toast.error(error.message ?? "No se pudo guardar el responsable SGI")
-      throw error
-    }
-  }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Funcionarios</h1>
           <p className="text-muted-foreground">Gestion del talento humano</p>
-          {sgiResponsibleEmployee && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              Responsable SGI:{" "}
-              <span className="font-medium text-foreground">
-                {sgiResponsibleEmployee.name} {sgiResponsibleEmployee.lastName}
-              </span>
-              {sgiResponsible?.signatureDate && (
-                <span> · Firma: {sgiResponsible.signatureDate.slice(0, 10)}</span>
-              )}
-            </p>
-          )}
         </div>
 
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setSgiResponsibleDialogOpen(true)}
-            className="gap-2"
-            disabled={employees.length === 0}
-          >
-            <UserCheck className="h-4 w-4" />
-            {sgiResponsible ? "Gestionar Responsable SGI" : "Asignar Responsable SGI"}
-          </Button>
           <EmployeeFormDialog onSave={handleCreateEmployee} />
         </div>
       </div>
@@ -1210,28 +1782,6 @@ export default function EmployeesPage() {
                       <SelectItem value="inactive">Inactivo</SelectItem>
                     </SelectContent>
                   </Select>
-                  <div className="flex rounded-md border border-border bg-secondary p-1">
-                    <Button
-                      type="button"
-                      variant={viewMode === "cards" ? "default" : "ghost"}
-                      size="sm"
-                      className="h-8 gap-2"
-                      onClick={() => setViewMode("cards")}
-                    >
-                      <LayoutGrid className="h-4 w-4" />
-                      Tarjetas
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={viewMode === "list" ? "default" : "ghost"}
-                      size="sm"
-                      className="h-8 gap-2"
-                      onClick={() => setViewMode("list")}
-                    >
-                      <List className="h-4 w-4" />
-                      Lista
-                    </Button>
-                  </div>
                 </div>
               </div>
             </CardContent>
@@ -1361,10 +1911,32 @@ export default function EmployeesPage() {
             </CardContent>
           </Card>
 
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-lg font-semibold text-foreground">Lista de empleados</h2>
               <p className="text-sm text-muted-foreground">{filteredEmployees.length} funcionarios encontrados</p>
+            </div>
+            <div className="flex w-fit rounded-md border border-border bg-secondary p-1">
+              <Button
+                type="button"
+                variant={viewMode === "cards" ? "default" : "ghost"}
+                size="sm"
+                className="h-8 gap-2"
+                onClick={() => setViewMode("cards")}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Tarjetas
+              </Button>
+              <Button
+                type="button"
+                variant={viewMode === "list" ? "default" : "ghost"}
+                size="sm"
+                className="h-8 gap-2"
+                onClick={() => setViewMode("list")}
+              >
+                <List className="h-4 w-4" />
+                Lista
+              </Button>
             </div>
           </div>
 
@@ -1405,6 +1977,10 @@ export default function EmployeesPage() {
                     </div>
 
                     <div className="mt-4 space-y-2">
+                      <div className="flex items-center justify-between gap-3 text-sm">
+                        <span className="text-muted-foreground">Documento</span>
+                        <span className="truncate text-right">{formatEmployeeDocument(employee)}</span>
+                      </div>
                       <div className="flex items-center justify-between gap-3 text-sm">
                         <span className="text-muted-foreground">Area</span>
                         <span className="truncate text-right">{employee.workArea?.name ?? "Sin area"}</span>
@@ -1480,14 +2056,17 @@ export default function EmployeesPage() {
                             <p className="truncate font-medium">
                               {employee.name} {employee.lastName}
                             </p>
-                            <p className="truncate text-sm text-muted-foreground">{employee.email || "No registrado"}</p>
+                            <div className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
+                              <IdCardIcon className="h-4 w-4 shrink-0" />
+                              <span className="truncate">{formatEmployeeDocument(employee)}</span>
+                            </div>
                           </div>
                         </div>
                         <div className="min-w-0 text-sm">
                           <p className="truncate font-medium">{employee.job?.name ?? "Sin puesto"}</p>
                           <p className="truncate text-muted-foreground">{employee.workArea?.name ?? "Sin area"}</p>
                         </div>
-                        <div className="flex flex-wrap items-center gap-3 text-sm">
+                        <div className="min-w-0 space-y-1 text-sm">
                           <Badge
                             variant="secondary"
                             className={cn(
@@ -1497,7 +2076,8 @@ export default function EmployeesPage() {
                           >
                             {employee.status ? "Activo" : "Inactivo"}
                           </Badge>
-                          <span className="text-muted-foreground">{employee.phone || "Sin telefono"}</span>
+                          <p className="truncate text-muted-foreground">{employee.email || "No registrado"}</p>
+                          <p className="truncate text-muted-foreground">{employee.phone || "Sin telefono"}</p>
                         </div>
                         <div className="flex items-center gap-2 md:justify-end">
                           <Link href={`/dashboard/employees/${employee.id}`}>
@@ -1538,13 +2118,6 @@ export default function EmployeesPage() {
           )}
       </div>
 
-      <SgiResponsibleFormDialog
-        employees={employees}
-        open={sgiResponsibleDialogOpen}
-        responsible={sgiResponsible}
-        onOpenChange={setSgiResponsibleDialogOpen}
-        onSave={handleSaveSgiResponsible}
-      />
     </div>
   )
 }

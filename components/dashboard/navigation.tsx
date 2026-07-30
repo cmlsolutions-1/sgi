@@ -15,6 +15,7 @@ import {
   IdCardIcon,
   ShieldPlus,
   UsersRound,
+  ClipboardCheck,
 } from "lucide-react"
 import type { ModuleNode } from "@/store/auth.store"
 
@@ -69,7 +70,19 @@ export const navigation: NavigationItem[] = [
       { code: "INCIDENTS", name: "Novedades Laborales", href: "/dashboard/incidents", icon: TriangleAlert },
     ],
   },
-  
+  {
+    code: "SG_SST",
+    name: "Gestion del SG-SST",
+    icon: ClipboardCheck,
+    subItems: [
+      {
+        code: "SGI_RESPONSIBLE",
+        name: "Responsable SG-SST",
+        href: "/dashboard/sgi-responsible",
+        icon: ShieldCheck,
+      },
+    ],
+  },
   {
     code: "PLANNING",
     name: "Planificacion",
@@ -92,9 +105,9 @@ export const navigation: NavigationItem[] = [
       },
     ],
   },
-  { 
-    code: "GESTION_DOCUMENTAL", 
-    name: "Gestion Documental", 
+  {
+    code: "GESTION_DOCUMENTAL",
+    name: "Gestion Documental",
     icon: FileStack,
     subItems: [
       {
@@ -104,7 +117,7 @@ export const navigation: NavigationItem[] = [
         icon: FileText,
       },
     ],
-    },
+  },
 ]
 
 function collectModuleCodes(modules: ModuleNode[]): Set<string> {

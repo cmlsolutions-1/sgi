@@ -2,7 +2,7 @@
 
 import { use, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Download, Edit, FileText, Loader2, Plus, Trash2, Upload, Users } from "lucide-react"
+import { ArrowLeft, Download, Edit, ExternalLink, Eye, FileText, Loader2, Plus, Trash2, Upload, Users } from "lucide-react"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
@@ -81,6 +81,12 @@ function formatFileSize(value?: number | null) {
 }
 
 type AttendanceFormState = CreateTrainingAttendanceDto
+
+type TrainingDocumentPreviewState = {
+  document: TrainingDocument
+  url: string
+  mimeType: string
+}
 
 const emptyAttendanceForm: AttendanceFormState = {
   employeeId: "",
@@ -199,8 +205,9 @@ function TrainingDocuments({ trainingId }: { trainingId: string }) {
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [file, setFile] = useState<File | null>(null)
-  const [type, setType] = useState("TRAINING_CERTIFICATE")
   const [isConfirmed, setIsConfirmed] = useState(true)
+  const [preview, setPreview] = useState<TrainingDocumentPreviewState | null>(null)
+  const [previewLoadingId, setPreviewLoadingId] = useState<string | null>(null)
 
   async function loadDocuments() {
     setLoading(true)
@@ -219,6 +226,12 @@ function TrainingDocuments({ trainingId }: { trainingId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trainingId])
 
+  useEffect(() => {
+    return () => {
+      if (preview?.url) URL.revokeObjectURL(preview.url)
+    }
+  }, [preview?.url])
+
   async function handleUpload(event: React.FormEvent) {
     event.preventDefault()
 
@@ -227,16 +240,11 @@ function TrainingDocuments({ trainingId }: { trainingId: string }) {
       return
     }
 
-    if (!type.trim()) {
-      toast.error("Ingresa el tipo de documento")
-      return
-    }
-
     setUploading(true)
     try {
       await uploadTrainingDocument(trainingId, {
         file,
-        type: type.trim(),
+        type: "TRAINING_CERTIFICATE",
         isConfirmed,
       })
       setFile(null)
@@ -252,14 +260,34 @@ function TrainingDocuments({ trainingId }: { trainingId: string }) {
   async function handleView(document: TrainingDocument) {
     if (!document.downloadUrl) return
 
+    setPreviewLoadingId(document.id)
     try {
       const blob = await downloadTrainingDocumentFile(document.downloadUrl)
       const url = URL.createObjectURL(blob)
-      window.open(url, "_blank", "noopener,noreferrer")
-      window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
+      setPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return {
+          document,
+          url,
+          mimeType: blob.type || document.mimeType || "",
+        }
+      })
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo abrir el documento")
+    } finally {
+      setPreviewLoadingId(null)
     }
+  }
+
+  function closePreview() {
+    setPreview((current) => {
+      if (current?.url) URL.revokeObjectURL(current.url)
+      return null
+    })
+  }
+
+  function canEmbedPreview(mimeType: string) {
+    return mimeType.startsWith("application/pdf") || mimeType.startsWith("image/")
   }
 
   async function handleDelete(documentId: string) {
@@ -273,80 +301,141 @@ function TrainingDocuments({ trainingId }: { trainingId: string }) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <FileText className="h-5 w-5" />
-          Documentos de la capacitacion
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleUpload} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_auto_auto] lg:items-end">
-          <div className="grid gap-2">
-            <Label>Archivo</Label>
-            <Input type="file" onChange={(event) => setFile(event.target.files?.[0] ?? null)} disabled={uploading} />
-          </div>
-          <div className="grid gap-2">
-            <Label>Tipo</Label>
-            <Input value={type} onChange={(event) => setType(event.target.value)} disabled={uploading} />
-          </div>
-          <label className="flex h-10 items-center gap-2 text-sm">
-            <Checkbox
-              checked={isConfirmed}
-              onCheckedChange={(checked) => setIsConfirmed(checked === true)}
-              disabled={uploading}
-            />
-            Confirmado
-          </label>
-          <Button type="submit" size="sm" className="gap-2" disabled={uploading}>
-            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-            Subir
-          </Button>
-        </form>
-
-        <div className="mt-4 space-y-2">
-          {loading ? (
-            <div className="flex justify-center py-4">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <FileText className="h-5 w-5" />
+            Documentos de la capacitacion
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleUpload} className="grid gap-3">
+            <div className="grid gap-2">
+              <Label>Archivo</Label>
+              <Input type="file" onChange={(event) => setFile(event.target.files?.[0] ?? null)} disabled={uploading} />
             </div>
-          ) : documents.length === 0 ? (
-            <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">Sin documentos cargados.</p>
-          ) : (
-            documents.map((document) => (
-              <div
-                key={document.id}
-                className="flex flex-col gap-3 rounded-md border px-3 py-2 text-sm md:flex-row md:items-center md:justify-between"
-              >
-                <div className="min-w-0">
-                  <p className="truncate font-medium">{document.originalName || document.type}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {document.type} · {formatFileSize(document.size)} · {document.isConfirmed ? "Confirmado" : "Pendiente"}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <label className="flex h-10 items-center gap-2 text-sm">
+                <Checkbox
+                  checked={isConfirmed}
+                  onCheckedChange={(checked) => setIsConfirmed(checked === true)}
+                  disabled={uploading}
+                />
+                Confirmado
+              </label>
+              <Button type="submit" size="sm" className="w-full gap-2 sm:w-auto" disabled={uploading}>
+                {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                Subir
+              </Button>
+            </div>
+          </form>
+
+          <div className="mt-4 space-y-2">
+            {loading ? (
+              <div className="flex justify-center py-4">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : documents.length === 0 ? (
+              <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">Sin documentos cargados.</p>
+            ) : (
+              documents.map((document) => (
+                <div
+                  key={document.id}
+                  className="flex flex-col gap-3 rounded-md border px-3 py-2 text-sm md:flex-row md:items-center md:justify-between"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">{document.originalName || "Documento"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatFileSize(document.size)} · {document.isConfirmed ? "Confirmado" : "Pendiente"}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    {document.downloadUrl && (
+                      <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => handleView(document)}>
+                        {previewLoadingId === document.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                        {previewLoadingId === document.id ? "Cargando" : "Ver"}
+                      </Button>
+                    )}
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="gap-2"
+                      onClick={() => handleDelete(document.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Eliminar
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && closePreview()}>
+        <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">
+          <DialogHeader className="border-b border-border px-4 py-3">
+            <DialogTitle className="truncate text-base">
+              {preview?.document.originalName || preview?.document.type || "Documento"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="min-h-0 flex-1 p-4">
+            {preview && canEmbedPreview(preview.mimeType) ? (
+              preview.mimeType.startsWith("image/") ? (
+                <div className="flex max-h-[70dvh] items-center justify-center overflow-auto rounded-md bg-secondary/40 p-2">
+                  <img
+                    src={preview.url}
+                    alt={preview.document.originalName || "Documento"}
+                    className="max-h-[68dvh] max-w-full rounded-md object-contain"
+                  />
+                </div>
+              ) : (
+                <iframe
+                  title={preview.document.originalName || "Documento"}
+                  src={preview.url}
+                  className="h-[70dvh] w-full rounded-md border border-border bg-white"
+                />
+              )
+            ) : (
+              <div className="flex min-h-[280px] flex-col items-center justify-center gap-3 rounded-md border border-dashed border-border bg-secondary/30 p-6 text-center">
+                <FileText className="h-10 w-10 text-muted-foreground" />
+                <div>
+                  <p className="font-medium">Vista previa no disponible</p>
+                  <p className="text-sm text-muted-foreground">
+                    Este tipo de archivo se puede abrir desde una pestana nueva.
                   </p>
                 </div>
-                <div className="flex gap-2">
-                  {document.downloadUrl && (
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => handleView(document)}>
-                      <Download className="h-4 w-4" />
-                      Ver
-                    </Button>
-                  )}
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    className="gap-2"
-                    onClick={() => handleDelete(document.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Eliminar
-                  </Button>
-                </div>
               </div>
-            ))
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            )}
+          </div>
+
+          <DialogFooter className="border-t border-border px-4 py-3">
+            {preview && (
+              <Button
+                type="button"
+                variant="outline"
+                className="gap-2"
+                onClick={() => window.open(preview.url, "_blank", "noopener,noreferrer")}
+              >
+                <ExternalLink className="h-4 w-4" />
+                Abrir en pestana
+              </Button>
+            )}
+            <Button type="button" onClick={closePreview}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 

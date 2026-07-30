@@ -20,7 +20,13 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { listJobs } from "@/services/jobService"
 import { listWorkAreaOptions } from "@/services/workAreaService"
-import type { CreateEmployeeDto, Employee, EmployeeGender, UpdateEmployeeDto } from "@/types/manager/employee"
+import type {
+  CreateEmployeeDto,
+  Employee,
+  EmployeeDocumentType,
+  EmployeeGender,
+  UpdateEmployeeDto,
+} from "@/types/manager/employee"
 import type { Job } from "@/types/manager/job"
 import type { WorkAreaOption } from "@/types/manager/work-area"
 
@@ -31,6 +37,8 @@ type EmployeeFormValues = {
   email: string
   address: string
   birthDate: string
+  documentType: EmployeeDocumentType | ""
+  documentNumber: string
   gender: EmployeeGender | ""
   workAreaId: string
   jobId: string
@@ -52,6 +60,8 @@ const emptyForm: EmployeeFormValues = {
   email: "",
   address: "",
   birthDate: "",
+  documentType: "",
+  documentNumber: "",
   gender: "",
   workAreaId: "",
   jobId: "",
@@ -61,6 +71,14 @@ const emptyForm: EmployeeFormValues = {
 const genderOptions: Array<{ value: EmployeeGender; label: string }> = [
   { value: "MASCULINO", label: "Masculino" },
   { value: "FEMENINO", label: "Femenino" },
+]
+
+const documentTypeOptions: Array<{ value: EmployeeDocumentType; label: string; description: string }> = [
+  { value: "CC", label: "CC", description: "Cedula de Ciudadania" },
+  { value: "TI", label: "TI", description: "Tarjeta de Identidad" },
+  { value: "RC", label: "RC", description: "Registro Civil" },
+  { value: "CE", label: "CE", description: "Cedula de Extranjeria" },
+  { value: "PP", label: "PP", description: "Pasaporte" },
 ]
 
 const fieldControlClassName =
@@ -81,6 +99,8 @@ function getInitialForm(employee?: Employee): EmployeeFormValues {
     email: employee.email ?? "",
     address: employee.address ?? "",
     birthDate: toDateInput(employee.birthDate),
+    documentType: (employee.documentType as EmployeeDocumentType | null) ?? "",
+    documentNumber: employee.documentNumber ?? "",
     gender: employee.gender ?? "",
     workAreaId: employee.workAreaId ?? "",
     jobId: employee.jobId ?? "",
@@ -165,6 +185,16 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
       return
     }
 
+    if (!formData.documentType) {
+      toast.error("Selecciona el tipo de documento")
+      return
+    }
+
+    if (!formData.documentNumber.trim()) {
+      toast.error("Ingresa el numero de documento")
+      return
+    }
+
     const payload: EmployeeFormPayload = {
       name: formData.name.trim(),
       lastName: formData.lastName.trim(),
@@ -172,6 +202,8 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
       email: formData.email.trim(),
       address: formData.address.trim(),
       birthDate: formData.birthDate,
+      documentType: formData.documentType,
+      documentNumber: formData.documentNumber.trim(),
       gender: formData.gender,
       workAreaId: formData.workAreaId,
       jobId: formData.jobId,
@@ -273,6 +305,36 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                     value={formData.email}
                     onChange={(event) => updateField("email", event.target.value)}
                     placeholder="correo@empresa.com"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Tipo de documento</Label>
+                  <Select
+                    value={formData.documentType}
+                    onValueChange={(value) => updateField("documentType", value as EmployeeDocumentType)}
+                  >
+                    <SelectTrigger className={fieldControlClassName}>
+                      <SelectValue placeholder="Selecciona el tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {documentTypeOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label} - {option.description}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="employee-documentNumber">Numero de documento</Label>
+                  <Input
+                    id="employee-documentNumber"
+                    className={fieldControlClassName}
+                    value={formData.documentNumber}
+                    onChange={(event) => updateField("documentNumber", event.target.value)}
+                    placeholder="Numero de documento"
                     required
                   />
                 </div>

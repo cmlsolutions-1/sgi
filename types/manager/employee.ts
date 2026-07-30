@@ -20,6 +20,7 @@ export type EmployeeCityOption = EmployeeCatalogOption & {
 export type EmployeeArlRiskLevel = "RIESGO_I" | "RIESGO_II" | "RIESGO_III" | "RIESGO_IV" | "RIESGO_V"
 export type EmployeeGender = "MASCULINO" | "FEMENINO"
 export type EmployeeContractType = "INDEFINIDO" | "FIJO" | "SERVICIOS"
+export type EmployeeDocumentType = "CC" | "TI" | "RC" | "CE" | "PP"
 
 export type Employee = {
   id: string
@@ -29,6 +30,8 @@ export type Employee = {
   email: string
   address: string
   birthDate: string
+  documentType?: EmployeeDocumentType | string | null
+  documentNumber?: string | null
   gender?: EmployeeGender | null
   companyId: string
   workAreaId: string
@@ -172,6 +175,8 @@ export type EmployeeMedicalEvaluation = {
   nextEvaluationDate: string
   medicalProfessional: string
   institution: string
+  jobProfileSentToDoctor?: boolean | null
+  jobProfileSentDate?: string | null
   employee: EmployeeEvaluationPerson
   createdAt: string
 }
@@ -184,6 +189,8 @@ export type CreateEmployeeMedicalEvaluationDto = {
   nextEvaluationDate?: string
   medicalProfessional: string
   institution: string
+  jobProfileSentToDoctor: boolean
+  jobProfileSentDate?: string
 }
 
 export type UpdateEmployeeMedicalEvaluationDto = Partial<CreateEmployeeMedicalEvaluationDto>
@@ -266,6 +273,8 @@ export type CreateEmployeeDto = {
   email: string
   address: string
   birthDate: string
+  documentType: EmployeeDocumentType
+  documentNumber: string
   gender: EmployeeGender
   workAreaId: string
   jobId: string
@@ -296,6 +305,8 @@ export type UpdateEmployeeDto = {
   email: string
   address: string
   birthDate: string
+  documentType: EmployeeDocumentType
+  documentNumber: string
   gender: EmployeeGender
   workAreaId: string
   jobId: string

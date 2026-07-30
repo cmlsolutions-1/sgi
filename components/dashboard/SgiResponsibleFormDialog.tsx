@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Download, FileText, Loader2, Trash2, Upload } from "lucide-react"
+import { Download, ExternalLink, Eye, FileText, Loader2, Trash2, Upload } from "lucide-react"
 import { toast } from "sonner"
 import jsPDF from "jspdf"
 
@@ -45,6 +45,8 @@ const SGI_RESPONSIBLE_RESPONSIBILITIES = [
   "Realizar asesoría y acompañamiento en actividades de registro.",
   "Entrenar a los comités del SG-SST.",
 ]
+
+const SGI_RESPONSIBLE_DOCUMENT_TYPE = "SGI_RESPONSIBLE"
 
 const dayNames: Record<number, string> = {
   1: "uno",
@@ -107,6 +109,23 @@ function safeFilename(value: string) {
     .replace(/^_+|_+$/g, "")
 }
 
+function formatFileSize(size?: number | null) {
+  if (!size) return "Tamano no disponible"
+  if (size < 1024) return `${size} B`
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function canEmbedPreview(mimeType: string) {
+  return mimeType.startsWith("application/pdf") || mimeType.startsWith("image/")
+}
+
+type DocumentPreviewState = {
+  document: EmployeeDocument
+  url: string
+  mimeType: string
+}
+
 export function SgiResponsibleFormDialog({
   employees,
   open,
@@ -123,10 +142,20 @@ export function SgiResponsibleFormDialog({
   const [documentsLoading, setDocumentsLoading] = useState(false)
   const [uploadingDocument, setUploadingDocument] = useState(false)
   const [documentFile, setDocumentFile] = useState<File | null>(null)
-  const [documentType, setDocumentType] = useState("SGI_RESPONSIBLE")
   const [documentConfirmed, setDocumentConfirmed] = useState(true)
+  const [preview, setPreview] = useState<DocumentPreviewState | null>(null)
+  const [previewLoadingId, setPreviewLoadingId] = useState<string | null>(null)
   const selectedEmployee = employees.find((employee) => employee.id === employeeId)
   const responsibleName = getEmployeeFullName(selectedEmployee ?? responsible?.employee)
+
+  useEffect(() => {
+    return () => {
+      setPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return null
+      })
+    }
+  }, [])
 
   useEffect(() => {
     if (!open) return
@@ -151,7 +180,7 @@ export function SgiResponsibleFormDialog({
         const data = await listSgiResponsibleDocuments()
         if (mounted) setDocuments(data)
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "No se pudo cargar los documentos del responsable SGI")
+        toast.error(error instanceof Error ? error.message : "No se pudo cargar los documentos del responsable SG-SST")
       } finally {
         if (mounted) setDocumentsLoading(false)
       }
@@ -281,7 +310,7 @@ export function SgiResponsibleFormDialog({
 
   async function handleUploadDocument() {
     if (!responsible?.id) {
-      toast.error("Primero guarda el responsable SGI")
+      toast.error("Primero guarda el responsable SG-SST")
       return
     }
 
@@ -294,13 +323,13 @@ export function SgiResponsibleFormDialog({
     try {
       await uploadSgiResponsibleDocument({
         file: documentFile,
-        type: documentType,
+        type: SGI_RESPONSIBLE_DOCUMENT_TYPE,
         isConfirmed: documentConfirmed,
       })
       setDocumentFile(null)
       const data = await listSgiResponsibleDocuments()
       setDocuments(data)
-      toast.success("Documento del responsable SGI subido correctamente")
+      toast.success("Documento del responsable SG-SST subido correctamente")
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo subir el documento")
     } finally {
@@ -321,22 +350,39 @@ export function SgiResponsibleFormDialog({
   async function handleViewDocument(document: EmployeeDocument) {
     if (!document.downloadUrl) return
 
+    setPreviewLoadingId(document.id)
     try {
       const blob = await downloadEmployeeDocumentFile(document.downloadUrl)
       const url = URL.createObjectURL(blob)
-      window.open(url, "_blank", "noopener,noreferrer")
-      window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
+      setPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return {
+          document,
+          url,
+          mimeType: blob.type || document.mimeType || "",
+        }
+      })
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo abrir el documento")
+    } finally {
+      setPreviewLoadingId(null)
     }
   }
 
+  function closePreview() {
+    setPreview((current) => {
+      if (current?.url) URL.revokeObjectURL(current.url)
+      return null
+    })
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-card border-border max-w-2xl max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Asignar Responsable del SGI</DialogTitle>
+            <DialogTitle>Asignar Responsable SG-SST</DialogTitle>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
@@ -380,7 +426,7 @@ export function SgiResponsibleFormDialog({
               <div className="mb-4">
                 <h3 className="flex items-center gap-2 text-sm font-medium">
                   <FileText className="h-4 w-4" />
-                  Designacion del responsable SGI
+                  Designacion del responsable SG-SST
                 </h3>
                 <p className="text-xs text-muted-foreground">
                   Diligencia el documento en linea y descargalo listo para imprimir y firmar.
@@ -424,7 +470,7 @@ export function SgiResponsibleFormDialog({
                   <div>
                     <h3 className="flex items-center gap-2 text-sm font-medium">
                       <FileText className="h-4 w-4" />
-                      Documentos del responsable SGI
+                      Documentos del responsable SG-SST
                     </h3>
                     <p className="text-xs text-muted-foreground">Sube el soporte despues de asignar el responsable.</p>
                   </div>
@@ -440,15 +486,7 @@ export function SgiResponsibleFormDialog({
                       disabled={uploadingDocument}
                     />
                   </div>
-                  <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-end">
-                    <div className="grid gap-2">
-                      <Label>Tipo</Label>
-                      <Input
-                        value={documentType}
-                        onChange={(event) => setDocumentType(event.target.value)}
-                        disabled={uploadingDocument}
-                      />
-                    </div>
+                  <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
                     <label className="flex h-10 items-center gap-2 text-sm">
                       <Checkbox
                         checked={documentConfirmed}
@@ -476,8 +514,10 @@ export function SgiResponsibleFormDialog({
                         className="flex flex-col gap-2 rounded-md bg-background/80 px-3 py-2 text-sm sm:flex-row sm:items-center sm:justify-between"
                       >
                         <div className="min-w-0">
-                          <p className="truncate font-medium">{document.originalName || document.type}</p>
-                          <p className="text-xs text-muted-foreground">{document.type}</p>
+                          <p className="truncate font-medium">{document.originalName || "Documento"}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatFileSize(document.size)} - {document.isConfirmed ? "Confirmado" : "Pendiente"}
+                          </p>
                         </div>
                         <div className="flex gap-2">
                           {document.downloadUrl && (
@@ -487,9 +527,14 @@ export function SgiResponsibleFormDialog({
                               size="sm"
                               className="gap-2"
                               onClick={() => handleViewDocument(document)}
+                              disabled={previewLoadingId === document.id}
                             >
-                              <Download className="h-4 w-4" />
-                              Ver
+                              {previewLoadingId === document.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                              {previewLoadingId === document.id ? "Cargando" : "Ver"}
                             </Button>
                           )}
                           <Button
@@ -521,6 +566,65 @@ export function SgiResponsibleFormDialog({
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+
+      </Dialog>
+
+      <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && closePreview()}>
+        <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">
+          <DialogHeader className="border-b border-border px-4 py-3">
+            <DialogTitle className="truncate text-base">
+              {preview?.document.originalName || "Documento"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="min-h-0 flex-1 p-4">
+            {preview && canEmbedPreview(preview.mimeType) ? (
+              preview.mimeType.startsWith("image/") ? (
+                <div className="flex max-h-[70dvh] items-center justify-center overflow-auto rounded-md bg-secondary/40 p-2">
+                  <img
+                    src={preview.url}
+                    alt={preview.document.originalName || "Documento"}
+                    className="max-h-[68dvh] max-w-full rounded-md object-contain"
+                  />
+                </div>
+              ) : (
+                <iframe
+                  title={preview.document.originalName || "Documento"}
+                  src={preview.url}
+                  className="h-[70dvh] w-full rounded-md border border-border bg-white"
+                />
+              )
+            ) : (
+              <div className="flex min-h-[280px] flex-col items-center justify-center gap-3 rounded-md border border-dashed border-border bg-secondary/30 p-6 text-center">
+                <FileText className="h-10 w-10 text-muted-foreground" />
+                <div>
+                  <p className="font-medium">Vista previa no disponible</p>
+                  <p className="text-sm text-muted-foreground">
+                    Este archivo se puede abrir o descargar desde una pestana nueva.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="border-t border-border px-4 py-3">
+            {preview && (
+              <Button
+                type="button"
+                variant="outline"
+                className="gap-2"
+                onClick={() => window.open(preview.url, "_blank", "noopener,noreferrer")}
+              >
+                <ExternalLink className="h-4 w-4" />
+                Abrir en pestaña
+              </Button>
+            )}
+            <Button type="button" onClick={closePreview}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
