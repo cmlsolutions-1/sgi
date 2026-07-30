@@ -212,6 +212,12 @@ function isPastDate(value?: string | null) {
   return date < today
 }
 
+function getTodayInputDate() {
+  const today = new Date()
+  const offsetDate = new Date(today.getTime() - today.getTimezoneOffset() * 60_000)
+  return offsetDate.toISOString().slice(0, 10)
+}
+
 function addYears(value: string, years: number) {
   const date = new Date(value)
   date.setFullYear(date.getFullYear() + years)
@@ -2046,8 +2052,13 @@ function EppDeliveryDialog({
 
   function validateForm() {
     const nextErrors: EppDeliveryFormErrors = {}
+    const today = getTodayInputDate()
 
-    if (!form.date) nextErrors.date = "Selecciona la fecha de entrega."
+    if (!form.date) {
+      nextErrors.date = "Selecciona la fecha de entrega."
+    } else if (form.date > today) {
+      nextErrors.date = "La fecha de entrega no puede ser futura."
+    }
     if (!form.description.trim()) nextErrors.description = "Ingresa la descripcion de la entrega."
     if (!form.deliveredItems.trim()) nextErrors.deliveredItems = "Ingresa los elementos entregados."
 
@@ -2095,11 +2106,12 @@ function EppDeliveryDialog({
 
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="epp-date">Fecha</Label>
+              <Label htmlFor="epp-date">Fecha de Entrega</Label>
               <Input
                 id="epp-date"
                 type="date"
                 value={form.date}
+                max={getTodayInputDate()}
                 onChange={(event) => updateField("date", event.target.value)}
                 className={cn(errors.date && "border-destructive focus-visible:ring-destructive/25")}
               />
@@ -3430,7 +3442,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                       <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>Fecha: {formatDate(item.date)}</span>
+                          <span>Fecha de entrega: {formatDate(item.date)}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-muted-foreground" />

@@ -70,6 +70,22 @@ function formatDate(value?: string | null) {
   return value.slice(0, 10)
 }
 
+function getTodayInputDate() {
+  const today = new Date()
+  const offsetDate = new Date(today.getTime() - today.getTimezoneOffset() * 60_000)
+  return offsetDate.toISOString().slice(0, 10)
+}
+
+function isPastDate(value?: string | null) {
+  if (!value) return false
+
+  const date = new Date(`${formatDate(value)}T00:00:00`)
+  if (Number.isNaN(date.getTime())) return false
+
+  const today = new Date(`${getTodayInputDate()}T00:00:00`)
+  return date < today
+}
+
 function getEmployeeFullName(employee: Employee) {
   return `${employee.name ?? ""} ${employee.lastName ?? ""}`.trim() || employee.email || employee.id
 }
@@ -88,8 +104,12 @@ function getTrainingStatusLabel(status?: string | null) {
   return status ?? "No registrada"
 }
 
+function isFinishedTrainingStatus(status?: string | null) {
+  return status === "FINALIZADA" || status === "FINISHED"
+}
+
 function getTrainingStatusBadgeClassName(status?: string | null) {
-  if (status === "FINALIZADA" || status === "FINISHED") return "bg-blue-600 text-white border-transparent"
+  if (isFinishedTrainingStatus(status)) return "bg-blue-600 text-white border-transparent"
   if (status === "CANCELADA" || status === "CANCELLED") return "bg-destructive text-white border-transparent"
   return undefined
 }
@@ -239,6 +259,8 @@ function TrainingDialog({
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<TrainingFormState>(emptyTrainingForm)
   const requiresInductionFields = form.type !== "CAPACITACION"
+  const today = getTodayInputDate()
+  const isFinishedPastTraining = Boolean(training && isFinishedTrainingStatus(training.status) && isPastDate(training.date))
 
   function toggleEmployee(employeeId: string, checked: boolean) {
     setForm((current) => ({
@@ -287,6 +309,16 @@ function TrainingDialog({
 
     if (!form.topicId || !form.date || !Number.isFinite(durationHours) || durationHours <= 0) {
       toast.error("Selecciona tema, fecha y una duracion valida")
+      return
+    }
+
+    if (!isFinishedPastTraining && form.date < today) {
+      toast.error("La fecha de la capacitacion debe ser desde hoy en adelante")
+      return
+    }
+
+    if (isFinishedPastTraining && form.date !== formatDate(training?.date)) {
+      toast.error("No puedes modificar la fecha de una capacitacion finalizada que ya paso")
       return
     }
 
@@ -388,9 +420,20 @@ function TrainingDialog({
                   className={trainingFieldControlClassName}
                   type="date"
                   value={form.date}
+                  min={isFinishedPastTraining ? undefined : today}
+                  disabled={isFinishedPastTraining}
                   onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))}
                   required
                 />
+                {isFinishedPastTraining ? (
+                  <p className="text-xs text-muted-foreground">
+                    La fecha no se puede editar porque la capacitacion esta finalizada y ya paso.
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    El plan solo permite programar capacitaciones desde hoy en adelante.
+                  </p>
+                )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="training-duration">Duracion en horas</Label>
