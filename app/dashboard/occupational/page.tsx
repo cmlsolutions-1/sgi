@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Eye, ClipboardList, Pencil, Trash2, UploadCloud } from "lucide-react"
+import { Plus, Eye, ClipboardList, ExternalLink, Pencil, Trash2, UploadCloud } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
@@ -121,6 +121,12 @@ type Evidence = {
   //createdAt: string
   performedAt: string // fecha de realización (YYYY-MM-DD)
   uploadedAt: string  // fecha/hora subida (ISO)
+}
+
+type EvidencePreviewState = {
+  evidence: Evidence
+  url: string
+  mimeType: string
 }
 
 type MeasureKey =
@@ -764,6 +770,8 @@ return Array.isArray(raw)
   const [uploadRiskId, setUploadRiskId] = useState<string | null>(null)
   const [evidencePerformedAt, setEvidencePerformedAt] = useState<string>(todayYYYYMMDD())
   const [evidenceFiles, setEvidenceFiles] = useState<FileList | null>(null)
+  const [evidencePreview, setEvidencePreview] = useState<EvidencePreviewState | null>(null)
+  const [evidencePreviewLoadingId, setEvidencePreviewLoadingId] = useState<string | null>(null)
 
   const emptyForm: Omit<RiskRow, "id"> = {
     status: "ACTIVE",
@@ -926,21 +934,48 @@ return Array.isArray(raw)
     setDetailOpen(true)
   }
 
+  function closeEvidencePreview() {
+    setEvidencePreview((current) => {
+      if (current?.url?.startsWith("blob:")) URL.revokeObjectURL(current.url)
+      return null
+    })
+  }
+
+  function canEmbedEvidence(mimeType: string) {
+    return mimeType.startsWith("application/pdf") || mimeType.startsWith("image/")
+  }
+
   async function openEvidence(ev: Evidence) {
+    setEvidencePreviewLoadingId(ev.id)
     try {
       if (ev.downloadUrl) {
         const blob = await downloadRiskDocumentFile(ev.downloadUrl)
         const url = URL.createObjectURL(blob)
-        window.open(url, "_blank", "noopener,noreferrer")
-        window.setTimeout(() => URL.revokeObjectURL(url), 60000)
+        setEvidencePreview((current) => {
+          if (current?.url?.startsWith("blob:")) URL.revokeObjectURL(current.url)
+          return {
+            evidence: ev,
+            url,
+            mimeType: blob.type || ev.mime || "",
+          }
+        })
         return
       }
 
       if (ev.dataUrl) {
-        window.open(ev.dataUrl, "_blank", "noopener,noreferrer")
+        setEvidencePreview((current) => {
+          if (current?.url?.startsWith("blob:")) URL.revokeObjectURL(current.url)
+          return {
+            evidence: ev,
+            url: ev.dataUrl,
+            mimeType: ev.mime || "",
+          }
+        })
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo abrir la evidencia")
+    } finally {
+      setEvidencePreviewLoadingId(null)
     }
   }
 
@@ -1333,9 +1368,66 @@ return Array.isArray(raw)
             </DialogContent>
           </Dialog>
 
+          <Dialog open={Boolean(evidencePreview)} onOpenChange={(open) => !open && closeEvidencePreview()}>
+            <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">
+              <DialogHeader className="border-b border-border px-4 py-3">
+                <DialogTitle className="truncate text-base">
+                  {evidencePreview?.evidence.name || "Evidencia"}
+                </DialogTitle>
+              </DialogHeader>
+
+              <div className="min-h-0 flex-1 p-4">
+                {evidencePreview && canEmbedEvidence(evidencePreview.mimeType) ? (
+                  evidencePreview.mimeType.startsWith("image/") ? (
+                    <div className="flex max-h-[70dvh] items-center justify-center overflow-auto rounded-md bg-secondary/40 p-2">
+                      <img
+                        src={evidencePreview.url}
+                        alt={evidencePreview.evidence.name || "Evidencia"}
+                        className="max-h-[68dvh] max-w-full rounded-md object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <iframe
+                      title={evidencePreview.evidence.name || "Evidencia"}
+                      src={evidencePreview.url}
+                      className="h-[70dvh] w-full rounded-md border border-border bg-white"
+                    />
+                  )
+                ) : (
+                  <div className="flex min-h-[280px] flex-col items-center justify-center gap-3 rounded-md border border-dashed border-border bg-secondary/30 p-6 text-center">
+                    <ClipboardList className="h-10 w-10 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">Vista previa no disponible</p>
+                      <p className="text-sm text-muted-foreground">
+                        Este archivo se puede abrir o descargar desde una pestaña nueva.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <DialogFooter className="border-t border-border px-4 py-3">
+                {evidencePreview && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="gap-2"
+                    onClick={() => window.open(evidencePreview.url, "_blank", "noopener,noreferrer")}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Abrir en pestaña
+                  </Button>
+                )}
+                <Button type="button" onClick={closeEvidencePreview}>
+                  Cerrar
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           {/* Drawer Crear/Editar */}
           <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-            <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
+            <SheetContent side="right" className="w-full overflow-hidden sm:max-w-xl">
               <SheetHeader className="space-y-2">
                 <SheetTitle>
                   {editingId ? "Editar fila · Matriz de Peligros" : "Nueva fila · Matriz de Peligros"}
@@ -1382,10 +1474,10 @@ return Array.isArray(raw)
                 </Card>
               </SheetHeader>
 
-              <div className="py-4 space-y-4">
+              <div className="flex-1 space-y-4 overflow-y-auto px-4 py-2 sm:px-6">
                 {/* STEP 1 */}
                 {step === 1 && (
-                  <div className="space-y-3">
+                  <div className="space-y-3 rounded-lg border border-border bg-card p-4">
                     <Input
                       placeholder="Proceso"
                       value={riskForm.proceso}
@@ -1426,7 +1518,7 @@ return Array.isArray(raw)
 
                 {/* STEP 2 */}
                 {step === 2 && (
-                  <div className="space-y-3">
+                  <div className="space-y-3 rounded-lg border border-border bg-card p-4">
                     <div>
                       <p className="text-sm mb-1">Clasificación del peligro</p>
                       <Select
@@ -1479,7 +1571,7 @@ return Array.isArray(raw)
 
                 {/* STEP 3 */}
                 {step === 3 && (
-                  <div className="space-y-3">
+                  <div className="space-y-3 rounded-lg border border-border bg-card p-4">
                     <Input
                       placeholder="Controles existentes - Fuente"
                       value={riskForm.controlesFuente}
@@ -1500,7 +1592,7 @@ return Array.isArray(raw)
 
                 {/* STEP 4 */}
                 {step === 4 && (
-                  <div className="space-y-3">
+                  <div className="space-y-3 rounded-lg border border-border bg-card p-4">
                     <div>
                       <p className="text-sm mb-1">ND (Deficiencia)</p>
                       <Select
@@ -1576,7 +1668,7 @@ return Array.isArray(raw)
 
                 {/* STEP 5 */}
                 {step === 5 && (
-                  <div className="space-y-3">
+                  <div className="space-y-4 rounded-lg border border-border bg-card p-4">
                     <Card>
                       <CardContent className="p-4 space-y-3">
                         <p className="font-semibold text-sm">Criterios</p>
@@ -1736,8 +1828,13 @@ return Array.isArray(raw)
                                   </p>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <Button size="sm" variant="secondary" onClick={() => openEvidence(ev)}>
-                                    Ver
+                                  <Button
+                                    size="sm"
+                                    variant="secondary"
+                                    onClick={() => openEvidence(ev)}
+                                    disabled={evidencePreviewLoadingId === ev.id}
+                                  >
+                                    {evidencePreviewLoadingId === ev.id ? "Cargando" : "Ver"}
                                   </Button>
                                   <Button size="sm" variant="destructive" onClick={() => removeEvidenceFromForm(ev.id)}>
                                     Quitar
@@ -1753,7 +1850,7 @@ return Array.isArray(raw)
                 )}
               </div>
 
-              <SheetFooter className="gap-2 sm:gap-2">
+              <SheetFooter className="border-t border-border bg-background/95 px-4 sm:gap-2 sm:px-6">
                 <div className="flex w-full items-center justify-between gap-2">
                   <Button variant="secondary" disabled={step === 1} onClick={() => setStep((s) => Math.max(1, s - 1))}>
                     Atrás
@@ -1766,7 +1863,7 @@ return Array.isArray(raw)
                       </Button>
                     ) : (
                       <Button disabled={!canSaveRisk} onClick={saveRiskRow}>
-                        {editingId ? "Guardar cambios" : "Guardar fila"}
+                        {editingId ? "Guardar cambios" : "Guardar riesgo"}
                       </Button>
                     )}
                   </div>
@@ -1777,7 +1874,7 @@ return Array.isArray(raw)
 
           {/* Drawer Detalle solo lectura + timeline evidencias */}
           <Sheet open={detailOpen} onOpenChange={setDetailOpen}>
-            <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
+            <SheetContent side="right" className="w-full overflow-hidden sm:max-w-xl">
               <SheetHeader className="space-y-2">
                 <SheetTitle>Detalle del riesgo</SheetTitle>
 
@@ -1816,7 +1913,7 @@ return Array.isArray(raw)
                 ) : null}
               </SheetHeader>
 
-              <div className="py-4 space-y-4">
+              <div className="flex-1 space-y-4 overflow-y-auto px-4 py-2 sm:px-6">
                 {detailRow ? (
                   <>
                     <Card>
@@ -1930,16 +2027,16 @@ return Array.isArray(raw)
                                     </p>
 
                                     <div className="pt-2">
-                                      <Button size="sm" variant="secondary" onClick={() => openEvidence(ev)}>
-                                        Ver evidencia
+                                      <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        onClick={() => openEvidence(ev)}
+                                        disabled={evidencePreviewLoadingId === ev.id}
+                                      >
+                                        {evidencePreviewLoadingId === ev.id ? "Cargando" : "Ver evidencia"}
                                       </Button>
                                     </div>
 
-                                    {ev.dataUrl && ev.mime.startsWith("image/") ? (
-                                      <div className="pt-3">
-                                        <img src={ev.dataUrl} alt={ev.name} className="w-full rounded-md border object-cover" />
-                                      </div>
-                                    ) : null}
                                   </div>
                                 </div>
                               ))}
@@ -1953,13 +2050,13 @@ return Array.isArray(raw)
                 )}
               </div>
 
-              <SheetFooter className="gap-2 sm:gap-2">
-                <div className="flex w-full items-center justify-between gap-2">
+              <SheetFooter className="border-t border-border bg-background/95 px-4 sm:gap-2 sm:px-6">
+                <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <Button variant="secondary" onClick={() => setDetailOpen(false)}>
                     Cerrar
                   </Button>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {detailRow ? (
                       <>
                         <Button
@@ -1983,7 +2080,7 @@ return Array.isArray(raw)
                           Editar
                         </Button>
 
-                        <div className="w-[180px]">
+                        <div className="w-full sm:w-[180px]">
                           <Select
                             value={detailRow.status}
                             onValueChange={(value) => updateRiskStatus(detailRow, value as RiskStatus)}

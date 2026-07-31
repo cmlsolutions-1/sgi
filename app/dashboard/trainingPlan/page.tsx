@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, type ReactNode } from "react"
 import Link from "next/link"
-import { CalendarDays, Edit, Eye, Loader2, Plus, Power, Trash2 } from "lucide-react"
+import { CalendarDays, Edit, Eye, LayoutGrid, List, Loader2, MoreHorizontal, Plus, Power, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -17,6 +17,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -24,12 +31,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import {
   activateTopicTraining,
-  activateTraining,
   changeTrainingStatus,
   createTopicTraining,
   createTraining,
   deleteTopicTraining,
-  deleteTraining,
   listTopicTraining,
   listTopicTrainingOptions,
   listTraining,
@@ -128,6 +133,7 @@ const trainingTypeOptions: Array<{ value: TrainingType; label: string }> = [
 ]
 
 type TopicFormState = CreateTopicTrainingDto
+type TrainingViewMode = "cards" | "list"
 
 const emptyTopicForm: TopicFormState = {
   name: "",
@@ -248,11 +254,13 @@ function TrainingDialog({
   training,
   topics,
   employees,
+  trigger,
   onSave,
 }: {
   training?: Training
   topics: TopicTrainingOption[]
   employees: Employee[]
+  trigger?: ReactNode
   onSave: (payload: CreateTrainingDto | UpdateTrainingDto, trainingId?: string) => Promise<void>
 }) {
   const [open, setOpen] = useState(false)
@@ -368,10 +376,12 @@ function TrainingDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={training ? "action" : "default"} size="sm" className="gap-2">
-          {training ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-          {training ? "Editar" : "Nueva capacitacion"}
-        </Button>
+        {trigger ?? (
+          <Button variant={training ? "action" : "default"} size="sm" className="gap-2">
+            {training ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+            {training ? "Editar" : "Nueva capacitacion"}
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] max-w-3xl overflow-hidden bg-card p-0">
         <form onSubmit={handleSubmit}>
@@ -574,6 +584,8 @@ export default function TrainingPlanPage() {
   const [yearFilter, setYearFilter] = useState("all")
   const [monthFilter, setMonthFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [viewMode, setViewMode] = useState<TrainingViewMode>("cards")
+  const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null)
 
   async function loadData() {
     setLoading(true)
@@ -672,23 +684,26 @@ export default function TrainingPlanPage() {
     }
   }
 
-  async function handleDeleteTraining(trainingId: string) {
+  async function handleChangeTrainingStatus(trainingId: string, status: TrainingStatus) {
+    setStatusUpdatingId(trainingId)
     try {
-      await deleteTraining(trainingId)
-      toast.success("Capacitacion eliminada")
-      await loadData()
+      const updatedTraining = await changeTrainingStatus(trainingId, status)
+      setTrainings((current) =>
+        current.map((training) =>
+          training.id === trainingId
+            ? {
+                ...training,
+                ...updatedTraining,
+                topic: updatedTraining.topic ?? training.topic,
+              }
+            : training,
+        ),
+      )
+      toast.success(status === "ACTIVE" ? "Capacitacion activada" : "Capacitacion inactivada")
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "No se pudo eliminar la capacitacion")
-    }
-  }
-
-  async function handleActivateTraining(trainingId: string) {
-    try {
-      await activateTraining(trainingId)
-      toast.success("Capacitacion activada")
-      await loadData()
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "No se pudo activar la capacitacion")
+      toast.error(error instanceof Error ? error.message : "No se pudo actualizar el estado de la capacitacion")
+    } finally {
+      setStatusUpdatingId(null)
     }
   }
 
@@ -764,6 +779,35 @@ export default function TrainingPlanPage() {
             </CardContent>
           </Card>
 
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Lista de capacitaciones</h2>
+              <p className="text-sm text-muted-foreground">{filteredTrainings.length} registros encontrados</p>
+            </div>
+            <div className="inline-flex w-fit rounded-md border border-border bg-secondary p-1">
+              <Button
+                type="button"
+                size="sm"
+                variant={viewMode === "cards" ? "default" : "ghost"}
+                className="h-8 gap-2"
+                onClick={() => setViewMode("cards")}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Tarjetas
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={viewMode === "list" ? "default" : "ghost"}
+                className="h-8 gap-2"
+                onClick={() => setViewMode("list")}
+              >
+                <List className="h-4 w-4" />
+                Lista
+              </Button>
+            </div>
+          </div>
+
           {loading ? (
             <div className="flex min-h-48 items-center justify-center">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -776,7 +820,7 @@ export default function TrainingPlanPage() {
                 <p className="text-sm text-muted-foreground">Crea un tema y programa la primera capacitacion.</p>
               </CardContent>
             </Card>
-          ) : (
+          ) : viewMode === "cards" ? (
             <div className="space-y-4">
               {filteredTrainings.map((training) => (
                 <Card key={training.id}>
@@ -815,21 +859,136 @@ export default function TrainingPlanPage() {
                           variant="destructive"
                           size="sm"
                           className="gap-2"
-                          onClick={() => handleDeleteTraining(training.id)}
+                          onClick={() => handleChangeTrainingStatus(training.id, "INACTIVE")}
+                          disabled={statusUpdatingId === training.id}
                         >
-                          <Trash2 className="h-4 w-4" />
-                          Eliminar
+                          {statusUpdatingId === training.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Power className="h-4 w-4" />
+                          )}
+                          {statusUpdatingId === training.id ? "Actualizando" : "Inactivar"}
                         </Button>
                       ) : (
-                        <Button variant="outline" size="sm" className="gap-2" onClick={() => handleActivateTraining(training.id)}>
-                          <Power className="h-4 w-4" />
-                          Activar
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                          onClick={() => handleChangeTrainingStatus(training.id, "ACTIVE")}
+                          disabled={statusUpdatingId === training.id}
+                        >
+                          {statusUpdatingId === training.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Power className="h-4 w-4" />
+                          )}
+                          {statusUpdatingId === training.id ? "Actualizando" : "Activar"}
                         </Button>
                       )}
                     </div>
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-md border border-border bg-card">
+              <table className="w-full min-w-[900px] text-sm">
+                <thead className="border-b border-border bg-secondary text-left text-xs font-medium uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Tema</th>
+                    <th className="px-4 py-3 font-medium">Tipo</th>
+                    <th className="px-4 py-3 font-medium">Fecha</th>
+                    <th className="px-4 py-3 font-medium">Duracion</th>
+                    <th className="px-4 py-3 font-medium">Estado</th>
+                    <th className="px-4 py-3 text-right font-medium">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filteredTrainings.map((training) => (
+                    <tr key={training.id} className="align-middle">
+                      <td className="px-4 py-3">
+                        <p className="max-w-[280px] truncate font-medium">{training.topic?.name ?? "Tema no registrado"}</p>
+                        <p className="text-sm text-muted-foreground">{getTrainingTypeLabel(training.type)} programada</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge variant="outline">{getTrainingTypeLabel(training.type)}</Badge>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">{formatDate(training.date)}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{training.durationHours} horas</td>
+                      <td className="px-4 py-3">
+                        <Badge
+                          variant={
+                            training.status === "ACTIVE"
+                              ? "accentActivd"
+                              : training.status === "INACTIVE"
+                                ? "destructive"
+                                : "secondary"
+                          }
+                          className={getTrainingStatusBadgeClassName(training.status)}
+                        >
+                          {getTrainingStatusLabel(training.status)}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-52">
+                            <DropdownMenuItem asChild>
+                              <Link href={`/dashboard/trainingPlan/${training.id}`}>
+                                <Eye className="h-4 w-4" />
+                                Detalle
+                              </Link>
+                            </DropdownMenuItem>
+                            <TrainingDialog
+                              training={training}
+                              topics={topicOptions}
+                              employees={employees}
+                              onSave={handleSaveTraining}
+                              trigger={
+                                <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+                                  <Edit className="h-4 w-4" />
+                                  Editar
+                                </DropdownMenuItem>
+                              }
+                            />
+                            <DropdownMenuSeparator />
+                            {training.status === "ACTIVE" ? (
+                              <DropdownMenuItem
+                                variant="destructive"
+                                disabled={statusUpdatingId === training.id}
+                                onSelect={() => handleChangeTrainingStatus(training.id, "INACTIVE")}
+                              >
+                                {statusUpdatingId === training.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Power className="h-4 w-4" />
+                                )}
+                                {statusUpdatingId === training.id ? "Actualizando" : "Inactivar"}
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem
+                                disabled={statusUpdatingId === training.id}
+                                onSelect={() => handleChangeTrainingStatus(training.id, "ACTIVE")}
+                              >
+                                {statusUpdatingId === training.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Power className="h-4 w-4" />
+                                )}
+                                {statusUpdatingId === training.id ? "Actualizando" : "Activar"}
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </TabsContent>

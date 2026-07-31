@@ -151,12 +151,17 @@ export async function changeTrainingStatus(id: string, status: TrainingStatus): 
 
 export async function deleteTraining(id: string): Promise<void> {
   const res = await apiFetch(`/api/training/${id}`, { method: "DELETE" })
+
+  if (res.status === 404 || res.status === 405) {
+    await changeTrainingStatus(id, "INACTIVE")
+    return
+  }
+
   await parseOrThrow<Record<string, never>>(res, "No se pudo eliminar la capacitacion")
 }
 
 export async function activateTraining(id: string): Promise<Training> {
-  const res = await apiFetch(`/api/training/active/${id}`, { method: "PUT" })
-  return parseOrThrow<Training>(res, "No se pudo activar la capacitacion")
+  return changeTrainingStatus(id, "ACTIVE")
 }
 
 export async function createTrainingAttendance(

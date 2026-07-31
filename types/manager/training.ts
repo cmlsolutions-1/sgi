@@ -12,6 +12,7 @@ export type TopicTraining = {
 export type TopicTrainingOption = {
   id: string
   name: string
+  description?: string | null
 }
 
 export type CreateTopicTrainingDto = {

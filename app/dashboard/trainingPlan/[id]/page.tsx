@@ -32,12 +32,14 @@ import {
   getTrainingById,
   listTrainingAttendances,
   listTrainingDocuments,
+  listTopicTraining,
   updateTrainingAttendance,
   uploadTrainingDocument,
 } from "@/services/trainingService"
 import type { Employee } from "@/types/manager/employee"
 import type {
   CreateTrainingAttendanceDto,
+  TopicTraining,
   Training,
   TrainingAttendance,
   TrainingAttendanceStatus,
@@ -68,10 +70,21 @@ function getTrainingStatusLabel(status?: string | null) {
   return status ?? "No registrada"
 }
 
+function getTrainingTypeLabel(type?: string | null) {
+  if (type === "INDUCCION") return "Induccion"
+  if (type === "REINDUCCION") return "Reinduccion"
+  return "Capacitacion"
+}
+
 function getTrainingStatusBadgeClassName(status?: string | null) {
   if (status === "FINALIZADA" || status === "FINISHED") return "bg-blue-600 text-white border-transparent"
   if (status === "CANCELADA" || status === "CANCELLED") return "bg-destructive text-white border-transparent"
   return undefined
+}
+
+function getEmployeeFullName(employee?: Pick<Employee, "name" | "lastName" | "email" | "id"> | null) {
+  if (!employee) return "No registrado"
+  return `${employee.name ?? ""} ${employee.lastName ?? ""}`.trim() || employee.email || employee.id
 }
 
 function formatFileSize(value?: number | null) {
@@ -446,19 +459,22 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
   const [training, setTraining] = useState<Training | null>(null)
   const [attendances, setAttendances] = useState<TrainingAttendance[]>([])
   const [employees, setEmployees] = useState<Employee[]>([])
+  const [topics, setTopics] = useState<TopicTraining[]>([])
   const [assigningAll, setAssigningAll] = useState(false)
 
   async function loadData() {
     setLoading(true)
     try {
-      const [trainingData, attendanceData, employeesData] = await Promise.all([
+      const [trainingData, attendanceData, employeesData, topicsData] = await Promise.all([
         getTrainingById(id),
         listTrainingAttendances(id),
         listEmployees(),
+        listTopicTraining(),
       ])
       setTraining(trainingData)
       setAttendances(attendanceData)
       setEmployees(employeesData)
+      setTopics(topicsData)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo cargar la capacitacion")
     } finally {
@@ -544,7 +560,7 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
 
     try {
       await deleteTraining(training.id)
-      toast.success("Capacitacion eliminada")
+      toast.success("Capacitacion eliminada o inactivada")
       router.push("/dashboard/trainingPlan")
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo eliminar la capacitacion")
@@ -555,20 +571,137 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
     if (!training) return
 
     const doc = new jsPDF("p", "mm", "a4")
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(14)
-    doc.text("ACTA DE CAPACITACION SG-SST", 105, 15, { align: "center" })
+    const pageWidth = doc.internal.pageSize.getWidth()
+    const pageHeight = doc.internal.pageSize.getHeight()
+    const margin = 14
+    const contentWidth = pageWidth - margin * 2
+    const topicName = training.topic?.name ?? "Tema no registrado"
+    const topicDescription =
+      training.topic?.description?.trim() ||
+      topics.find((topic) => topic.id === training.topicId)?.description?.trim() ||
+      "Sin descripcion registrada."
+    const responsibleEmployee = training.responsibleEmployeeId
+      ? employees.find((employee) => employee.id === training.responsibleEmployeeId)
+      : null
+    const primaryColor: [number, number, number] = [31, 92, 77]
+    const softColor: [number, number, number] = [235, 244, 241]
+    let y = 16
 
-    doc.setFontSize(10)
-    doc.text(`Tema: ${training.topic?.name ?? training.topicId}`, 14, 30)
-    doc.text(`Fecha: ${formatDate(training.date)}`, 14, 37)
-    doc.text(`Duracion: ${training.durationHours} horas`, 14, 44)
-    doc.text(`Estado: ${getTrainingStatusLabel(training.status)}`, 14, 51)
+    function addFooter() {
+      const pageCount =
+        (doc as unknown as { getNumberOfPages?: () => number }).getNumberOfPages?.() ??
+        Math.max(1, ((doc.internal as unknown as { pages?: unknown[] }).pages?.length ?? 2) - 1)
+      for (let pageNumber = 1; pageNumber <= pageCount; pageNumber += 1) {
+        doc.setPage(pageNumber)
+        doc.setDrawColor(220, 226, 224)
+        doc.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14)
+        doc.setFont("helvetica", "normal")
+        doc.setFontSize(8)
+        doc.setTextColor(100, 116, 139)
+        doc.text("Documento generado desde el Sistema de Gestion SG-SST", margin, pageHeight - 8)
+        doc.text(`Pagina ${pageNumber} de ${pageCount}`, pageWidth - margin, pageHeight - 8, { align: "right" })
+      }
+    }
+
+    function ensureSpace(requiredHeight: number) {
+      if (y + requiredHeight <= pageHeight - 22) return
+      doc.addPage()
+      y = 18
+    }
+
+    function sectionTitle(title: string) {
+      ensureSpace(12)
+      doc.setFillColor(...softColor)
+      doc.setDrawColor(210, 226, 220)
+      doc.roundedRect(margin, y, contentWidth, 9, 2, 2, "FD")
+      doc.setFont("helvetica", "bold")
+      doc.setFontSize(10)
+      doc.setTextColor(...primaryColor)
+      doc.text(title.toUpperCase(), margin + 3, y + 6)
+      y += 14
+    }
+
+    function addParagraph(text: string) {
+      const lines = doc.splitTextToSize(text, contentWidth)
+      ensureSpace(lines.length * 5 + 2)
+      doc.setFont("helvetica", "normal")
+      doc.setFontSize(9)
+      doc.setTextColor(30, 41, 59)
+      doc.text(lines, margin, y)
+      y += lines.length * 5 + 3
+    }
+
+    function detailsTable(rows: Array<[string, string]>) {
+      autoTable(doc, {
+        startY: y,
+        theme: "grid",
+        margin: { left: margin, right: margin },
+        styles: {
+          font: "helvetica",
+          fontSize: 8.5,
+          cellPadding: 2.5,
+          lineColor: [220, 226, 224],
+          lineWidth: 0.1,
+          textColor: [30, 41, 59],
+        },
+        columnStyles: {
+          0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 52 },
+          1: { cellWidth: contentWidth - 52 },
+        },
+        body: rows,
+      })
+      y = ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? y) + 8
+    }
+
+    doc.setFillColor(...primaryColor)
+    doc.roundedRect(margin, y, contentWidth, 24, 3, 3, "F")
+    doc.setTextColor(255, 255, 255)
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(15)
+    doc.text("ACTA DE CAPACITACION SG-SST", margin + 5, y + 9)
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(9)
+    doc.text("Registro de ejecucion, asistencia y firma de participantes", margin + 5, y + 16)
+    doc.text(`Fecha de generacion: ${formatDate(new Date().toISOString())}`, pageWidth - margin - 5, y + 16, {
+      align: "right",
+    })
+    y += 32
+
+    sectionTitle("Datos generales de la capacitacion")
+    detailsTable([
+      ["Tema", topicName],
+      ["Descripcion del tema", topicDescription],
+      ["Tipo", getTrainingTypeLabel(training.type)],
+      ["Fecha programada", formatDate(training.date)],
+      ["Duracion", `${training.durationHours} horas`],
+      ["Estado", getTrainingStatusLabel(training.status)],
+      ["Modalidad", training.modality?.trim() || "No registrada"],
+    ])
+
+    if (training.type && training.type !== "CAPACITACION") {
+      sectionTitle("Datos adicionales")
+      detailsTable([
+        ["Fecha de ingreso", formatDate(training.entryDate)],
+        ["Fecha de induccion", formatDate(training.inductionDate)],
+        ["Responsable", getEmployeeFullName(responsibleEmployee)],
+        ["Funcionarios asignados", `${attendances.length}`],
+      ])
+    }
+
+    sectionTitle("Objetivo y alcance")
+    addParagraph(
+      `Mediante la presente acta se deja constancia de la ejecucion de la ${getTrainingTypeLabel(
+        training.type,
+      ).toLowerCase()} denominada "${topicName}", relacionada con: ${topicDescription}`,
+    )
+
+    sectionTitle("Control de asistencia")
 
     autoTable(doc, {
-      startY: 62,
+      startY: y,
       theme: "grid",
-      head: [["No.", "Nombre", "Correo", "Estado", "Firma"]],
+      margin: { left: margin, right: margin },
+      head: [["No.", "Funcionario", "Correo", "Estado", "Firma"]],
       body: attendances.map((attendance, index) => [
         index + 1,
         `${attendance.employee?.name ?? ""} ${attendance.employee?.lastName ?? ""}`.trim(),
@@ -576,11 +709,49 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
         getAttendanceStatusLabel(attendance.status),
         "",
       ]),
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+      styles: {
+        font: "helvetica",
+        fontSize: 8,
+        cellPadding: 2.4,
+        minCellHeight: 11,
+        lineColor: [220, 226, 224],
+        lineWidth: 0.1,
+      },
+      headStyles: { fillColor: primaryColor, textColor: 255, fontStyle: "bold" },
+      columnStyles: {
+        0: { cellWidth: 12, halign: "center" },
+        1: { cellWidth: 48 },
+        2: { cellWidth: 54 },
+        3: { cellWidth: 28 },
+        4: { cellWidth: contentWidth - 142 },
+      },
     })
+    y = ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? y) + 12
 
-    doc.save(`Acta_Capacitacion_${formatDate(training.date)}.pdf`)
+    sectionTitle("Cierre y firmas")
+    addParagraph(
+      "Los participantes relacionados declaran haber recibido la informacion correspondiente y firman como evidencia de asistencia y participacion en la actividad.",
+    )
+
+    ensureSpace(34)
+    const signatureWidth = 70
+    const leftX = margin
+    const rightX = pageWidth - margin - signatureWidth
+    doc.setDrawColor(120, 130, 140)
+    doc.line(leftX, y + 18, leftX + signatureWidth, y + 18)
+    doc.line(rightX, y + 18, rightX + signatureWidth, y + 18)
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(8.5)
+    doc.setTextColor(30, 41, 59)
+    doc.text("Responsable de la actividad", leftX, y + 24)
+    doc.text("Representante de la empresa", rightX, y + 24)
+    doc.setFont("helvetica", "normal")
+    doc.text(getEmployeeFullName(responsibleEmployee), leftX, y + 30)
+    doc.text("Nombre y firma", rightX, y + 30)
+
+    addFooter()
+
+    doc.save(`Acta_Capacitacion_${formatDate(training.date)}_${topicName.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
   }
 
   if (loading) {
