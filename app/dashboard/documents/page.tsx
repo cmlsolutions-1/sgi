@@ -1,8 +1,24 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
-import { AlertCircle, BookOpen, Download, Edit, FileText, Filter, Loader2, MoreHorizontal, Paperclip, Plus, Power, Search, Trash2, Upload } from "lucide-react"
-import jsPDF from "jspdf"
+import {
+  AlertCircle,
+  BookOpen,
+  Download,
+  Edit,
+  ExternalLink,
+  Eye,
+  FileText,
+  Filter,
+  Loader2,
+  MoreHorizontal,
+  Paperclip,
+  Plus,
+  Power,
+  Search,
+  Trash2,
+  Upload,
+} from "lucide-react"
 import { toast } from "sonner"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -56,6 +72,12 @@ type DocumentFormState = UpsertManagedDocumentDto & {
   id?: string
 }
 
+type ManagedDocumentPreviewState = {
+  file: ManagedDocumentFile
+  url: string
+  mimeType: string
+}
+
 const documentFieldControlClassName =
   "w-full border-slate-300 bg-white shadow-sm hover:border-slate-400 focus-visible:border-primary focus-visible:ring-primary/25"
 
@@ -101,81 +123,8 @@ function formatFileSize(size: number) {
   return `${(size / (1024 * 1024)).toFixed(1)} MB`
 }
 
-function safeFilename(value: string) {
-  return value.replace(/[\\/:*?"<>|]+/g, "-").trim() || "documento"
-}
-
-function downloadPrintableDocument(document: ManagedDocument) {
-  const pdf = new jsPDF("p", "mm", "a4")
-  const pageHeight = pdf.internal.pageSize.getHeight()
-  const margin = 18
-  const width = pdf.internal.pageSize.getWidth() - margin * 2
-  let y = 20
-
-  const ensureSpace = (height: number) => {
-    if (y + height > pageHeight - margin) {
-      pdf.addPage()
-      y = 20
-    }
-  }
-
-  const writeLine = (label: string, value: string) => {
-    const lines = pdf.splitTextToSize(value || "No registrado", width - 40) as string[]
-    ensureSpace(Math.max(7, lines.length * 5))
-    pdf.setFont("helvetica", "bold")
-    pdf.text(`${label}:`, margin, y)
-    pdf.setFont("helvetica", "normal")
-    pdf.text(lines, margin + 38, y)
-    y += Math.max(7, lines.length * 5)
-  }
-
-  const writeSection = (title: string, value: string) => {
-    ensureSpace(14)
-    pdf.setFont("helvetica", "bold")
-    pdf.setFontSize(12)
-    pdf.text(title, margin, y)
-    y += 7
-    pdf.setFont("helvetica", "normal")
-    pdf.setFontSize(10)
-
-    const lines = pdf.splitTextToSize(value || "No registrado", width) as string[]
-    lines.forEach((line) => {
-      ensureSpace(5)
-      pdf.text(line, margin, y)
-      y += 5
-    })
-    y += 5
-  }
-
-  pdf.setFont("helvetica", "bold")
-  pdf.setFontSize(18)
-  const titleLines = pdf.splitTextToSize(document.name, width) as string[]
-  pdf.text(titleLines, margin, y)
-  y += titleLines.length * 8 + 2
-  pdf.setFontSize(10)
-  pdf.setFont("helvetica", "normal")
-  pdf.text(`${documentTypeLabel(document.type)} - Documento de gestión`, margin, y)
-  y += 10
-
-  writeLine("Código", document.code)
-  writeLine("Versión", document.version)
-  writeLine("Consecutivo", String(document.consecutive))
-  writeLine("Área", document.workArea?.name ?? "No registrada")
-  writeLine("Puesto", document.job?.name ?? "No registrado")
-  writeLine(
-    "Responsable",
-    document.responsibleEmployee
-      ? `${document.responsibleEmployee.name} ${document.responsibleEmployee.lastName}`
-      : "No registrado",
-  )
-  writeLine("Estado", statusLabel(document.status))
-  y += 4
-
-  writeSection("Objetivo", document.objective)
-  writeSection("Actividades", document.activities)
-  writeSection("Recursos", document.resources)
-
-  pdf.save(`${safeFilename(document.code || document.name)}-v${safeFilename(document.version)}.pdf`)
+function canEmbedPreview(mimeType: string) {
+  return mimeType.startsWith("application/pdf") || mimeType.startsWith("image/")
 }
 
 export default function DocumentsPage() {
@@ -200,6 +149,9 @@ export default function DocumentsPage() {
   const [uploadingFile, setUploadingFile] = useState(false)
   const [downloadingFileId, setDownloadingFileId] = useState<string | null>(null)
   const [deletingFileId, setDeletingFileId] = useState<string | null>(null)
+  const [preview, setPreview] = useState<ManagedDocumentPreviewState | null>(null)
+  const [previewingDocumentId, setPreviewingDocumentId] = useState<string | null>(null)
+  const [downloadingDocumentId, setDownloadingDocumentId] = useState<string | null>(null)
 
   const filteredDocuments = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -237,7 +189,13 @@ export default function DocumentsPage() {
       total: documents.length,
       active: documents.filter((document) => document.status === "ACTIVE").length,
       inactive: documents.filter((document) => document.status === "INACTIVE").length,
-      procedures: documents.filter((document) => document.type === "PROCEDURE").length,
+      byType: DOCUMENT_TYPES.reduce(
+        (acc, type) => {
+          acc[type.value] = documents.filter((document) => document.type === type.value).length
+          return acc
+        },
+        {} as Record<ManagedDocumentType, number>,
+      ),
     }),
     [documents],
   )
@@ -501,6 +459,66 @@ export default function DocumentsPage() {
     } finally {
       setDownloadingFileId(null)
     }
+  }
+
+  async function getPrimaryFileForDocument(document: ManagedDocument) {
+    const files = await listManagedDocumentFiles(document.id)
+    const sortedFiles = [...files].sort((a, b) => {
+      const aTime = new Date(a.createdAt || 0).getTime()
+      const bTime = new Date(b.createdAt || 0).getTime()
+      return bTime - aTime
+    })
+    const file = sortedFiles[0]
+
+    if (!file) {
+      throw new Error("Este documento no tiene archivos cargados")
+    }
+
+    if (!file.downloadUrl) {
+      throw new Error("El archivo no tiene una URL de descarga")
+    }
+
+    return file
+  }
+
+  async function handlePreviewDocumentFile(document: ManagedDocument) {
+    setPreviewingDocumentId(document.id)
+    try {
+      const file = await getPrimaryFileForDocument(document)
+      const blob = await downloadManagedDocumentFile(file.downloadUrl)
+      const url = URL.createObjectURL(blob)
+      setPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return {
+          file,
+          url,
+          mimeType: blob.type || file.mimeType || "",
+        }
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo visualizar el documento")
+    } finally {
+      setPreviewingDocumentId(null)
+    }
+  }
+
+  async function handleDownloadDocumentFile(document: ManagedDocument) {
+    setDownloadingDocumentId(document.id)
+    try {
+      const file = await getPrimaryFileForDocument(document)
+      await handleDownloadFile(file)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar el archivo")
+    } finally {
+      setDownloadingDocumentId(null)
+    }
+  }
+
+  function closePreview() {
+    setPreview((current) => {
+      if (current?.url) URL.revokeObjectURL(current.url)
+      return null
+    })
   }
 
   async function handleDeleteFile(document: ManagedDocumentFile) {
@@ -831,37 +849,94 @@ export default function DocumentsPage() {
         </DialogContent>
       </Dialog>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Total Documentos</p>
-            <p className="text-2xl font-bold">{stats.total}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Activos</p>
-            <p className="text-2xl font-bold text-green-600">{stats.active}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Inactivos</p>
-            <p className="text-2xl font-bold">{stats.inactive}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Procedimientos</p>
-            <p className="text-2xl font-bold">{stats.procedures}</p>
-          </CardContent>
-        </Card>
+      <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && closePreview()}>
+        <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">
+          <DialogHeader className="border-b border-border px-4 py-3">
+            <DialogTitle className="truncate text-base">{preview?.file.originalName || "Documento"}</DialogTitle>
+          </DialogHeader>
+
+          <div className="min-h-0 flex-1 p-4">
+            {preview && canEmbedPreview(preview.mimeType) ? (
+              preview.mimeType.startsWith("image/") ? (
+                <div className="flex max-h-[70dvh] items-center justify-center overflow-auto rounded-md bg-secondary/40 p-2">
+                  <img
+                    src={preview.url}
+                    alt={preview.file.originalName || "Documento"}
+                    className="max-h-[68dvh] max-w-full rounded-md object-contain"
+                  />
+                </div>
+              ) : (
+                <iframe
+                  title={preview.file.originalName || "Documento"}
+                  src={preview.url}
+                  className="h-[70dvh] w-full rounded-md border border-border bg-white"
+                />
+              )
+            ) : (
+              <div className="flex min-h-[280px] flex-col items-center justify-center gap-3 rounded-md border border-dashed border-border bg-secondary/30 p-6 text-center">
+                <FileText className="h-10 w-10 text-muted-foreground" />
+                <div>
+                  <p className="font-medium">Vista previa no disponible</p>
+                  <p className="text-sm text-muted-foreground">
+                    Este archivo se puede abrir o descargar desde una pestaña nueva.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="border-t border-border px-4 py-3">
+            {preview && (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => window.open(preview.url, "_blank", "noopener,noreferrer")}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Abrir en pestaña
+                </Button>
+                <Button type="button" variant="outline" className="gap-2" onClick={() => handleDownloadFile(preview.file)}>
+                  <Download className="h-4 w-4" />
+                  Descargar
+                </Button>
+              </>
+            )}
+            <Button type="button" onClick={closePreview}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <div className="overflow-x-auto px-3 py-1">
+        <div className="flex min-w-max items-center justify-center gap-2">
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Total</span>
+            <span className="text-sm font-semibold">{stats.total}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Activos</span>
+            <span className="text-sm font-semibold text-green-600">{stats.active}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Inactivos</span>
+            <span className="text-sm font-semibold">{stats.inactive}</span>
+          </div>
+          {DOCUMENT_TYPES.map((type) => (
+            <div key={type.value} className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+              <span className="text-xs text-muted-foreground">{type.label}</span>
+              <span className="text-sm font-semibold">{stats.byType[type.value] ?? 0}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       <Card>
-        <CardContent className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="relative md:col-span-2">
+        <CardContent className="p-3">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+            <div className="relative min-w-0 flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 value={search}
@@ -872,7 +947,7 @@ export default function DocumentsPage() {
             </div>
 
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger>
+              <SelectTrigger className="lg:w-44">
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>
@@ -886,7 +961,7 @@ export default function DocumentsPage() {
             </Select>
 
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
+              <SelectTrigger className="lg:w-44">
                 <SelectValue placeholder="Estado" />
               </SelectTrigger>
               <SelectContent>
@@ -896,7 +971,7 @@ export default function DocumentsPage() {
               </SelectContent>
             </Select>
 
-            <div className="md:col-span-2">
+            <div className="lg:w-64">
               <Select value={workAreaFilter} onValueChange={setWorkAreaFilter}>
                 <SelectTrigger>
                   <Filter className="h-4 w-4 mr-2" />
@@ -1003,16 +1078,32 @@ export default function DocumentsPage() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem
+                      disabled={previewingDocumentId === document.id}
+                      onSelect={() => handlePreviewDocumentFile(document)}
+                    >
+                      {previewingDocumentId === document.id ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Eye className="mr-2 h-4 w-4" />
+                      )}
+                      {previewingDocumentId === document.id ? "Cargando" : "Ver"}
+                    </DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => openFileDialog(document)}>
                       <Paperclip className="mr-2 h-4 w-4" />
                       Subir documento
                     </DropdownMenuItem>
-                    {document.type !== "OTHERS" && (
-                      <DropdownMenuItem onSelect={() => downloadPrintableDocument(document)}>
+                    <DropdownMenuItem
+                      disabled={downloadingDocumentId === document.id}
+                      onSelect={() => handleDownloadDocumentFile(document)}
+                    >
+                      {downloadingDocumentId === document.id ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
                         <Download className="mr-2 h-4 w-4" />
-                        Descargar PDF
-                      </DropdownMenuItem>
-                    )}
+                      )}
+                      {downloadingDocumentId === document.id ? "Descargando" : "Descargar archivo"}
+                    </DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => openEditDialog(document)}>
                       <Edit className="mr-2 h-4 w-4" />
                       Editar

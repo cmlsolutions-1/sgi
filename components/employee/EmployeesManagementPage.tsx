@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react"
 import Link from "next/link"
 import {
-  Building2,
   Calendar,
   Download,
   Edit,
@@ -21,7 +20,6 @@ import {
   TriangleAlert,
   Upload,
   UserCheck,
-  Users,
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -1679,62 +1677,36 @@ export default function EmployeesPage() {
       </div>
 
       <div className="space-y-6">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-            <Card className="bg-card border-border">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Total Funcionarios</p>
-                    <p className="text-2xl font-bold">{stats.total}</p>
-                  </div>
-                  <Users className="h-8 w-8 text-primary" />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border-border">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Activos</p>
-                    <p className="text-2xl font-bold text-accent">{stats.active}</p>
-                  </div>
-                  <UserCheck className="h-8 w-8 text-accent" />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border-border">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Inactivos</p>
-                    <p className="text-2xl font-bold text-muted-foreground">{stats.inactive}</p>
-                  </div>
-                  <Users className="h-8 w-8 text-muted-foreground" />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border-border">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Areas vinculadas</p>
-                    <p className="text-2xl font-bold text-primary">{stats.workAreas}</p>
-                  </div>
-                  <Building2 className="h-8 w-8 text-primary" />
-                </div>
-              </CardContent>
-            </Card>
+          <div className="overflow-x-auto px-3 py-1">
+            <div className="flex min-w-max items-center justify-center gap-2">
+              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+                <span className="text-xs text-muted-foreground">Total</span>
+                <span className="text-sm font-semibold">{stats.total}</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+                <span className="text-xs text-muted-foreground">Activos</span>
+                <span className="text-sm font-semibold text-green-600">{stats.active}</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+                <span className="text-xs text-muted-foreground">Inactivos</span>
+                <span className="text-sm font-semibold">{stats.inactive}</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+                <span className="text-xs text-muted-foreground">Áreas vinculadas</span>
+                <span className="text-sm font-semibold text-primary">{stats.workAreas}</span>
+              </div>
+            </div>
           </div>
 
           <Card className="bg-card border-border">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base font-medium">
-                <Filter className="h-5 w-5" />
+            <CardHeader className="px-4 pb-2 pt-3">
+              <CardTitle className="flex items-center gap-2 text-sm font-medium">
+                <Filter className="h-4 w-4" />
                 Filtros
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-4">
-              <div className="flex flex-col gap-4 md:flex-row">
+            <CardContent className="px-4 pb-3 pt-0">
+              <div className="flex flex-col gap-3 md:flex-row">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -1744,7 +1716,7 @@ export default function EmployeesPage() {
                     className="pl-10"
                   />
                 </div>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-2">
                   <Select value={workAreaFilter} onValueChange={setWorkAreaFilter}>
                     <SelectTrigger className="w-[200px]">
                       <Filter className="mr-2 h-4 w-4" />

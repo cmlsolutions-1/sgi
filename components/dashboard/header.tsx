@@ -377,7 +377,7 @@ export function Header() {
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push("/dashboard/settings")} className="gap-2">
                 <Settings className="h-4 w-4" />
-                Configuracion
+                Ajustes
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem

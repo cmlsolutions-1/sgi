@@ -16,12 +16,26 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
-import { Plus, Search, Clock, CheckCircle, Pencil, Trash2, Upload, Download, FileText, Loader2 } from "lucide-react"
+import {
+  Plus,
+  Search,
+  Clock,
+  CheckCircle,
+  Pencil,
+  Trash2,
+  Upload,
+  Download,
+  FileText,
+  Loader2,
+  Eye,
+  ExternalLink,
+} from "lucide-react"
 import { toast } from "sonner"
 
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -117,6 +131,10 @@ function formatFileSize(size: number) {
   return `${(size / (1024 * 1024)).toFixed(1)} MB`
 }
 
+function canEmbedPreview(mimeType: string) {
+  return mimeType.startsWith("application/pdf") || mimeType.startsWith("image/")
+}
+
 function buildPayload(form: MeasureForm): UpsertPreventiveMeasureDto {
   return {
     ...(form.sourceType === "RISK" && form.riskId ? { riskId: form.riskId } : {}),
@@ -136,8 +154,13 @@ function PreventiveMeasureDocuments({ measureId }: { measureId: string }) {
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [file, setFile] = useState<File | null>(null)
-  const [type, setType] = useState("OTHER")
   const [isConfirmed, setIsConfirmed] = useState(true)
+  const [preview, setPreview] = useState<{
+    document: PreventiveMeasureDocument
+    url: string
+    mimeType: string
+  } | null>(null)
+  const [previewLoadingId, setPreviewLoadingId] = useState<string | null>(null)
 
   async function loadDocuments() {
     setLoading(true)
@@ -156,6 +179,12 @@ function PreventiveMeasureDocuments({ measureId }: { measureId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [measureId])
 
+  useEffect(() => {
+    return () => {
+      if (preview?.url) URL.revokeObjectURL(preview.url)
+    }
+  }, [preview?.url])
+
   async function handleUpload(event: FormEvent) {
     event.preventDefault()
 
@@ -164,16 +193,10 @@ function PreventiveMeasureDocuments({ measureId }: { measureId: string }) {
       return
     }
 
-    if (!type.trim()) {
-      toast.error("Ingresa el tipo de documento")
-      return
-    }
-
     setUploading(true)
     try {
       await uploadPreventiveMeasureDocument(measureId, {
         file,
-        type: type.trim(),
         isConfirmed,
       })
       setFile(null)
@@ -189,14 +212,41 @@ function PreventiveMeasureDocuments({ measureId }: { measureId: string }) {
   async function handleView(document: PreventiveMeasureDocument) {
     if (!document.downloadUrl) return
 
+    setPreviewLoadingId(document.id)
     try {
       const blob = await downloadPreventiveMeasureDocumentFile(document.downloadUrl)
       const url = URL.createObjectURL(blob)
-      window.open(url, "_blank", "noopener,noreferrer")
-      window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
+      setPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return {
+          document,
+          url,
+          mimeType: blob.type || document.mimeType || "",
+        }
+      })
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo abrir el documento")
+    } finally {
+      setPreviewLoadingId(null)
     }
+  }
+
+  function closePreview() {
+    setPreview((current) => {
+      if (current?.url) URL.revokeObjectURL(current.url)
+      return null
+    })
+  }
+
+  function handleDownloadPreview() {
+    if (!preview) return
+
+    const anchor = window.document.createElement("a")
+    anchor.href = preview.url
+    anchor.download = preview.document.originalName || "documento"
+    window.document.body.appendChild(anchor)
+    anchor.click()
+    anchor.remove()
   }
 
   async function handleDelete(documentId: string) {
@@ -216,14 +266,10 @@ function PreventiveMeasureDocuments({ measureId }: { measureId: string }) {
         Documentos
       </div>
 
-      <form onSubmit={handleUpload} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_180px_auto_auto] lg:items-end">
+      <form onSubmit={handleUpload} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-end">
         <div className="grid gap-2">
           <Label>Archivo</Label>
           <Input type="file" onChange={(event) => setFile(event.target.files?.[0] ?? null)} disabled={uploading} />
-        </div>
-        <div className="grid gap-2">
-          <Label>Tipo</Label>
-          <Input value={type} onChange={(event) => setType(event.target.value)} disabled={uploading} />
         </div>
         <label className="flex h-10 items-center gap-2 text-sm">
           <Checkbox
@@ -253,16 +299,20 @@ function PreventiveMeasureDocuments({ measureId }: { measureId: string }) {
               className="flex flex-col gap-3 rounded-md border px-3 py-2 text-sm md:flex-row md:items-center md:justify-between"
             >
               <div className="min-w-0">
-                <p className="truncate font-medium">{document.originalName || document.type}</p>
+                <p className="truncate font-medium">{document.originalName || "Documento"}</p>
                 <p className="text-xs text-muted-foreground">
-                  {document.type} · {formatFileSize(document.size)} · {document.isConfirmed ? "Confirmado" : "Pendiente"}
+                  {formatFileSize(document.size)} · {document.isConfirmed ? "Confirmado" : "Pendiente"}
                 </p>
               </div>
               <div className="flex gap-2">
                 {document.downloadUrl && (
                   <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => handleView(document)}>
-                    <Download className="h-4 w-4" />
-                    Ver
+                    {previewLoadingId === document.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                    {previewLoadingId === document.id ? "Cargando" : "Ver"}
                   </Button>
                 )}
                 <Button
@@ -280,6 +330,67 @@ function PreventiveMeasureDocuments({ measureId }: { measureId: string }) {
           ))
         )}
       </div>
+
+      <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && closePreview()}>
+        <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">
+          <DialogHeader className="border-b border-border px-4 py-3">
+            <DialogTitle className="truncate text-base">
+              {preview?.document.originalName || "Documento de la medida preventiva"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="min-h-0 flex-1 overflow-hidden px-4 py-3">
+            {preview && canEmbedPreview(preview.mimeType) ? (
+              preview.mimeType.startsWith("image/") ? (
+                <div className="flex h-[65vh] items-center justify-center overflow-auto rounded-md border bg-muted/30 p-3">
+                  <img
+                    src={preview.url}
+                    alt={preview.document.originalName || "Documento"}
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </div>
+              ) : (
+                <iframe
+                  title={preview.document.originalName || "Documento"}
+                  src={preview.url}
+                  className="h-[65vh] w-full rounded-md border bg-background"
+                />
+              )
+            ) : (
+              <div className="flex h-[45vh] flex-col items-center justify-center rounded-md border border-dashed bg-muted/30 text-center">
+                <FileText className="h-10 w-10 text-muted-foreground" />
+                <p className="mt-3 text-sm font-medium">Vista previa no disponible</p>
+                <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+                  Este archivo puede abrirse en una pestaña nueva o descargarse.
+                </p>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="border-t border-border px-4 py-3">
+            {preview && (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => window.open(preview.url, "_blank", "noopener,noreferrer")}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Abrir en pestaña
+                </Button>
+                <Button type="button" variant="outline" className="gap-2" onClick={handleDownloadPreview}>
+                  <Download className="h-4 w-4" />
+                  Descargar
+                </Button>
+              </>
+            )}
+            <Button type="button" onClick={closePreview}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -738,31 +849,25 @@ export default function PreventiveMeasuresPage() {
       </div>
 
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-card border-border">
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Total Medidas</p>
-            <p className="text-2xl font-bold">{stats.total}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-card border-border">
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Pendientes</p>
-            <p className="text-2xl font-bold text-warning">{stats.pending}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-card border-border">
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Cumplidas</p>
-            <p className="text-2xl font-bold text-accent">{stats.done}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-card border-border">
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Desde riesgos</p>
-            <p className="text-2xl font-bold">{stats.riskBased}</p>
-          </CardContent>
-        </Card>
+      <div className="overflow-x-auto px-3 py-1">
+        <div className="flex min-w-max items-center justify-center gap-2">
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Total</span>
+            <span className="text-sm font-semibold">{stats.total}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Pendientes</span>
+            <span className="text-sm font-semibold text-warning">{stats.pending}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Cumplidas</span>
+            <span className="text-sm font-semibold text-green-600">{stats.done}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Desde riesgos</span>
+            <span className="text-sm font-semibold">{stats.riskBased}</span>
+          </div>
+        </div>
       </div>
 
       <Card className="bg-card border-border">

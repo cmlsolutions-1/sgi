@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Eye, ClipboardList, ExternalLink, Pencil, Trash2, UploadCloud } from "lucide-react"
+import { Plus, Eye, ClipboardList, ExternalLink, CircleHelp, Pencil, Trash2, UploadCloud } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
@@ -33,6 +33,7 @@ import {
   SheetTitle,
   SheetFooter,
 } from "@/components/ui/sheet"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { toast } from "sonner"
 import {
   changeRiskStatus,
@@ -366,6 +367,20 @@ function getRiskProgress(measures?: MeasureControl[]): {
   return { total, done, pct, state }
 }
 
+function getRiskProcessProgress(row: Pick<RiskRow, "status" | "measures">) {
+  const progress = getRiskProgress(row.measures)
+
+  if (row.status === "FINALIZADO") {
+    return {
+      ...progress,
+      state: "CUMPLIDO" as RiskProgressState,
+      pct: progress.pct === 0 ? 100 : progress.pct,
+    }
+  }
+
+  return progress
+}
+
 function progressChipColor(state: RiskProgressState) {
   switch (state) {
     case "CUMPLIDO":
@@ -412,6 +427,28 @@ function riskStatusColor(status: RiskStatus) {
 }
 
 const steps = ["Contexto", "Peligro", "Controles", "Evaluación", "Medidas"]
+
+function EvaluationHelpLabel({ label, help }: { label: string; help: string }) {
+  return (
+    <div className="mb-1 flex items-center gap-1.5 text-sm">
+      <span>{label}</span>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={`Ayuda sobre ${label}`}
+          >
+            <CircleHelp className="h-3.5 w-3.5" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="top" sideOffset={6} className="max-w-72 text-left leading-relaxed">
+          {help}
+        </TooltipContent>
+      </Tooltip>
+    </div>
+  )
+}
 
 type RiskCatalogs = {
   hazardTypes: RiskCatalogItem[]
@@ -1125,13 +1162,12 @@ return Array.isArray(raw)
 
   const dashboard = useMemo(() => {
     const byLevel = { I: 0, II: 0, III: 0, IV: 0, NA: 0 }
-    type RiskProgressState = "CUMPLIDO" | "ACTIVO" | "VENCIDO"
+    const byState: Record<RiskProgressState, number> = {
+      CUMPLIDO: 0,
+      ACTIVO: 0,
+      VENCIDO: 0,
+    }
 
-      const byState: Record<RiskProgressState, number> = {
-        CUMPLIDO: 0,
-        ACTIVO: 0,
-        VENCIDO: 0,
-      }
     for (const r of riskRows) {
       if (r.nrNivel === "I") byLevel.I++
       else if (r.nrNivel === "II") byLevel.II++
@@ -1139,8 +1175,8 @@ return Array.isArray(raw)
       else if (r.nrNivel === "IV") byLevel.IV++
       else byLevel.NA++
 
-      const pr = getRiskProgress(r.measures)
-        byState[pr.state]++
+      const pr = getRiskProcessProgress(r)
+      byState[pr.state]++
     }
 
     return { byLevel, byState, total: riskRows.length }
@@ -1211,7 +1247,7 @@ return Array.isArray(raw)
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Se calcula según avance de medidas (cumplido/pendiente) y fechas.
+                  Se calcula según estado del riesgo, avance de medidas y fechas.
                 </p>
               </CardContent>
             </Card>
@@ -1238,7 +1274,7 @@ return Array.isArray(raw)
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                   {riskRows.map((r) => {
-                    const pr = getRiskProgress(r.measures)
+                    const pr = getRiskProcessProgress(r)
                     return (
                       <Card key={r.id} className="border">
                         <CardContent className="p-4 space-y-2">
@@ -1594,7 +1630,10 @@ return Array.isArray(raw)
                 {step === 4 && (
                   <div className="space-y-3 rounded-lg border border-border bg-card p-4">
                     <div>
-                      <p className="text-sm mb-1">ND (Deficiencia)</p>
+                      <EvaluationHelpLabel
+                        label="ND (Deficiencia)"
+                        help="Indica qué tan deficiente o insuficiente es la condición de seguridad existente frente al peligro. A mayor ND, mayor probabilidad base de que ocurra el evento."
+                      />
                       <Select
                         value={riskForm.ndKey}
                         onValueChange={(v) => setRiskForm((p) => ({ ...p, ndKey: v as RiskRow["ndKey"] }))}
@@ -1613,7 +1652,10 @@ return Array.isArray(raw)
                     </div>
 
                     <div>
-                      <p className="text-sm mb-1">NE (Exposición)</p>
+                      <EvaluationHelpLabel
+                        label="NE (Exposición)"
+                        help="Mide con qué frecuencia o intensidad las personas están expuestas al peligro durante sus actividades. A mayor exposición, mayor probabilidad."
+                      />
                       <Select
                         value={riskForm.neKey}
                         onValueChange={(v) => setRiskForm((p) => ({ ...p, neKey: v as RiskRow["neKey"] }))}
@@ -1632,7 +1674,10 @@ return Array.isArray(raw)
                     </div>
 
                     <div>
-                      <p className="text-sm mb-1">NC (Consecuencia)</p>
+                      <EvaluationHelpLabel
+                        label="NC (Consecuencia)"
+                        help="Representa la severidad del daño posible si el evento ocurre. A mayor consecuencia, mayor nivel de riesgo resultante."
+                      />
                       <Select
                         value={riskForm.ncKey}
                         onValueChange={(v) => setRiskForm((p) => ({ ...p, ncKey: v as RiskRow["ncKey"] }))}
@@ -1895,7 +1940,7 @@ return Array.isArray(raw)
                           Estado: {riskStatusLabel(detailRow.status)}
                         </span>
                         {(() => {
-                          const pr = getRiskProgress(detailRow.measures)
+                          const pr = getRiskProcessProgress(detailRow)
                           return (
                             <span className={cn("rounded-full border px-3 py-1 text-xs font-semibold", progressChipColor(pr.state))}>
                               {pr.state === "CUMPLIDO" ? "Cumplido" : pr.state === "VENCIDO" ? "Vencido" : "Activo"} ·{" "}

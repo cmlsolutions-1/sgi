@@ -10,6 +10,7 @@ import { useAuthStore } from "@/store/auth.store";
 
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -83,6 +84,13 @@ export function Sidebar() {
     setOpenDropdown(openDropdown === name ? null : name);
   };
 
+  const expandCollapsedSidebar = (dropdownName?: string) => {
+    if (!collapsed) return false;
+    setCollapsed(false);
+    if (dropdownName) setOpenDropdown(dropdownName);
+    return true;
+  };
+
   const router = useRouter();
 
   async function handleLogout() {
@@ -101,19 +109,22 @@ export function Sidebar() {
         collapsed ? "w-16" : "w-64"
       )}
     >
-      <div className="flex h-16 shrink-0 items-center justify-between px-4 border-b border-sidebar-border">
-        {!collapsed && (
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">
-                SGC
-              </span>
-            </div>
+      <div
+        className={cn(
+          "flex h-16 shrink-0 items-center border-b border-sidebar-border",
+          collapsed ? "justify-center px-2" : "justify-between px-4",
+        )}
+      >
+        <div className={cn("flex items-center gap-2", collapsed && "sr-only")}>
+          <div className="relative h-10 w-10 overflow-hidden rounded-xl bg-white/5 shadow-sm">
+            <Image src="/icono3.png" alt="SafeCloud" fill priority className="object-cover" sizes="40px" />
+          </div>
+          {!collapsed && (
             <span className="font-semibold text-sidebar-foreground">
               SafeCloud
             </span>
-          </div>
-        )}
+          )}
+        </div>
         <Button
           variant="ghost"
           size="icon"
@@ -135,7 +146,10 @@ export function Sidebar() {
             return (
               <div key={item.name}>
                 <button
-                  onClick={() => !collapsed && toggleDropdown(item.name)}
+                  onClick={() => {
+                    if (expandCollapsedSidebar(item.name)) return;
+                    toggleDropdown(item.name);
+                  }}
                   className={cn(
                     "flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                     openDropdown === item.name
@@ -194,6 +208,10 @@ export function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
+              onClick={(event) => {
+                if (!expandCollapsedSidebar()) return;
+                event.preventDefault();
+              }}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                 isActive
@@ -209,16 +227,30 @@ export function Sidebar() {
       </nav>
 
       <div className="shrink-0 p-2 border-t border-sidebar-border space-y-1">
-        <Link
-          href="/dashboard/settings"
-          className={cn(
-            "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-            "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-          )}
-        >
-          <Settings className="h-5 w-5 shrink-0" />
-          {!collapsed && <span>Configuración</span>}
-        </Link>
+        {collapsed ? (
+          <button
+            type="button"
+            onClick={() => expandCollapsedSidebar()}
+            className={cn(
+              "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+              "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+            )}
+            aria-label="Mostrar ajustes"
+          >
+            <Settings className="h-5 w-5 shrink-0" />
+          </button>
+        ) : (
+          <Link
+            href="/dashboard/settings"
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+              "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            )}
+          >
+            <Settings className="h-5 w-5 shrink-0" />
+            <span>Ajustes</span>
+          </Link>
+        )}
 
         <button
           type="button"

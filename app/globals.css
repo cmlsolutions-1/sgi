@@ -152,4 +152,24 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  html[data-sgi-density="compact"] [data-slot="card"] {
+    gap: 1rem;
+    padding-block: 1rem;
+  }
+
+  html[data-sgi-density="compact"] [data-slot="card-header"],
+  html[data-sgi-density="compact"] [data-slot="card-content"],
+  html[data-sgi-density="compact"] [data-slot="card-footer"] {
+    padding-inline: 1rem;
+  }
+
+  html[data-sgi-reduce-motion="true"] *,
+  html[data-sgi-reduce-motion="true"] *::before,
+  html[data-sgi-reduce-motion="true"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
