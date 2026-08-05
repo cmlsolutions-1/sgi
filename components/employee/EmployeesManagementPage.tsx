@@ -166,10 +166,94 @@ function getIncidentTypeLabel(type?: string | null) {
   if (type === "ACCIDENTE") return "Accidente"
   if (type === "ENFERMEDAD_LABORAL") return "Enfermedad laboral"
   if (type === "INCAPACIDAD_MEDICA") return "Incapacidad medica"
+  if (type === "LICENCIA_MATERNIDAD") return "Licencia de maternidad"
+  if (type === "LICENCIA_PATERNIDAD") return "Licencia de paternidad"
+  if (type === "VACACIONES") return "Vacaciones"
+  if (type === "DIAS_NO_REMUNERADO") return "Dias no remunerados"
+  if (type === "DIA_REMUNERADO") return "Dia remunerado"
   if (type === "REVISION_POR_LA_DIRECCION") return "Revision por la direccion"
   if (type === "REQUERIMIENTO_DE_AUTORIDAD_ADMINISTRATIVA") return "Requerimiento de autoridad administrativa"
   if (type === "RECOMENDACION_DE_LA_ARL") return "Recomendacion de la ARL"
   return "Tipo no registrado"
+}
+
+const incidentTypesWithIncapacityDetails: IncidentType[] = [
+  "INCAPACIDAD_MEDICA",
+  "LICENCIA_MATERNIDAD",
+  "LICENCIA_PATERNIDAD",
+  "VACACIONES",
+  "DIAS_NO_REMUNERADO",
+  "DIA_REMUNERADO",
+]
+
+type IncidentIncapacityDetailLabels = {
+  title: string
+  startLabel: string
+  endLabel: string
+  daysLabel: string
+  dateError: string
+  requiredError: string
+}
+
+const defaultIncidentIncapacityDetailLabels: IncidentIncapacityDetailLabels = {
+  title: "Incapacidad medica",
+  startLabel: "Inicio incapacidad",
+  endLabel: "Fin incapacidad",
+  daysLabel: "Dias incapacidad",
+  dateError: "La fecha inicial de incapacidad no puede ser posterior a la fecha final",
+  requiredError: "Registra origen, fecha inicial y fecha final de la incapacidad",
+}
+
+const incidentIncapacityDetailLabels: Partial<Record<IncidentType, IncidentIncapacityDetailLabels>> = {
+  INCAPACIDAD_MEDICA: defaultIncidentIncapacityDetailLabels,
+  LICENCIA_MATERNIDAD: {
+    title: "Licencia de maternidad",
+    startLabel: "Inicio maternidad",
+    endLabel: "Fin maternidad",
+    daysLabel: "Dias maternidad",
+    dateError: "La fecha inicial de maternidad no puede ser posterior a la fecha final",
+    requiredError: "Registra origen, fecha inicial y fecha final de la licencia de maternidad",
+  },
+  LICENCIA_PATERNIDAD: {
+    title: "Licencia de paternidad",
+    startLabel: "Inicio paternidad",
+    endLabel: "Fin paternidad",
+    daysLabel: "Dias paternidad",
+    dateError: "La fecha inicial de paternidad no puede ser posterior a la fecha final",
+    requiredError: "Registra origen, fecha inicial y fecha final de la licencia de paternidad",
+  },
+  VACACIONES: {
+    title: "Vacaciones",
+    startLabel: "Inicio vacaciones",
+    endLabel: "Fin vacaciones",
+    daysLabel: "Dias vacaciones",
+    dateError: "La fecha inicial de vacaciones no puede ser posterior a la fecha final",
+    requiredError: "Registra origen, fecha inicial y fecha final de las vacaciones",
+  },
+  DIAS_NO_REMUNERADO: {
+    title: "Dias no remunerados",
+    startLabel: "Inicio dias no remunerados",
+    endLabel: "Fin dias no remunerados",
+    daysLabel: "Dias no remunerados",
+    dateError: "La fecha inicial de dias no remunerados no puede ser posterior a la fecha final",
+    requiredError: "Registra origen, fecha inicial y fecha final de los dias no remunerados",
+  },
+  DIA_REMUNERADO: {
+    title: "Dia remunerado",
+    startLabel: "Inicio dia remunerado",
+    endLabel: "Fin dia remunerado",
+    daysLabel: "Dias remunerados",
+    dateError: "La fecha inicial del dia remunerado no puede ser posterior a la fecha final",
+    requiredError: "Registra origen, fecha inicial y fecha final del dia remunerado",
+  },
+}
+
+function hasIncapacityDetails(type?: IncidentType | string | null) {
+  return incidentTypesWithIncapacityDetails.includes(type as IncidentType)
+}
+
+function getIncidentIncapacityDetailLabels(type?: IncidentType | string | null) {
+  return incidentIncapacityDetailLabels[(type as IncidentType) ?? "INCAPACIDAD_MEDICA"] ?? defaultIncidentIncapacityDetailLabels
 }
 
 function formatIncidentConsecutive(consecutive?: string | null) {
@@ -207,8 +291,7 @@ function getCaseStatusLabel(value?: string | null) {
 function hasIncidentDataChanges(current: Incident | undefined, payload: UpdateIncidentDto) {
   if (!current) return true
 
-  const compareIncapacityFields =
-    current.type === "INCAPACIDAD_MEDICA" || payload.type === "INCAPACIDAD_MEDICA"
+  const compareIncapacityFields = hasIncapacityDetails(current.type) || hasIncapacityDetails(payload.type)
 
   return (
     current.employeeId !== payload.employeeId ||
@@ -234,7 +317,7 @@ function hasIncidentDataChanges(current: Incident | undefined, payload: UpdateIn
 function sanitizeIncidentPayload(payload: IncidentFormState): CreateIncidentDto {
   const { status: _status, ...incidentPayload } = payload
 
-  if (incidentPayload.type !== "INCAPACIDAD_MEDICA") {
+  if (!hasIncapacityDetails(incidentPayload.type)) {
     return {
       ...incidentPayload,
       incapacityDays: 0,
@@ -289,6 +372,11 @@ const incidentTypeOptions: Array<{ value: IncidentType; label: string }> = [
   { value: "ACCIDENTE", label: "Accidente" },
   { value: "ENFERMEDAD_LABORAL", label: "Enfermedad laboral" },
   { value: "INCAPACIDAD_MEDICA", label: "Incapacidad medica" },
+  { value: "LICENCIA_MATERNIDAD", label: "Licencia de maternidad" },
+  { value: "LICENCIA_PATERNIDAD", label: "Licencia de paternidad" },
+  { value: "VACACIONES", label: "Vacaciones" },
+  { value: "DIAS_NO_REMUNERADO", label: "Dias no remunerados" },
+  { value: "DIA_REMUNERADO", label: "Dia remunerado" },
   { value: "REVISION_POR_LA_DIRECCION", label: "Revision por la direccion" },
   { value: "REQUERIMIENTO_DE_AUTORIDAD_ADMINISTRATIVA", label: "Requerimiento de autoridad administrativa" },
   { value: "RECOMENDACION_DE_LA_ARL", label: "Recomendacion de la ARL" },
@@ -322,7 +410,8 @@ function IncidentDialog({
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<IncidentFormState>(emptyIncidentForm)
-  const isMedicalIncapacity = form.type === "INCAPACIDAD_MEDICA"
+  const hasPeriodDetails = hasIncapacityDetails(form.type)
+  const periodLabels = getIncidentIncapacityDetailLabels(form.type)
 
   const workAreaOptions = useMemo(() => {
     const unique = new Map<string, string>()
@@ -356,13 +445,15 @@ function IncidentDialog({
   }
 
   function handleIncidentTypeChange(value: IncidentType) {
+    const shouldKeepPeriodDetails = hasIncapacityDetails(value)
+
     setForm((current) => ({
       ...current,
       type: value,
-      incapacityDays: value === "INCAPACIDAD_MEDICA" ? current.incapacityDays : 0,
-      incapacityOrigin: value === "INCAPACIDAD_MEDICA" ? (current.incapacityOrigin ?? "COMUN") : undefined,
-      incapacityStartDate: value === "INCAPACIDAD_MEDICA" ? current.incapacityStartDate : undefined,
-      incapacityEndDate: value === "INCAPACIDAD_MEDICA" ? current.incapacityEndDate : undefined,
+      incapacityDays: shouldKeepPeriodDetails ? current.incapacityDays : 0,
+      incapacityOrigin: shouldKeepPeriodDetails ? (current.incapacityOrigin ?? "COMUN") : undefined,
+      incapacityStartDate: shouldKeepPeriodDetails ? current.incapacityStartDate : undefined,
+      incapacityEndDate: shouldKeepPeriodDetails ? current.incapacityEndDate : undefined,
     }))
   }
 
@@ -399,7 +490,7 @@ function IncidentDialog({
             consequences: incident.consequences ?? "",
             correctiveActions: incident.correctiveActions ?? "",
             incapacityDays: incident.incapacityDays ?? 0,
-            incapacityOrigin: incident.incapacityOrigin ?? (incident.type === "INCAPACIDAD_MEDICA" ? "COMUN" : undefined),
+            incapacityOrigin: incident.incapacityOrigin ?? (hasIncapacityDetails(incident.type) ? "COMUN" : undefined),
             incapacityStartDate: formatFormDate(incident.incapacityStartDate) || undefined,
             incapacityEndDate: formatFormDate(incident.incapacityEndDate) || undefined,
             isFatal: Boolean(incident.isFatal),
@@ -419,17 +510,17 @@ function IncidentDialog({
     }
 
     if (
-      isMedicalIncapacity &&
+      hasPeriodDetails &&
       form.incapacityStartDate &&
       form.incapacityEndDate &&
       form.incapacityStartDate > form.incapacityEndDate
     ) {
-      toast.error("La fecha inicial de incapacidad no puede ser posterior a la fecha final")
+      toast.error(periodLabels.dateError)
       return
     }
 
-    if (isMedicalIncapacity && (!form.incapacityOrigin || !form.incapacityStartDate || !form.incapacityEndDate)) {
-      toast.error("Registra origen, fecha inicial y fecha final de la incapacidad")
+    if (hasPeriodDetails && (!form.incapacityOrigin || !form.incapacityStartDate || !form.incapacityEndDate)) {
+      toast.error(periodLabels.requiredError)
       return
     }
 
@@ -646,9 +737,9 @@ function IncidentDialog({
             </div>
             </section>
 
-            {isMedicalIncapacity && (
+            {hasPeriodDetails && (
               <section className="grid gap-4">
-                <h3 className="text-sm font-semibold text-foreground">Incapacidad medica</h3>
+                <h3 className="text-sm font-semibold text-foreground">{periodLabels.title}</h3>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                   <div className="grid gap-2">
                     <Label>Origen incapacidad</Label>
@@ -671,7 +762,7 @@ function IncidentDialog({
                     </Select>
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="incident-incapacity-start">Inicio incapacidad</Label>
+                    <Label htmlFor="incident-incapacity-start">{periodLabels.startLabel}</Label>
                     <Input
                       id="incident-incapacity-start"
                       className={incidentFieldControlClassName}
@@ -682,7 +773,7 @@ function IncidentDialog({
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="incident-incapacity-end">Fin incapacidad</Label>
+                    <Label htmlFor="incident-incapacity-end">{periodLabels.endLabel}</Label>
                     <Input
                       id="incident-incapacity-end"
                       className={incidentFieldControlClassName}
@@ -693,7 +784,7 @@ function IncidentDialog({
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="incident-incapacity-days">Dias incapacidad</Label>
+                    <Label htmlFor="incident-incapacity-days">{periodLabels.daysLabel}</Label>
                     <Input
                       id="incident-incapacity-days"
                       className={incidentFieldControlClassName}
@@ -852,23 +943,23 @@ function IncidentDocuments({ incidentId, compact = false }: { incidentId: string
           <div className="grid gap-2">
             <Label>Archivo</Label>
             <div className="flex min-h-10 flex-col gap-2 rounded-md border border-slate-300 bg-white px-2 py-2 shadow-xs sm:flex-row sm:items-center">
-              <Input
-                id={`incident-document-file-${incidentId}`}
-                className="sr-only"
-                type="file"
-                onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-                disabled={uploading}
-              />
-              <Label
-                htmlFor={`incident-document-file-${incidentId}`}
+              <label
                 className={cn(
-                  "inline-flex h-8 w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 sm:w-auto",
+                  "relative inline-flex h-8 w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 sm:w-auto",
                   uploading && "pointer-events-none opacity-50",
                 )}
               >
+                <Input
+                  id={`incident-document-file-${incidentId}`}
+                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  type="file"
+                  onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+                  disabled={uploading}
+                  aria-label="Seleccionar archivo"
+                />
                 <Upload className="h-3.5 w-3.5" />
                 Seleccionar archivo
-              </Label>
+              </label>
               <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
                 {file?.name ?? "Ningun archivo seleccionado"}
               </span>
@@ -1307,20 +1398,26 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
                     <p>{incident.isFatal ? "Si" : "No"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Incapacidad</p>
+                    <p className="text-xs text-muted-foreground">
+                      {hasIncapacityDetails(incident.type) ? getIncidentIncapacityDetailLabels(incident.type).title : "Periodo"}
+                    </p>
                     <p>
-                      {incident.type === "INCAPACIDAD_MEDICA"
-                        ? `${incident.incapacityDays ?? 0} dias · ${getIncapacityOriginLabel(incident.incapacityOrigin)}`
+                      {hasIncapacityDetails(incident.type)
+                        ? `${incident.incapacityDays ?? 0} dias - ${getIncapacityOriginLabel(incident.incapacityOrigin)}`
                         : "No aplica"}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Inicio incapacidad</p>
-                    <p>{incident.type === "INCAPACIDAD_MEDICA" ? formatDate(incident.incapacityStartDate) : "No aplica"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {hasIncapacityDetails(incident.type) ? getIncidentIncapacityDetailLabels(incident.type).startLabel : "Inicio"}
+                    </p>
+                    <p>{hasIncapacityDetails(incident.type) ? formatDate(incident.incapacityStartDate) : "No aplica"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Fin incapacidad</p>
-                    <p>{incident.type === "INCAPACIDAD_MEDICA" ? formatDate(incident.incapacityEndDate) : "No aplica"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {hasIncapacityDetails(incident.type) ? getIncidentIncapacityDetailLabels(incident.type).endLabel : "Fin"}
+                    </p>
+                    <p>{hasIncapacityDetails(incident.type) ? formatDate(incident.incapacityEndDate) : "No aplica"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Consecuencias</p>

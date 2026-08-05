@@ -22,10 +22,18 @@ type Props = {
     email: string
     status: "active" | "inactive"
   }) => Promise<void>
+  getActiveChildModuleCount: (company: Company) => number
   onOpenModules: (company: Company) => void
 }
 
-export function CompaniesCard({ companies, selectedCompany, onSelect, onCreateCompany, onOpenModules }: Props) {
+export function CompaniesCard({
+  companies,
+  selectedCompany,
+  onSelect,
+  onCreateCompany,
+  getActiveChildModuleCount,
+  onOpenModules,
+}: Props) {
   return (
     <Card className="bg-card border-border shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between">
@@ -41,6 +49,7 @@ export function CompaniesCard({ companies, selectedCompany, onSelect, onCreateCo
         <div className="space-y-3">
           {companies.map((company) => {
             const isSelected = selectedCompany?.id === company.id
+            const activeChildModules = getActiveChildModuleCount(company)
             return (
               <div
                 key={company.id}
@@ -80,7 +89,7 @@ export function CompaniesCard({ companies, selectedCompany, onSelect, onCreateCo
                     <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
                       <span>{company.totalUsers} usuarios</span>
                       <span>•</span>
-                      <span>{company.activeModules.length} módulos activos</span>
+                      <span>{activeChildModules} módulos hijos activos</span>
                       <span>•</span>
                       <span>Creada: {new Date(company.registrationDate).toLocaleDateString("es-ES")}</span>
                     </div>

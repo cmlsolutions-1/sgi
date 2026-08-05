@@ -28,19 +28,57 @@ import type { Module } from "@/types/manager/module"
 import type { Permission } from "@/types/manager/permission"
 import type { Role } from "@/types/manager/role"
 
+const childModulesStoragePrefix = "sgi:company-child-modules:"
+
+function readStoredChildModuleIds(companyId: string): string[] | null {
+  if (typeof window === "undefined") return null
+
+  try {
+    const rawValue = window.localStorage.getItem(`${childModulesStoragePrefix}${companyId}`)
+    if (rawValue === null) return null
+
+    const parsed = JSON.parse(rawValue)
+    return Array.isArray(parsed) ? parsed.filter((value): value is string => typeof value === "string") : null
+  } catch {
+    return null
+  }
+}
+
 function normalizeActiveModuleIds(activeModules: Module[], moduleCatalog: Module[]): string[] {
-  const childrenByParentId = new Map(moduleCatalog.map((module) => [module.id, module.children.map((child) => child.id)]))
+  const parentIds = new Set(moduleCatalog.map((module) => module.id))
 
   return Array.from(new Set(activeModules.flatMap((module) => {
-    if (module.children?.length) {
-      return module.children.map((child) => child.id)
-    }
-
     if (module.parentId) return [module.id]
 
-    return childrenByParentId.get(module.id) ?? []
+    return parentIds.has(module.id) ? [module.id] : []
   })))
 }
+
+function countActiveChildModules(company: Company, moduleCatalog: Module[]) {
+  const validChildIds = new Set(moduleCatalog.flatMap((module) => module.children.map((child) => child.id)))
+  const storedChildIds = readStoredChildModuleIds(company.id)
+
+  if (storedChildIds) {
+    return storedChildIds.filter((moduleId) => validChildIds.has(moduleId)).length
+  }
+
+  const activeIds = new Set(company.activeModules)
+  const activeChildIds = new Set<string>()
+
+  moduleCatalog.forEach((module) => {
+    if (activeIds.has(module.id)) {
+      module.children.forEach((child) => activeChildIds.add(child.id))
+      return
+    }
+
+    module.children.forEach((child) => {
+      if (activeIds.has(child.id)) activeChildIds.add(child.id)
+    })
+  })
+
+  return activeChildIds.size
+}
+
 function getPermissionGroup(permissionName: string) {
   const [, ...rest] = permissionName.split(" ")
   return rest.join(" ").trim() || "General"
@@ -100,6 +138,7 @@ export default function SuperAdminDashboard() {
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>([])
   const [loadingPermissions, setLoadingPermissions] = useState(false)
   const [savingPermissions, setSavingPermissions] = useState(false)
+  const [moduleCatalog, setModuleCatalog] = useState<Module[]>([])
 
   // ✅ Seleccionar primera empresa automáticamente
   useEffect(() => {
@@ -107,6 +146,14 @@ export default function SuperAdminDashboard() {
       selectCompany(companies[0])
     }
   }, [companies, selectedCompany, selectCompany])
+
+  useEffect(() => {
+    listModules()
+      .then(setModuleCatalog)
+      .catch((error) => {
+        console.warn("No se pudo cargar el catalogo de modulos:", error)
+      })
+  }, [])
 
   // ✅ Función PURA: solo obtiene módulos, NO actualiza estado
   // Esto evita dependencias circulares
@@ -358,6 +405,7 @@ export default function SuperAdminDashboard() {
             selectedCompany={selectedCompany}
             onSelect={selectCompany}
             onCreateCompany={handleCreateCompany}
+            getActiveChildModuleCount={(company) => countActiveChildModules(company, moduleCatalog)}
             onOpenModules={(company) => {
               selectCompany(company)
               setModulesOpen(true)

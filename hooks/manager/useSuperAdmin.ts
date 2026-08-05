@@ -4,6 +4,61 @@
 import { useEffect, useMemo, useState, useCallback } from "react"
 import type { Company, CompanyStatus } from "@/types/manager/super-admin"
 import { listCompanies, createCompany as createCompanyRequest } from "@/services/companyService"
+import { getModulesByCompany } from "@/services/modulesService"
+import { getCompanyAdmin } from "@/services/userService"
+
+type CompanyApiItem = {
+  id: string
+  name: string
+  nit?: string | null
+  address?: string | null
+  phone?: string | null
+  email?: string | null
+  registrationDate?: string | null
+  createdAt?: string | null
+  status?: string | boolean | null
+  activeModules?: Array<string | { id?: string | null; moduleId?: string | null }> | null
+  totalUsers?: number | null
+  usersCount?: number | null
+  userCount?: number | null
+}
+
+function normalizeCompanyStatus(value: CompanyApiItem["status"], fallback: CompanyStatus = "active"): CompanyStatus {
+  if (value === true || value === "ACTIVE" || value === "active") return "active"
+  if (value === false || value === "INACTIVE" || value === "inactive") return "inactive"
+  return fallback
+}
+
+function normalizeActiveModuleIds(value: CompanyApiItem["activeModules"]): string[] {
+  if (!Array.isArray(value)) return []
+
+  return Array.from(
+    new Set(
+      value
+        .map((module) => (typeof module === "string" ? module : module.id ?? module.moduleId ?? null))
+        .filter((moduleId): moduleId is string => Boolean(moduleId)),
+    ),
+  )
+}
+
+function readUsersCount(company: CompanyApiItem, fallback = 0) {
+  return company.totalUsers ?? company.usersCount ?? company.userCount ?? fallback
+}
+
+function mapCompany(company: CompanyApiItem, existing?: Company): Company {
+  return {
+    id: company.id,
+    name: company.name,
+    nit: company.nit ?? existing?.nit ?? "",
+    address: company.address ?? existing?.address ?? "",
+    phone: company.phone ?? existing?.phone ?? "",
+    email: company.email ?? existing?.email ?? "",
+    registrationDate: company.registrationDate ?? company.createdAt ?? existing?.registrationDate ?? "",
+    status: normalizeCompanyStatus(company.status, existing?.status ?? "active"),
+    activeModules: normalizeActiveModuleIds(company.activeModules) ?? existing?.activeModules ?? [],
+    totalUsers: readUsersCount(company, existing?.totalUsers ?? 0),
+  }
+}
 
 export function useSuperAdmin() {
   const [companies, setCompanies] = useState<Company[]>([])
@@ -43,27 +98,33 @@ export function useSuperAdmin() {
     setCompanyError(null)
 
     try {
-      const data = await listCompanies()
+      const data = (await listCompanies()) as CompanyApiItem[]
 
       // Usar functional update para no depender de companies
-      setCompanies((prevCompanies) => {
-        const mapped: Company[] = data.map((c) => {
-          const existing = prevCompanies.find((prev) => prev.id === c.id)
+      setCompanies((prevCompanies) =>
+        data.map((company) => mapCompany(company, prevCompanies.find((prev) => prev.id === company.id))),
+      )
+
+      const hydratedCompanies = await Promise.all(
+        data.map(async (companyApi) => {
+          const baseCompany = mapCompany(companyApi)
+          const [modulesResult, adminResult] = await Promise.allSettled([
+            getModulesByCompany(baseCompany.id),
+            getCompanyAdmin(baseCompany.id),
+          ])
+
           return {
-            id: c.id,
-            name: c.name,
-            nit: existing?.nit ?? "",
-            address: existing?.address ?? "",
-            phone: existing?.phone ?? "",
-            email: existing?.email ?? "",
-            registrationDate: existing?.registrationDate ?? "",
-            status: existing?.status ?? "active",
-            activeModules: existing?.activeModules ?? [],
-            totalUsers: existing?.totalUsers ?? 0,
+            ...baseCompany,
+            activeModules:
+              modulesResult.status === "fulfilled"
+                ? modulesResult.value.map((module) => module.id)
+                : baseCompany.activeModules,
+            totalUsers: adminResult.status === "fulfilled" ? 1 : baseCompany.totalUsers,
           }
-        })
-        return mapped
-      })
+        }),
+      )
+
+      setCompanies(hydratedCompanies)
 
       // Usar functional update para selectedCompany
       setSelectedCompany((prev) => {
@@ -72,7 +133,7 @@ export function useSuperAdmin() {
           return null // No seleccionar automáticamente aquí para evitar bucles
         }
         // Mantener selección si existe en la nueva lista
-        return prev // Mantener referencia si el ID coincide
+        return hydratedCompanies.find((company) => company.id === prev.id) ?? prev
       })
     } catch (e: any) {
       setCompanyError(e?.message ?? "Error cargando compañías")

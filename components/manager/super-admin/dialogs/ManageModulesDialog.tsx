@@ -27,6 +27,32 @@ type Props = {
   onRefresh: (activeModuleIds?: string[]) => Promise<void>
 }
 
+const childModulesStoragePrefix = "sgi:company-child-modules:"
+
+function getChildModulesStorageKey(companyId: string) {
+  return `${childModulesStoragePrefix}${companyId}`
+}
+
+function readStoredChildModuleIds(companyId: string): string[] | null {
+  if (typeof window === "undefined") return null
+
+  try {
+    const rawValue = window.localStorage.getItem(getChildModulesStorageKey(companyId))
+    if (rawValue === null) return null
+
+    const parsed = JSON.parse(rawValue)
+    return Array.isArray(parsed) ? parsed.filter((value): value is string => typeof value === "string") : null
+  } catch {
+    return null
+  }
+}
+
+function saveStoredChildModuleIds(companyId: string, moduleIds: string[]) {
+  if (typeof window === "undefined") return
+
+  window.localStorage.setItem(getChildModulesStorageKey(companyId), JSON.stringify(Array.from(new Set(moduleIds))))
+}
+
 function normalizeActiveModuleIds(activeModules: Module[], moduleCatalog: Module[]): string[] {
   const childrenByParentId = new Map(moduleCatalog.map((module) => [module.id, module.children.map((child) => child.id)]))
 
@@ -76,8 +102,14 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
       const validModuleIds = new Set(data.flatMap((module) => module.children.map((child) => child.id)))
       const activeIds = normalizeActiveModuleIds(activeModulesData, data).filter((moduleId) => validModuleIds.has(moduleId))
       const fallbackActiveIds = normalizeKnownModuleIds(company.activeModules, data).filter((moduleId) => validModuleIds.has(moduleId))
+      const storedActiveIds = readStoredChildModuleIds(company.id)
+      const validStoredActiveIds = storedActiveIds?.filter((moduleId) => validModuleIds.has(moduleId))
 
-      setActiveModuleIds(activeIds.length > 0 ? activeIds : fallbackActiveIds)
+      if (validStoredActiveIds && (validStoredActiveIds.length > 0 || (fallbackActiveIds.length === 0 && activeIds.length === 0))) {
+        setActiveModuleIds(validStoredActiveIds)
+      } else {
+        setActiveModuleIds(fallbackActiveIds.length > 0 ? fallbackActiveIds : activeIds)
+      }
     } catch (err: any) {
       const message = err.message ?? "Error al cargar modulos"
       setError(message)
@@ -93,13 +125,6 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
 
   const isChildActive = (childId: string): boolean => {
     return isModuleActive(childId)
-  }
-
-  const refreshActiveModules = async (): Promise<string[]> => {
-    if (!company) return []
-
-    const modulesData = await getModulesByCompany(company.id)
-    return normalizeActiveModuleIds(modulesData, modules)
   }
 
   const getParentIdsForActiveChildren = (childIds: string[]): string[] => {
@@ -133,17 +158,16 @@ export function ManageModulesDialog({ open, onOpenChange, company, onRefresh }: 
         currentlyActive ? `Modulo "${moduleName}" desactivado desde panel` : "Actualizado desde panel",
       )
 
-      if (parentIdsToPersist.length > 0) {
+      if (nextActiveIds.length > 0) {
         await syncAdminCompanyPermissions(company.id).catch((error: any) => {
           toast.warning(error.message ?? "Los modulos se actualizaron, pero no se pudieron sincronizar los permisos")
         })
       }
 
-      const refreshedActiveIds = await refreshActiveModules()
-      const persistedActiveIds = refreshedActiveIds.includes(moduleId) === !currentlyActive ? refreshedActiveIds : nextActiveIds
-      setActiveModuleIds(persistedActiveIds)
+      saveStoredChildModuleIds(company.id, nextActiveIds)
+      setActiveModuleIds(nextActiveIds)
       toast.success(`Modulo "${moduleName}" ${currentlyActive ? "desactivado" : "activado"}`)
-      await onRefresh(persistedActiveIds)
+      await onRefresh(parentIdsToPersist)
     } catch (err: any) {
       setActiveModuleIds(previousActiveIds)
       toast.error(err.message ?? "Error al actualizar modulo")
