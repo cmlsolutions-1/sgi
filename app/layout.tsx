@@ -16,9 +16,9 @@ export const metadata: Metadata = {
   description: "Sistema de Gestión Integral",
   generator: "v0.app",
   icons: {
-    icon: "/SGI-nube.png",
-    shortcut: "/SGI-nube.png",
-    apple: "/SGI-nube.png",
+    icon: "/icono4sinfondo.png",
+    shortcut: "/icono4sinfondo.png",
+    apple: "/icono4sinfondo.png",
   },
 }
 

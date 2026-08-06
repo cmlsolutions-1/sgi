@@ -200,13 +200,13 @@ export default function LoginPage() {
           <div className="w-full space-y-7 sm:space-y-8">
             <div className="flex justify-center lg:hidden">
               <div className="relative h-16 w-16 overflow-hidden rounded-2xl bg-white/70 shadow-lg shadow-sky-900/10">
-                <Image src="/icono4.png" alt="SafeCloud" fill priority className="object-cover" sizes="64px" />
+                <Image src="/icono4sinfondo.png" alt="SafeCloud" fill priority className="object-cover" sizes="64px" />
               </div>
             </div>
 
             <div className="flex justify-center">
               <Image
-                src="/logoCompleto.png"
+                src="/logoCompletoSinfondo.png"
                 alt="SafeCloud Sistema de Gestión Integral"
                 width={300}
                 height={96}

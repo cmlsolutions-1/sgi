@@ -124,7 +124,7 @@ export function Sidebar() {
       >
         <div className={cn("flex items-center gap-2", collapsed && "sr-only")}>
           <div className="relative h-10 w-10 overflow-hidden rounded-xl bg-white/5 shadow-sm">
-            <Image src="/icono3.png" alt="SafeCloud" fill priority className="object-cover" sizes="40px" />
+            <Image src="/icono3sinfondo.png" alt="SafeCloud" fill priority className="object-cover" sizes="40px" />
           </div>
           {!collapsed && (
             <span className="font-semibold text-sidebar-foreground">
@@ -312,7 +312,7 @@ export function MobileSidebar({
         <SheetHeader className="border-b border-sidebar-border px-4 py-4 text-left">
           <SheetTitle className="flex items-center gap-3 text-sidebar-foreground">
             <span className="relative h-10 w-10 overflow-hidden rounded-xl bg-white/5 shadow-sm">
-              <Image src="/icono3.png" alt="SafeCloud" fill priority className="object-cover" sizes="40px" />
+              <Image src="/icono4sinfondo.png" alt="SafeCloud" fill priority className="object-cover" sizes="40px" />
             </span>
             <span>SafeCloud</span>
           </SheetTitle>

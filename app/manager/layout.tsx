@@ -8,11 +8,11 @@ export const metadata: Metadata = {
   generator: "v0.app",
   icons: {
     icon: [
-      { url: "/SGI-nube.png", media: "(prefers-color-scheme: light)" },
-      { url: "/SGI-nube", media: "(prefers-color-scheme: dark)" },
-      { url: "/SGI-nube.png", type: "image/svg+xml" },
+      { url: "/icono4sinfondo.png", media: "(prefers-color-scheme: light)" },
+      { url: "/icono4sinfondo.png", media: "(prefers-color-scheme: dark)" },
+      { url: "/icono4sinfondo.png", type: "image/svg+xml" },
     ],
-    apple: "/SGI-nube.png",
+    apple: "/icono4sinfondo.png",
   },
 };
 
