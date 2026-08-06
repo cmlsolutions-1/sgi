@@ -174,8 +174,8 @@ export default function LoginPage() {
               <p className="text-xs uppercase tracking-[0.28em] text-cyan-200/80">Mejora</p>
               <p className="mt-1 text-sm font-medium text-white/90">Cumplimiento continuo</p>
             </div>
-            <div className="relative h-36 w-36 overflow-hidden rounded-[2.75rem] border border-white/10 bg-white/5 shadow-2xl shadow-cyan-500/20 xl:h-48 xl:w-48 xl:rounded-[3.25rem]">
-              <Image src="/icono4.png" alt="SafeCloud" fill priority className="object-cover" sizes="(min-width: 1280px) 192px, 144px" />
+            <div className="relative h-20 w-20 overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/5 shadow-2xl shadow-cyan-500/20 xl:h-30 xl:w-30 xl:rounded-[2.75rem]">
+              <Image src="/icono4.png" alt="SafeCloud" fill priority className="object-cover" sizes="(min-width: 1280px) 160px, 112px" />
               <div className="absolute inset-0 rounded-[3.25rem] ring-1 ring-inset ring-white/10" />
             </div>
           </div>

@@ -12,9 +12,14 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 // <CHANGE> Metadata actualizada para SGC
 export const metadata: Metadata = {
-  title: "SGC - Sistema de Gestión de Calidad",
-  description: "Dashboard administrativo para gestión de calidad ISO 9001",
-    generator: 'v0.app'
+  title: "SafeCloud",
+  description: "Sistema de Gestión Integral",
+  generator: "v0.app",
+  icons: {
+    icon: "/SGI-nube.png",
+    shortcut: "/SGI-nube.png",
+    apple: "/SGI-nube.png",
+  },
 }
 
 export default function RootLayout({
