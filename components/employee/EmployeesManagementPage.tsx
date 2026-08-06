@@ -1815,7 +1815,7 @@ export default function EmployeesPage() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Select value={workAreaFilter} onValueChange={setWorkAreaFilter}>
-                    <SelectTrigger className="w-[200px]">
+                    <SelectTrigger className="w-full sm:w-[200px]">
                       <Filter className="mr-2 h-4 w-4" />
                       <SelectValue placeholder="Area" />
                     </SelectTrigger>
@@ -1829,7 +1829,7 @@ export default function EmployeesPage() {
                     </SelectContent>
                   </Select>
                   <Select value={jobFilter} onValueChange={setJobFilter}>
-                    <SelectTrigger className="w-[200px]">
+                    <SelectTrigger className="w-full sm:w-[200px]">
                       <SelectValue placeholder="Puesto" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1842,7 +1842,7 @@ export default function EmployeesPage() {
                     </SelectContent>
                   </Select>
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-[140px]">
+                    <SelectTrigger className="w-full sm:w-[140px]">
                       <SelectValue placeholder="Estado" />
                     </SelectTrigger>
                     <SelectContent>
@@ -2064,9 +2064,9 @@ export default function EmployeesPage() {
                       </div>
                     </div>
 
-                    <div className="mt-4 flex items-center gap-2 border-t border-border pt-4">
-                      <Link href={`/dashboard/employees/${employee.id}`} className="flex-1">
-                        <Button variant="action" className="w-full gap-2">
+                    <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
+                      <Link href={`/dashboard/employees/${employee.id}`} className="min-w-[11rem] flex-1">
+                        <Button variant="action" size="sm" className="w-full gap-2">
                           <Eye className="h-4 w-4" />
                           Ver Hoja de Vida
                         </Button>
@@ -2075,7 +2075,7 @@ export default function EmployeesPage() {
                         employee={employee}
                         onSave={(payload) => handleUpdateEmployee(employee, payload)}
                         trigger={
-                          <Button variant="action" size="icon">
+                          <Button variant="action" size="icon" className="h-9 w-9 shrink-0">
                             <Edit className="h-4 w-4" />
                           </Button>
                         }
@@ -2084,12 +2084,13 @@ export default function EmployeesPage() {
                         <Button
                           variant="destructive"
                           size="icon"
+                          className="h-9 w-9 shrink-0"
                           onClick={() => handleDeleteEmployee(employee)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       ) : (
-                        <Button variant="outline" size="sm" onClick={() => handleActivateEmployee(employee)}>
+                        <Button variant="outline" size="sm" className="shrink-0" onClick={() => handleActivateEmployee(employee)}>
                           Activar
                         </Button>
                       )}

@@ -16,11 +16,11 @@ export default function DashboardLayout({
   return (
     <AuthGuard redirectAdminToManager>
     <SgiPreferencesProvider />
-    <div className="flex h-screen min-h-screen overflow-hidden bg-background">
+    <div className="flex h-svh min-h-svh overflow-hidden bg-background">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header />
-        <main className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-[var(--sgi-content-padding,1.5rem)]">
+        <main className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 lg:p-[var(--sgi-content-padding,1.5rem)]">
           <ModuleGuard>{children}</ModuleGuard>
         </main>
       </div>
@@ -28,4 +28,3 @@ export default function DashboardLayout({
     </AuthGuard>
   )
 }
-

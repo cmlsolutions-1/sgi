@@ -333,18 +333,20 @@ export default function RolesPage() {
               >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary">
                         <Shield className="h-5 w-5 text-primary-foreground" />
                       </div>
-                      <div>
-                        <h3 className="font-medium">{role.name}</h3>
+                      <div className="min-w-0">
+                        <h3 className="truncate font-medium">{role.name}</h3>
                         <p className="text-xs text-muted-foreground">
                           {normalizeRolePermissionIds(role, permissions).length} permisos
                         </p>
                       </div>
                     </div>
-                    <Badge variant={role.status === "ACTIVE" ? "accentActivd" : "destructive"}>{role.status}</Badge>
+                    <Badge className="shrink-0" variant={role.status === "ACTIVE" ? "accentActivd" : "destructive"}>
+                      {role.status}
+                    </Badge>
                   </div>
                 </CardContent>
               </Card>

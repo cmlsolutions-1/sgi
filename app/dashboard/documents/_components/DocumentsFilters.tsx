@@ -46,9 +46,9 @@ export default function DocumentsFilters({
             />
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:flex-wrap">
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="w-full lg:w-[150px]">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
@@ -63,7 +63,7 @@ export default function DocumentsFilters({
             </Select>
 
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="w-full lg:w-[150px]">
                 <SelectValue placeholder="Estado" />
               </SelectTrigger>
               <SelectContent>
@@ -76,7 +76,7 @@ export default function DocumentsFilters({
             </Select>
 
             <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:col-span-2 lg:w-[180px]">
                 <SelectValue placeholder="Departamento" />
               </SelectTrigger>
               <SelectContent>

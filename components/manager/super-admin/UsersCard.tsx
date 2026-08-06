@@ -74,7 +74,7 @@ export function UsersCard({
 
   return (
     <Card className="bg-card border-border shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <CardTitle className="text-foreground flex items-center gap-2">
             Usuarios {companyName ? `- ${companyName}` : ""}

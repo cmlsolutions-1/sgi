@@ -146,7 +146,7 @@ export default function PreventiveMeasureDetailPage() {
             {statusInfo?.badge}
           </Badge>
 
-          <div className="w-[200px]">
+          <div className="w-full sm:w-[200px]">
             <Select value={measure.status} onValueChange={(v) => onChangeStatus(v as PreventiveMeasure["status"])}>
               <SelectTrigger>
                 <SelectValue placeholder="Estado" />

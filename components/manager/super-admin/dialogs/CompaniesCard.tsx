@@ -36,7 +36,7 @@ export function CompaniesCard({
 }: Props) {
   return (
     <Card className="bg-card border-border shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <CardTitle className="text-foreground">Empresas</CardTitle>
           <CardDescription className="text-muted-foreground">Selecciona una empresa para gestionar usuarios</CardDescription>

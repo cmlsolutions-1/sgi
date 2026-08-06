@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Bell, CheckCheck, Loader2, LogOut, Search, Settings, UserCircle } from "lucide-react"
+import { Bell, CheckCheck, Loader2, LogOut, Menu, Search, Settings, UserCircle } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -29,6 +29,7 @@ import {
 } from "@/services/notificationService"
 import { getUserById } from "@/services/userService"
 import type { NotificationItem, NotificationReferenceType, NotificationType } from "@/types/manager/notification"
+import { MobileSidebar } from "@/components/dashboard/sidebar"
 
 const NOTIFICATION_REFRESH_INTERVAL_MS = 15_000
 
@@ -80,6 +81,7 @@ export function Header() {
   const [readingId, setReadingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
   const [currentUser, setCurrentUser] = useState<{ name: string; email?: string; roleLabel: string }>({
     name: "Usuario",
@@ -250,15 +252,28 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-6">
-      <div className="flex items-center gap-4 flex-1">
-        <div className="relative w-full max-w-md">
+    <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border bg-card px-3 sm:px-4 lg:px-6">
+      <MobileSidebar open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} />
+
+      <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="shrink-0 md:hidden"
+          onClick={() => setMobileMenuOpen(true)}
+          aria-label="Abrir menu"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+
+        <div className="relative hidden w-full max-w-md sm:block">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Buscar documentos, usuarios..." className="pl-10" />
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex shrink-0 items-center gap-1 sm:gap-3 lg:gap-4">
         <DropdownMenu open={open} onOpenChange={handleOpenChange}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative" aria-label="Notificaciones">
@@ -270,7 +285,7 @@ export function Header() {
               ) : null}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[min(92vw,380px)] p-0">
+          <DropdownMenuContent align="end" sideOffset={10} className="mr-3 w-[calc(100vw-4rem)] max-w-[360px] p-0 sm:mr-0 sm:w-[min(92vw,380px)] sm:max-w-[380px]">
             <div className="flex items-center justify-between gap-3 px-4 py-3">
               <DropdownMenuLabel className="p-0">Notificaciones</DropdownMenuLabel>
               <Button
