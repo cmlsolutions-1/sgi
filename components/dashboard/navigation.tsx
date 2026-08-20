@@ -118,6 +118,25 @@ export const navigation: NavigationItem[] = [
       },
     ],
   },
+  {
+    code: "COMMITTEE",
+    name: "Comités",
+    icon: UsersRound,
+    subItems: [
+      {
+        code: "COMMITTEE_MANAGEMENT",
+        name: "Gestión de Comités",
+        href: "/dashboard/committee-management",
+        icon: ClipboardCheck,
+      },
+      {
+        code: "MEETINGS",
+        name: "Reuniones",
+        href: "/dashboard/meetings",
+        icon: CalendarDays,
+      },
+    ],
+  },
 ]
 
 function collectModuleCodes(modules: ModuleNode[]): Set<string> {
