@@ -103,6 +103,12 @@ export const navigation: NavigationItem[] = [
         href: "/dashboard/preventiveMeasures",
         icon: ShieldCheck,
       },
+      {
+        code: "PREVENTIVE_MAINTENANCE",
+        name: "Mantenimiento Preventivo",
+        href: "/dashboard/preventive-maintenance",
+        icon: ClipboardCheck,
+      },
     ],
   },
   {
@@ -134,6 +140,25 @@ export const navigation: NavigationItem[] = [
         name: "Reuniones",
         href: "/dashboard/meetings",
         icon: CalendarDays,
+      },
+    ],
+  },
+  {
+    code: "EMERGENCY_PLAN",
+    name: "Plan de Emergencias",
+    icon: TriangleAlert,
+    subItems: [
+      {
+        code: "EMERGENCY_MANAGEMENT",
+        name: "Gestión de Emergencias",
+        href: "/dashboard/emergency-management",
+        icon: ClipboardCheck,
+      },
+      {
+        code: "EMERGENCY_BRIGADE",
+        name: "Brigada de Emergencias",
+        href: "/dashboard/emergency-brigades",
+        icon: UsersRound,
       },
     ],
   },
