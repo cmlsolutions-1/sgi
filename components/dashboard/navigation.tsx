@@ -16,6 +16,7 @@ import {
   ShieldPlus,
   UsersRound,
   ClipboardCheck,
+  Fingerprint,
 } from "lucide-react"
 import type { ModuleNode } from "@/store/auth.store"
 
@@ -68,6 +69,7 @@ export const navigation: NavigationItem[] = [
       { code: "JOBS", name: "Puestos de trabajo", href: "/dashboard/jobs", icon: BriefcaseBusiness },
       { code: "EMPLOYEE_MANAGEMENT", name: "Gestión Empleados", href: "/dashboard/employees", icon: UserCircle },
       { code: "INCIDENTS", name: "Novedades Laborales", href: "/dashboard/incidents", icon: TriangleAlert },
+      { code: "DATA_AUTHORIZATIONS", name: "Tratamiento de Datos", href: "/dashboard/data-processing", icon: Fingerprint},
     ],
   },
   {
@@ -145,7 +147,7 @@ export const navigation: NavigationItem[] = [
   },
   {
     code: "EMERGENCY_PLAN",
-    name: "Plan de Emergencias",
+    name: "Plan Emergencias",
     icon: TriangleAlert,
     subItems: [
       {
@@ -162,6 +164,19 @@ export const navigation: NavigationItem[] = [
       },
     ],
   },
+  /* {
+    code: "DATA_PROCESSING",
+    name: "Tratamiento de Datos",
+    icon: Fingerprint,
+    subItems: [
+      {
+        code: "DATA_AUTHORIZATIONS",
+        name: "Autorizaciones",
+        href: "/dashboard/data-processing",
+        icon: Fingerprint,
+      },
+    ],
+  }, */
 ]
 
 function collectModuleCodes(modules: ModuleNode[]): Set<string> {
@@ -180,11 +195,19 @@ function collectModuleCodes(modules: ModuleNode[]): Set<string> {
   return codes
 }
 
-const alwaysVisibleCodes = new Set<string>()
+const alwaysVisibleCodes = new Set<string>(["DATA_PROCESSING", "DATA_AUTHORIZATIONS"])
 
 const moduleCodeAliases: Record<string, string[]> = {
   DOCUMENTS: ["DOCUMENTS", "DOCUMENT", "DOCUMENT_MANAGEMENT", "DOCUMENTAL_MANAGEMENT"],
   INCIDENTS: ["INCIDENTS", "LABOR"],
+  DATA_PROCESSING: ["DATA_PROCESSING", "DATA_CONSENT", "PERSONAL_DATA", "PERSONAL_DATA_PROCESSING"],
+  DATA_AUTHORIZATIONS: [
+    "DATA_AUTHORIZATIONS",
+    "DATA_PROCESSING",
+    "DATA_CONSENT",
+    "PERSONAL_DATA",
+    "PERSONAL_DATA_AUTHORIZATIONS",
+  ],
 }
 
 function isCodeAllowed(code: string, allowedCodes: Set<string>) {

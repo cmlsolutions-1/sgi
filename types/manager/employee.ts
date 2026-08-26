@@ -21,6 +21,14 @@ export type EmployeeArlRiskLevel = "RIESGO_I" | "RIESGO_II" | "RIESGO_III" | "RI
 export type EmployeeGender = "MASCULINO" | "FEMENINO"
 export type EmployeeContractType = "INDEFINIDO" | "FIJO" | "SERVICIOS"
 export type EmployeeDocumentType = "CC" | "TI" | "RC" | "CE" | "PP"
+export type EmployeeDataAuthorizationStatus =
+  | "PENDING"
+  | "SENT"
+  | "ACCEPTED"
+  | "REJECTED"
+  | "REVOKED"
+  | "REQUIRES_REACCEPTANCE"
+  | "EXPIRED"
 
 export type Employee = {
   id: string
@@ -59,6 +67,8 @@ export type Employee = {
   startDateCompensation?: string | null
   endDateCompensation?: string | null
   statusCompensation?: boolean | null
+  dataAuthorizationStatus?: EmployeeDataAuthorizationStatus | null
+  dataAuthorizationAcceptedAt?: string | null
   status: boolean
 }
 
