@@ -1,19 +1,13 @@
-import jsPDF from "jspdf"
-
+import { apiFetch } from "@/lib/apiClient"
+import { listEmployees } from "@/services/employeeService"
+import type { Employee } from "@/types/manager/employee"
 import type {
-  ConsentAuditLog,
   DataAuthorizationStatus,
-  DataConsentAuditEvent,
-  DataConsentEmployee,
   DataConsentSummary,
   EmployeeDataConsent,
   PublicConsentVerification,
   PublicDataConsent,
 } from "@/types/manager/data-processing"
-
-const STORAGE_KEY = "safecloud_data_processing_mock_v1"
-const DEFAULT_VALIDITY_DAYS = 7
-export const DEMO_CONSENT_TOKEN = "demo-autorizacion-safecloud"
 
 export const dataAuthorizationStatusLabels: Record<DataAuthorizationStatus, string> = {
   PENDING: "Pendiente",
@@ -36,203 +30,227 @@ export const dataAuthorizationStatusOptions: Array<{ value: DataAuthorizationSta
   { value: "REQUIRES_REACCEPTANCE", label: "Requieren nueva aceptación" },
 ]
 
-function nowIso() {
-  return new Date().toISOString()
+type ApiErrorResponse = {
+  ok?: boolean
+  message?: string
+  errors?: Array<{ message?: string }>
+  data?: unknown
 }
 
-function addDaysIso(days: number) {
-  const date = new Date()
-  date.setDate(date.getDate() + days)
-  return date.toISOString()
+type ApiResponse<T> = {
+  ok: boolean
+  message: string
+  data: T
+  errors: null | Array<{ message?: string }>
 }
 
-function createId(prefix: string) {
-  const value =
-    typeof crypto !== "undefined" && "randomUUID" in crypto
-      ? crypto.randomUUID()
-      : Math.random().toString(36).slice(2) + Date.now().toString(36)
-
-  return `${prefix}_${value}`
+type GenerateConsentLinkResponse = {
+  employeeId: string
+  linkId: string
+  url: string
+  expiresAt: string
+  consentVersion: string
+  status: "PENDING"
 }
 
-function maskDocument(documentNumber: string) {
-  const clean = documentNumber.replace(/\D/g, "")
+type EmployeeDataConsentStatusResponse = {
+  employeeId: string
+  status: "PENDING" | "ACCEPTED"
+  acceptedAt: string | null
+  authorizationId: string | null
+  consentVersion: string | null
+  evidenceHash: string | null
+  certificateAvailable: boolean
+}
+
+type PublicConsentContextResponse = {
+  employeeId: string
+  companyName: string
+  employeeFullName: string
+  maskedDocumentNumber: string
+  consentVersion: string
+  consentTitle: string
+  consentText: string
+  linkExpiresAt: string
+}
+
+type VerifiedConsentIdentityResponse = PublicConsentContextResponse & {
+  verificationToken: string
+  verificationExpiresAt: string
+}
+
+type AcceptDataConsentResponse = {
+  authorizationId: string
+  employeeId: string
+  status: "ACCEPTED"
+  acceptedAt: string
+  consentVersion: string
+  evidenceHash: string
+  certificateAvailable: boolean
+}
+
+export type ConsentEvidenceType = "SIGNATURE" | "CERTIFICATE"
+
+function getErrorMessage(json: ApiErrorResponse | null, fallbackMsg: string) {
+  const detail = json?.errors?.find((error) => error.message)?.message
+  const message = detail ?? json?.message ?? fallbackMsg
+
+  if (message.includes("DATA_CONSENT_TEXT")) {
+    return "No se pudo generar el enlace porque el backend no tiene configurado el texto de autorización de tratamiento de datos. Configura DATA_CONSENT_TEXT y vuelve a intentarlo."
+  }
+
+  return message
+}
+
+async function parseJsonOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
+  const json = (await res.json().catch(() => null)) as ApiResponse<T> | ApiErrorResponse | null
+
+  if (!res.ok || json?.ok === false || !json || !("data" in json)) {
+    throw new Error(getErrorMessage(json, fallbackMsg))
+  }
+
+  return json.data as T
+}
+
+async function parseFileOrThrow(res: Response, fallbackMsg: string): Promise<{ blob: Blob; filename: string }> {
+  if (!res.ok) {
+    const json = (await res.json().catch(() => null)) as ApiErrorResponse | null
+    throw new Error(getErrorMessage(json, fallbackMsg))
+  }
+
+  const disposition = res.headers.get("content-disposition") ?? ""
+  const filename = disposition.match(/filename="?([^"]+)"?/i)?.[1]
+
+  return {
+    blob: await res.blob(),
+    filename: filename ? decodeURIComponent(filename) : "constancia-tratamiento-datos.pdf",
+  }
+}
+
+function maskDocument(documentNumber?: string | null) {
+  const clean = String(documentNumber ?? "").replace(/\D/g, "")
+  if (!clean) return "No registrado"
   if (clean.length <= 4) return "****"
   return `${"*".repeat(Math.max(clean.length - 4, 4))}${clean.slice(-4)}`
 }
 
-function protectName(name: string, lastName: string) {
-  const first = name.trim().charAt(0).toUpperCase()
-  const second = lastName.trim().charAt(0).toUpperCase()
-  return `${first || "T"}.${second || "D"}.`
+function getEmployeeConsentStatus(employee: Employee): DataAuthorizationStatus {
+  const status = employee.dataConsentStatus ?? employee.dataAuthorizationStatus
+  return status === "ACCEPTED" ? "ACCEPTED" : "PENDING"
 }
 
-async function sha256(value: string) {
-  if (typeof crypto !== "undefined" && crypto.subtle) {
-    const data = new TextEncoder().encode(value)
-    const digest = await crypto.subtle.digest("SHA-256", data)
-    return Array.from(new Uint8Array(digest))
-      .map((byte) => byte.toString(16).padStart(2, "0"))
-      .join("")
-  }
-
-  let hash = 0
-  for (let index = 0; index < value.length; index += 1) {
-    hash = (hash << 5) - hash + value.charCodeAt(index)
-    hash |= 0
-  }
-  return `mock-${Math.abs(hash).toString(16)}`
+function getEmployeeConsentAcceptedAt(employee: Employee) {
+  return employee.dataConsentAcceptedAt ?? employee.dataAuthorizationAcceptedAt ?? null
 }
 
-function createAudit(event: DataConsentAuditEvent, actor: ConsentAuditLog["actor"], metadata = {}) {
-  return {
-    id: createId("audit"),
-    event,
-    actor,
-    metadata,
-    timestamp: nowIso(),
-  } satisfies ConsentAuditLog
-}
-
-const template = {
-  id: "tpl_safecloud_1",
-  companyId: null,
-  title: "Autorización para el Tratamiento de Datos Personales",
-  version: "1.0",
-  effectiveDate: "2026-08-26",
-  status: "ACTIVE" as const,
-  createdAt: "2026-08-26T00:00:00.000Z",
-  updatedAt: "2026-08-26T00:00:00.000Z",
-  content:
-    "Autorizo de manera libre, previa, expresa e informada a SafeCloud - Sistema de Gestión Integral y a la empresa vinculada para recolectar, almacenar, usar, circular, actualizar y tratar mis datos personales con la finalidad de gestionar mi vinculación laboral, cumplir obligaciones legales, documentar actividades del SGI, administrar información de seguridad y salud en el trabajo, emitir soportes, conservar evidencias y atender procesos internos autorizados. Declaro que conozco mis derechos como titular de datos personales, incluyendo consultar, actualizar, rectificar, solicitar prueba de la autorización, revocar la autorización cuando sea procedente y presentar reclamos ante la autoridad competente. Esta autorización no constituye una firma digital certificada; corresponde a una firma electrónica manuscrita acompañada de validación de identidad, trazabilidad y evidencia electrónica.",
-}
-
-function createEmployee(
-  id: string,
-  name: string,
-  lastName: string,
-  documentNumber: string,
-  birthDate: string,
-  status: DataAuthorizationStatus,
-): DataConsentEmployee {
-  return {
-    id,
-    companyId: "company_safecloud_demo",
-    companyName: "Alfonsilla S.A.S.",
-    name,
-    lastName,
-    documentType: "CC",
-    documentNumber,
-    documentNumberMasked: maskDocument(documentNumber),
-    birthDate,
-    email: `${name.toLowerCase().replace(/\s/g, ".")}@empresa.com`,
-    phone: "3211234567",
-    dataAuthorizationStatus: status,
-    dataAuthorizationAcceptedAt: status === "ACCEPTED" ? "2026-08-20T14:30:00.000Z" : null,
-  }
-}
-
-function createConsent(employee: DataConsentEmployee, status: DataAuthorizationStatus, token?: string): EmployeeDataConsent {
-  const sentAt = status === "SENT" || status === "EXPIRED" ? "2026-08-22T13:00:00.000Z" : null
-  const expiresAt = status === "EXPIRED" ? "2026-08-23T13:00:00.000Z" : status === "SENT" ? addDaysIso(2) : null
-  const acceptedAt = status === "ACCEPTED" ? employee.dataAuthorizationAcceptedAt ?? "2026-08-20T14:30:00.000Z" : null
-  const verificationCode = status === "ACCEPTED" ? "SC-AUT-2026-0001" : null
+function toEmployeeDataConsent(
+  employee: Employee,
+  statusDetail?: EmployeeDataConsentStatusResponse | null,
+  link?: GenerateConsentLinkResponse | null,
+): EmployeeDataConsent {
+  const status = (statusDetail?.status ?? getEmployeeConsentStatus(employee)) as DataAuthorizationStatus
+  const acceptedAt = statusDetail?.acceptedAt ?? getEmployeeConsentAcceptedAt(employee)
+  const version = statusDetail?.consentVersion ?? link?.consentVersion ?? "Pendiente"
 
   return {
-    id: createId("consent"),
+    id: statusDetail?.authorizationId ?? employee.id,
     companyId: employee.companyId,
     employeeId: employee.id,
-    employee,
-    templateId: template.id,
-    template,
-    templateVersion: template.version,
+    employee: {
+      id: employee.id,
+      companyId: employee.companyId,
+      companyName: "Empresa actual",
+      name: employee.name,
+      lastName: employee.lastName,
+      documentType: String(employee.documentType ?? ""),
+      documentNumber: String(employee.documentNumber ?? ""),
+      documentNumberMasked: maskDocument(employee.documentNumber),
+      birthDate: employee.birthDate,
+      email: employee.email,
+      phone: employee.phone,
+      dataAuthorizationStatus: status,
+      dataAuthorizationAcceptedAt: acceptedAt,
+    },
+    templateId: version,
+    template: {
+      id: version,
+      companyId: employee.companyId,
+      title: "Autorización para el Tratamiento de Datos Personales",
+      version,
+      content: "El texto exacto aceptado queda custodiado por backend y se consulta desde el enlace público.",
+      effectiveDate: "",
+      status: "ACTIVE",
+      createdAt: "",
+      updatedAt: "",
+    },
+    templateVersion: version,
     status,
-    token: token ?? null,
-    publicUrl: token ? `/autorizacion/${token}` : null,
-    sentAt,
-    expiresAt,
+    token: null,
+    publicUrl: link?.url ?? null,
+    sentAt: link ? new Date().toISOString() : null,
+    expiresAt: link?.expiresAt ?? null,
     acceptedAt,
-    rejectedAt: status === "REJECTED" ? "2026-08-21T11:10:00.000Z" : null,
-    revokedAt: status === "REVOKED" ? "2026-08-21T15:00:00.000Z" : null,
+    rejectedAt: null,
+    revokedAt: null,
     verificationMethod: acceptedAt ? "DOCUMENT_AND_BIRTH_DATE" : null,
-    signatureFileId: acceptedAt ? "file_signature_demo" : null,
-    documentNumberMasked: employee.documentNumberMasked,
+    signatureFileId: null,
+    documentNumberMasked: maskDocument(employee.documentNumber),
     birthDateVerified: Boolean(acceptedAt),
-    ipAddress: acceptedAt ? "181.***.***.24" : null,
-    userAgent: acceptedAt ? "Mozilla/5.0" : null,
-    browser: acceptedAt ? "Chrome" : null,
-    operatingSystem: acceptedAt ? "Android" : null,
-    deviceType: acceptedAt ? "Mobile" : null,
-    consentTextHash: acceptedAt ? "sha256-demo-template-1" : null,
-    evidenceHash: acceptedAt ? "sha256-demo-evidence-1" : null,
-    verificationCode,
+    ipAddress: null,
+    userAgent: null,
+    browser: null,
+    operatingSystem: null,
+    deviceType: null,
+    consentTextHash: null,
+    evidenceHash: statusDetail?.evidenceHash ?? null,
+    verificationCode: statusDetail?.authorizationId ?? null,
     attempts: 0,
     blockedUntil: null,
-    auditLogs: [
-      createAudit(status === "PENDING" ? "REACCEPTANCE_REQUIRED" : "CONSENT_LINK_CREATED", "SYSTEM", {
-        status,
-      }),
-    ],
-    createdAt: "2026-08-20T12:00:00.000Z",
-    updatedAt: nowIso(),
+    auditLogs: [],
+    createdAt: "",
+    updatedAt: "",
   }
 }
 
-function initialConsents() {
-  const employees = [
-    createEmployee("emp_1", "Mona", "Pelona", "1020304050", "1994-05-16", "SENT"),
-    createEmployee("emp_2", "Carlos", "Rodríguez", "80123456", "1988-02-11", "ACCEPTED"),
-    createEmployee("emp_3", "Luisa", "Fernández", "1098765432", "1999-09-08", "PENDING"),
-    createEmployee("emp_4", "Andrés", "Morales", "1144556677", "1991-01-20", "EXPIRED"),
-    createEmployee("emp_5", "Paola", "Gómez", "55667788", "1985-07-12", "REQUIRES_REACCEPTANCE"),
-  ]
-
-  return [
-    createConsent(employees[0], "SENT", DEMO_CONSENT_TOKEN),
-    createConsent(employees[1], "ACCEPTED"),
-    createConsent(employees[2], "PENDING"),
-    createConsent(employees[3], "EXPIRED", "enlace-vencido-demo"),
-    createConsent(employees[4], "REQUIRES_REACCEPTANCE"),
-  ]
-}
-
-function readConsents() {
-  if (typeof window === "undefined") return initialConsents()
-
-  const raw = window.localStorage.getItem(STORAGE_KEY)
-  if (!raw) {
-    const records = initialConsents()
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(records))
-    return records
-  }
-
-  try {
-    return JSON.parse(raw) as EmployeeDataConsent[]
-  } catch {
-    const records = initialConsents()
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(records))
-    return records
+function toPublicConsent(data: PublicConsentContextResponse | VerifiedConsentIdentityResponse): PublicDataConsent {
+  return {
+    id: data.employeeId,
+    companyName: data.companyName,
+    employeeName: data.employeeFullName,
+    documentType: "",
+    documentNumberMasked: data.maskedDocumentNumber,
+    templateTitle: data.consentTitle,
+    templateVersion: data.consentVersion,
+    templateContent: data.consentText,
+    status: "PENDING",
+    expiresAt: data.linkExpiresAt,
+    verificationToken: "verificationToken" in data ? data.verificationToken : undefined,
+    verificationExpiresAt: "verificationExpiresAt" in data ? data.verificationExpiresAt : undefined,
   }
 }
 
-function writeConsents(consents: EmployeeDataConsent[]) {
-  if (typeof window === "undefined") return
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(consents))
-}
-
-function updateConsent(id: string, updater: (consent: EmployeeDataConsent) => EmployeeDataConsent) {
-  const consents = readConsents()
-  const updated = consents.map((consent) => (consent.id === id ? updater(consent) : consent))
-  writeConsents(updated)
-  return updated.find((consent) => consent.id === id) ?? null
+async function getEmployeeConsentStatusDetail(employeeId: string) {
+  const res = await apiFetch(`/api/employee-data-consents/${employeeId}`, { method: "GET" })
+  return parseJsonOrThrow<EmployeeDataConsentStatusResponse>(res, "No se pudo consultar el estado de autorización")
 }
 
 export async function listDataConsentAuthorizations() {
-  return readConsents()
+  const employees = await listEmployees()
+
+  return Promise.all(
+    employees.map(async (employee) => {
+      try {
+        const statusDetail = await getEmployeeConsentStatusDetail(employee.id)
+        return toEmployeeDataConsent(employee, statusDetail)
+      } catch {
+        return toEmployeeDataConsent(employee)
+      }
+    }),
+  )
 }
 
 export async function getDataConsentSummary(): Promise<DataConsentSummary> {
-  const consents = readConsents()
+  const consents = await listDataConsentAuthorizations()
 
   return {
     totalEmployees: consents.length,
@@ -243,276 +261,370 @@ export async function getDataConsentSummary(): Promise<DataConsentSummary> {
   }
 }
 
-export async function generateDataConsentLink(consentId: string) {
-  const token = createId("consent_token").replace(/_/g, "-")
-  return updateConsent(consentId, (consent) => ({
-    ...consent,
-    status: "SENT",
-    token,
-    publicUrl: `/autorizacion/${token}`,
-    sentAt: nowIso(),
-    expiresAt: addDaysIso(DEFAULT_VALIDITY_DAYS),
-    attempts: 0,
-    blockedUntil: null,
-    updatedAt: nowIso(),
-    auditLogs: [createAudit("CONSENT_LINK_CREATED", "ADMIN", { validityDays: DEFAULT_VALIDITY_DAYS }), ...consent.auditLogs],
-  }))
-}
+export async function generateDataConsentLink(employeeId: string) {
+  const res = await apiFetch(`/api/employee-data-consents/${employeeId}/link`, { method: "POST" })
+  const link = await parseJsonOrThrow<GenerateConsentLinkResponse>(res, "No se pudo generar el enlace de autorización")
+  const employee = (await listEmployees()).find((item) => item.id === employeeId)
 
-export async function regenerateDataConsentLink(consentId: string) {
-  return generateDataConsentLink(consentId)
-}
-
-export async function invalidateDataConsentLink(consentId: string) {
-  return updateConsent(consentId, (consent) => ({
-    ...consent,
-    status: "EXPIRED",
-    token: null,
-    publicUrl: null,
-    expiresAt: nowIso(),
-    updatedAt: nowIso(),
-    auditLogs: [createAudit("CONSENT_LINK_EXPIRED", "ADMIN"), ...consent.auditLogs],
-  }))
-}
-
-export async function requestDataConsentReacceptance(consentId: string) {
-  return updateConsent(consentId, (consent) => ({
-    ...consent,
-    status: "REQUIRES_REACCEPTANCE",
-    token: null,
-    publicUrl: null,
-    acceptedAt: null,
-    employee: {
-      ...consent.employee,
-      dataAuthorizationStatus: "REQUIRES_REACCEPTANCE",
-      dataAuthorizationAcceptedAt: null,
-    },
-    updatedAt: nowIso(),
-    auditLogs: [createAudit("REACCEPTANCE_REQUIRED", "ADMIN", { templateVersion: template.version }), ...consent.auditLogs],
-  }))
-}
-
-export async function getPublicDataConsent(token: string): Promise<PublicDataConsent | null> {
-  const consents = readConsents()
-  const consent = consents.find((item) => item.token === token)
-  if (!consent) return null
-
-  if (consent.expiresAt && new Date(consent.expiresAt).getTime() < Date.now() && consent.status !== "ACCEPTED") {
-    invalidateDataConsentLink(consent.id)
+  if (!employee) {
     return {
-      id: consent.id,
-      companyName: consent.employee.companyName,
-      employeeName: `${consent.employee.name} ${consent.employee.lastName}`,
-      documentType: consent.employee.documentType,
-      documentNumberMasked: consent.documentNumberMasked,
-      templateTitle: consent.template.title,
-      templateVersion: consent.templateVersion,
-      status: "EXPIRED",
-      expiresAt: consent.expiresAt,
-    }
+      publicUrl: link.url,
+      employeeId: link.employeeId,
+    } as EmployeeDataConsent
   }
 
-  updateConsent(consent.id, (current) => ({
-    ...current,
-    auditLogs: [createAudit("CONSENT_LINK_OPENED", "EMPLOYEE"), ...current.auditLogs],
-  }))
-
-  return {
-    id: consent.id,
-    companyName: consent.employee.companyName,
-    employeeName: `${consent.employee.name} ${consent.employee.lastName}`,
-    documentType: consent.employee.documentType,
-    documentNumberMasked: consent.documentNumberMasked,
-    templateTitle: consent.template.title,
-    templateVersion: consent.templateVersion,
-    status: consent.status,
-    expiresAt: consent.expiresAt,
-  }
+  return toEmployeeDataConsent(employee, null, link)
 }
 
-export async function verifyDataConsentIdentity(token: string, documentNumber: string, birthDate: string) {
-  const consents = readConsents()
-  const consent = consents.find((item) => item.token === token)
+export async function regenerateDataConsentLink(employeeId: string) {
+  return generateDataConsentLink(employeeId)
+}
 
-  if (!consent) return { ok: false, blocked: false, message: "Enlace no válido o vencido." }
-  if (consent.blockedUntil && new Date(consent.blockedUntil).getTime() > Date.now()) {
-    return { ok: false, blocked: true, message: "El enlace se encuentra bloqueado temporalmente. Intenta más tarde." }
-  }
+export async function invalidateDataConsentLink() {
+  throw new Error("El backend aún no expone endpoint para invalidar enlaces.")
+}
 
-  const matches =
-    consent.employee.documentNumber.replace(/\D/g, "") === documentNumber.replace(/\D/g, "") &&
-    consent.employee.birthDate === birthDate
+export async function requestDataConsentReacceptance() {
+  throw new Error("El backend aún no expone endpoint para solicitar nueva aceptación.")
+}
 
-  if (!matches) {
-    const attempts = consent.attempts + 1
-    const blockedDate = attempts >= 5 ? new Date(Date.now() + 15 * 60 * 1000).toISOString() : null
-    updateConsent(consent.id, (current) => ({
-      ...current,
-      attempts,
-      blockedUntil: blockedDate,
-      auditLogs: [
-        createAudit("IDENTITY_VERIFICATION_FAILED", "EMPLOYEE", {
-          attempts,
-          blocked: Boolean(blockedDate),
-        }),
-        ...current.auditLogs,
-      ],
-    }))
+export async function getPublicDataConsent(employeeId: string, token: string): Promise<PublicDataConsent | null> {
+  if (!employeeId || !token) return null
 
+  const res = await fetch(`/api/public/data-consents/${employeeId}?token=${encodeURIComponent(token)}`, {
+    method: "GET",
+    referrerPolicy: "no-referrer",
+  })
+  const data = await parseJsonOrThrow<PublicConsentContextResponse>(res, "Enlace no válido o vencido")
+  return toPublicConsent(data)
+}
+
+export async function verifyDataConsentIdentity(employeeId: string, token: string, documentNumber: string, birthDate: string) {
+  const res = await fetch(`/api/public/data-consents/${employeeId}/verify-identity?token=${encodeURIComponent(token)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    referrerPolicy: "no-referrer",
+    body: JSON.stringify({ documentNumber, birthDate }),
+  })
+
+  if (!res.ok) {
+    const json = (await res.json().catch(() => null)) as ApiErrorResponse | null
     return {
       ok: false,
-      blocked: Boolean(blockedDate),
-      message: "Los datos ingresados no coinciden con la información registrada. Verifica la información e intenta nuevamente.",
+      blocked: res.status === 410 || res.status === 429,
+      message:
+        res.status === 401
+          ? "Los datos ingresados no coinciden con la información registrada. Verifica la información e intenta nuevamente."
+          : getErrorMessage(json, "No se pudo validar la identidad"),
     }
   }
 
-  const updated = updateConsent(consent.id, (current) => ({
-    ...current,
-    birthDateVerified: true,
-    verificationMethod: "DOCUMENT_AND_BIRTH_DATE",
-    attempts: 0,
-    blockedUntil: null,
-    auditLogs: [createAudit("IDENTITY_VERIFIED", "EMPLOYEE"), ...current.auditLogs],
-  }))
-
+  const data = await parseJsonOrThrow<VerifiedConsentIdentityResponse>(res, "No se pudo validar la identidad")
   return {
     ok: true,
     blocked: false,
-    consent: updated,
-    publicConsent: {
-      id: consent.id,
-      companyName: consent.employee.companyName,
-      employeeName: `${consent.employee.name} ${consent.employee.lastName}`,
-      documentType: consent.employee.documentType,
-      documentNumberMasked: consent.documentNumberMasked,
-      templateTitle: consent.template.title,
-      templateVersion: consent.templateVersion,
-      templateContent: consent.template.content,
-      status: consent.status,
-      expiresAt: consent.expiresAt,
-    } satisfies PublicDataConsent,
+    publicConsent: toPublicConsent(data),
+    verificationToken: data.verificationToken,
+    verificationExpiresAt: data.verificationExpiresAt,
   }
 }
 
-export async function acceptDataConsent(token: string, signatureDataUrl: string, idempotencyKey: string) {
-  const consents = readConsents()
-  const consent = consents.find((item) => item.token === token)
-  if (!consent) throw new Error("Enlace no válido o vencido.")
-
-  if (consent.status === "ACCEPTED") return consent
-  if (!signatureDataUrl.startsWith("data:image/png")) throw new Error("La firma del titular es obligatoria.")
-
-  const acceptedAt = nowIso()
-  const signatureFileId = createId("signature_file")
-  const verificationCode = `SC-AUT-${new Date().getFullYear()}-${Math.floor(Math.random() * 900000 + 100000)}`
-  const consentTextHash = await sha256(consent.template.content)
-  const evidenceHash = await sha256(
-    [
-      consent.employeeId,
-      consent.companyId,
-      consent.templateVersion,
-      consentTextHash,
-      acceptedAt,
-      signatureFileId,
-      consent.id,
-      idempotencyKey,
-    ].join("|"),
-  )
-
-  const updated = updateConsent(consent.id, (current) => ({
-    ...current,
-    status: "ACCEPTED",
-    token: null,
-    publicUrl: null,
-    acceptedAt,
-    verificationMethod: "DOCUMENT_AND_BIRTH_DATE",
-    signatureFileId,
-    documentNumberMasked: current.employee.documentNumberMasked,
-    birthDateVerified: true,
-    userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "No disponible",
-    browser: "Detectado por backend",
-    operatingSystem: "Detectado por backend",
-    deviceType: typeof navigator !== "undefined" && /Mobi|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
-    consentTextHash,
-    evidenceHash,
-    verificationCode,
-    updatedAt: acceptedAt,
-    employee: {
-      ...current.employee,
-      dataAuthorizationStatus: "ACCEPTED",
-      dataAuthorizationAcceptedAt: acceptedAt,
-    },
-    auditLogs: [
-      createAudit("CONSENT_ACCEPTED", "EMPLOYEE", {
-        verificationCode,
-        templateVersion: current.templateVersion,
-      }),
-      createAudit("CONSENT_PDF_GENERATED", "SYSTEM", { verificationCode }),
-      ...current.auditLogs,
-    ],
-  }))
-
-  return updated
+async function canvasDataUrlToBlob(dataUrl: string): Promise<Blob> {
+  const response = await fetch(dataUrl)
+  return response.blob()
 }
 
-export async function getPublicConsentVerification(verificationCode: string): Promise<PublicConsentVerification | null> {
-  const consent = readConsents().find((item) => item.verificationCode === verificationCode)
-  if (!consent || !consent.acceptedAt) return null
+export async function acceptDataConsent(input: {
+  employeeId: string
+  token: string
+  verificationToken: string
+  consentVersion: string
+  signatureDataUrl: string
+}) {
+  const signature = await canvasDataUrlToBlob(input.signatureDataUrl)
+  const formData = new FormData()
+  formData.append("signature", signature, "signature.png")
+  formData.append("token", input.token)
+  formData.append("verificationToken", input.verificationToken)
+  formData.append("consentVersion", input.consentVersion)
+  formData.append("accepted", "true")
+
+  const res = await fetch(`/api/public/data-consents/${input.employeeId}/accept`, {
+    method: "POST",
+    body: formData,
+    referrerPolicy: "no-referrer",
+  })
+  const data = await parseJsonOrThrow<AcceptDataConsentResponse>(res, "No se pudo registrar la autorización")
 
   return {
-    valid: true,
-    companyName: consent.employee.companyName,
-    protectedEmployeeName: protectName(consent.employee.name, consent.employee.lastName),
-    acceptedAt: consent.acceptedAt,
-    templateVersion: consent.templateVersion,
-    status: consent.status,
-    verificationCode,
+    id: data.authorizationId,
+    companyId: "",
+    employeeId: data.employeeId,
+    employee: {
+      id: data.employeeId,
+      companyId: "",
+      companyName: "",
+      name: "",
+      lastName: "",
+      documentType: "",
+      documentNumber: "",
+      documentNumberMasked: "",
+      birthDate: "",
+      email: "",
+      phone: "",
+      dataAuthorizationStatus: "ACCEPTED",
+      dataAuthorizationAcceptedAt: data.acceptedAt,
+    },
+    templateId: data.consentVersion,
+    template: {
+      id: data.consentVersion,
+      title: "Autorización para el Tratamiento de Datos Personales",
+      version: data.consentVersion,
+      content: "",
+      effectiveDate: "",
+      status: "ACTIVE",
+      createdAt: "",
+      updatedAt: "",
+    },
+    templateVersion: data.consentVersion,
+    status: data.status,
+    acceptedAt: data.acceptedAt,
+    evidenceHash: data.evidenceHash,
+    certificateAvailable: data.certificateAvailable,
+    verificationCode: data.authorizationId,
+    documentNumberMasked: "",
+    attempts: 0,
+    auditLogs: [],
+    createdAt: "",
+    updatedAt: "",
+  } satisfies EmployeeDataConsent & { certificateAvailable: boolean }
+}
+
+export async function downloadConsentEvidence(employeeId: string, evidenceType: ConsentEvidenceType) {
+  const res = await apiFetch(`/api/employee-data-consents/${employeeId}/evidence/${evidenceType}`, { method: "GET" })
+  return parseFileOrThrow(
+    res,
+    evidenceType === "CERTIFICATE" ? "No se pudo descargar la constancia" : "No se pudo descargar la firma",
+  )
+}
+
+function formatCertificateDateTime(value?: string | null) {
+  if (!value) return "No registrada"
+  return new Date(value).toLocaleString("es-CO", {
+    timeZone: "America/Bogota",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+}
+
+function formatCertificateDate(value?: string | null) {
+  if (!value) return "No registrada"
+  return new Date(value).toLocaleDateString("es-CO", {
+    timeZone: "America/Bogota",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  })
+}
+
+function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(new Error("No se pudo preparar la imagen para la constancia"))
+    reader.readAsDataURL(blob)
+  })
+}
+
+async function loadPublicImageDataUrl(path: string) {
+  const res = await fetch(path)
+  if (!res.ok) return null
+  return blobToDataUrl(await res.blob())
+}
+
+function certificateFilename(consent: EmployeeDataConsent) {
+  const employeeName = `${consent.employee.name} ${consent.employee.lastName}`
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+
+  return `constancia-tratamiento-datos-${employeeName || consent.employeeId}.pdf`
+}
+
+export async function downloadConsentCertificate(consent: EmployeeDataConsent) {
+  const [{ default: jsPDF }, signatureEvidence] = await Promise.all([
+    import("jspdf"),
+    downloadConsentEvidence(consent.employeeId, "SIGNATURE"),
+  ])
+  const signatureDataUrl = await blobToDataUrl(signatureEvidence.blob)
+  const logoDataUrl = await loadPublicImageDataUrl("/SGI-nube.png").catch(() => null)
+  const doc = new jsPDF({ unit: "mm", format: "letter" })
+  const pageWidth = doc.internal.pageSize.getWidth()
+  const pageHeight = doc.internal.pageSize.getHeight()
+  const margin = 16
+  const contentWidth = pageWidth - margin * 2
+  let y = margin
+
+  const ensureSpace = (height: number) => {
+    if (y + height > pageHeight - margin) {
+      doc.addPage()
+      y = margin
+    }
   }
+
+  const addWrappedText = (text: string, x: number, width: number, lineHeight = 5) => {
+    const lines = doc.splitTextToSize(text || "No registrado", width) as string[]
+    ensureSpace(lines.length * lineHeight + 2)
+    doc.text(lines, x, y)
+    y += lines.length * lineHeight
+  }
+
+  const addSectionTitle = (title: string) => {
+    ensureSpace(14)
+    doc.setFillColor(236, 244, 255)
+    doc.roundedRect(margin, y, contentWidth, 8, 2, 2, "F")
+    doc.setTextColor(30, 64, 175)
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(10)
+    doc.text(title, margin + 4, y + 5.5)
+    y += 13
+    doc.setTextColor(15, 23, 42)
+  }
+
+  const addInfoRow = (label: string, value: string, x: number, rowY: number, width: number) => {
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(8)
+    doc.setTextColor(71, 85, 105)
+    doc.text(label, x, rowY)
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(9)
+    doc.setTextColor(15, 23, 42)
+    doc.text(doc.splitTextToSize(value || "No registrado", width), x, rowY + 5)
+  }
+
+  if (logoDataUrl) {
+    doc.addImage(logoDataUrl, "PNG", margin, y, 16, 16)
+  }
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(14)
+  doc.setTextColor(15, 23, 42)
+  doc.text("SafeCloud - Sistema de Gestión Integral", logoDataUrl ? margin + 20 : margin, y + 6)
+  doc.setFontSize(11)
+  doc.setFont("helvetica", "normal")
+  doc.text("Constancia de autorización para el tratamiento de datos personales", logoDataUrl ? margin + 20 : margin, y + 13)
+  y += 26
+
+  addSectionTitle("Datos básicos del titular")
+  const leftX = margin
+  const rightX = margin + contentWidth / 2 + 4
+  const colWidth = contentWidth / 2 - 8
+  const fullName = `${consent.employee.name} ${consent.employee.lastName}`.trim() || "No registrado"
+  const document = `${consent.employee.documentType || "Documento"} ${consent.documentNumberMasked || consent.employee.documentNumberMasked}`
+  const firstRowY = y
+  addInfoRow("Titular", fullName, leftX, firstRowY, colWidth)
+  addInfoRow("Documento", document, rightX, firstRowY, colWidth)
+  y += 17
+  const secondRowY = y
+  addInfoRow("Fecha de nacimiento", formatCertificateDate(consent.employee.birthDate), leftX, secondRowY, colWidth)
+  addInfoRow("Empresa", consent.employee.companyName || "Empresa actual", rightX, secondRowY, colWidth)
+  y += 17
+  const thirdRowY = y
+  addInfoRow("Correo electrónico", consent.employee.email || "No registrado", leftX, thirdRowY, colWidth)
+  addInfoRow("Celular", consent.employee.phone || "No registrado", rightX, thirdRowY, colWidth)
+  y += 16
+
+  addSectionTitle("Información de la autorización")
+  const authRowY = y
+  addInfoRow("Documento autorizado", consent.template.title, leftX, authRowY, colWidth)
+  addInfoRow("Versión aceptada", consent.templateVersion, rightX, authRowY, colWidth)
+  y += 17
+  const acceptRowY = y
+  addInfoRow("Fecha y hora de aceptación", formatCertificateDateTime(consent.acceptedAt), leftX, acceptRowY, colWidth)
+  addInfoRow("Método de validación", "Documento y fecha de nacimiento", rightX, acceptRowY, colWidth)
+  y += 17
+  const idRowY = y
+  addInfoRow("Identificador de autorización", consent.verificationCode || consent.id, leftX, idRowY, colWidth)
+  addInfoRow("Estado", dataAuthorizationStatusLabels[consent.status], rightX, idRowY, colWidth)
+  y += 16
+
+  addSectionTitle("Texto autorizado")
+  doc.setFont("helvetica", "normal")
+  doc.setFontSize(9)
+  doc.setTextColor(30, 41, 59)
+  addWrappedText(consent.template.content, margin, contentWidth, 5)
+  y += 4
+
+  addSectionTitle("Evidencia técnica")
+  doc.setFont("helvetica", "normal")
+  doc.setFontSize(8.5)
+  addWrappedText(`Hash de evidencia SHA-256: ${consent.evidenceHash || "No registrado"}`, margin, contentWidth, 4.5)
+  addWrappedText(`Archivo de firma: ${signatureEvidence.filename}`, margin, contentWidth, 4.5)
+  y += 5
+
+  addSectionTitle("Firma del titular")
+  ensureSpace(45)
+  doc.setDrawColor(203, 213, 225)
+  doc.roundedRect(margin, y, contentWidth, 34, 2, 2)
+  const imageFormat = signatureEvidence.blob.type.includes("jpeg") ? "JPEG" : "PNG"
+  doc.addImage(signatureDataUrl, imageFormat, margin + 8, y + 4, contentWidth - 16, 22, undefined, "FAST")
+  y += 40
+  doc.setDrawColor(15, 23, 42)
+  doc.line(margin + 28, y, pageWidth - margin - 28, y)
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(9)
+  doc.text(fullName, pageWidth / 2, y + 5, { align: "center" })
+  doc.setFont("helvetica", "normal")
+  doc.setFontSize(8)
+  doc.setTextColor(71, 85, 105)
+  doc.text("Firma electrónica manuscrita del titular", pageWidth / 2, y + 10, { align: "center" })
+
+  const pageCount = doc.getNumberOfPages()
+  for (let page = 1; page <= pageCount; page += 1) {
+    doc.setPage(page)
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(7.5)
+    doc.setTextColor(100, 116, 139)
+    doc.text(
+      `Documento generado por SafeCloud. Página ${page} de ${pageCount}. Fecha de generación: ${formatCertificateDateTime(new Date().toISOString())}`,
+      margin,
+      pageHeight - 8,
+    )
+  }
+
+  const blob = doc.output("blob")
+  const filename = certificateFilename(consent)
+  const url = URL.createObjectURL(blob)
+  const anchor = window.document.createElement("a")
+  anchor.href = url
+  anchor.download = filename
+  window.document.body.appendChild(anchor)
+  anchor.click()
+  anchor.remove()
+  URL.revokeObjectURL(url)
+}
+
+export async function downloadConsentSignature(consent: EmployeeDataConsent) {
+  const { blob, filename } = await downloadConsentEvidence(consent.employeeId, "SIGNATURE")
+  const url = URL.createObjectURL(blob)
+  const anchor = window.document.createElement("a")
+  anchor.href = url
+  anchor.download = filename
+  window.document.body.appendChild(anchor)
+  anchor.click()
+  anchor.remove()
+  URL.revokeObjectURL(url)
 }
 
 export function buildPublicConsentUrl(publicUrl?: string | null) {
-  if (!publicUrl) return ""
-  if (typeof window === "undefined") return publicUrl
-  return `${window.location.origin}${publicUrl}`
+  return publicUrl ?? ""
 }
 
-export function downloadConsentCertificate(consent: EmployeeDataConsent) {
-  const doc = new jsPDF("p", "mm", "a4")
-  const acceptedAt = consent.acceptedAt ? new Date(consent.acceptedAt) : new Date()
-  const date = acceptedAt.toLocaleString("es-CO", { timeZone: "America/Bogota" })
-
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(15)
-  doc.text("SafeCloud - Sistema de Gestión Integral", 20, 20)
-  doc.setFontSize(12)
-  doc.text("Constancia de autorización para el tratamiento de datos personales", 20, 30)
-
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(10)
-  doc.text(`Empresa: ${consent.employee.companyName}`, 20, 45)
-  doc.text(`Titular: ${consent.employee.name} ${consent.employee.lastName}`, 20, 52)
-  doc.text(`Documento: ${consent.documentNumberMasked}`, 20, 59)
-  doc.text(`Fecha y hora: ${date} (America/Bogota)`, 20, 66)
-  doc.text(`Versión documento: ${consent.templateVersion}`, 20, 73)
-  doc.text(`Estado: ${dataAuthorizationStatusLabels[consent.status]}`, 20, 80)
-  doc.text(`Método: Validación de documento y fecha de nacimiento`, 20, 87)
-
-  doc.setFont("helvetica", "bold")
-  doc.text("Texto aceptado", 20, 102)
-  doc.setFont("helvetica", "normal")
-  const lines = doc.splitTextToSize(consent.template.content, 170)
-  doc.text(lines, 20, 110)
-
-  const evidenceY = Math.min(250, 116 + lines.length * 5)
-  doc.setFont("helvetica", "bold")
-  doc.text("Evidencia técnica", 20, evidenceY)
-  doc.setFont("helvetica", "normal")
-  doc.text(`Identificador: ${consent.id}`, 20, evidenceY + 8)
-  doc.text(`Hash evidencia: ${consent.evidenceHash ?? "Pendiente"}`, 20, evidenceY + 15, { maxWidth: 170 })
-  doc.rect(160, evidenceY + 22, 28, 28)
-  doc.setFontSize(7)
-  doc.text(`Verificación`, 164, evidenceY + 34)
-  doc.text(consent.verificationCode ?? "Sin código", 162, evidenceY + 40, { maxWidth: 24 })
-
-  doc.save(`constancia-autorizacion-${consent.employee.name}-${consent.employee.lastName}.pdf`)
+export async function getPublicConsentVerification(_verificationCode?: string): Promise<PublicConsentVerification | null> {
+  return null
 }

@@ -40,7 +40,6 @@ import {
   dataAuthorizationStatusOptions,
   downloadConsentCertificate,
   generateDataConsentLink,
-  getDataConsentSummary,
   invalidateDataConsentLink,
   listDataConsentAuthorizations,
   regenerateDataConsentLink,
@@ -89,6 +88,17 @@ function StatusBadge({ status }: { status: DataAuthorizationStatus }) {
   )
 }
 
+function canDownloadCertificate(consent: EmployeeDataConsent) {
+  return Boolean(
+    consent.certificateAvailable ||
+      consent.status === "ACCEPTED" ||
+      consent.acceptedAt ||
+      consent.employee.dataAuthorizationAcceptedAt ||
+      consent.evidenceHash ||
+      consent.verificationCode,
+  )
+}
+
 function MetricCard({
   title,
   value,
@@ -125,15 +135,41 @@ export default function DataProcessingPage() {
   const [query, setQuery] = useState("")
   const [status, setStatus] = useState<DataAuthorizationStatus | "ALL">("ALL")
   const [selected, setSelected] = useState<EmployeeDataConsent | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  async function loadData() {
-    const [records, metrics] = await Promise.all([listDataConsentAuthorizations(), getDataConsentSummary()])
-    setAuthorizations(records)
-    setSummary(metrics)
+  function calculateSummary(records: EmployeeDataConsent[]): DataConsentSummary {
+    return {
+      totalEmployees: records.length,
+      accepted: records.filter((consent) => consent.status === "ACCEPTED").length,
+      pending: records.filter((consent) => consent.status === "PENDING" || consent.status === "SENT").length,
+      expired: records.filter((consent) => consent.status === "EXPIRED").length,
+      requiresReacceptance: records.filter((consent) => consent.status === "REQUIRES_REACCEPTANCE").length,
+    }
+  }
+
+  async function loadData(options: { silent?: boolean; selectedEmployeeId?: string } = {}) {
+    setLoading(true)
+    try {
+      const records = await listDataConsentAuthorizations()
+      setAuthorizations(records)
+      setSummary(calculateSummary(records))
+
+      if (options.selectedEmployeeId) {
+        setSelected(records.find((record) => record.employeeId === options.selectedEmployeeId) ?? null)
+      }
+
+      if (!options.silent) {
+        toast.success("Estados de autorización actualizados")
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron actualizar las autorizaciones")
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
-    loadData()
+    loadData({ silent: true })
   }, [])
 
   const filteredAuthorizations = useMemo(() => {
@@ -154,21 +190,34 @@ export default function DataProcessingPage() {
   async function refreshSelected(consentId?: string) {
     const records = await listDataConsentAuthorizations()
     setAuthorizations(records)
-    setSummary(await getDataConsentSummary())
+    setSummary(calculateSummary(records))
     if (consentId) {
-      setSelected(records.find((record) => record.id === consentId) ?? null)
+      setSelected(records.find((record) => record.id === consentId || record.employeeId === consentId) ?? null)
     }
   }
 
+  async function handleRefresh() {
+    await loadData({ selectedEmployeeId: selected?.employeeId })
+  }
+
   async function handleGenerate(consent: EmployeeDataConsent) {
-    const updated = await generateDataConsentLink(consent.id)
-    await refreshSelected(consent.id)
-    const url = buildPublicConsentUrl(updated?.publicUrl)
-    if (url) {
-      await navigator.clipboard?.writeText(url)
-      toast.success("Autorización generada y enlace copiado")
-    } else {
-      toast.success("Autorización generada")
+    try {
+      const updated = await generateDataConsentLink(consent.employeeId)
+      const nextAuthorizations = authorizations.map((authorization) =>
+        authorization.employeeId === consent.employeeId ? { ...authorization, ...updated } : authorization,
+      )
+      setAuthorizations(nextAuthorizations)
+      setSelected((current) => (current?.employeeId === consent.employeeId ? { ...current, ...updated } : current))
+      setSummary(calculateSummary(nextAuthorizations))
+      const url = buildPublicConsentUrl(updated?.publicUrl)
+      if (url) {
+        await navigator.clipboard?.writeText(url)
+        toast.success("Autorización generada y enlace copiado")
+      } else {
+        toast.success("Autorización generada")
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo generar el enlace de autorización")
     }
   }
 
@@ -183,30 +232,60 @@ export default function DataProcessingPage() {
   }
 
   async function handleRegenerate(consent: EmployeeDataConsent) {
-    await regenerateDataConsentLink(consent.id)
-    await refreshSelected(consent.id)
-    toast.success("Enlace regenerado")
+    try {
+      const updated = await regenerateDataConsentLink(consent.employeeId)
+      const nextAuthorizations = authorizations.map((authorization) =>
+        authorization.employeeId === consent.employeeId ? { ...authorization, ...updated } : authorization,
+      )
+      setAuthorizations(nextAuthorizations)
+      setSelected((current) => (current?.employeeId === consent.employeeId ? { ...current, ...updated } : current))
+      setSummary(calculateSummary(nextAuthorizations))
+      const url = buildPublicConsentUrl(updated?.publicUrl)
+      if (url) await navigator.clipboard?.writeText(url)
+      toast.success(url ? "Enlace regenerado y copiado" : "Enlace regenerado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo regenerar el enlace")
+    }
   }
 
   async function handleInvalidate(consent: EmployeeDataConsent) {
-    await invalidateDataConsentLink(consent.id)
-    await refreshSelected(consent.id)
-    toast.success("Enlace invalidado")
+    try {
+      await invalidateDataConsentLink()
+      await refreshSelected(consent.employeeId)
+      toast.success("Enlace invalidado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo invalidar el enlace")
+    }
   }
 
   async function handleReacceptance(consent: EmployeeDataConsent) {
-    await requestDataConsentReacceptance(consent.id)
-    await refreshSelected(consent.id)
-    toast.success("Nueva aceptación solicitada")
+    try {
+      await requestDataConsentReacceptance()
+      await refreshSelected(consent.employeeId)
+      toast.success("Nueva aceptación solicitada")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo solicitar la nueva aceptación")
+    }
+  }
+
+  async function handleDownloadCertificate(consent: EmployeeDataConsent) {
+    try {
+      await downloadConsentCertificate(consent)
+      toast.success("Constancia descargada")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar la constancia")
+    }
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Tratamiento de Datos</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Gestiona autorizaciones, enlaces, constancias y trazabilidad del tratamiento de datos personales.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Tratamiento de Datos</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Gestiona autorizaciones, enlaces, constancias y trazabilidad del tratamiento de datos personales.
+          </p>
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
@@ -221,7 +300,7 @@ export default function DataProcessingPage() {
         <CardHeader className="gap-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <CardTitle>Autorizaciones</CardTitle>
-            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_220px] lg:w-[560px]">
+            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_220px_auto] lg:w-[720px]">
               <div className="relative">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -243,6 +322,10 @@ export default function DataProcessingPage() {
                   ))}
                 </SelectContent>
               </Select>
+              <Button type="button" className="gap-2" onClick={handleRefresh} disabled={loading}>
+                <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+                Refrescar estados
+              </Button>
             </div>
           </div>
         </CardHeader>
@@ -364,7 +447,21 @@ export default function DataProcessingPage() {
                     <History className="h-4 w-4" />
                     Solicitar nueva aceptación
                   </Button>
-                  <Button type="button" variant="outline" className="gap-2" onClick={() => downloadConsentCertificate(selected)}>
+                  <Button
+                    type="button"
+                    className="gap-2"
+                    onClick={handleRefresh}
+                    disabled={loading}
+                  >
+                    <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+                    Actualizar estado
+                  </Button>
+                  <Button
+                    type="button"
+                    className="gap-2"
+                    onClick={() => handleDownloadCertificate(selected)}
+                    disabled={!canDownloadCertificate(selected)}
+                  >
                     <Download className="h-4 w-4" />
                     Descargar constancia PDF
                   </Button>

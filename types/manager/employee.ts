@@ -69,6 +69,8 @@ export type Employee = {
   statusCompensation?: boolean | null
   dataAuthorizationStatus?: EmployeeDataAuthorizationStatus | null
   dataAuthorizationAcceptedAt?: string | null
+  dataConsentStatus?: EmployeeDataAuthorizationStatus | null
+  dataConsentAcceptedAt?: string | null
   status: boolean
 }
 

@@ -83,6 +83,7 @@ export type EmployeeDataConsent = {
   consentTextHash?: string | null
   evidenceHash?: string | null
   verificationCode?: string | null
+  certificateAvailable?: boolean
   attempts: number
   blockedUntil?: string | null
   auditLogs: ConsentAuditLog[]
@@ -109,6 +110,8 @@ export type PublicDataConsent = {
   templateContent?: string
   status: DataAuthorizationStatus
   expiresAt?: string | null
+  verificationToken?: string
+  verificationExpiresAt?: string
 }
 
 export type PublicConsentVerification = {

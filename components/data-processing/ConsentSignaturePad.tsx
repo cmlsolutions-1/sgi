@@ -131,7 +131,7 @@ export function ConsentSignaturePad({ onChange, disabled, className }: ConsentSi
       <canvas
         ref={canvasRef}
         className={cn(
-          "h-44 w-full touch-none rounded-md border border-dashed border-slate-300 bg-slate-50",
+          "h-36 w-full touch-none rounded-md border border-dashed border-slate-300 bg-slate-50 sm:h-44",
           disabled && "cursor-not-allowed opacity-60",
         )}
         onPointerDown={handlePointerDown}

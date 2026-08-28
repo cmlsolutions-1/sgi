@@ -2,7 +2,7 @@
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
 import Image from "next/image"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import { AlertTriangle, CheckCircle2, FileCheck2, Loader2, ShieldCheck } from "lucide-react"
 import { toast } from "sonner"
 
@@ -16,8 +16,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
   acceptDataConsent,
-  dataAuthorizationStatusLabels,
-  downloadConsentCertificate,
   getPublicDataConsent,
   verifyDataConsentIdentity,
 } from "@/services/dataProcessingService"
@@ -49,8 +47,10 @@ function StepBadge({ currentStep }: { currentStep: Step }) {
 }
 
 export default function PublicAuthorizationPage() {
-  const params = useParams<{ token: string }>()
-  const token = String(params?.token ?? "")
+  const params = useParams<{ employeeId: string }>()
+  const searchParams = useSearchParams()
+  const employeeId = String(params?.employeeId ?? "")
+  const token = searchParams.get("token") ?? ""
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [step, setStep] = useState<Step>(1)
@@ -60,18 +60,24 @@ export default function PublicAuthorizationPage() {
   const [birthDate, setBirthDate] = useState("")
   const [identityError, setIdentityError] = useState("")
   const [readAccepted, setReadAccepted] = useState(false)
+  const [verificationToken, setVerificationToken] = useState("")
   const [signature, setSignature] = useState({ isSigned: false, dataUrl: "" })
 
   useEffect(() => {
     async function loadConsent() {
       setLoading(true)
-      const data = await getPublicDataConsent(token)
-      setPublicConsent(data)
-      setLoading(false)
+      try {
+        const data = await getPublicDataConsent(employeeId, token)
+        setPublicConsent(data)
+      } catch {
+        setPublicConsent(null)
+      } finally {
+        setLoading(false)
+      }
     }
 
     loadConsent()
-  }, [token])
+  }, [employeeId, token])
 
   const canShowDocument = useMemo(() => Boolean(publicConsent?.templateContent), [publicConsent?.templateContent])
 
@@ -86,12 +92,13 @@ export default function PublicAuthorizationPage() {
 
     setSubmitting(true)
     try {
-      const result = await verifyDataConsentIdentity(token, documentNumber, birthDate)
-      if (!result.ok || !result.publicConsent) {
+      const result = await verifyDataConsentIdentity(employeeId, token, documentNumber, birthDate)
+      if (!result.ok || !result.publicConsent || !result.verificationToken) {
         setIdentityError(result.message)
         return
       }
 
+      setVerificationToken(result.verificationToken)
       setPublicConsent(result.publicConsent)
       setStep(2)
     } finally {
@@ -108,6 +115,14 @@ export default function PublicAuthorizationPage() {
   }
 
   async function handleAccept() {
+    if (!publicConsent) return
+
+    if (!verificationToken) {
+      toast.error("La verificación de identidad venció. Valida nuevamente tus datos.")
+      setStep(1)
+      return
+    }
+
     if (!signature.isSigned || !signature.dataUrl) {
       toast.error("La firma del titular es obligatoria")
       return
@@ -115,12 +130,25 @@ export default function PublicAuthorizationPage() {
 
     setSubmitting(true)
     try {
-      const idempotencyKey =
-        typeof crypto !== "undefined" && "randomUUID" in crypto
-          ? crypto.randomUUID()
-          : `idem-${Date.now()}-${Math.random().toString(36).slice(2)}`
-      const consent = await acceptDataConsent(token, signature.dataUrl, idempotencyKey)
-      setAcceptedConsent(consent)
+      const consent = await acceptDataConsent({
+        employeeId,
+        token,
+        verificationToken,
+        consentVersion: publicConsent.templateVersion,
+        signatureDataUrl: signature.dataUrl,
+      })
+
+      setAcceptedConsent({
+        ...consent,
+        employee: {
+          ...consent.employee,
+          companyName: publicConsent.companyName,
+          name: publicConsent.employeeName,
+          lastName: "",
+          documentNumberMasked: publicConsent.documentNumberMasked,
+        },
+        documentNumberMasked: publicConsent.documentNumberMasked,
+      })
       setStep(4)
       toast.success("Autorización registrada correctamente")
     } catch (error) {
@@ -132,15 +160,15 @@ export default function PublicAuthorizationPage() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
+      <main className="flex h-dvh items-center justify-center overflow-y-auto bg-slate-50 p-4">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </main>
     )
   }
 
-  if (!publicConsent || publicConsent.status === "EXPIRED") {
+  if (!publicConsent) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-8">
+      <main className="h-dvh overflow-y-auto bg-slate-50 px-4 py-8">
         <Card className="mx-auto max-w-lg rounded-xl">
           <CardContent className="space-y-4 p-6 text-center">
             <AlertTriangle className="mx-auto h-10 w-10 text-amber-500" />
@@ -155,8 +183,8 @@ export default function PublicAuthorizationPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-5 sm:py-8">
-      <div className="mx-auto max-w-3xl space-y-4">
+    <main className="h-dvh overflow-y-auto bg-slate-50 px-3 py-4 sm:px-4 sm:py-8">
+      <div className="mx-auto w-full max-w-3xl space-y-4 pb-6">
         <header className="rounded-2xl border bg-white p-4 shadow-sm sm:p-5">
           <div className="flex items-center gap-3">
             <div className="relative h-12 w-12 overflow-hidden rounded-xl bg-slate-100">
@@ -227,7 +255,7 @@ export default function PublicAuthorizationPage() {
                   <h2 className="text-xl font-bold text-slate-900">{publicConsent.templateTitle}</h2>
                   <p className="mt-1 text-sm text-muted-foreground">Versión {publicConsent.templateVersion}</p>
                 </div>
-                <div className="max-h-[48vh] overflow-y-auto rounded-xl border bg-slate-50 p-4 text-sm leading-6 text-slate-700">
+                <div className="max-h-[42dvh] overflow-y-auto rounded-xl border bg-slate-50 p-4 text-sm leading-6 text-slate-700 sm:max-h-[48vh]">
                   {publicConsent.templateContent}
                 </div>
                 <label className="flex items-start gap-3 rounded-xl border p-3 text-sm">
@@ -237,11 +265,11 @@ export default function PublicAuthorizationPage() {
                     su tratamiento conforme a las finalidades y condiciones allí establecidas.
                   </span>
                 </label>
-                <div className="flex flex-col gap-2 sm:flex-row">
+                <div className="sticky bottom-0 z-10 -mx-4 flex flex-col gap-2 border-t bg-white/95 p-4 shadow-[0_-8px_20px_rgba(15,23,42,0.06)] backdrop-blur sm:static sm:mx-0 sm:flex-row sm:border-t-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-0">
                   <Button type="button" variant="outline" onClick={() => setStep(1)}>
                     Volver
                   </Button>
-                  <Button type="button" onClick={handleContinueToSignature}>
+                  <Button type="button" className="h-auto min-h-10 whitespace-normal py-2" onClick={handleContinueToSignature}>
                     Continuar a firma
                   </Button>
                 </div>
@@ -249,7 +277,7 @@ export default function PublicAuthorizationPage() {
             )}
 
             {step === 3 && (
-              <div className="space-y-4">
+              <div className="space-y-4 pb-2">
                 <div>
                   <h2 className="text-xl font-bold text-slate-900">Confirma y firma</h2>
                   <p className="mt-1 text-sm text-muted-foreground">
@@ -261,7 +289,7 @@ export default function PublicAuthorizationPage() {
                     <span className="font-medium">Titular:</span> {publicConsent.employeeName}
                   </p>
                   <p>
-                    <span className="font-medium">Documento:</span> {publicConsent.documentType} {publicConsent.documentNumberMasked}
+                    <span className="font-medium">Documento:</span> {publicConsent.documentNumberMasked}
                   </p>
                   <p>
                     <span className="font-medium">Empresa:</span> {publicConsent.companyName}
@@ -274,11 +302,16 @@ export default function PublicAuthorizationPage() {
                   </p>
                 </div>
                 <ConsentSignaturePad onChange={setSignature} disabled={submitting} />
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <Button type="button" variant="outline" onClick={() => setStep(2)} disabled={submitting}>
+                <div className="sticky bottom-0 z-10 -mx-4 flex flex-col gap-2 border-t bg-white/95 p-4 shadow-[0_-8px_20px_rgba(15,23,42,0.06)] backdrop-blur sm:static sm:mx-0 sm:flex-row sm:border-t-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-0">
+                  <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={() => setStep(2)} disabled={submitting}>
                     Volver
                   </Button>
-                  <Button type="button" className="gap-2" onClick={handleAccept} disabled={submitting}>
+                  <Button
+                    type="button"
+                    className="h-auto min-h-10 w-full whitespace-normal py-2 sm:w-auto"
+                    onClick={handleAccept}
+                    disabled={submitting}
+                  >
                     {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileCheck2 className="h-4 w-4" />}
                     Aceptar y firmar autorización
                   </Button>
@@ -297,7 +330,7 @@ export default function PublicAuthorizationPage() {
                 </div>
                 <div className="mx-auto grid max-w-xl gap-3 rounded-xl border bg-slate-50 p-4 text-left text-sm sm:grid-cols-2">
                   <p>
-                    <span className="font-medium">Empresa:</span> {acceptedConsent.employee.companyName}
+                    <span className="font-medium">Empresa:</span> {publicConsent.companyName}
                   </p>
                   <p>
                     <span className="font-medium">Fecha:</span> {formatDateTime(acceptedConsent.acceptedAt)}
@@ -306,10 +339,13 @@ export default function PublicAuthorizationPage() {
                     <span className="font-medium">Número de constancia:</span> {acceptedConsent.verificationCode}
                   </p>
                 </div>
-                <Button type="button" className="gap-2" onClick={() => downloadConsentCertificate(acceptedConsent)}>
+                <Button type="button" className="gap-2" disabled>
                   <FileCheck2 className="h-4 w-4" />
-                  Descargar constancia
+                  Constancia generada
                 </Button>
+                <p className="text-xs text-muted-foreground">
+                  La constancia quedó disponible para descarga desde el panel administrativo de la empresa.
+                </p>
               </div>
             )}
           </CardContent>
