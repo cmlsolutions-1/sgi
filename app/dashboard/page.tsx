@@ -8,7 +8,9 @@ import {
   CalendarClock,
   CheckCircle2,
   ClipboardList,
+  Download,
   FileText,
+  Filter,
   HardHat,
   Loader2,
   ShieldAlert,
@@ -16,9 +18,23 @@ import {
 } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { KpiCard } from "@/components/dashboard/kpi-card"
+import {
+  buildReportPdf,
+  defaultDateRangeFilter,
+  formatDisplayDate,
+  getRangeDates,
+  isWithinRange,
+  validateDateRange,
+  type DateRangeFilter,
+  type DateRangeMode,
+} from "@/lib/reporting"
+import { toast } from "sonner"
 import { listManagedDocuments } from "@/services/documentManagementService"
 import { listEmployees, getSgiResponsible } from "@/services/employeeService"
 import { listIncidents } from "@/services/incidentService"
@@ -81,16 +97,7 @@ function flattenModuleCodes(modules: ReturnType<typeof useAuthStore.getState>["m
 }
 
 function formatDate(value?: string | null) {
-  if (!value) return "Sin fecha"
-
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
-
-  return new Intl.DateTimeFormat("es-CO", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(date)
+  return formatDisplayDate(value)
 }
 
 function isBeforeToday(value?: string | null) {
@@ -162,6 +169,7 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardData>(initialData)
   const [errors, setErrors] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
+  const [dateFilter, setDateFilter] = useState<DateRangeFilter>(() => defaultDateRangeFilter())
 
   const moduleCodes = useMemo(() => flattenModuleCodes(modules), [modules])
   const hasModuleConfig = moduleCodes.size > 0
@@ -225,37 +233,51 @@ export default function DashboardPage() {
     }
   }, [hasHydrated, moduleCodes])
 
+  const range = useMemo(() => getRangeDates(dateFilter), [dateFilter])
+  const filteredData = useMemo(() => {
+    const filterByDate = (value?: string | null) => isWithinRange(value, range.startDate, range.endDate)
+
+    return {
+      ...data,
+      incidents: data.incidents.filter((incident) => filterByDate(incident.date)),
+      trainings: data.trainings.filter((training) => filterByDate(training.date)),
+      preventiveMeasures: data.preventiveMeasures.filter((measure) =>
+        filterByDate(measure.doneDate ?? measure.dueDate),
+      ),
+    }
+  }, [data, range.endDate, range.startDate])
+
   const metrics = useMemo(() => {
-    const activeEmployees = data.employees.filter((employee) => employee.status).length
-    const inactiveEmployees = data.employees.length - activeEmployees
-    const socialSecurityComplete = data.employees.filter(
+    const activeEmployees = filteredData.employees.filter((employee) => employee.status).length
+    const inactiveEmployees = filteredData.employees.length - activeEmployees
+    const socialSecurityComplete = filteredData.employees.filter(
       (employee) => employee.epsId && employee.arlId && employee.pensionId && employee.compensationId,
     ).length
 
-    const activeRisks = data.risks.filter((risk) => risk.status === "ACTIVE").length
-    const highRisks = data.risks.filter(
+    const activeRisks = filteredData.risks.filter((risk) => risk.status === "ACTIVE").length
+    const highRisks = filteredData.risks.filter(
       (risk) => ["I", "II"].includes(risk.riskLevelName) || Number(risk.riskLevel) >= 150,
     ).length
 
-    const pendingMeasures = data.preventiveMeasures.filter((measure) => measure.status === "PENDING").length
-    const doneMeasures = data.preventiveMeasures.filter((measure) => measure.status === "DONE").length
-    const overdueMeasures = data.preventiveMeasures.filter(
+    const pendingMeasures = filteredData.preventiveMeasures.filter((measure) => measure.status === "PENDING").length
+    const doneMeasures = filteredData.preventiveMeasures.filter((measure) => measure.status === "DONE").length
+    const overdueMeasures = filteredData.preventiveMeasures.filter(
       (measure) => measure.status === "PENDING" && measure.type === "DATE" && isBeforeToday(measure.dueDate),
     ).length
 
-    const activeTrainings = data.trainings.filter((training) => training.status === "ACTIVE").length
-    const finishedTrainings = data.trainings.filter((training) => training.status === "FINALIZADA").length
-    const upcomingTrainings = data.trainings
+    const activeTrainings = filteredData.trainings.filter((training) => training.status === "ACTIVE").length
+    const finishedTrainings = filteredData.trainings.filter((training) => training.status === "FINALIZADA").length
+    const upcomingTrainings = filteredData.trainings
       .filter((training) => training.status === "ACTIVE" && isTodayOrFuture(training.date))
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .slice(0, 5)
 
-    const activeDocuments = data.documents.filter((document) => document.status === "ACTIVE").length
-    const procedures = data.documents.filter((document) => document.type === "PROCEDURE").length
-    const policies = data.documents.filter((document) => document.type === "POLICY").length
+    const activeDocuments = filteredData.documents.filter((document) => document.status === "ACTIVE").length
+    const procedures = filteredData.documents.filter((document) => document.type === "PROCEDURE").length
+    const policies = filteredData.documents.filter((document) => document.type === "POLICY").length
 
-    const activeIncidents = data.incidents.filter((incident) => incident.status === "ACTIVE").length
-    const accidents = data.incidents.filter((incident) => incident.type === "ACCIDENTE").length
+    const activeIncidents = filteredData.incidents.filter((incident) => incident.status === "ACTIVE").length
+    const accidents = filteredData.incidents.filter((incident) => incident.type === "ACCIDENTE").length
 
     return {
       activeEmployees,
@@ -274,28 +296,68 @@ export default function DashboardPage() {
       policies,
       activeIncidents,
       accidents,
-      employeeCoverage: percent(socialSecurityComplete, data.employees.length),
-      measureProgress: percent(doneMeasures, data.preventiveMeasures.length),
-      riskControl: percent(data.risks.length - highRisks, data.risks.length),
-      documentActivity: percent(activeDocuments, data.documents.length),
+      employeeCoverage: percent(socialSecurityComplete, filteredData.employees.length),
+      measureProgress: percent(doneMeasures, filteredData.preventiveMeasures.length),
+      riskControl: percent(filteredData.risks.length - highRisks, filteredData.risks.length),
+      documentActivity: percent(activeDocuments, filteredData.documents.length),
     }
-  }, [data])
+  }, [filteredData])
 
   const recentRisks = useMemo(
     () =>
-      [...data.risks]
+      [...filteredData.risks]
         .sort((a, b) => Number(b.riskLevel) - Number(a.riskLevel))
         .slice(0, 5),
-    [data.risks],
+    [filteredData.risks],
   )
 
   const overdueMeasures = useMemo(
     () =>
-      data.preventiveMeasures
+      filteredData.preventiveMeasures
         .filter((measure) => measure.status === "PENDING" && measure.type === "DATE" && isBeforeToday(measure.dueDate))
         .slice(0, 5),
-    [data.preventiveMeasures],
+    [filteredData.preventiveMeasures],
   )
+
+  function updateDateFilter(partial: Partial<DateRangeFilter>) {
+    setDateFilter((current) => ({ ...current, ...partial }))
+  }
+
+  function handleDownloadDashboardReport() {
+    if (!validateDateRange(dateFilter)) {
+      toast.error("Selecciona una fecha inicial y final válidas")
+      return
+    }
+
+    buildReportPdf({
+      title: "Reporte Dashboard SGI",
+      subtitle: `Periodo: ${range.label}`,
+      filename: `dashboard-sgi-${new Date().toISOString().slice(0, 10)}.pdf`,
+      summary: [
+        ["Funcionarios", filteredData.employees.length],
+        ["Riesgos laborales", filteredData.risks.length],
+        ["Medidas preventivas", filteredData.preventiveMeasures.length],
+        ["Capacitaciones", filteredData.trainings.length],
+        ["Documentos SGI", filteredData.documents.length],
+        ["Novedades laborales", filteredData.incidents.length],
+        ["Medidas vencidas", metrics.overdueMeasures],
+        ["Riesgos prioritarios", metrics.highRisks],
+      ],
+      rows: [
+        { modulo: "Funcionarios", total: filteredData.employees.length, indicador: `${metrics.activeEmployees} activos` },
+        { modulo: "Riesgos laborales", total: filteredData.risks.length, indicador: `${metrics.highRisks} prioritarios` },
+        { modulo: "Medidas preventivas", total: filteredData.preventiveMeasures.length, indicador: `${metrics.measureProgress}% cerradas` },
+        { modulo: "Capacitaciones", total: filteredData.trainings.length, indicador: `${metrics.activeTrainings} activas` },
+        { modulo: "Documentos SGI", total: filteredData.documents.length, indicador: `${metrics.activeDocuments} activos` },
+        { modulo: "Novedades laborales", total: filteredData.incidents.length, indicador: `${metrics.accidents} accidentes` },
+      ],
+      columns: [
+        { header: "Modulo", value: (row) => row.modulo },
+        { header: "Total", value: (row) => row.total },
+        { header: "Indicador", value: (row) => row.indicador },
+      ],
+    })
+  }
 
   if (loading) {
     return (
@@ -322,6 +384,82 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      <Card className="border-border bg-card">
+        <CardContent className="grid gap-3 p-4 md:grid-cols-2 xl:grid-cols-[180px_160px_160px_160px_auto] xl:items-end">
+          <div className="grid gap-1">
+            <span className="text-xs font-medium text-muted-foreground">Periodo</span>
+            <Select value={dateFilter.mode} onValueChange={(value) => updateDateFilter({ mode: value as DateRangeMode })}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="bimester">Bimestre</SelectItem>
+                <SelectItem value="quarter">Trimestre</SelectItem>
+                <SelectItem value="custom">Rango de fechas</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="grid gap-1">
+            <span className="text-xs font-medium text-muted-foreground">Año</span>
+            <Input
+              type="number"
+              min="2020"
+              max="2100"
+              value={dateFilter.year}
+              disabled={dateFilter.mode === "all" || dateFilter.mode === "custom"}
+              onChange={(event) => updateDateFilter({ year: event.target.value })}
+            />
+          </div>
+          {dateFilter.mode === "bimester" || dateFilter.mode === "quarter" ? (
+            <div className="grid gap-1">
+              <span className="text-xs font-medium text-muted-foreground">
+                {dateFilter.mode === "bimester" ? "Bimestre" : "Trimestre"}
+              </span>
+              <Select value={dateFilter.period} onValueChange={(period) => updateDateFilter({ period })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: dateFilter.mode === "bimester" ? 6 : 4 }, (_, index) => (
+                    <SelectItem key={index + 1} value={String(index + 1)}>
+                      {index + 1}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : (
+            <div className="grid gap-1">
+              <span className="text-xs font-medium text-muted-foreground">Fecha inicial</span>
+              <Input
+                type="date"
+                value={dateFilter.startDate}
+                disabled={dateFilter.mode !== "custom"}
+                onChange={(event) => updateDateFilter({ startDate: event.target.value })}
+              />
+            </div>
+          )}
+          <div className="grid gap-1">
+            <span className="text-xs font-medium text-muted-foreground">Fecha final</span>
+            <Input
+              type="date"
+              value={dateFilter.endDate}
+              disabled={dateFilter.mode !== "custom"}
+              onChange={(event) => updateDateFilter({ endDate: event.target.value })}
+            />
+          </div>
+          <Button type="button" className="gap-2" onClick={handleDownloadDashboardReport}>
+            <Download className="h-4 w-4" />
+            Descargar PDF
+          </Button>
+          <div className="text-xs text-muted-foreground md:col-span-2 xl:col-span-5">
+            <Filter className="mr-1 inline h-3.5 w-3.5" />
+            Datos filtrados por: {range.label}
+          </div>
+        </CardContent>
+      </Card>
+
       {errors.length > 0 ? (
         <Alert>
           <AlertTriangle className="h-4 w-4" />
@@ -336,7 +474,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
         <KpiCard
           title="Funcionarios"
-          value={data.employees.length}
+          value={filteredData.employees.length}
           target={metrics.activeEmployees}
           targetLabel="Activos"
           trend="stable"
@@ -344,7 +482,7 @@ export default function DashboardPage() {
         />
         <KpiCard
           title="Riesgos laborales"
-          value={data.risks.length}
+          value={filteredData.risks.length}
           target={metrics.highRisks}
           targetLabel="Prioritarios"
           trend={metrics.highRisks > 0 ? "down" : "stable"}
@@ -352,7 +490,7 @@ export default function DashboardPage() {
         />
         <KpiCard
           title="Medidas preventivas"
-          value={data.preventiveMeasures.length}
+          value={filteredData.preventiveMeasures.length}
           target={metrics.pendingMeasures}
           targetLabel="Pendientes"
           trend={metrics.overdueMeasures > 0 ? "down" : "stable"}
@@ -360,7 +498,7 @@ export default function DashboardPage() {
         />
         <KpiCard
           title="Capacitaciones"
-          value={data.trainings.length}
+          value={filteredData.trainings.length}
           target={metrics.activeTrainings}
           targetLabel="Activas"
           trend="stable"
@@ -368,7 +506,7 @@ export default function DashboardPage() {
         />
         <KpiCard
           title="Documentos SGI"
-          value={data.documents.length}
+          value={filteredData.documents.length}
           target={metrics.activeDocuments}
           targetLabel="Activos"
           trend="stable"
@@ -376,7 +514,7 @@ export default function DashboardPage() {
         />
         <KpiCard
           title="Novedades laborales"
-          value={data.incidents.length}
+          value={filteredData.incidents.length}
           target={metrics.activeIncidents}
           targetLabel="Activas"
           trend={metrics.accidents > 0 ? "down" : "stable"}
@@ -393,7 +531,7 @@ export default function DashboardPage() {
             </div>
             <Progress value={metrics.employeeCoverage} />
             <p className="text-xs text-muted-foreground">
-              {metrics.socialSecurityComplete} de {data.employees.length} funcionarios con EPS, ARL, pension y caja.
+              {metrics.socialSecurityComplete} de {filteredData.employees.length} funcionarios con EPS, ARL, pension y caja.
             </p>
           </div>
         </DashboardSection>

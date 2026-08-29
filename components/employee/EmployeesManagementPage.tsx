@@ -61,6 +61,7 @@ import {
   updateIncident,
   uploadIncidentDocument,
 } from "@/services/incidentService"
+import { buildReportPdf, formatDisplayDate } from "@/lib/reporting"
 import {
   activateEmployee,
   createEmployee,
@@ -1097,9 +1098,30 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
   const [viewMode, setViewMode] = useState<LaborNewsViewMode>("cards")
   const [documentsIncident, setDocumentsIncident] = useState<Incident | null>(null)
   const [employeeFilter, setEmployeeFilter] = useState("all")
+  const [typeFilter, setTypeFilter] = useState<IncidentType | "all">("all")
+  const [statusFilter, setStatusFilter] = useState<IncidentStatus | "all">("all")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
   const [activeFilters, setActiveFilters] = useState<IncidentFilters>({})
+
+  const filteredIncidents = useMemo(
+    () =>
+      incidents.filter((incident) => {
+        if (typeFilter !== "all" && incident.type !== typeFilter) return false
+        if (statusFilter !== "all" && incident.status !== statusFilter) return false
+        return true
+      }),
+    [incidents, statusFilter, typeFilter],
+  )
+
+  const incidentsByType = useMemo(
+    () =>
+      incidentTypeOptions.map((option) => ({
+        ...option,
+        total: filteredIncidents.filter((incident) => incident.type === option.value).length,
+      })),
+    [filteredIncidents],
+  )
 
   async function loadData(filters = activeFilters) {
     setLoading(true)
@@ -1145,6 +1167,8 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
 
   async function handleClearFilters() {
     setEmployeeFilter("all")
+    setTypeFilter("all")
+    setStatusFilter("all")
     setStartDate("")
     setEndDate("")
     setActiveFilters({})
@@ -1169,6 +1193,32 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
     } finally {
       setExporting(false)
     }
+  }
+
+  function handleExportPdf() {
+    buildReportPdf({
+      title: "Reporte de novedades laborales",
+      subtitle: `Periodo: ${startDate || "inicio"} a ${endDate || "actual"} · Registros: ${filteredIncidents.length}`,
+      filename: `novedades-laborales-${new Date().toISOString().slice(0, 10)}.pdf`,
+      summary: incidentsByType
+        .filter((item) => item.total > 0)
+        .map((item) => [item.label, item.total] as [string, string | number]),
+      rows: filteredIncidents,
+      columns: [
+        {
+          header: "Funcionario",
+          value: (incident) =>
+            incident.employee ? `${incident.employee.name ?? ""} ${incident.employee.lastName ?? ""}`.trim() : incident.employeeId,
+        },
+        { header: "Tipo", value: (incident) => getIncidentTypeLabel(incident.type) },
+        { header: "Fecha", value: (incident) => formatDisplayDate(incident.date) },
+        { header: "Area", value: (incident) => incident.workArea?.name ?? "No registrada" },
+        { header: "Puesto", value: (incident) => incident.job?.name ?? "No registrado" },
+        { header: "Estado", value: (incident) => getIncidentStatusLabel(incident.status) },
+        { header: "Caso", value: (incident) => getCaseStatusLabel(incident.caseStatus) },
+        { header: "Descripcion", value: (incident) => incident.description },
+      ],
+    })
   }
 
   async function handleSaveIncident(payload: IncidentFormState, incidentId?: string) {
@@ -1236,8 +1286,8 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
       </div>
 
       <Card className="bg-card border-border">
-        <CardContent className="p-4">
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(220px,1fr)_180px_180px_auto_auto_auto] xl:items-end">
+        <CardContent className="space-y-4 p-4">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-[minmax(220px,1fr)_180px_180px_180px_150px] xl:items-end">
             <div className="grid gap-1">
               <Label>Funcionario</Label>
               <Select value={employeeFilter} onValueChange={setEmployeeFilter}>
@@ -1251,6 +1301,35 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
                       {`${employee.name ?? ""} ${employee.lastName ?? ""}`.trim() || employee.email || employee.id}
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-1">
+              <Label>Tipo</Label>
+              <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value as IncidentType | "all")}>
+                <SelectTrigger className={incidentFieldControlClassName}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los tipos</SelectItem>
+                  {incidentTypeOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-1">
+              <Label>Estado</Label>
+              <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as IncidentStatus | "all")}>
+                <SelectTrigger className={incidentFieldControlClassName}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="ACTIVE">Activos</SelectItem>
+                  <SelectItem value="INACTIVE">Inactivos</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1276,6 +1355,8 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
                 onChange={(event) => setEndDate(event.target.value)}
               />
             </div>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
             <Button type="button" onClick={handleApplyFilters} disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Filter className="h-4 w-4" />}
               Filtrar
@@ -1287,14 +1368,32 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
               {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
               Descargar CSV
             </Button>
+            <Button type="button" className="gap-2" onClick={handleExportPdf} disabled={filteredIncidents.length === 0}>
+              <Download className="h-4 w-4" />
+              Descargar PDF
+            </Button>
           </div>
         </CardContent>
       </Card>
 
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {incidentsByType
+          .filter((item) => item.total > 0)
+          .slice(0, 8)
+          .map((item) => (
+            <Card key={item.value} className="bg-card border-border">
+              <CardContent className="p-4">
+                <p className="truncate text-xs font-medium text-muted-foreground">{item.label}</p>
+                <p className="mt-1 text-2xl font-bold text-foreground">{item.total}</p>
+              </CardContent>
+            </Card>
+          ))}
+      </div>
+
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Lista de novedades laborales</h2>
-          <p className="text-sm text-muted-foreground">{incidents.length} novedades encontradas</p>
+          <p className="text-sm text-muted-foreground">{filteredIncidents.length} novedades encontradas</p>
         </div>
         <div className="flex w-fit rounded-md border border-border bg-secondary p-1">
           <Button
@@ -1324,7 +1423,7 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
         <div className="flex min-h-[260px] items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
-      ) : incidents.length === 0 ? (
+      ) : filteredIncidents.length === 0 ? (
         <Card className="bg-card border-border">
           <CardContent className="p-10 text-center text-sm text-muted-foreground">
             No hay novedades laborales registradas.
@@ -1332,7 +1431,7 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
         </Card>
       ) : viewMode === "cards" ? (
         <div className="space-y-4">
-          {incidents.map((incident) => (
+          {filteredIncidents.map((incident) => (
             <Card key={incident.id} className="bg-card border-border">
               <CardContent className="p-4">
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -1448,7 +1547,7 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {incidents.map((incident) => (
+              {filteredIncidents.map((incident) => (
                 <tr key={incident.id} className="align-middle">
                   <td className="px-4 py-3">
                     <p className="font-medium">

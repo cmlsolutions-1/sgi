@@ -3,9 +3,19 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Eye, ClipboardList, ExternalLink, CircleHelp, Pencil, Trash2, UploadCloud } from "lucide-react"
+import { Plus, Eye, ClipboardList, ExternalLink, CircleHelp, Pencil, Trash2, UploadCloud, Download } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import {
+  buildReportPdf,
+  defaultDateRangeFilter,
+  formatDisplayDate,
+  getRangeDates,
+  isWithinRange,
+  validateDateRange,
+  type DateRangeFilter,
+  type DateRangeMode,
+} from "@/lib/reporting"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -734,6 +744,7 @@ return Array.isArray(raw)
   : []
   })
 
+  const [riskReportFilter, setRiskReportFilter] = useState<DateRangeFilter>(() => defaultDateRangeFilter())
   const [riskCatalogs, setRiskCatalogs] = useState<RiskCatalogs>(emptyRiskCatalogs)
   const [risksLoading, setRisksLoading] = useState(true)
 
@@ -1160,6 +1171,60 @@ return Array.isArray(raw)
     }
   }
 
+  const riskReportRange = useMemo(() => getRangeDates(riskReportFilter), [riskReportFilter])
+
+  const filteredRiskRows = useMemo(() => {
+    const hasRange = Boolean(riskReportRange.startDate || riskReportRange.endDate)
+    if (!hasRange) return riskRows
+
+    return riskRows.filter((row) => {
+      const rowDate =
+        (row as RiskRow & { createdAt?: string; date?: string; fecha?: string }).createdAt ??
+        (row as RiskRow & { createdAt?: string; date?: string; fecha?: string }).date ??
+        (row as RiskRow & { createdAt?: string; date?: string; fecha?: string }).fecha
+
+      return rowDate ? isWithinRange(rowDate, riskReportRange.startDate, riskReportRange.endDate) : true
+    })
+  }, [riskRows, riskReportRange.endDate, riskReportRange.startDate])
+
+  function updateRiskReportFilter(partial: Partial<DateRangeFilter>) {
+    setRiskReportFilter((current) => ({ ...current, ...partial }))
+  }
+
+  function handleDownloadRiskMatrixPdf() {
+    if (!validateDateRange(riskReportFilter)) {
+      toast.error("Selecciona una fecha inicial y final válidas")
+      return
+    }
+
+    buildReportPdf({
+      title: "Matriz de riesgos laborales",
+      subtitle: `Periodo: ${riskReportRange.label}`,
+      filename: `matriz-riesgos-${new Date().toISOString().slice(0, 10)}.pdf`,
+      summary: [
+        ["Total riesgos", filteredRiskRows.length],
+        ["Nivel I", filteredRiskRows.filter((row) => row.nrNivel === "I").length],
+        ["Nivel II", filteredRiskRows.filter((row) => row.nrNivel === "II").length],
+        ["Nivel III", filteredRiskRows.filter((row) => row.nrNivel === "III").length],
+        ["Nivel IV", filteredRiskRows.filter((row) => row.nrNivel === "IV").length],
+      ],
+      rows: filteredRiskRows,
+      columns: [
+        { header: "Proceso", value: (row) => row.proceso },
+        { header: "Zona", value: (row) => row.zonaLugar },
+        { header: "Actividad", value: (row) => row.actividades },
+        { header: "Tarea", value: (row) => row.tareas },
+        { header: "Peligro", value: (row) => getHazardTypeName(row.peligroClasificacion) },
+        { header: "Descripcion", value: (row) => getHazardDescriptionName(row.peligroDescripcion) },
+        { header: "NP", value: (row) => row.np },
+        { header: "NR", value: (row) => row.nr },
+        { header: "Nivel", value: (row) => row.nrNivel || "Sin nivel" },
+        { header: "Aceptabilidad", value: (row) => row.aceptabilidad },
+        { header: "Estado", value: (row) => riskStatusLabel(row.status) },
+      ],
+    })
+  }
+
   const dashboard = useMemo(() => {
     const byLevel = { I: 0, II: 0, III: 0, IV: 0, NA: 0 }
     const byState: Record<RiskProgressState, number> = {
@@ -1168,7 +1233,7 @@ return Array.isArray(raw)
       VENCIDO: 0,
     }
 
-    for (const r of riskRows) {
+    for (const r of filteredRiskRows) {
       if (r.nrNivel === "I") byLevel.I++
       else if (r.nrNivel === "II") byLevel.II++
       else if (r.nrNivel === "III") byLevel.III++
@@ -1179,8 +1244,8 @@ return Array.isArray(raw)
       byState[pr.state]++
     }
 
-    return { byLevel, byState, total: riskRows.length }
-  }, [riskRows])
+    return { byLevel, byState, total: filteredRiskRows.length }
+  }, [filteredRiskRows])
 
   return (
     <div className="space-y-6">
@@ -1253,6 +1318,81 @@ return Array.isArray(raw)
             </Card>
           </div>
 
+          <Card>
+            <CardContent className="grid gap-3 p-4 md:grid-cols-2 xl:grid-cols-[180px_160px_160px_160px_auto] xl:items-end">
+              <div className="grid gap-1">
+                <span className="text-xs font-medium text-muted-foreground">Periodo</span>
+                <Select value={riskReportFilter.mode} onValueChange={(value) => updateRiskReportFilter({ mode: value as DateRangeMode })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="bimester">Bimestre</SelectItem>
+                    <SelectItem value="quarter">Trimestre</SelectItem>
+                    <SelectItem value="custom">Rango de fechas</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-1">
+                <span className="text-xs font-medium text-muted-foreground">Año</span>
+                <Input
+                  type="number"
+                  min="2020"
+                  max="2100"
+                  value={riskReportFilter.year}
+                  disabled={riskReportFilter.mode === "all" || riskReportFilter.mode === "custom"}
+                  onChange={(event) => updateRiskReportFilter({ year: event.target.value })}
+                />
+              </div>
+              {riskReportFilter.mode === "bimester" || riskReportFilter.mode === "quarter" ? (
+                <div className="grid gap-1">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {riskReportFilter.mode === "bimester" ? "Bimestre" : "Trimestre"}
+                  </span>
+                  <Select value={riskReportFilter.period} onValueChange={(period) => updateRiskReportFilter({ period })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: riskReportFilter.mode === "bimester" ? 6 : 4 }, (_, index) => (
+                        <SelectItem key={index + 1} value={String(index + 1)}>
+                          {index + 1}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="grid gap-1">
+                  <span className="text-xs font-medium text-muted-foreground">Fecha inicial</span>
+                  <Input
+                    type="date"
+                    value={riskReportFilter.startDate}
+                    disabled={riskReportFilter.mode !== "custom"}
+                    onChange={(event) => updateRiskReportFilter({ startDate: event.target.value })}
+                  />
+                </div>
+              )}
+              <div className="grid gap-1">
+                <span className="text-xs font-medium text-muted-foreground">Fecha final</span>
+                <Input
+                  type="date"
+                  value={riskReportFilter.endDate}
+                  disabled={riskReportFilter.mode !== "custom"}
+                  onChange={(event) => updateRiskReportFilter({ endDate: event.target.value })}
+                />
+              </div>
+              <Button type="button" className="gap-2" onClick={handleDownloadRiskMatrixPdf} disabled={filteredRiskRows.length === 0}>
+                <Download className="h-4 w-4" />
+                Exportar matriz PDF
+              </Button>
+              <p className="text-xs text-muted-foreground md:col-span-2 xl:col-span-5">
+                Periodo del reporte: {riskReportRange.label}. Los registros sin fecha disponible se mantienen visibles hasta que el backend entregue una fecha de creación o evaluación.
+              </p>
+            </CardContent>
+          </Card>
+
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <h2 className="text-lg font-semibold">Cuadro de riesgos</h2>
@@ -1269,11 +1409,11 @@ return Array.isArray(raw)
 
           <Card>
             <CardContent className="p-4 space-y-3">
-              {riskRows.length === 0 ? (
+              {filteredRiskRows.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Aún no hay filas registradas.</p>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                  {riskRows.map((r) => {
+                  {filteredRiskRows.map((r) => {
                     const pr = getRiskProcessProgress(r)
                     return (
                       <Card key={r.id} className="border">

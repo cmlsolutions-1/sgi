@@ -17,6 +17,9 @@ import {
   UsersRound,
   ClipboardCheck,
   Fingerprint,
+  PackageCheck,
+  SprayCan,
+  Bug,
 } from "lucide-react"
 import type { ModuleNode } from "@/store/auth.store"
 
@@ -161,6 +164,31 @@ export const navigation: NavigationItem[] = [
         name: "Brigada de Emergencias",
         href: "/dashboard/emergency-brigades",
         icon: UsersRound,
+      },
+    ],
+  },
+  {
+    code: "SANITARY_MANAGEMENT",
+    name: "Gestión Sanitaria",
+    icon: SprayCan,
+    subItems: [
+      {
+        code: "HYGIENE_SUPPLIES",
+        name: "Insumos de higiene",
+        href: "/dashboard/hygiene-supplies",
+        icon: PackageCheck,
+      },
+      {
+        code: "SANITATION",
+        name: "Saneamiento",
+        href: "/dashboard/sanitation",
+        icon: SprayCan,
+      },
+      {
+        code: "PEST_CONTROL",
+        name: "Control de plagas",
+        href: "/dashboard/pest-control",
+        icon: Bug,
       },
     ],
   },
