@@ -1,7 +1,18 @@
 "use client"
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
-import { Edit, Loader2, Plus, Power, Search, UsersRound } from "lucide-react"
+import {
+  Edit,
+  LayoutGrid,
+  List,
+  Loader2,
+  MoreHorizontal,
+  Plus,
+  Power,
+  Search,
+  Upload,
+  UsersRound,
+} from "lucide-react"
 import { toast } from "sonner"
 
 import { EmergencyDocumentPanel } from "@/components/emergency/EmergencyDocumentPanel"
@@ -16,6 +27,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -41,6 +59,8 @@ const BRIGADE_TYPES: Array<{ value: BrigadeType; label: string }> = [
   { value: "SEARCH_AND_RESCUE", label: "Búsqueda y rescate" },
   { value: "COMMUNICATION_AND_INFORMATION", label: "Comunicación e información" },
 ]
+
+type ViewMode = "cards" | "list"
 
 const emptyForm: UpsertEmergencyBrigadeDto = {
   objective: "",
@@ -262,6 +282,8 @@ export default function EmergencyBrigadesPage() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingBrigade, setEditingBrigade] = useState<EmergencyBrigade | null>(null)
+  const [documentsBrigade, setDocumentsBrigade] = useState<EmergencyBrigade | null>(null)
+  const [viewMode, setViewMode] = useState<ViewMode>("list")
   const [statusFilter, setStatusFilter] = useState<EmergencyStatus | "all">("all")
   const [typeFilter, setTypeFilter] = useState<BrigadeType | "all">("all")
   const [search, setSearch] = useState("")
@@ -365,18 +387,20 @@ export default function EmergencyBrigadesPage() {
 
       <Card>
         <CardContent className="space-y-5 p-5">
-          <div className="grid gap-3 md:grid-cols-3">
-            <div className="rounded-md bg-slate-50 p-4">
-              <p className="text-2xl font-bold text-slate-900">{brigades.length}</p>
-              <p className="text-sm text-slate-500">Brigadas registradas</p>
-            </div>
-            <div className="rounded-md bg-slate-50 p-4">
-              <p className="text-2xl font-bold text-emerald-600">{activeCount}</p>
-              <p className="text-sm text-slate-500">Brigadas activas</p>
-            </div>
-            <div className="rounded-md bg-slate-50 p-4">
-              <p className="text-2xl font-bold text-slate-900">{membersCount}</p>
-              <p className="text-sm text-slate-500">Integrantes vinculados</p>
+          <div className="overflow-x-auto px-3 py-1">
+            <div className="flex min-w-max items-center justify-center gap-2">
+              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+                <span className="text-xs text-muted-foreground">Total</span>
+                <span className="text-sm font-semibold">{brigades.length}</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+                <span className="text-xs text-muted-foreground">Activas</span>
+                <span className="text-sm font-semibold text-green-600">{activeCount}</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+                <span className="text-xs text-muted-foreground">Integrantes</span>
+                <span className="text-sm font-semibold">{membersCount}</span>
+              </div>
             </div>
           </div>
 
@@ -431,59 +455,155 @@ export default function EmergencyBrigadesPage() {
           <CardContent className="p-8 text-center text-muted-foreground">No hay brigadas registradas.</CardContent>
         </Card>
       ) : (
-        <section className="grid gap-4">
-          {brigades.map((brigade) => (
-            <Card key={brigade.id}>
-              <CardContent className="p-5">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-lg font-bold text-slate-900">{brigadeTypeLabel(brigade.brigadeType)}</h2>
-                      <Badge className={statusClassName(brigade.status)}>{statusLabel(brigade.status)}</Badge>
-                    </div>
-                    <p className="mt-3 text-sm text-slate-600">{brigade.objective}</p>
-                    <p className="mt-2 text-sm text-slate-600">{brigade.functions}</p>
-                    <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
-                      <UsersRound className="h-4 w-4" />
-                      {brigade.employees?.length ?? brigade.employeeIds?.length ?? 0} integrantes
-                    </div>
-                    {brigade.employees?.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {brigade.employees.map((employee) => (
-                          <Badge key={employee.id} variant="outline">
-                            {employeeName(employee)}
-                          </Badge>
-                        ))}
+        <>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Lista de brigadas de emergencia</h2>
+              <p className="text-sm text-muted-foreground">{brigades.length} registros encontrados</p>
+            </div>
+            <div className="inline-flex w-fit rounded-md border border-border bg-secondary p-1">
+              <Button
+                type="button"
+                size="sm"
+                variant={viewMode === "cards" ? "default" : "ghost"}
+                className="h-8 gap-2"
+                onClick={() => setViewMode("cards")}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Tarjetas
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={viewMode === "list" ? "default" : "ghost"}
+                className="h-8 gap-2"
+                onClick={() => setViewMode("list")}
+              >
+                <List className="h-4 w-4" />
+                Lista
+              </Button>
+            </div>
+          </div>
+
+          {viewMode === "cards" ? (
+            <section className="grid gap-4">
+              {brigades.map((brigade) => (
+                <Card key={brigade.id}>
+                  <CardContent className="p-5">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h2 className="text-lg font-bold text-slate-900">{brigadeTypeLabel(brigade.brigadeType)}</h2>
+                          <Badge className={statusClassName(brigade.status)}>{statusLabel(brigade.status)}</Badge>
+                        </div>
+                        <p className="mt-3 text-sm text-slate-600">{brigade.objective}</p>
+                        <p className="mt-2 text-sm text-slate-600">{brigade.functions}</p>
+                        <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
+                          <UsersRound className="h-4 w-4" />
+                          {brigade.employees?.length ?? brigade.employeeIds?.length ?? 0} integrantes
+                        </div>
+                        {brigade.employees?.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {brigade.employees.map((employee) => (
+                              <Badge key={employee.id} variant="outline">
+                                {employeeName(employee)}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
 
-                  <div className="flex shrink-0 flex-wrap gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="gap-2"
-                      onClick={() => {
-                        setEditingBrigade(brigade)
-                        setDialogOpen(true)
-                      }}
-                    >
-                      <Edit className="h-4 w-4" />
-                      Editar
-                    </Button>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => handleChangeStatus(brigade)}>
-                      <Power className="h-4 w-4" />
-                      {brigade.status === "ACTIVE" ? "Inactivar" : "Activar"}
-                    </Button>
-                  </div>
-                </div>
+                      <div className="flex shrink-0 flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                          onClick={() => {
+                            setEditingBrigade(brigade)
+                            setDialogOpen(true)
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                          Editar
+                        </Button>
+                        <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => handleChangeStatus(brigade)}>
+                          <Power className="h-4 w-4" />
+                          {brigade.status === "ACTIVE" ? "Inactivar" : "Activar"}
+                        </Button>
+                      </div>
+                    </div>
 
-                <EmergencyDocumentPanel owner="brigade" ownerId={brigade.id} />
-              </CardContent>
-            </Card>
-          ))}
-        </section>
+                    <EmergencyDocumentPanel owner="brigade" ownerId={brigade.id} />
+                  </CardContent>
+                </Card>
+              ))}
+            </section>
+          ) : (
+            <div className="overflow-x-auto rounded-md border border-border bg-card">
+              <table className="w-full min-w-[980px] text-sm">
+                <thead className="border-b border-border bg-secondary text-left text-xs font-medium uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Brigada</th>
+                    <th className="px-4 py-3 font-medium">Objetivo</th>
+                    <th className="px-4 py-3 font-medium">Funciones</th>
+                    <th className="px-4 py-3 font-medium">Integrantes</th>
+                    <th className="px-4 py-3 font-medium">Estado</th>
+                    <th className="px-4 py-3 text-right font-medium">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {brigades.map((brigade) => (
+                    <tr key={brigade.id} className="align-middle">
+                      <td className="px-4 py-3 font-medium">{brigadeTypeLabel(brigade.brigadeType)}</td>
+                      <td className="px-4 py-3">
+                        <p className="max-w-[260px] truncate text-muted-foreground">{brigade.objective}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="max-w-[260px] truncate text-muted-foreground">{brigade.functions}</p>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {brigade.employees?.length ?? brigade.employeeIds?.length ?? 0}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge className={statusClassName(brigade.status)}>{statusLabel(brigade.status)}</Badge>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-52">
+                            <DropdownMenuItem
+                              onSelect={() => {
+                                setEditingBrigade(brigade)
+                                setDialogOpen(true)
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => setDocumentsBrigade(brigade)}>
+                              <Upload className="h-4 w-4" />
+                              Cargar / ver archivos
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onSelect={() => handleChangeStatus(brigade)}>
+                              <Power className="h-4 w-4" />
+                              {brigade.status === "ACTIVE" ? "Inactivar" : "Activar"}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
       )}
 
       <EmergencyBrigadeDialog
@@ -494,6 +614,17 @@ export default function EmergencyBrigadesPage() {
         onClose={() => setDialogOpen(false)}
         onSave={handleSave}
       />
+
+      <Dialog open={Boolean(documentsBrigade)} onOpenChange={(open) => !open && setDocumentsBrigade(null)}>
+        <DialogContent className="max-h-[88vh] w-[calc(100vw-2rem)] max-w-4xl overflow-hidden bg-card p-0">
+          <DialogHeader className="border-b border-border px-6 py-4">
+            <DialogTitle>Documentos de la brigada de emergencia</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto px-6 py-4">
+            {documentsBrigade && <EmergencyDocumentPanel owner="brigade" ownerId={documentsBrigade.id} />}
+          </div>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }

@@ -1,7 +1,19 @@
 "use client"
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
-import { CalendarDays, Edit, Loader2, Plus, Power, Search, UserRound } from "lucide-react"
+import {
+  CalendarDays,
+  Edit,
+  LayoutGrid,
+  List,
+  Loader2,
+  MoreHorizontal,
+  Plus,
+  Power,
+  Search,
+  Upload,
+  UserRound,
+} from "lucide-react"
 import { toast } from "sonner"
 
 import { PreventiveMaintenanceDocumentPanel } from "@/components/preventive-maintenance/PreventiveMaintenanceDocumentPanel"
@@ -15,6 +27,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -38,6 +57,8 @@ const actionOptions: Array<{ value: PreventiveMaintenanceAction; label: string }
   { value: "CORRECTIVE", label: "Correctivo" },
   { value: "IMPROVEMENT", label: "Mejora" },
 ]
+
+type ViewMode = "cards" | "list"
 
 type MaintenanceForm = Omit<UpsertPreventiveMaintenanceDto, "date"> & {
   date: string
@@ -266,6 +287,8 @@ export default function PreventiveMaintenancePage() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingMaintenance, setEditingMaintenance] = useState<PreventiveMaintenance | null>(null)
+  const [documentsMaintenance, setDocumentsMaintenance] = useState<PreventiveMaintenance | null>(null)
+  const [viewMode, setViewMode] = useState<ViewMode>("list")
   const [search, setSearch] = useState("")
   const [actionFilter, setActionFilter] = useState<PreventiveMaintenanceAction | "all">("all")
   const [statusFilter, setStatusFilter] = useState<PreventiveMaintenanceStatus | "all">("all")
@@ -375,18 +398,20 @@ export default function PreventiveMaintenancePage() {
 
       <Card>
         <CardContent className="space-y-5 p-5">
-          <div className="grid gap-3 md:grid-cols-3">
-            <div className="rounded-md bg-slate-50 p-4">
-              <p className="text-2xl font-bold text-slate-900">{maintenances.length}</p>
-              <p className="text-sm text-slate-500">Mantenimientos registrados</p>
-            </div>
-            <div className="rounded-md bg-slate-50 p-4">
-              <p className="text-2xl font-bold text-emerald-600">{activeCount}</p>
-              <p className="text-sm text-slate-500">Mantenimientos activos</p>
-            </div>
-            <div className="rounded-md bg-slate-50 p-4">
-              <p className="text-2xl font-bold text-slate-900">{maintenances.length - activeCount}</p>
-              <p className="text-sm text-slate-500">Mantenimientos inactivos</p>
+          <div className="overflow-x-auto px-3 py-1">
+            <div className="flex min-w-max items-center justify-center gap-2">
+              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+                <span className="text-xs text-muted-foreground">Total</span>
+                <span className="text-sm font-semibold">{maintenances.length}</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+                <span className="text-xs text-muted-foreground">Activos</span>
+                <span className="text-sm font-semibold text-green-600">{activeCount}</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+                <span className="text-xs text-muted-foreground">Inactivos</span>
+                <span className="text-sm font-semibold">{maintenances.length - activeCount}</span>
+              </div>
             </div>
           </div>
 
@@ -470,63 +495,162 @@ export default function PreventiveMaintenancePage() {
           </CardContent>
         </Card>
       ) : (
-        <section className="grid gap-4">
-          {maintenances.map((maintenance) => (
-            <Card key={maintenance.id}>
-              <CardContent className="p-5">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-lg font-bold text-slate-900">{actionLabel(maintenance.action)}</h2>
-                      <Badge className={actionClassName(maintenance.action)}>{actionLabel(maintenance.action)}</Badge>
-                      <Badge className={statusClassName(maintenance.status)}>{statusLabel(maintenance.status)}</Badge>
-                    </div>
-                    <p className="mt-3 text-sm text-slate-600">{maintenance.description}</p>
-                    <p className="mt-2 text-sm text-slate-600">{maintenance.observations}</p>
-                    <div className="mt-3 grid gap-2 text-sm text-slate-600 md:grid-cols-2">
-                      <p className="flex items-center gap-2">
-                        <CalendarDays className="h-4 w-4" />
-                        {formatDateTime(maintenance.date)}
-                      </p>
-                      <p className="flex items-center gap-2">
-                        <UserRound className="h-4 w-4" />
-                        {employeeName(maintenance.responsibleEmployee)}
-                      </p>
-                    </div>
-                  </div>
+        <>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Lista de mantenimientos</h2>
+              <p className="text-sm text-muted-foreground">{maintenances.length} registros encontrados</p>
+            </div>
+            <div className="inline-flex w-fit rounded-md border border-border bg-secondary p-1">
+              <Button
+                type="button"
+                size="sm"
+                variant={viewMode === "cards" ? "default" : "ghost"}
+                className="h-8 gap-2"
+                onClick={() => setViewMode("cards")}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Tarjetas
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={viewMode === "list" ? "default" : "ghost"}
+                className="h-8 gap-2"
+                onClick={() => setViewMode("list")}
+              >
+                <List className="h-4 w-4" />
+                Lista
+              </Button>
+            </div>
+          </div>
 
-                  <div className="flex shrink-0 flex-wrap gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="gap-2"
-                      onClick={() => {
-                        setEditingMaintenance(maintenance)
-                        setDialogOpen(true)
-                      }}
-                    >
-                      <Edit className="h-4 w-4" />
-                      Editar
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="gap-2"
-                      onClick={() => handleChangeStatus(maintenance)}
-                    >
-                      <Power className="h-4 w-4" />
-                      {maintenance.status === "ACTIVE" ? "Inactivar" : "Activar"}
-                    </Button>
-                  </div>
-                </div>
+          {viewMode === "cards" ? (
+            <section className="grid gap-4">
+              {maintenances.map((maintenance) => (
+                <Card key={maintenance.id}>
+                  <CardContent className="p-5">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h2 className="text-lg font-bold text-slate-900">{actionLabel(maintenance.action)}</h2>
+                          <Badge className={actionClassName(maintenance.action)}>{actionLabel(maintenance.action)}</Badge>
+                          <Badge className={statusClassName(maintenance.status)}>{statusLabel(maintenance.status)}</Badge>
+                        </div>
+                        <p className="mt-3 text-sm text-slate-600">{maintenance.description}</p>
+                        <p className="mt-2 text-sm text-slate-600">{maintenance.observations}</p>
+                        <div className="mt-3 grid gap-2 text-sm text-slate-600 md:grid-cols-2">
+                          <p className="flex items-center gap-2">
+                            <CalendarDays className="h-4 w-4" />
+                            {formatDateTime(maintenance.date)}
+                          </p>
+                          <p className="flex items-center gap-2">
+                            <UserRound className="h-4 w-4" />
+                            {employeeName(maintenance.responsibleEmployee)}
+                          </p>
+                        </div>
+                      </div>
 
-                <PreventiveMaintenanceDocumentPanel maintenanceId={maintenance.id} />
-              </CardContent>
-            </Card>
-          ))}
-        </section>
+                      <div className="flex shrink-0 flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                          onClick={() => {
+                            setEditingMaintenance(maintenance)
+                            setDialogOpen(true)
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                          Editar
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                          onClick={() => handleChangeStatus(maintenance)}
+                        >
+                          <Power className="h-4 w-4" />
+                          {maintenance.status === "ACTIVE" ? "Inactivar" : "Activar"}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <PreventiveMaintenanceDocumentPanel maintenanceId={maintenance.id} />
+                  </CardContent>
+                </Card>
+              ))}
+            </section>
+          ) : (
+            <div className="overflow-x-auto rounded-md border border-border bg-card">
+              <table className="w-full min-w-[980px] text-sm">
+                <thead className="border-b border-border bg-secondary text-left text-xs font-medium uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Acción</th>
+                    <th className="px-4 py-3 font-medium">Fecha</th>
+                    <th className="px-4 py-3 font-medium">Responsable</th>
+                    <th className="px-4 py-3 font-medium">Descripción</th>
+                    <th className="px-4 py-3 font-medium">Estado</th>
+                    <th className="px-4 py-3 text-right font-medium">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {maintenances.map((maintenance) => (
+                    <tr key={maintenance.id} className="align-middle">
+                      <td className="px-4 py-3">
+                        <Badge className={actionClassName(maintenance.action)}>{actionLabel(maintenance.action)}</Badge>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">{formatDateTime(maintenance.date)}</td>
+                      <td className="px-4 py-3">
+                        <p className="max-w-[220px] truncate text-muted-foreground">
+                          {employeeName(maintenance.responsibleEmployee)}
+                        </p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="max-w-[320px] truncate font-medium">{maintenance.description}</p>
+                        <p className="max-w-[320px] truncate text-muted-foreground">{maintenance.observations}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge className={statusClassName(maintenance.status)}>{statusLabel(maintenance.status)}</Badge>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-52">
+                            <DropdownMenuItem
+                              onSelect={() => {
+                                setEditingMaintenance(maintenance)
+                                setDialogOpen(true)
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => setDocumentsMaintenance(maintenance)}>
+                              <Upload className="h-4 w-4" />
+                              Cargar / ver archivos
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onSelect={() => handleChangeStatus(maintenance)}>
+                              <Power className="h-4 w-4" />
+                              {maintenance.status === "ACTIVE" ? "Inactivar" : "Activar"}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
       )}
 
       <MaintenanceDialog
@@ -537,6 +661,17 @@ export default function PreventiveMaintenancePage() {
         onClose={() => setDialogOpen(false)}
         onSave={handleSave}
       />
+
+      <Dialog open={Boolean(documentsMaintenance)} onOpenChange={(open) => !open && setDocumentsMaintenance(null)}>
+        <DialogContent className="max-h-[88vh] w-[calc(100vw-2rem)] max-w-4xl overflow-hidden bg-card p-0">
+          <DialogHeader className="border-b border-border px-6 py-4">
+            <DialogTitle>Documentos del mantenimiento preventivo</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto px-6 py-4">
+            {documentsMaintenance && <PreventiveMaintenanceDocumentPanel maintenanceId={documentsMaintenance.id} />}
+          </div>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }

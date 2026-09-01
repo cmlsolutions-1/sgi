@@ -1,7 +1,7 @@
 "use client"
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
-import { Bug, CalendarDays, Edit, Loader2, Plus, Power, Search } from "lucide-react"
+import { Bug, CalendarDays, Edit, LayoutGrid, List, Loader2, MoreHorizontal, Plus, Power, Search, Upload } from "lucide-react"
 import { toast } from "sonner"
 
 import { SanitaryDocumentPanel } from "@/components/sanitary/SanitaryDocumentPanel"
@@ -9,6 +9,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -22,6 +29,8 @@ import type {
   PestControlRecord,
   RecordStatus,
 } from "@/types/manager/sanitary"
+
+type ViewMode = "cards" | "list"
 
 const emptyForm: CreatePestControlRequest = {
   date: "",
@@ -154,6 +163,8 @@ export default function PestControlPage() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingRecord, setEditingRecord] = useState<PestControlRecord | null>(null)
+  const [documentsRecord, setDocumentsRecord] = useState<PestControlRecord | null>(null)
+  const [viewMode, setViewMode] = useState<ViewMode>("list")
 
   const activeCount = useMemo(() => records.filter((record) => record.status === "ACTIVE").length, [records])
   const scheduledCount = useMemo(() => {
@@ -260,12 +271,36 @@ export default function PestControlPage() {
 
       <Card className="rounded-lg">
         <CardContent className="space-y-4 p-4 sm:p-5">
-          <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900">Seguimientos registrados</h2>
-              <p className="text-sm text-muted-foreground">Filtra por estado, proveedor o rango de fechas.</p>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">Seguimientos registrados</h2>
+                <p className="text-sm text-muted-foreground">Filtra por estado, proveedor o rango de fechas.</p>
+              </div>
+              <div className="inline-flex w-fit rounded-md border border-border bg-secondary p-1">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={viewMode === "cards" ? "default" : "ghost"}
+                  className="h-8 gap-2"
+                  onClick={() => setViewMode("cards")}
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                  Tarjetas
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  className="h-8 gap-2"
+                  onClick={() => setViewMode("list")}
+                >
+                  <List className="h-4 w-4" />
+                  Lista
+                </Button>
+              </div>
             </div>
-            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-[150px_150px_150px_220px_auto]">
+            <div className="grid gap-2 sm:grid-cols-2 xl:ml-auto xl:grid-cols-[150px_150px_150px_220px_auto]">
               <select
                 value={status}
                 onChange={(event) => setStatus(event.target.value as RecordStatus | "all")}
@@ -296,7 +331,7 @@ export default function PestControlPage() {
             <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-muted-foreground">
               No hay controles de plagas registrados.
             </div>
-          ) : (
+          ) : viewMode === "cards" ? (
             <div className="space-y-3">
               {records.map((record) => (
                 <article key={record.id} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
@@ -351,6 +386,64 @@ export default function PestControlPage() {
                 </article>
               ))}
             </div>
+          ) : (
+            <div className="overflow-x-auto rounded-md border border-border bg-card">
+              <table className="w-full min-w-[820px] text-sm">
+                <thead className="border-b border-border bg-secondary text-left text-xs font-medium uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Proveedor</th>
+                    <th className="px-4 py-3 font-medium">Fecha control</th>
+                    <th className="px-4 py-3 font-medium">Próxima visita</th>
+                    <th className="px-4 py-3 font-medium">Estado</th>
+                    <th className="px-4 py-3 text-right font-medium">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {records.map((record) => (
+                    <tr key={record.id} className="align-middle">
+                      <td className="px-4 py-3 font-medium">{record.serviceProviderCompanyName}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{formatDate(record.date)}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{formatDate(record.nextVisitDate)}</td>
+                      <td className="px-4 py-3">
+                        <Badge className={statusClassName(record.status)}>{statusLabel(record.status)}</Badge>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-52">
+                            <DropdownMenuItem
+                              onSelect={() => {
+                                setEditingRecord(record)
+                                setDialogOpen(true)
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => setDocumentsRecord(record)}>
+                              <Upload className="h-4 w-4" />
+                              Cargar / ver archivos
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              variant={record.status === "ACTIVE" ? "destructive" : "default"}
+                              onSelect={() => handleChangeStatus(record)}
+                            >
+                              <Power className="h-4 w-4" />
+                              {record.status === "ACTIVE" ? "Inactivar" : "Activar"}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -361,6 +454,17 @@ export default function PestControlPage() {
         onClose={() => setDialogOpen(false)}
         onSave={handleSave}
       />
+
+      <Dialog open={Boolean(documentsRecord)} onOpenChange={(open) => !open && setDocumentsRecord(null)}>
+        <DialogContent className="max-h-[88vh] w-[calc(100vw-2rem)] max-w-4xl overflow-hidden bg-card p-0">
+          <DialogHeader className="border-b border-border px-6 py-4">
+            <DialogTitle>Documentos de control de plagas</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto px-6 py-4">
+            {documentsRecord && <SanitaryDocumentPanel referenceType="PEST_CONTROL" resourceId={documentsRecord.id} />}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

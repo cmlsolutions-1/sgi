@@ -1,7 +1,7 @@
 "use client"
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
-import { Download, Edit, Loader2, Plus, Power, Search, SprayCan } from "lucide-react"
+import { Download, Edit, LayoutGrid, List, Loader2, MoreHorizontal, Plus, Power, Search, SprayCan, Upload } from "lucide-react"
 import { toast } from "sonner"
 
 import { SanitaryDocumentPanel } from "@/components/sanitary/SanitaryDocumentPanel"
@@ -10,6 +10,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { buildReportPdf, formatDisplayDate } from "@/lib/reporting"
@@ -30,6 +37,8 @@ import type {
   SanitationResponsibleType,
   SanitationType,
 } from "@/types/manager/sanitary"
+
+type ViewMode = "cards" | "list"
 
 const sanitationTypes: Array<{ value: SanitationType; label: string }> = [
   { value: "CLEANING_AND_DISINFECTION", label: "Limpieza y desinfección" },
@@ -299,11 +308,30 @@ export default function SanitationPage() {
   const [supplies, setSupplies] = useState<HygieneSupply[]>([])
   const [status, setStatus] = useState<RecordStatus | "all">("all")
   const [type, setType] = useState<SanitationType | "all">("all")
+  const [query, setQuery] = useState("")
+  const [viewMode, setViewMode] = useState<ViewMode>("list")
   const [loading, setLoading] = useState(true)
   const [loadingEmployees, setLoadingEmployees] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingRecord, setEditingRecord] = useState<SanitationRecord | null>(null)
+  const [documentsRecord, setDocumentsRecord] = useState<SanitationRecord | null>(null)
   const activeCount = useMemo(() => records.filter((record) => record.status === "ACTIVE").length, [records])
+  const filteredRecords = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase()
+    if (!normalizedQuery) return records
+
+    return records.filter((record) => {
+      const responsible =
+        record.responsibleType === "EMPLOYEE"
+          ? employeeName(record.responsibleEmployee)
+          : record.thirdPartyName || ""
+      const suppliesText = record.hygieneSupplies?.map((supply) => supply.name).join(" ") || ""
+      return [typeLabel(record.type), responsible, suppliesText, record.date, record.time]
+        .join(" ")
+        .toLowerCase()
+        .includes(normalizedQuery)
+    })
+  }, [query, records])
 
   async function loadData() {
     setLoading(true)
@@ -420,9 +448,42 @@ export default function SanitationPage() {
 
       <Card className="rounded-lg">
         <CardContent className="space-y-4 p-4 sm:p-5">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <h2 className="text-lg font-semibold text-slate-900">Plan de saneamiento</h2>
-            <div className="grid gap-2 sm:grid-cols-[180px_150px_auto]">
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <h2 className="text-lg font-semibold text-slate-900">Plan de saneamiento</h2>
+              <div className="inline-flex w-fit rounded-md border border-border bg-secondary p-1">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={viewMode === "cards" ? "default" : "ghost"}
+                  className="h-8 gap-2"
+                  onClick={() => setViewMode("cards")}
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                  Tarjetas
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  className="h-8 gap-2"
+                  onClick={() => setViewMode("list")}
+                >
+                  <List className="h-4 w-4" />
+                  Lista
+                </Button>
+              </div>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2 xl:ml-auto xl:grid-cols-[220px_180px_150px_auto]">
+              <div className="relative sm:col-span-2 xl:col-span-1">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  className="pl-9"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Buscar actividad o responsable"
+                />
+              </div>
               <select value={type} onChange={(event) => setType(event.target.value as SanitationType | "all")} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
                 <option value="all">Todos los tipos</option>
                 {sanitationTypes.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
@@ -438,11 +499,11 @@ export default function SanitationPage() {
 
           {loading ? (
             <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
-          ) : records.length === 0 ? (
+          ) : filteredRecords.length === 0 ? (
             <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-muted-foreground">No hay actividades registradas.</div>
-          ) : (
+          ) : viewMode === "cards" ? (
             <div className="space-y-3">
-              {records.map((record) => (
+              {filteredRecords.map((record) => (
                 <article key={record.id} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                     <div className="space-y-2">
@@ -466,6 +527,80 @@ export default function SanitationPage() {
                 </article>
               ))}
             </div>
+          ) : (
+            <div className="overflow-x-auto rounded-md border border-border bg-card">
+              <table className="w-full min-w-[980px] text-sm">
+                <thead className="border-b border-border bg-secondary text-left text-xs font-medium uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Actividad</th>
+                    <th className="px-4 py-3 font-medium">Fecha</th>
+                    <th className="px-4 py-3 font-medium">Responsable</th>
+                    <th className="px-4 py-3 font-medium">Insumos</th>
+                    <th className="px-4 py-3 font-medium">Estado</th>
+                    <th className="px-4 py-3 text-right font-medium">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filteredRecords.map((record) => {
+                    const responsible =
+                      record.responsibleType === "EMPLOYEE"
+                        ? employeeName(record.responsibleEmployee)
+                        : record.thirdPartyName || "No registrado"
+
+                    return (
+                      <tr key={record.id} className="align-middle">
+                        <td className="px-4 py-3 font-medium">{typeLabel(record.type)}</td>
+                        <td className="px-4 py-3 text-muted-foreground">
+                          {record.date} {record.time?.slice(0, 5)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="max-w-[220px] truncate text-muted-foreground">{responsible}</p>
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="max-w-[300px] truncate text-muted-foreground">
+                            {record.hygieneSupplies?.map((supply) => supply.name).join(", ") || "No aplica"}
+                          </p>
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge className={statusClassName(record.status)}>{statusLabel(record.status)}</Badge>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-52">
+                              <DropdownMenuItem onSelect={() => handleDownloadOrder(record)}>
+                                <Download className="h-4 w-4" />
+                                Descargar orden
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onSelect={() => { setEditingRecord(record); setDialogOpen(true) }}>
+                                <Edit className="h-4 w-4" />
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onSelect={() => setDocumentsRecord(record)}>
+                                <Upload className="h-4 w-4" />
+                                Cargar / ver archivos
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                variant={record.status === "ACTIVE" ? "destructive" : "default"}
+                                onSelect={() => handleChangeStatus(record)}
+                              >
+                                <Power className="h-4 w-4" />
+                                {record.status === "ACTIVE" ? "Inactivar" : "Activar"}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -479,6 +614,17 @@ export default function SanitationPage() {
         onClose={() => setDialogOpen(false)}
         onSave={handleSave}
       />
+
+      <Dialog open={Boolean(documentsRecord)} onOpenChange={(open) => !open && setDocumentsRecord(null)}>
+        <DialogContent className="max-h-[88vh] w-[calc(100vw-2rem)] max-w-4xl overflow-hidden bg-card p-0">
+          <DialogHeader className="border-b border-border px-6 py-4">
+            <DialogTitle>Documentos de saneamiento</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto px-6 py-4">
+            {documentsRecord && <SanitaryDocumentPanel referenceType="SANITATION" resourceId={documentsRecord.id} />}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

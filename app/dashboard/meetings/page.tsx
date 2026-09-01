@@ -1,10 +1,24 @@
 "use client"
 
 import { useEffect, useMemo, useState, type FormEvent } from "react"
-import { CalendarDays, Edit, Loader2, MapPin, Plus, Power, Search, UsersRound, X } from "lucide-react"
+import { CalendarDays, Edit, LayoutGrid, List, Loader2, MapPin, MoreHorizontal, Plus, Power, Search, Upload, UsersRound, X } from "lucide-react"
 import { toast } from "sonner"
 
 import { CommitteeDocumentPanel } from "@/components/committee/CommitteeDocumentPanel"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   changeMeetingStatus,
   createMeeting,
@@ -33,6 +47,8 @@ const emptyForm: CreateMeetingDto = {
   location: "",
   attendeeIds: [],
 }
+
+type ViewMode = "cards" | "list"
 
 function formatDate(value?: string | null) {
   if (!value) return "No registrada"
@@ -302,6 +318,8 @@ export default function MeetingsPage() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingMeeting, setEditingMeeting] = useState<Meeting | null>(null)
+  const [documentsMeeting, setDocumentsMeeting] = useState<Meeting | null>(null)
+  const [viewMode, setViewMode] = useState<ViewMode>("list")
   const [statusFilter, setStatusFilter] = useState<CommitteeStatus | "all">("all")
   const [committeeFilter, setCommitteeFilter] = useState("all")
   const [search, setSearch] = useState("")
@@ -389,18 +407,20 @@ export default function MeetingsPage() {
       </div>
 
       <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="grid gap-3 md:grid-cols-3">
-          <div className="rounded-md bg-slate-50 p-4">
-            <p className="text-2xl font-bold text-slate-900">{meetings.length}</p>
-            <p className="text-sm text-slate-500">Reuniones registradas</p>
-          </div>
-          <div className="rounded-md bg-slate-50 p-4">
-            <p className="text-2xl font-bold text-emerald-600">{activeCount}</p>
-            <p className="text-sm text-slate-500">Reuniones activas</p>
-          </div>
-          <div className="rounded-md bg-slate-50 p-4">
-            <p className="text-2xl font-bold text-slate-900">{committees.length}</p>
-            <p className="text-sm text-slate-500">Comités disponibles</p>
+        <div className="flex justify-center overflow-x-auto px-3 py-1">
+          <div className="flex w-fit min-w-max items-center gap-2">
+            <div className="rounded-md bg-secondary px-3 py-1.5">
+              <span className="text-sm font-bold text-slate-900">{meetings.length}</span>
+              <span className="ml-2 text-xs text-muted-foreground">Registradas</span>
+            </div>
+            <div className="rounded-md bg-secondary px-3 py-1.5">
+              <span className="text-sm font-bold text-emerald-700">{activeCount}</span>
+              <span className="ml-2 text-xs text-muted-foreground">Activas</span>
+            </div>
+            <div className="rounded-md bg-secondary px-3 py-1.5">
+              <span className="text-sm font-bold text-slate-900">{committees.length}</span>
+              <span className="ml-2 text-xs text-muted-foreground">Comités</span>
+            </div>
           </div>
         </div>
 
@@ -460,64 +480,191 @@ export default function MeetingsPage() {
           No hay reuniones registradas con los filtros actuales.
         </div>
       ) : (
-        <section className="grid gap-4">
-          {meetings.map((meeting) => (
-            <article key={meeting.id} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-lg font-bold text-slate-900">{meeting.topic}</h2>
-                    <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${getStatusClass(meeting.status)}`}>
-                      {getStatusLabel(meeting.status)}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-sm font-semibold text-slate-600">Acta {meeting.minutesNumber}</p>
-                  <p className="mt-2 text-sm text-slate-600">{meeting.description}</p>
-                  <div className="mt-3 grid gap-2 text-sm text-slate-600 md:grid-cols-2">
-                    <p className="flex items-center gap-2">
-                      <CalendarDays className="h-4 w-4" />
-                      {formatDate(meeting.meetingDate)} · {formatTime(meeting.startTime)} - {formatTime(meeting.endTime)}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      {meeting.location}
-                    </p>
-                    <p>{getCommitteeTypeLabel(meeting.committee?.type)}</p>
-                    <p className="flex items-center gap-2">
-                      <UsersRound className="h-4 w-4" />
-                      {meeting.attendees?.length ?? meeting.attendeeIds?.length ?? 0} asistentes
-                    </p>
-                  </div>
-                </div>
+        <>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Lista de reuniones</h2>
+              <p className="text-sm text-muted-foreground">{meetings.length} registros encontrados</p>
+            </div>
+            <div className="inline-flex w-fit rounded-md border border-border bg-secondary p-1">
+              <Button
+                type="button"
+                size="sm"
+                variant={viewMode === "cards" ? "default" : "ghost"}
+                className="h-8 gap-2"
+                onClick={() => setViewMode("cards")}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Tarjetas
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={viewMode === "list" ? "default" : "ghost"}
+                className="h-8 gap-2"
+                onClick={() => setViewMode("list")}
+              >
+                <List className="h-4 w-4" />
+                Lista
+              </Button>
+            </div>
+          </div>
 
-                <div className="flex shrink-0 flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditingMeeting(meeting)
-                      setDialogOpen(true)
-                    }}
-                    className="inline-flex items-center gap-2 rounded-md border border-sky-200 px-3 py-2 text-sm font-semibold text-sky-700 hover:bg-sky-50"
-                  >
-                    <Edit className="h-4 w-4" />
-                    Editar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleChangeStatus(meeting)}
-                    className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
-                  >
-                    <Power className="h-4 w-4" />
-                    {meeting.status === "ACTIVE" ? "Inactivar" : "Activar"}
-                  </button>
-                </div>
-              </div>
+          {viewMode === "cards" ? (
+            <section className="grid gap-4">
+              {meetings.map((meeting) => (
+                <article key={meeting.id} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="text-lg font-bold text-slate-900">{meeting.topic}</h2>
+                        <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${getStatusClass(meeting.status)}`}>
+                          {getStatusLabel(meeting.status)}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm font-semibold text-slate-600">Acta {meeting.minutesNumber}</p>
+                      <p className="mt-2 text-sm text-slate-600">{meeting.description}</p>
+                      <div className="mt-3 grid gap-2 text-sm text-slate-600 md:grid-cols-2">
+                        <p className="flex items-center gap-2">
+                          <CalendarDays className="h-4 w-4" />
+                          {formatDate(meeting.meetingDate)} · {formatTime(meeting.startTime)} - {formatTime(meeting.endTime)}
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4" />
+                          {meeting.location}
+                        </p>
+                        <p>{getCommitteeTypeLabel(meeting.committee?.type)}</p>
+                        <p className="flex items-center gap-2">
+                          <UsersRound className="h-4 w-4" />
+                          {meeting.attendees?.length ?? meeting.attendeeIds?.length ?? 0} asistentes
+                        </p>
+                      </div>
+                    </div>
 
-              <CommitteeDocumentPanel owner="meeting" ownerId={meeting.id} />
-            </article>
-          ))}
-        </section>
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingMeeting(meeting)
+                          setDialogOpen(true)
+                        }}
+                        className="inline-flex items-center gap-2 rounded-md border border-sky-200 px-3 py-2 text-sm font-semibold text-sky-700 hover:bg-sky-50"
+                      >
+                        <Edit className="h-4 w-4" />
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChangeStatus(meeting)}
+                        className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                      >
+                        <Power className="h-4 w-4" />
+                        {meeting.status === "ACTIVE" ? "Inactivar" : "Activar"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <CommitteeDocumentPanel owner="meeting" ownerId={meeting.id} />
+                </article>
+              ))}
+            </section>
+          ) : (
+            <div className="overflow-x-auto rounded-md border border-border bg-card">
+              <table className="w-full min-w-[1080px] text-sm">
+                <thead className="border-b border-border bg-secondary text-left text-xs font-medium uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Reunión</th>
+                    <th className="px-4 py-3 font-medium">Comité</th>
+                    <th className="px-4 py-3 font-medium">Fecha y hora</th>
+                    <th className="px-4 py-3 font-medium">Lugar</th>
+                    <th className="px-4 py-3 font-medium">Asistentes</th>
+                    <th className="px-4 py-3 font-medium">Estado</th>
+                    <th className="px-4 py-3 text-right font-medium">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {meetings.map((meeting) => (
+                    <tr key={meeting.id} className="align-middle">
+                      <td className="px-4 py-3">
+                        <p className="max-w-[280px] truncate font-medium text-foreground">{meeting.topic}</p>
+                        <p className="max-w-[280px] truncate text-muted-foreground">Acta {meeting.minutesNumber}</p>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {getCommitteeTypeLabel(meeting.committee?.type)}
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        <div className="flex flex-col gap-1">
+                          <span>{formatDate(meeting.meetingDate)}</span>
+                          <span>
+                            {formatTime(meeting.startTime)} - {formatTime(meeting.endTime)}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        <div className="flex max-w-[180px] items-center gap-2">
+                          <MapPin className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{meeting.location}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        <div className="flex items-center gap-2">
+                          <UsersRound className="h-4 w-4" />
+                          <span>{meeting.attendees?.length ?? meeting.attendeeIds?.length ?? 0}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${getStatusClass(meeting.status)}`}>
+                          {getStatusLabel(meeting.status)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-52">
+                            <DropdownMenuItem
+                              onSelect={() => {
+                                setEditingMeeting(meeting)
+                                setDialogOpen(true)
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => setDocumentsMeeting(meeting)}>
+                              <Upload className="h-4 w-4" />
+                              Cargar / ver archivos
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onSelect={() => handleChangeStatus(meeting)}>
+                              <Power className="h-4 w-4" />
+                              {meeting.status === "ACTIVE" ? "Inactivar" : "Activar"}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
       )}
+
+      <Dialog open={Boolean(documentsMeeting)} onOpenChange={(open) => !open && setDocumentsMeeting(null)}>
+        <DialogContent className="max-h-[88vh] w-[calc(100vw-2rem)] max-w-4xl overflow-hidden bg-card p-0">
+          <DialogHeader className="border-b border-border px-6 py-4">
+            <DialogTitle>Documentos de la reunión</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto px-6 py-4">
+            {documentsMeeting && <CommitteeDocumentPanel owner="meeting" ownerId={documentsMeeting.id} />}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <MeetingDialog
         open={dialogOpen}

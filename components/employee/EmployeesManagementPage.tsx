@@ -1638,7 +1638,7 @@ export default function EmployeesPage() {
   const [workAreaFilter, setWorkAreaFilter] = useState<string>("all")
   const [jobFilter, setJobFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [viewMode, setViewMode] = useState<EmployeeViewMode>("cards")
+  const [viewMode, setViewMode] = useState<EmployeeViewMode>("list")
   const [reportGender, setReportGender] = useState<string>("all")
   const [reportArlRiskLevel, setReportArlRiskLevel] = useState<string>("all")
   const [reportMinAge, setReportMinAge] = useState("")
@@ -2207,35 +2207,58 @@ export default function EmployeesPage() {
               )}
             </div>
           ) : (
-            <Card className="bg-card border-border">
-              <CardContent className="p-0">
-                {filteredEmployees.length === 0 ? (
-                  <div className="p-10 text-center text-sm text-muted-foreground">No hay funcionarios para mostrar.</div>
-                ) : (
-                  <div className="divide-y divide-border">
+            <div className="overflow-x-auto rounded-md border border-border bg-card">
+              {filteredEmployees.length === 0 ? (
+                <div className="p-10 text-center text-sm text-muted-foreground">No hay funcionarios para mostrar.</div>
+              ) : (
+                <table className="w-full min-w-[980px] text-sm">
+                  <thead className="border-b border-border bg-secondary text-left text-xs font-medium uppercase text-muted-foreground">
+                    <tr>
+                      <th className="px-4 py-3 font-medium">Funcionario</th>
+                      <th className="px-4 py-3 font-medium">Documento</th>
+                      <th className="px-4 py-3 font-medium">Cargo / Área</th>
+                      <th className="px-4 py-3 font-medium">Contacto</th>
+                      <th className="px-4 py-3 font-medium">Estado</th>
+                      <th className="px-4 py-3 text-right font-medium">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
                     {filteredEmployees.map((employee) => (
-                      <div key={employee.id} className="grid gap-4 p-4 md:grid-cols-[minmax(220px,1.4fr)_1fr_1fr_auto] md:items-center">
-                        <div className="flex min-w-0 items-center gap-3">
-                          <Avatar className="h-10 w-10">
-                            <AvatarFallback className="bg-primary/10 text-sm text-primary">
-                              {getEmployeeInitials(employee)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0">
-                            <p className="truncate font-medium">
-                              {employee.name} {employee.lastName}
-                            </p>
-                            <div className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
-                              <IdCardIcon className="h-4 w-4 shrink-0" />
-                              <span className="truncate">{formatEmployeeDocument(employee)}</span>
+                      <tr key={employee.id} className="align-middle">
+                        <td className="px-4 py-3">
+                          <div className="flex min-w-0 items-center gap-3">
+                            <Avatar className="h-10 w-10">
+                              <AvatarFallback className="bg-primary/10 text-sm text-primary">
+                                {getEmployeeInitials(employee)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="min-w-0">
+                              <p className="max-w-[240px] truncate font-medium">
+                                {employee.name} {employee.lastName}
+                              </p>
+                              <p className="max-w-[240px] truncate text-muted-foreground">
+                                {employee.email || "Correo no registrado"}
+                              </p>
                             </div>
                           </div>
-                        </div>
-                        <div className="min-w-0 text-sm">
-                          <p className="truncate font-medium">{employee.job?.name ?? "Sin puesto"}</p>
-                          <p className="truncate text-muted-foreground">{employee.workArea?.name ?? "Sin area"}</p>
-                        </div>
-                        <div className="min-w-0 space-y-1 text-sm">
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex max-w-[180px] items-center gap-2 text-muted-foreground">
+                            <IdCardIcon className="h-4 w-4 shrink-0" />
+                            <span className="truncate">{formatEmployeeDocument(employee)}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="max-w-[220px] truncate font-medium">{employee.job?.name ?? "Sin puesto"}</p>
+                          <p className="max-w-[220px] truncate text-muted-foreground">
+                            {employee.workArea?.name ?? "Sin area"}
+                          </p>
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="max-w-[220px] truncate text-muted-foreground">{employee.phone || "Sin telefono"}</p>
+                          <p className="max-w-[220px] truncate text-muted-foreground">{employee.email || "No registrado"}</p>
+                        </td>
+                        <td className="px-4 py-3">
                           <Badge
                             variant="secondary"
                             className={cn(
@@ -2245,45 +2268,52 @@ export default function EmployeesPage() {
                           >
                             {employee.status ? "Activo" : "Inactivo"}
                           </Badge>
-                          <p className="truncate text-muted-foreground">{employee.email || "No registrado"}</p>
-                          <p className="truncate text-muted-foreground">{employee.phone || "Sin telefono"}</p>
-                        </div>
-                        <div className="flex items-center gap-2 md:justify-end">
-                          <Link href={`/dashboard/employees/${employee.id}`}>
-                            <Button variant="action" size="sm" className="gap-2">
-                              <Eye className="h-4 w-4" />
-                              Ver
-                            </Button>
-                          </Link>
-                          <EmployeeFormDialog
-                            employee={employee}
-                            onSave={(payload) => handleUpdateEmployee(employee, payload)}
-                            trigger={
-                              <Button variant="action" size="icon">
-                                <Edit className="h-4 w-4" />
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones">
+                                <MoreHorizontal className="h-4 w-4" />
                               </Button>
-                            }
-                          />
-                          {employee.status ? (
-                            <Button
-                              variant="destructive"
-                              size="icon"
-                              onClick={() => handleDeleteEmployee(employee)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          ) : (
-                            <Button variant="outline" size="sm" onClick={() => handleActivateEmployee(employee)}>
-                              Activar
-                            </Button>
-                          )}
-                        </div>
-                      </div>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-52">
+                              <DropdownMenuItem asChild>
+                                <Link href={`/dashboard/employees/${employee.id}`}>
+                                  <Eye className="h-4 w-4" />
+                                  Ver hoja de vida
+                                </Link>
+                              </DropdownMenuItem>
+                              <EmployeeFormDialog
+                                employee={employee}
+                                onSave={(payload) => handleUpdateEmployee(employee, payload)}
+                                trigger={
+                                  <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+                                    <Edit className="h-4 w-4" />
+                                    Editar
+                                  </DropdownMenuItem>
+                                }
+                              />
+                              <DropdownMenuSeparator />
+                              {employee.status ? (
+                                <DropdownMenuItem variant="destructive" onSelect={() => handleDeleteEmployee(employee)}>
+                                  <Trash2 className="h-4 w-4" />
+                                  Eliminar
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem onSelect={() => handleActivateEmployee(employee)}>
+                                  <UserCheck className="h-4 w-4" />
+                                  Activar
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      </tr>
                     ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  </tbody>
+                </table>
+              )}
+            </div>
           )}
       </div>
 

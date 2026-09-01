@@ -21,6 +21,7 @@ import {
   Search,
   Clock,
   CheckCircle,
+  LayoutGrid,
   Pencil,
   Trash2,
   Upload,
@@ -29,6 +30,8 @@ import {
   Loader2,
   Eye,
   ExternalLink,
+  List,
+  MoreHorizontal,
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -40,6 +43,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 import {
   createPreventiveMeasure,
@@ -66,6 +76,7 @@ import type {
 } from "@/types/manager/preventiveMeasure"
 
 type SourceType = "PROCEDURE" | "RISK" | "FREE"
+type ViewMode = "cards" | "list"
 
 type MeasureForm = {
   sourceType: SourceType
@@ -411,6 +422,8 @@ export default function PreventiveMeasuresPage() {
 
   const [openModal, setOpenModal] = useState(false)
   const [editingMeasure, setEditingMeasure] = useState<PreventiveMeasure | null>(null)
+  const [documentsMeasure, setDocumentsMeasure] = useState<PreventiveMeasure | null>(null)
+  const [viewMode, setViewMode] = useState<ViewMode>("list")
   const [form, setForm] = useState<MeasureForm>(emptyForm)
 
   async function loadData() {
@@ -945,90 +958,210 @@ export default function PreventiveMeasuresPage() {
         </CardContent>
       </Card>
 
-      <div className="space-y-4">
-        {loading ? (
+      {loading ? (
+        <div className="space-y-4">
           <Card className="bg-card border-border">
             <CardContent className="p-6 text-sm text-muted-foreground">Cargando medidas...</CardContent>
           </Card>
-        ) : filtered.length === 0 ? (
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="space-y-4">
           <Card className="bg-card border-border">
             <CardContent className="p-6 text-sm text-muted-foreground">
               No hay medidas que coincidan con los filtros. Crea una nueva medida para empezar.
             </CardContent>
           </Card>
-        ) : (
-          filtered.map((measure) => {
-            const status = statusConfig[measure.status]
-            const StatusIcon = status.icon
-
-            return (
-              <Card
-                key={measure.id}
-                className="bg-card border-border hover:border-primary/50 transition-colors"
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Lista de medidas de prevención</h2>
+              <p className="text-sm text-muted-foreground">{filtered.length} registros encontrados</p>
+            </div>
+            <div className="inline-flex w-fit rounded-md border border-border bg-secondary p-1">
+              <Button
+                type="button"
+                size="sm"
+                variant={viewMode === "cards" ? "default" : "ghost"}
+                className="h-8 gap-2"
+                onClick={() => setViewMode("cards")}
               >
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <Badge variant="outline" className={cn("text-xs", status.color)}>
-                          {status.label}
-                        </Badge>
-                        <Badge variant="secondary" className="text-xs">
-                          {keyLabels[measure.key]}
-                        </Badge>
-                        <Badge variant="secondary" className="text-xs">
-                          {actionLabels[measure.accion]}
-                        </Badge>
-                        <Badge variant="secondary" className="text-xs">
-                          {measure.type === "DATE" ? "Por fecha" : "Permanente"}
-                        </Badge>
+                <LayoutGrid className="h-4 w-4" />
+                Tarjetas
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={viewMode === "list" ? "default" : "ghost"}
+                className="h-8 gap-2"
+                onClick={() => setViewMode("list")}
+              >
+                <List className="h-4 w-4" />
+                Lista
+              </Button>
+            </div>
+          </div>
+
+          {viewMode === "cards" ? (
+            <div className="space-y-4">
+              {filtered.map((measure) => {
+                const status = statusConfig[measure.status]
+                const StatusIcon = status.icon
+
+                return (
+                  <Card
+                    key={measure.id}
+                    className="bg-card border-border hover:border-primary/50 transition-colors"
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2 flex-wrap">
+                            <Badge variant="outline" className={cn("text-xs", status.color)}>
+                              {status.label}
+                            </Badge>
+                            <Badge variant="secondary" className="text-xs">
+                              {keyLabels[measure.key]}
+                            </Badge>
+                            <Badge variant="secondary" className="text-xs">
+                              {actionLabels[measure.accion]}
+                            </Badge>
+                            <Badge variant="secondary" className="text-xs">
+                              {measure.type === "DATE" ? "Por fecha" : "Permanente"}
+                            </Badge>
+                          </div>
+
+                          <p className="text-sm font-medium">{measure.title}</p>
+                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{measure.description}</p>
+
+                          {measure.risk ? (
+                            <p className="text-xs text-muted-foreground mt-2">
+                              Riesgo vinculado: {measure.risk.process} / {measure.risk.activity} / {measure.risk.task}
+                            </p>
+                          ) : (
+                            <p className="text-xs text-muted-foreground mt-2">Sin riesgo vinculado</p>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <StatusIcon className={cn("h-4 w-4", status.color)} />
+                          <Badge variant="outline" className={cn("text-xs", status.badge)}>
+                            {status.label}
+                          </Badge>
+                        </div>
                       </div>
 
-                      <p className="text-sm font-medium">{measure.title}</p>
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{measure.description}</p>
+                      <div className="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-border flex-wrap">
+                        <span className="text-xs text-muted-foreground">
+                          {measure.type === "DATE" ? `Fecha límite: ${measure.dueDate || "Sin fecha"}` : "Medida permanente"}
+                          {measure.doneDate ? ` · Cumplida: ${measure.doneDate}` : ""}
+                        </span>
 
-                      {measure.risk ? (
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Riesgo vinculado: {measure.risk.process} / {measure.risk.activity} / {measure.risk.task}
-                        </p>
-                      ) : (
-                        <p className="text-xs text-muted-foreground mt-2">Sin riesgo vinculado</p>
-                      )}
-                    </div>
+                        <div className="flex items-center gap-2">
+                          <Button variant="action" size="sm" className="gap-2" onClick={() => openEditModal(measure)}>
+                            <Pencil className="h-4 w-4" />
+                            Editar
+                          </Button>
+                          <Button variant="destructive" size="sm" className="gap-2" onClick={() => removeMeasure(measure)}>
+                            <Trash2 className="h-4 w-4" />
+                            Eliminar
+                          </Button>
+                        </div>
+                      </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      <StatusIcon className={cn("h-4 w-4", status.color)} />
-                      <Badge variant="outline" className={cn("text-xs", status.badge)}>
-                        {status.label}
-                      </Badge>
-                    </div>
-                  </div>
+                      <PreventiveMeasureDocuments measureId={measure.id} />
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-md border border-border bg-card">
+              <table className="w-full min-w-[980px] text-sm">
+                <thead className="border-b border-border bg-secondary text-left text-xs font-medium uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Medida</th>
+                    <th className="px-4 py-3 font-medium">Jerarquía</th>
+                    <th className="px-4 py-3 font-medium">Acción</th>
+                    <th className="px-4 py-3 font-medium">Fecha</th>
+                    <th className="px-4 py-3 font-medium">Estado</th>
+                    <th className="px-4 py-3 text-right font-medium">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filtered.map((measure) => {
+                    const status = statusConfig[measure.status]
 
-                  <div className="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-border flex-wrap">
-                    <span className="text-xs text-muted-foreground">
-                      {measure.type === "DATE" ? `Fecha límite: ${measure.dueDate || "Sin fecha"}` : "Medida permanente"}
-                      {measure.doneDate ? ` · Cumplida: ${measure.doneDate}` : ""}
-                    </span>
+                    return (
+                      <tr key={measure.id} className="align-middle">
+                        <td className="px-4 py-3">
+                          <p className="max-w-[300px] truncate font-medium">{measure.title}</p>
+                          <p className="max-w-[300px] truncate text-muted-foreground">
+                            {measure.risk
+                              ? `${measure.risk.process} / ${measure.risk.activity} / ${measure.risk.task}`
+                              : "Sin riesgo vinculado"}
+                          </p>
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge variant="secondary">{keyLabels[measure.key]}</Badge>
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge variant="outline">{actionLabels[measure.accion]}</Badge>
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground">
+                          {measure.type === "DATE" ? measure.dueDate || "Sin fecha" : "Permanente"}
+                          {measure.doneDate ? ` · ${measure.doneDate}` : ""}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge variant="outline" className={cn("text-xs", status.badge)}>
+                            {status.label}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-52">
+                              <DropdownMenuItem onSelect={() => openEditModal(measure)}>
+                                <Pencil className="h-4 w-4" />
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onSelect={() => setDocumentsMeasure(measure)}>
+                                <Upload className="h-4 w-4" />
+                                Cargar / ver archivos
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem variant="destructive" onSelect={() => removeMeasure(measure)}>
+                                <Trash2 className="h-4 w-4" />
+                                Eliminar
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
 
-                    <div className="flex items-center gap-2">
-                      <Button variant="action" size="sm" className="gap-2" onClick={() => openEditModal(measure)}>
-                        <Pencil className="h-4 w-4" />
-                        Editar
-                      </Button>
-                      <Button variant="destructive" size="sm" className="gap-2" onClick={() => removeMeasure(measure)}>
-                        <Trash2 className="h-4 w-4" />
-                        Eliminar
-                      </Button>
-                    </div>
-                  </div>
-
-                  <PreventiveMeasureDocuments measureId={measure.id} />
-                </CardContent>
-              </Card>
-            )
-          })
-        )}
-      </div>
+      <Dialog open={Boolean(documentsMeasure)} onOpenChange={(open) => !open && setDocumentsMeasure(null)}>
+        <DialogContent className="max-h-[88vh] w-[calc(100vw-2rem)] max-w-4xl overflow-hidden bg-card p-0">
+          <DialogHeader className="border-b border-border px-6 py-4">
+            <DialogTitle>Documentos de la medida preventiva</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto px-6 py-4">
+            {documentsMeasure && <PreventiveMeasureDocuments measureId={documentsMeasure.id} />}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

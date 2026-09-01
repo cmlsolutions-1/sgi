@@ -1,7 +1,7 @@
 "use client"
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
-import { Edit, Loader2, PackageCheck, Plus, Power, Search } from "lucide-react"
+import { Edit, LayoutGrid, List, Loader2, MoreHorizontal, PackageCheck, Plus, Power, Search, Upload } from "lucide-react"
 import { toast } from "sonner"
 
 import { SanitaryDocumentPanel } from "@/components/sanitary/SanitaryDocumentPanel"
@@ -9,6 +9,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -19,6 +26,8 @@ import {
   updateHygieneSupply,
 } from "@/services/sanitaryService"
 import type { CreateHygieneSupplyRequest, HygieneSupply, RecordStatus } from "@/types/manager/sanitary"
+
+type ViewMode = "cards" | "list"
 
 const emptyForm: CreateHygieneSupplyRequest = {
   name: "",
@@ -142,6 +151,8 @@ export default function HygieneSuppliesPage() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingSupply, setEditingSupply] = useState<HygieneSupply | null>(null)
+  const [documentsSupply, setDocumentsSupply] = useState<HygieneSupply | null>(null)
+  const [viewMode, setViewMode] = useState<ViewMode>("list")
   const activeCount = useMemo(() => supplies.filter((supply) => supply.status === "ACTIVE").length, [supplies])
 
   async function loadData() {
@@ -224,9 +235,33 @@ export default function HygieneSuppliesPage() {
 
       <Card className="rounded-lg">
         <CardContent className="space-y-4 p-4 sm:p-5">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <h2 className="text-lg font-semibold text-slate-900">Inventario de insumos</h2>
-            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_150px_auto] lg:w-[620px]">
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <h2 className="text-lg font-semibold text-slate-900">Inventario de insumos</h2>
+              <div className="inline-flex w-fit rounded-md border border-border bg-secondary p-1">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={viewMode === "cards" ? "default" : "ghost"}
+                  className="h-8 gap-2"
+                  onClick={() => setViewMode("cards")}
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                  Tarjetas
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  className="h-8 gap-2"
+                  onClick={() => setViewMode("list")}
+                >
+                  <List className="h-4 w-4" />
+                  Lista
+                </Button>
+              </div>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_150px_auto] lg:ml-auto lg:w-[620px]">
               <div className="relative">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input className="pl-9" placeholder="Buscar insumo" value={query} onChange={(event) => setQuery(event.target.value)} />
@@ -254,7 +289,7 @@ export default function HygieneSuppliesPage() {
             <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-muted-foreground">
               No hay insumos registrados.
             </div>
-          ) : (
+          ) : viewMode === "cards" ? (
             <div className="space-y-3">
               {supplies.map((supply) => (
                 <article key={supply.id} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
@@ -285,9 +320,82 @@ export default function HygieneSuppliesPage() {
                 </article>
               ))}
             </div>
+          ) : (
+            <div className="overflow-x-auto rounded-md border border-border bg-card">
+              <table className="w-full min-w-[900px] text-sm">
+                <thead className="border-b border-border bg-secondary text-left text-xs font-medium uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Insumo</th>
+                    <th className="px-4 py-3 font-medium">Ficha técnica</th>
+                    <th className="px-4 py-3 font-medium">Uso</th>
+                    <th className="px-4 py-3 font-medium">Estado</th>
+                    <th className="px-4 py-3 text-right font-medium">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {supplies.map((supply) => (
+                    <tr key={supply.id} className="align-middle">
+                      <td className="px-4 py-3 font-medium">{supply.name}</td>
+                      <td className="px-4 py-3">
+                        <p className="max-w-[300px] truncate text-muted-foreground">{supply.technicalSheet}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="max-w-[300px] truncate text-muted-foreground">{supply.usageInstructions}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge className={statusClassName(supply.status)}>{statusLabel(supply.status)}</Badge>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-52">
+                            <DropdownMenuItem
+                              onSelect={() => {
+                                setEditingSupply(supply)
+                                setDialogOpen(true)
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => setDocumentsSupply(supply)}>
+                              <Upload className="h-4 w-4" />
+                              Cargar / ver archivos
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              variant={supply.status === "ACTIVE" ? "destructive" : "default"}
+                              onSelect={() => handleChangeStatus(supply)}
+                            >
+                              <Power className="h-4 w-4" />
+                              {supply.status === "ACTIVE" ? "Inactivar" : "Activar"}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={Boolean(documentsSupply)} onOpenChange={(open) => !open && setDocumentsSupply(null)}>
+        <DialogContent className="max-h-[88vh] w-[calc(100vw-2rem)] max-w-4xl overflow-hidden bg-card p-0">
+          <DialogHeader className="border-b border-border px-6 py-4">
+            <DialogTitle>Documentos del insumo de higiene</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto px-6 py-4">
+            {documentsSupply && <SanitaryDocumentPanel referenceType="HYGIENE_SUPPLY" resourceId={documentsSupply.id} />}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <SupplyDialog open={dialogOpen} supply={editingSupply} onClose={() => setDialogOpen(false)} onSave={handleSave} />
     </div>
