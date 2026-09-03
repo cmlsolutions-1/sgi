@@ -67,9 +67,18 @@ export type GetCompanyAdminResponse = {
   }
   admin: {
     id: string
+    userId?: string
     name: string
     email: string
     phone: string
+    status?: UserStatus
+    user?: {
+      id: string
+      name?: string
+      email?: string
+      phone?: string
+      status?: UserStatus
+    }
   }
 }
 

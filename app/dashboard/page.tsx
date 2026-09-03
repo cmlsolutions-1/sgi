@@ -16,6 +16,19 @@ import {
   ShieldAlert,
   Users,
 } from "lucide-react"
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip as RechartsTooltip,
+  XAxis,
+  YAxis,
+} from "recharts"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -82,6 +95,37 @@ const riskStatusLabels: Record<string, string> = {
   CANCELADO: "Cancelado",
 }
 
+const trainingStatusLabels: Record<string, string> = {
+  ACTIVE: "Activa",
+  INACTIVE: "Inactiva",
+  FINALIZADA: "Finalizada",
+  CANCELADA: "Cancelada",
+}
+
+const incidentTypeLabels: Record<string, string> = {
+  INCIDENTE: "Incidente",
+  ACCIDENTE: "Accidente",
+  ENFERMEDAD_LABORAL: "Enfermedad laboral",
+  INCAPACIDAD_MEDICA: "Incapacidad medica",
+  LICENCIA_MATERNIDAD: "Licencia maternidad",
+  LICENCIA_PATERNIDAD: "Licencia paternidad",
+  VACACIONES: "Vacaciones",
+  DIAS_NO_REMUNERADO: "Dias no remunerado",
+  DIA_REMUNERADO: "Dia remunerado",
+  REVISION_POR_LA_DIRECCION: "Revision por direccion",
+  REQUERIMIENTO_DE_AUTORIDAD_ADMINISTRATIVA: "Req. autoridad",
+  RECOMENDACION_DE_LA_ARL: "Recomendacion ARL",
+}
+
+const chartColors = [
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+  "var(--chart-5)",
+  "#64748b",
+]
+
 function flattenModuleCodes(modules: ReturnType<typeof useAuthStore.getState>["modules"]) {
   const codes = new Set<string>()
 
@@ -123,6 +167,43 @@ function percent(part: number, total: number) {
   return Math.round((part / total) * 100)
 }
 
+function countByLabel<T>(items: T[], getKey: (item: T) => string | null | undefined, labels: Record<string, string>) {
+  const totals = new Map<string, number>()
+
+  items.forEach((item) => {
+    const key = getKey(item) ?? "SIN_DATO"
+    const label = labels[key] ?? key.replaceAll("_", " ").toLowerCase()
+    totals.set(label, (totals.get(label) ?? 0) + 1)
+  })
+
+  return Array.from(totals.entries()).map(([name, total]) => ({ name, total }))
+}
+
+function truncateLabel(value: string, maxLength = 16) {
+  if (value.length <= maxLength) return value
+  return `${value.slice(0, maxLength).trim()}...`
+}
+
+function ChartTooltipBox({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null
+
+  return (
+    <div className="rounded-lg border border-border bg-white px-3 py-2 text-xs shadow-lg">
+      <p className="mb-1 font-medium text-foreground">{label}</p>
+      {payload.map((item: any) => (
+        <div key={`${item.name}-${item.value}`} className="flex items-center gap-2">
+          <span
+            className="h-2.5 w-2.5 rounded-full"
+            style={{ backgroundColor: item.color ?? item.payload?.fill }}
+          />
+          <span className="text-muted-foreground">{item.name ?? "Total"}:</span>
+          <span className="font-semibold text-foreground">{item.value}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 async function safeLoad<T>(enabled: boolean, loader: () => Promise<T>, fallback: T): Promise<LoadResult<T>> {
   if (!enabled) return { data: fallback, error: null }
 
@@ -148,18 +229,125 @@ async function safeOptionalLoad<T>(enabled: boolean, loader: () => Promise<T>): 
 
 function DashboardSection({
   title,
+  description,
   children,
 }: {
   title: string
+  description?: string
   children: ReactNode
 }) {
   return (
     <Card className="border-border bg-card">
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-medium">{title}</CardTitle>
+        {description ? <p className="text-xs text-muted-foreground">{description}</p> : null}
       </CardHeader>
       <CardContent>{children}</CardContent>
     </Card>
+  )
+}
+
+function EmptyChart({ message = "No hay datos suficientes para graficar." }: { message?: string }) {
+  return (
+    <div className="flex h-[260px] items-center justify-center rounded-md border border-dashed border-border text-center text-sm text-muted-foreground">
+      {message}
+    </div>
+  )
+}
+
+function DashboardBarChart({
+  data,
+  dataKey = "total",
+  color = "var(--chart-1)",
+  layout = "horizontal",
+}: {
+  data: Array<{ name: string; total: number }>
+  dataKey?: string
+  color?: string
+  layout?: "horizontal" | "vertical"
+}) {
+  if (data.length === 0 || data.every((item) => item.total === 0)) return <EmptyChart />
+
+  return (
+    <div className="h-[280px] w-full min-w-0">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={data}
+          layout={layout}
+          margin={layout === "vertical" ? { top: 8, right: 18, left: 8, bottom: 0 } : { top: 8, right: 12, left: -16, bottom: 0 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+          {layout === "vertical" ? (
+            <>
+              <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+              <YAxis
+                dataKey="name"
+                type="category"
+                tickLine={false}
+                axisLine={false}
+                tick={{ fontSize: 11 }}
+                tickFormatter={(value) => truncateLabel(String(value), 20)}
+                width={124}
+              />
+            </>
+          ) : (
+            <>
+              <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} tickFormatter={(value) => truncateLabel(String(value), 12)} interval={0} />
+              <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize: 11 }} width={36} />
+            </>
+          )}
+          <RechartsTooltip
+            cursor={{ fill: "var(--muted)" }}
+            content={<ChartTooltipBox />}
+          />
+          <Bar dataKey={dataKey} fill={color} radius={layout === "vertical" ? [0, 6, 6, 0] : [6, 6, 0, 0]} barSize={layout === "vertical" ? 18 : undefined}>
+            {data.map((entry, index) => (
+              <Cell key={entry.name} fill={chartColors[index % chartColors.length]} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  )
+}
+
+function DashboardPieChart({ data }: { data: Array<{ name: string; total: number }> }) {
+  const visibleData = data.filter((item) => item.total > 0)
+  if (visibleData.length === 0) return <EmptyChart />
+  const total = visibleData.reduce((acc, item) => acc + item.total, 0)
+
+  return (
+    <div className="relative h-[280px] w-full min-w-0">
+      <div className="pointer-events-none absolute left-1/2 top-[43%] z-10 -translate-x-1/2 -translate-y-1/2 text-center">
+        <p className="text-2xl font-bold text-foreground">{total}</p>
+        <p className="text-[11px] text-muted-foreground">Total</p>
+      </div>
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={visibleData}
+            dataKey="total"
+            nameKey="name"
+            innerRadius={48}
+            outerRadius={82}
+            paddingAngle={3}
+            stroke="var(--card)"
+            strokeWidth={3}
+          >
+            {visibleData.map((entry, index) => (
+              <Cell key={entry.name} fill={chartColors[index % chartColors.length]} />
+            ))}
+          </Pie>
+          <RechartsTooltip
+            content={<ChartTooltipBox />}
+          />
+          <Legend
+            iconType="circle"
+            wrapperStyle={{ fontSize: 11, lineHeight: "18px" }}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
   )
 }
 
@@ -317,6 +505,52 @@ export default function DashboardPage() {
         .filter((measure) => measure.status === "PENDING" && measure.type === "DATE" && isBeforeToday(measure.dueDate))
         .slice(0, 5),
     [filteredData.preventiveMeasures],
+  )
+
+  const moduleSummaryChartData = useMemo(
+    () => [
+      { name: "Funcionarios", total: filteredData.employees.length },
+      { name: "Riesgos", total: filteredData.risks.length },
+      { name: "Medidas", total: filteredData.preventiveMeasures.length },
+      { name: "Capacitaciones", total: filteredData.trainings.length },
+      { name: "Documentos", total: filteredData.documents.length },
+      { name: "Novedades", total: filteredData.incidents.length },
+    ],
+    [
+      filteredData.documents.length,
+      filteredData.employees.length,
+      filteredData.incidents.length,
+      filteredData.preventiveMeasures.length,
+      filteredData.risks.length,
+      filteredData.trainings.length,
+    ],
+  )
+
+  const riskStatusChartData = useMemo(
+    () => countByLabel(filteredData.risks, (risk) => risk.status, riskStatusLabels),
+    [filteredData.risks],
+  )
+
+  const measureStatusChartData = useMemo(
+    () => [
+      { name: "Pendientes", total: metrics.pendingMeasures },
+      { name: "Finalizadas", total: metrics.doneMeasures },
+      { name: "Vencidas", total: metrics.overdueMeasures },
+    ],
+    [metrics.doneMeasures, metrics.overdueMeasures, metrics.pendingMeasures],
+  )
+
+  const trainingStatusChartData = useMemo(
+    () => countByLabel(filteredData.trainings, (training) => training.status, trainingStatusLabels),
+    [filteredData.trainings],
+  )
+
+  const incidentTypeChartData = useMemo(
+    () =>
+      countByLabel(filteredData.incidents, (incident) => incident.type ?? "INCIDENTE", incidentTypeLabels)
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 8),
+    [filteredData.incidents],
   )
 
   function updateDateFilter(partial: Partial<DateRangeFilter>) {
@@ -520,6 +754,30 @@ export default function DashboardPage() {
           trend={metrics.accidents > 0 ? "down" : "stable"}
           icon={<HardHat className="h-5 w-5" />}
         />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <DashboardSection title="Resumen por modulo" description="Volumen de registros activos en el periodo filtrado.">
+          <DashboardBarChart data={moduleSummaryChartData} />
+        </DashboardSection>
+
+        <DashboardSection title="Estados de riesgos" description="Distribucion del estado actual de la matriz de riesgos.">
+          <DashboardPieChart data={riskStatusChartData} />
+        </DashboardSection>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <DashboardSection title="Medidas preventivas" description="Seguimiento general de cumplimiento y vencimientos.">
+          <DashboardPieChart data={measureStatusChartData} />
+        </DashboardSection>
+
+        <DashboardSection title="Capacitaciones por estado" description="Plan anual agrupado por estado de ejecucion.">
+          <DashboardBarChart data={trainingStatusChartData} color="var(--chart-2)" />
+        </DashboardSection>
+
+        <DashboardSection title="Tipos de novedades" description="Principales novedades laborales reportadas.">
+          <DashboardBarChart data={incidentTypeChartData} color="var(--chart-3)" layout="vertical" />
+        </DashboardSection>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">

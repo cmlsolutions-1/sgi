@@ -5,13 +5,10 @@ import { useState, useCallback, useEffect } from "react"
 import {
   getCompanyAdmin,
   createCompanyAdmin,
-  updateUser,
-  deleteUser,
 } from "@/services/userService"
 import type {
   User,
   CreateCompanyAdminDto,
-  UpdateUserDto,
 } from "@/types/manager/user"
 import { toast } from "sonner"
 
@@ -97,41 +94,29 @@ export function useUsers(companyId?: string, autoFetch = true) {
   )
 
   const updateUserHandler = useCallback(
-    async (id: string, dto: UpdateUserDto): Promise<boolean> => {
+    async (dto: CreateCompanyAdminDto): Promise<boolean> => {
+      if (!companyId) {
+        toast.error("No hay empresa seleccionada")
+        return false
+      }
+
       setLoading(true)
       setError(null)
       try {
-        await updateUser(id, dto)
+        await createCompanyAdmin(companyId, dto)
         await fetchUsers()
-        toast.success("Usuario actualizado exitosamente")
+        toast.success("Administrador de empresa actualizado")
         return true
       } catch (err: any) {
-        setError(err.message ?? "Error al actualizar usuario")
-        toast.error(err.message ?? "Error al actualizar usuario")
+        setError(err.message ?? "Error al actualizar administrador de empresa")
+        toast.error(err.message ?? "Error al actualizar administrador de empresa")
         return false
       } finally {
         setLoading(false)
       }
     },
-    [fetchUsers]
+    [companyId, fetchUsers],
   )
-
-  const deleteUserHandler = useCallback(async (id: string): Promise<boolean> => {
-    setLoading(true)
-    setError(null)
-    try {
-      await deleteUser(id)
-      setUsers([])
-      toast.success("Usuario eliminado exitosamente")
-      return true
-    } catch (err: any) {
-      setError(err.message ?? "Error al eliminar usuario")
-      toast.error(err.message ?? "Error al eliminar usuario")
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [])
 
   return {
     users,
@@ -140,6 +125,5 @@ export function useUsers(companyId?: string, autoFetch = true) {
     fetchUsers,
     createUser: createUserHandler,
     updateUser: updateUserHandler,
-    deleteUser: deleteUserHandler,
   }
 }

@@ -24,6 +24,7 @@ import {
 import { toast } from "sonner"
 
 import { EmployeeFormDialog } from "@/components/dashboard/employee-form-dialog"
+import { AnalyticsBarChart, AnalyticsChartCard, AnalyticsDonutChart } from "@/components/dashboard/analytics-charts"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -1095,7 +1096,7 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
   const [incidents, setIncidents] = useState<Incident[]>([])
   const [loading, setLoading] = useState(true)
   const [exporting, setExporting] = useState(false)
-  const [viewMode, setViewMode] = useState<LaborNewsViewMode>("cards")
+  const [viewMode, setViewMode] = useState<LaborNewsViewMode>("list")
   const [documentsIncident, setDocumentsIncident] = useState<Incident | null>(null)
   const [employeeFilter, setEmployeeFilter] = useState("all")
   const [typeFilter, setTypeFilter] = useState<IncidentType | "all">("all")
@@ -1121,6 +1122,32 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
         total: filteredIncidents.filter((incident) => incident.type === option.value).length,
       })),
     [filteredIncidents],
+  )
+
+  const incidentsByStatus = useMemo(
+    () => [
+      { name: "Activas", total: filteredIncidents.filter((incident) => incident.status === "ACTIVE").length },
+      { name: "Inactivas", total: filteredIncidents.filter((incident) => incident.status === "INACTIVE").length },
+    ],
+    [filteredIncidents],
+  )
+
+  const incidentsByCaseStatus = useMemo(
+    () =>
+      incidentCaseStatusOptions.map((option) => ({
+        name: option.label,
+        total: filteredIncidents.filter((incident) => incident.caseStatus === option.value).length,
+      })),
+    [filteredIncidents],
+  )
+
+  const incidentsTypeChartData = useMemo(
+    () =>
+      incidentsByType
+        .filter((item) => item.total > 0)
+        .map((item) => ({ name: item.label, total: item.total }))
+        .slice(0, 8),
+    [incidentsByType],
   )
 
   async function loadData(filters = activeFilters) {
@@ -1388,6 +1415,20 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
               </CardContent>
             </Card>
           ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <AnalyticsChartCard title="Novedades por tipo" description="Distribucion de los tipos registrados en el periodo filtrado.">
+          <AnalyticsBarChart data={incidentsTypeChartData} layout="vertical" />
+        </AnalyticsChartCard>
+
+        <AnalyticsChartCard title="Estado de novedades" description="Relacion entre novedades activas e inactivas.">
+          <AnalyticsDonutChart data={incidentsByStatus} />
+        </AnalyticsChartCard>
+
+        <AnalyticsChartCard title="Estado del caso" description="Seguimiento de casos abiertos, en investigacion y cerrados.">
+          <AnalyticsBarChart data={incidentsByCaseStatus} color="var(--chart-2)" />
+        </AnalyticsChartCard>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

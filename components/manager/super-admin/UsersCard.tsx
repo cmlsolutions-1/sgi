@@ -1,25 +1,13 @@
 // components/manager/super-admin/UsersCard.tsx
 "use client"
 
-import { useState } from "react"
 // Importar CreateCompanyAdminDto en lugar de CreateUserDto
-import type { User, CreateCompanyAdminDto, UpdateUserDto } from "@/types/manager/user"
+import type { User, CreateCompanyAdminDto } from "@/types/manager/user"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CreateUserDialog } from "@/components/manager/super-admin/dialogs/CreateUserDialog"
-import { Loader2, Trash2, Edit2, RefreshCw, AlertTriangle, Settings } from "lucide-react"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+import { Loader2, RefreshCw, AlertTriangle, Settings } from "lucide-react"
 
 type Props = {
   companyName?: string
@@ -30,8 +18,7 @@ type Props = {
   loading: boolean
   //  Usar CreateCompanyAdminDto
   onCreateUser: (payload: CreateCompanyAdminDto) => Promise<User | null>
-  onUpdateUser: (id: string, payload: UpdateUserDto) => Promise<boolean>
-  onDeleteUser: (id: string) => Promise<boolean>
+  onUpdateUser: (payload: CreateCompanyAdminDto) => Promise<boolean>
   onRefresh: () => Promise<void>
   onOpenModules: () => void
 }
@@ -44,18 +31,9 @@ export function UsersCard({
   loading,
   onCreateUser,
   onUpdateUser,
-  onDeleteUser,
   onRefresh,
   onOpenModules,
 }: Props) {
-  const [deletingId, setDeletingId] = useState<string | null>(null)
-
-  const handleDelete = async (id: string) => {
-    setDeletingId(id)
-    await onDeleteUser(id)
-    setDeletingId(null)
-  }
-
   const getStatusBadge = (status: User["status"]) => {
     const isActive = status === "ACTIVE"
     return (
@@ -155,49 +133,14 @@ export function UsersCard({
                 </div>
 
                 <div className="flex items-center gap-2 ml-4">
-                  <Button
-                    variant="action"
-                    size="icon"
-                    onClick={() => {}}
-                    className="h-8 w-8"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
-
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        className="h-8 w-8"
-                        disabled={deletingId === u.id}
-                      >
-                        {deletingId === u.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>¿Eliminar usuario?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Esta acción no se puede deshacer. Se eliminará permanentemente el usuario{" "}
-                          <strong>{u.name}</strong>.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(u.id)}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          Eliminar
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <CreateUserDialog
+                    disabled={loading}
+                    companyName={companyName}
+                    loading={loading}
+                    user={u}
+                    onCreate={onCreateUser}
+                    onUpdate={onUpdateUser}
+                  />
                 </div>
               </div>
             ))}

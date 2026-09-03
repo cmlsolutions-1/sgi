@@ -5,6 +5,7 @@ import Link from "next/link"
 import { CalendarDays, Edit, Eye, LayoutGrid, List, Loader2, MoreHorizontal, Plus, Power, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 
+import { AnalyticsBarChart, AnalyticsChartCard, AnalyticsDonutChart } from "@/components/dashboard/analytics-charts"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -131,6 +132,35 @@ const trainingTypeOptions: Array<{ value: TrainingType; label: string }> = [
   { value: "INDUCCION", label: "Induccion" },
   { value: "REINDUCCION", label: "Reinduccion" },
 ]
+
+function countTrainingByStatus(trainings: Training[]) {
+  return trainingStatusOptions.map((option) => ({
+    name: option.label,
+    total: trainings.filter((training) => training.status === option.value).length,
+  }))
+}
+
+function countTrainingByType(trainings: Training[]) {
+  return trainingTypeOptions.map((option) => ({
+    name: option.label,
+    total: trainings.filter((training) => (training.type ?? "CAPACITACION") === option.value).length,
+  }))
+}
+
+function getTrainingHoursByMonth(trainings: Training[]) {
+  const totals = new Map(months.map((month) => [month.value, { name: month.label.slice(0, 3), total: 0 }]))
+
+  trainings.forEach((training) => {
+    const date = new Date(`${formatDate(training.date)}T00:00:00`)
+    if (Number.isNaN(date.getTime())) return
+
+    const monthKey = String(date.getMonth() + 1).padStart(2, "0")
+    const current = totals.get(monthKey)
+    if (current) current.total += Number(training.durationHours ?? 0)
+  })
+
+  return Array.from(totals.values()).filter((item) => item.total > 0)
+}
 
 type TopicFormState = CreateTopicTrainingDto
 type TrainingViewMode = "cards" | "list"
@@ -630,6 +660,10 @@ export default function TrainingPlanPage() {
     })
   }, [monthFilter, statusFilter, trainings, yearFilter])
 
+  const trainingsByStatus = useMemo(() => countTrainingByStatus(filteredTrainings), [filteredTrainings])
+  const trainingsByType = useMemo(() => countTrainingByType(filteredTrainings), [filteredTrainings])
+  const trainingHoursByMonth = useMemo(() => getTrainingHoursByMonth(filteredTrainings), [filteredTrainings])
+
   async function handleSaveTopic(payload: CreateTopicTrainingDto | UpdateTopicTrainingDto, topicId?: string) {
     try {
       if (topicId) {
@@ -778,6 +812,20 @@ export default function TrainingPlanPage() {
               </div>
             </CardContent>
           </Card>
+
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+            <AnalyticsChartCard title="Capacitaciones por estado" description="Estado actual del plan anual filtrado.">
+              <AnalyticsDonutChart data={trainingsByStatus} />
+            </AnalyticsChartCard>
+
+            <AnalyticsChartCard title="Capacitaciones por tipo" description="Relacion entre capacitacion, induccion y reinduccion.">
+              <AnalyticsBarChart data={trainingsByType} color="var(--chart-2)" />
+            </AnalyticsChartCard>
+
+            <AnalyticsChartCard title="Horas por mes" description="Horas planeadas o ejecutadas dentro del periodo seleccionado.">
+              <AnalyticsBarChart data={trainingHoursByMonth} color="var(--chart-3)" />
+            </AnalyticsChartCard>
+          </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>

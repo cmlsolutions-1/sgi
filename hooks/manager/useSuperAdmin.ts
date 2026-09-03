@@ -3,7 +3,11 @@
 
 import { useEffect, useMemo, useState, useCallback } from "react"
 import type { Company, CompanyStatus } from "@/types/manager/super-admin"
-import { listCompanies, createCompany as createCompanyRequest } from "@/services/companyService"
+import {
+  listCompanies,
+  createCompany as createCompanyRequest,
+  activateCompany as toggleCompanyStatusRequest,
+} from "@/services/companyService"
 import { getModulesByCompany } from "@/services/modulesService"
 import { getCompanyAdmin } from "@/services/userService"
 
@@ -195,6 +199,27 @@ export function useSuperAdmin() {
     []
   )
 
+  const toggleCompanyStatus = useCallback(async (company: Company) => {
+    setCompanyError(null)
+
+    try {
+      await toggleCompanyStatusRequest(company.id)
+
+      const updatedCompany: Company = {
+        ...company,
+        status: company.status === "active" ? "inactive" : "active",
+      }
+
+      setCompanies((prev) => prev.map((item) => (item.id === company.id ? updatedCompany : item)))
+      setSelectedCompany((prev) => (prev?.id === company.id ? updatedCompany : prev))
+
+      return updatedCompany
+    } catch (e: any) {
+      setCompanyError(e?.message ?? "Error actualizando estado de la compañía")
+      throw e
+    }
+  }, [])
+
   return {
     companies,
     selectedCompany,
@@ -204,6 +229,7 @@ export function useSuperAdmin() {
     refreshCompanies,
     selectCompany,
     createCompany,
+    toggleCompanyStatus,
     updateCompanyInList,
   }
 }

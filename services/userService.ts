@@ -35,15 +35,17 @@ export async function getCompanyAdmin(companyId: string): Promise<User> {
   
   // Usar GetCompanyAdminResponse que tiene 'admin'
   const data = await parseOrThrow<GetCompanyAdminResponse>(res, "No se pudo cargar el administrador")
+  const adminUser = data.admin.user
+  const userId = data.admin.userId ?? adminUser?.id ?? data.admin.id
   
   // Mapear data.admin al tipo User
   const user: User = {
-    id: data.admin.id,
-    name: data.admin.name,
-    email: data.admin.email,
-    phone: data.admin.phone,
+    id: userId,
+    name: adminUser?.name ?? data.admin.name,
+    email: adminUser?.email ?? data.admin.email,
+    phone: adminUser?.phone ?? data.admin.phone,
     description: "",
-    status: "ACTIVE",
+    status: adminUser?.status ?? data.admin.status ?? "ACTIVE",
     companyId: data.company.id,
     roles: [{ id: "company-admin", name: "Administrador de Empresa" }],
   }

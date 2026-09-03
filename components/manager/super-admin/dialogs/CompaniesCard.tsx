@@ -6,7 +6,8 @@ import type { Company } from "@/types/manager/super-admin"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Building2, CheckCircle2, Settings, XCircle } from "lucide-react"
+import { Building2, CheckCircle2, Loader2, Power, Settings, XCircle } from "lucide-react"
+import { useState } from "react"
 
 import { CreateCompanyDialog } from "@/components/manager/super-admin/dialogs/CreateCompanyDialog"
 
@@ -22,6 +23,7 @@ type Props = {
     email: string
     status: "active" | "inactive"
   }) => Promise<void>
+  onToggleCompanyStatus: (company: Company) => Promise<void>
   getActiveChildModuleCount: (company: Company) => number
   onOpenModules: (company: Company) => void
 }
@@ -31,9 +33,21 @@ export function CompaniesCard({
   selectedCompany,
   onSelect,
   onCreateCompany,
+  onToggleCompanyStatus,
   getActiveChildModuleCount,
   onOpenModules,
 }: Props) {
+  const [updatingCompanyId, setUpdatingCompanyId] = useState<string | null>(null)
+
+  async function handleToggleCompanyStatus(company: Company) {
+    setUpdatingCompanyId(company.id)
+    try {
+      await onToggleCompanyStatus(company)
+    } finally {
+      setUpdatingCompanyId(null)
+    }
+  }
+
   return (
     <Card className="bg-card border-border shadow-sm">
       <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -50,11 +64,12 @@ export function CompaniesCard({
           {companies.map((company) => {
             const isSelected = selectedCompany?.id === company.id
             const activeChildModules = getActiveChildModuleCount(company)
+            const isUpdatingStatus = updatingCompanyId === company.id
             return (
               <div
                 key={company.id}
                 onClick={() => onSelect(company)}
-                className={`flex items-center justify-between p-4 rounded-lg border border-border bg-white hover:bg-secondary/50 transition-colors shadow-sm cursor-pointer ${
+                className={`flex flex-col gap-4 rounded-lg border border-border bg-white p-4 shadow-sm transition-colors hover:bg-secondary/50 sm:flex-row sm:items-center sm:justify-between cursor-pointer ${
                   isSelected ? "ring-2 ring-primary/40" : ""
                 }`}
               >
@@ -96,18 +111,42 @@ export function CompaniesCard({
                   </div>
                 </div>
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onOpenModules(company)
-                  }}
-                  className="border-border text-foreground hover:bg-secondary"
-                >
-                  <Settings className="h-4 w-4 mr-2" />
-                  Módulos
-                </Button>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <Button
+                    variant={company.status === "active" ? "destructive" : "default"}
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleToggleCompanyStatus(company)
+                    }}
+                    disabled={isUpdatingStatus}
+                    className={
+                      company.status === "active"
+                        ? "bg-red-500 text-white hover:bg-red-600"
+                        : "bg-primary text-primary-foreground hover:bg-primary/90"
+                    }
+                  >
+                    {isUpdatingStatus ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Power className="h-4 w-4 mr-2" />
+                    )}
+                    {company.status === "active" ? "Inactivar" : "Activar"}
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onOpenModules(company)
+                    }}
+                    className="border-border text-foreground hover:bg-secondary"
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Módulos
+                  </Button>
+                </div>
               </div>
             )
           })}

@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/sheet"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { toast } from "sonner"
+import { AnalyticsBarChart, AnalyticsChartCard, AnalyticsDonutChart } from "@/components/dashboard/analytics-charts"
 import {
   changeRiskStatus,
   createRisk,
@@ -1247,6 +1248,49 @@ return Array.isArray(raw)
     return { byLevel, byState, total: filteredRiskRows.length }
   }, [filteredRiskRows])
 
+  const riskLevelChartData = useMemo(
+    () => [
+      { name: "Nivel I", total: dashboard.byLevel.I },
+      { name: "Nivel II", total: dashboard.byLevel.II },
+      { name: "Nivel III", total: dashboard.byLevel.III },
+      { name: "Nivel IV", total: dashboard.byLevel.IV },
+      { name: "Sin nivel", total: dashboard.byLevel.NA },
+    ],
+    [dashboard.byLevel.I, dashboard.byLevel.II, dashboard.byLevel.III, dashboard.byLevel.IV, dashboard.byLevel.NA],
+  )
+
+  const riskStatusChartData = useMemo(
+    () =>
+      RISK_STATUS_OPTIONS.map((option) => ({
+        name: option.label,
+        total: filteredRiskRows.filter((row) => row.status === option.value).length,
+      })),
+    [filteredRiskRows],
+  )
+
+  const riskHazardChartData = useMemo(() => {
+    const totals = new Map<string, number>()
+
+    filteredRiskRows.forEach((row) => {
+      const name = getHazardTypeName(row.peligroClasificacion)
+      totals.set(name, (totals.get(name) ?? 0) + 1)
+    })
+
+    return Array.from(totals.entries())
+      .map(([name, total]) => ({ name, total }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 8)
+  }, [filteredRiskRows, riskCatalogs.hazardTypes])
+
+  const riskProcessChartData = useMemo(
+    () => [
+      { name: "Activos", total: dashboard.byState.ACTIVO },
+      { name: "Vencidos", total: dashboard.byState.VENCIDO },
+      { name: "Cumplidos", total: dashboard.byState.CUMPLIDO },
+    ],
+    [dashboard.byState.ACTIVO, dashboard.byState.CUMPLIDO, dashboard.byState.VENCIDO],
+  )
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -1316,6 +1360,24 @@ return Array.isArray(raw)
                 </p>
               </CardContent>
             </Card>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-4">
+            <AnalyticsChartCard title="Niveles de riesgo" description="Distribucion por nivel de intervencion.">
+              <AnalyticsDonutChart data={riskLevelChartData} />
+            </AnalyticsChartCard>
+
+            <AnalyticsChartCard title="Estado del riesgo" description="Riesgos activos, en proceso, finalizados o cancelados.">
+              <AnalyticsBarChart data={riskStatusChartData} color="var(--chart-2)" />
+            </AnalyticsChartCard>
+
+            <AnalyticsChartCard title="Peligros frecuentes" description="Clasificaciones de peligro con mayor registro.">
+              <AnalyticsBarChart data={riskHazardChartData} layout="vertical" color="var(--chart-3)" />
+            </AnalyticsChartCard>
+
+            <AnalyticsChartCard title="Estado del proceso" description="Avance calculado desde medidas y fechas.">
+              <AnalyticsDonutChart data={riskProcessChartData} />
+            </AnalyticsChartCard>
           </div>
 
           <Card>

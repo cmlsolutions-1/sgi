@@ -119,6 +119,7 @@ export default function SuperAdminDashboard() {
     stats,
     selectCompany,
     createCompany,
+    toggleCompanyStatus,
     refreshCompanies,
     updateCompanyInList,
   } = useSuperAdmin()
@@ -129,7 +130,6 @@ export default function SuperAdminDashboard() {
     fetchUsers,
     createUser,
     updateUser,
-    deleteUser,
   } = useUsers(selectedCompany?.id, false)
 
   const [modulesOpen, setModulesOpen] = useState(false)
@@ -341,6 +341,15 @@ export default function SuperAdminDashboard() {
     await createCompany(payload)
   }
 
+  const handleToggleCompanyStatus = async (company: Company) => {
+    try {
+      await toggleCompanyStatus(company)
+      toast.success(company.status === "active" ? "Empresa inactivada correctamente" : "Empresa activada correctamente")
+    } catch (error: any) {
+      toast.error(error?.message ?? "No se pudo actualizar el estado de la empresa")
+    }
+  }
+
   return (
     <div className="min-h-dvh bg-background p-6">
       <div className="mb-8 flex items-start justify-between gap-4">
@@ -405,6 +414,7 @@ export default function SuperAdminDashboard() {
             selectedCompany={selectedCompany}
             onSelect={selectCompany}
             onCreateCompany={handleCreateCompany}
+            onToggleCompanyStatus={handleToggleCompanyStatus}
             getActiveChildModuleCount={(company) => countActiveChildModules(company, moduleCatalog)}
             onOpenModules={(company) => {
               selectCompany(company)
@@ -420,7 +430,6 @@ export default function SuperAdminDashboard() {
             loading={usersLoading}
             onCreateUser={createUser}
             onUpdateUser={updateUser}
-            onDeleteUser={deleteUser}
             onRefresh={fetchUsers}
             onOpenModules={() => setModulesOpen(true)}
           />
