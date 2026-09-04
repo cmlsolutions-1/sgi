@@ -614,7 +614,7 @@ export default function TrainingPlanPage() {
   const [yearFilter, setYearFilter] = useState("all")
   const [monthFilter, setMonthFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [viewMode, setViewMode] = useState<TrainingViewMode>("cards")
+  const [viewMode, setViewMode] = useState<TrainingViewMode>("list")
   const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null)
 
   async function loadData() {

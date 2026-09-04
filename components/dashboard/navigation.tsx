@@ -4,7 +4,9 @@ import {
   LayoutDashboard,
   Users,
   FileText,
+  FileCheck2,
   FileStack,
+  FileSearch,
   TriangleAlert,
   UserCircle,
   ShieldCheck,
@@ -72,6 +74,7 @@ export const navigation: NavigationItem[] = [
       { code: "JOBS", name: "Puestos de trabajo", href: "/dashboard/jobs", icon: BriefcaseBusiness },
       { code: "EMPLOYEE_MANAGEMENT", name: "Gestión Empleados", href: "/dashboard/employees", icon: UserCircle },
       { code: "INCIDENTS", name: "Novedades Laborales", href: "/dashboard/incidents", icon: TriangleAlert },
+      { code: "INVESTIGATIONS", name: "Investigaciones", href: "/dashboard/investigations", icon: FileSearch },
       { code: "DATA_AUTHORIZATIONS", name: "Tratamiento de Datos", href: "/dashboard/data-processing", icon: Fingerprint},
     ],
   },
@@ -86,6 +89,12 @@ export const navigation: NavigationItem[] = [
         href: "/dashboard/sgi-responsible",
         icon: ShieldCheck,
       },
+      {
+        code: "ACPM",
+        name: "ACPM",
+        href: "/dashboard/acpm",
+        icon: FileCheck2,
+      },
     ],
   },
   {
@@ -94,6 +103,7 @@ export const navigation: NavigationItem[] = [
     icon: CalendarDays,
     subItems: [
       { code: "TRAINING", name: "Capacitaciones", href: "/dashboard/trainingPlan", icon: Brain },
+      { code: "WORK_PLAN", name: "Plan de Trabajo", href: "/dashboard/work-plan", icon: ClipboardCheck },
     ],
   },
   {
@@ -282,6 +292,8 @@ function isSubItemAllowed(
   if (!subItem.code) return true
   if (alwaysVisibleCodes.has(subItem.code)) return true
   if (!parentCode) return isCodeAllowed(subItem.code, allowedCodes)
+  if (subItem.code === "INVESTIGATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "ACPM" && isCodeAllowed(parentCode, allowedCodes)) return true
 
   const parentChildCodes = getDirectChildCodesByParentCode(modules, parentCode)
 
