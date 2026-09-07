@@ -14,6 +14,7 @@ export type HygieneSupply = {
   technicalSheet: string
   usageInstructions: string
   contraindications: string
+  expirationDate?: string | null
   status: RecordStatus
 }
 
@@ -22,6 +23,7 @@ export type CreateHygieneSupplyRequest = {
   technicalSheet: string
   usageInstructions: string
   contraindications: string
+  expirationDate: string
 }
 
 export type UpdateHygieneSupplyRequest = Partial<CreateHygieneSupplyRequest>

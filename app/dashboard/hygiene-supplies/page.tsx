@@ -34,6 +34,7 @@ const emptyForm: CreateHygieneSupplyRequest = {
   technicalSheet: "",
   usageInstructions: "",
   contraindications: "",
+  expirationDate: "",
 }
 
 function statusLabel(status: RecordStatus) {
@@ -44,6 +45,19 @@ function statusClassName(status: RecordStatus) {
   return status === "ACTIVE"
     ? "bg-accentActivd text-accentActivd-foreground border-transparent"
     : "bg-destructive text-white border-transparent"
+}
+
+function formatDate(value?: string | null) {
+  if (!value) return "No registrada"
+  return value.slice(0, 10)
+}
+
+function isExpiredDate(value?: string | null) {
+  if (!value) return false
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const expiration = new Date(`${value.slice(0, 10)}T00:00:00`)
+  return expiration < today
 }
 
 function SupplyDialog({
@@ -69,6 +83,7 @@ function SupplyDialog({
             technicalSheet: supply.technicalSheet ?? "",
             usageInstructions: supply.usageInstructions ?? "",
             contraindications: supply.contraindications ?? "",
+            expirationDate: supply.expirationDate ? supply.expirationDate.slice(0, 10) : "",
           }
         : emptyForm,
     )
@@ -81,6 +96,7 @@ function SupplyDialog({
     if (!form.technicalSheet.trim()) return toast.error("Ingresa la ficha técnica")
     if (!form.usageInstructions.trim()) return toast.error("Ingresa las instrucciones de uso")
     if (!form.contraindications.trim()) return toast.error("Ingresa las contraindicaciones")
+    if (!form.expirationDate) return toast.error("Selecciona la fecha de vencimiento")
 
     setSaving(true)
     try {
@@ -89,6 +105,7 @@ function SupplyDialog({
         technicalSheet: form.technicalSheet.trim(),
         usageInstructions: form.usageInstructions.trim(),
         contraindications: form.contraindications.trim(),
+        expirationDate: form.expirationDate,
       })
       onClose()
     } finally {
@@ -107,6 +124,14 @@ function SupplyDialog({
           <div className="grid gap-2">
             <Label>Nombre</Label>
             <Input value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} />
+          </div>
+          <div className="grid gap-2">
+            <Label>Fecha de vencimiento</Label>
+            <Input
+              type="date"
+              value={form.expirationDate}
+              onChange={(event) => setForm((current) => ({ ...current, expirationDate: event.target.value }))}
+            />
           </div>
           <div className="grid gap-2">
             <Label>Ficha técnica</Label>
@@ -154,6 +179,7 @@ export default function HygieneSuppliesPage() {
   const [documentsSupply, setDocumentsSupply] = useState<HygieneSupply | null>(null)
   const [viewMode, setViewMode] = useState<ViewMode>("list")
   const activeCount = useMemo(() => supplies.filter((supply) => supply.status === "ACTIVE").length, [supplies])
+  const expiredCount = useMemo(() => supplies.filter((supply) => isExpiredDate(supply.expirationDate)).length, [supplies])
 
   async function loadData() {
     setLoading(true)
@@ -231,6 +257,12 @@ export default function HygieneSuppliesPage() {
             <p className="mt-1 text-2xl font-bold text-slate-900">{activeCount}</p>
           </CardContent>
         </Card>
+        <Card className="rounded-lg">
+          <CardContent className="p-4">
+            <p className="text-xs font-medium text-muted-foreground">Vencidos</p>
+            <p className="mt-1 text-2xl font-bold text-slate-900">{expiredCount}</p>
+          </CardContent>
+        </Card>
       </div>
 
       <Card className="rounded-lg">
@@ -298,11 +330,13 @@ export default function HygieneSuppliesPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="text-lg font-semibold text-slate-900">{supply.name}</h3>
                         <Badge className={statusClassName(supply.status)}>{statusLabel(supply.status)}</Badge>
+                        {isExpiredDate(supply.expirationDate) && <Badge variant="destructive">Vencido</Badge>}
                       </div>
                       <p className="text-sm text-muted-foreground">{supply.technicalSheet}</p>
-                      <div className="grid gap-2 text-sm text-slate-600 md:grid-cols-2">
+                      <div className="grid gap-2 text-sm text-slate-600 md:grid-cols-3">
                         <p><span className="font-medium">Uso:</span> {supply.usageInstructions}</p>
                         <p><span className="font-medium">Contraindicaciones:</span> {supply.contraindications}</p>
+                        <p><span className="font-medium">Vencimiento:</span> {formatDate(supply.expirationDate)}</p>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -322,12 +356,13 @@ export default function HygieneSuppliesPage() {
             </div>
           ) : (
             <div className="overflow-x-auto rounded-md border border-border bg-card">
-              <table className="w-full min-w-[900px] text-sm">
+              <table className="w-full min-w-[1000px] text-sm">
                 <thead className="border-b border-border bg-secondary text-left text-xs font-medium uppercase text-muted-foreground">
                   <tr>
                     <th className="px-4 py-3 font-medium">Insumo</th>
                     <th className="px-4 py-3 font-medium">Ficha técnica</th>
                     <th className="px-4 py-3 font-medium">Uso</th>
+                    <th className="px-4 py-3 font-medium">Vencimiento</th>
                     <th className="px-4 py-3 font-medium">Estado</th>
                     <th className="px-4 py-3 text-right font-medium">Acciones</th>
                   </tr>
@@ -341,6 +376,12 @@ export default function HygieneSuppliesPage() {
                       </td>
                       <td className="px-4 py-3">
                         <p className="max-w-[300px] truncate text-muted-foreground">{supply.usageInstructions}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-slate-700">{formatDate(supply.expirationDate)}</span>
+                          {isExpiredDate(supply.expirationDate) && <Badge variant="destructive">Vencido</Badge>}
+                        </div>
                       </td>
                       <td className="px-4 py-3">
                         <Badge className={statusClassName(supply.status)}>{statusLabel(supply.status)}</Badge>
