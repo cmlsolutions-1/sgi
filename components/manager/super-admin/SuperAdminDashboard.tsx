@@ -119,6 +119,7 @@ export default function SuperAdminDashboard() {
     stats,
     selectCompany,
     createCompany,
+    updateCompany,
     toggleCompanyStatus,
     refreshCompanies,
     updateCompanyInList,
@@ -129,7 +130,7 @@ export default function SuperAdminDashboard() {
     loading: usersLoading,
     fetchUsers,
     createUser,
-    updateUser,
+    changeAdminPassword,
   } = useUsers(selectedCompany?.id, false)
 
   const [modulesOpen, setModulesOpen] = useState(false)
@@ -341,6 +342,22 @@ export default function SuperAdminDashboard() {
     await createCompany(payload)
   }
 
+  const handleUpdateCompany = async (company: Company, payload: {
+    name: string
+    nit: string
+    address: string
+    phone: string
+    email: string
+  }) => {
+    try {
+      await updateCompany(company, payload)
+      toast.success("Empresa actualizada correctamente")
+    } catch (error: any) {
+      toast.error(error?.message ?? "No se pudo actualizar la empresa")
+      throw error
+    }
+  }
+
   const handleToggleCompanyStatus = async (company: Company) => {
     try {
       await toggleCompanyStatus(company)
@@ -414,6 +431,7 @@ export default function SuperAdminDashboard() {
             selectedCompany={selectedCompany}
             onSelect={selectCompany}
             onCreateCompany={handleCreateCompany}
+            onUpdateCompany={handleUpdateCompany}
             onToggleCompanyStatus={handleToggleCompanyStatus}
             getActiveChildModuleCount={(company) => countActiveChildModules(company, moduleCatalog)}
             onOpenModules={(company) => {
@@ -429,7 +447,7 @@ export default function SuperAdminDashboard() {
             users={users}
             loading={usersLoading}
             onCreateUser={createUser}
-            onUpdateUser={updateUser}
+            onChangeAdminPassword={changeAdminPassword}
             onRefresh={fetchUsers}
             onOpenModules={() => setModulesOpen(true)}
           />

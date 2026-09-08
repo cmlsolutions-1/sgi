@@ -1,6 +1,12 @@
 // services/companyService.ts
 import { apiFetch } from "@/lib/apiClient";
-import type { ApiResponse, CompanyLite, CreateCompanyDto, UpdateCompanyDto } from "@/types/manager/company";
+import type {
+  ApiResponse,
+  ChangeCompanyStatusDto,
+  CompanyLite,
+  CreateCompanyDto,
+  UpdateCompanyDto,
+} from "@/types/manager/company";
 
 
 
@@ -8,7 +14,7 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
   const json = (await res.json().catch(() => null)) as ApiResponse<T> | null;
 
   if (!res.ok || !json?.ok) {
-    const msg = json?.message ?? fallbackMsg;
+    const msg = json?.errors?.find((error) => error.message)?.message ?? json?.message ?? fallbackMsg;
     throw new Error(msg);
   }
 
@@ -48,7 +54,11 @@ export async function deleteCompany(id: string): Promise<void> {
   await parseOrThrow<Record<string, never>>(res, "No se pudo eliminar la compañía");
 }
 
-export async function activateCompany(id: string): Promise<void> {
-  const res = await apiFetch(`/api/company/active/${id}`, { method: "PUT" });
-  await parseOrThrow<Record<string, never>>(res, "No se pudo activar la compañía");
+export async function changeCompanyStatus(id: string, dto: ChangeCompanyStatusDto): Promise<CompanyLite> {
+  const res = await apiFetch(`/api/company/change-status/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dto),
+  });
+  return parseOrThrow<CompanyLite>(res, "No se pudo actualizar el estado de la compañía");
 }

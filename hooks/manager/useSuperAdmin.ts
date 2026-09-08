@@ -6,7 +6,8 @@ import type { Company, CompanyStatus } from "@/types/manager/super-admin"
 import {
   listCompanies,
   createCompany as createCompanyRequest,
-  activateCompany as toggleCompanyStatusRequest,
+  updateCompany as updateCompanyRequest,
+  changeCompanyStatus,
 } from "@/services/companyService"
 import { getModulesByCompany } from "@/services/modulesService"
 import { getCompanyAdmin } from "@/services/userService"
@@ -59,7 +60,10 @@ function mapCompany(company: CompanyApiItem, existing?: Company): Company {
     email: company.email ?? existing?.email ?? "",
     registrationDate: company.registrationDate ?? company.createdAt ?? existing?.registrationDate ?? "",
     status: normalizeCompanyStatus(company.status, existing?.status ?? "active"),
-    activeModules: normalizeActiveModuleIds(company.activeModules) ?? existing?.activeModules ?? [],
+    activeModules:
+      company.activeModules === undefined || company.activeModules === null
+        ? existing?.activeModules ?? []
+        : normalizeActiveModuleIds(company.activeModules),
     totalUsers: readUsersCount(company, existing?.totalUsers ?? 0),
   }
 }
@@ -199,16 +203,45 @@ export function useSuperAdmin() {
     []
   )
 
+  const updateCompany = useCallback(async (company: Company, payload: {
+    name: string
+    nit: string
+    address: string
+    phone: string
+    email: string
+  }) => {
+    if (!payload.name || !payload.nit || !payload.email) return
+
+    setCompanyError(null)
+
+    try {
+      const updated = await updateCompanyRequest(company.id, {
+        name: payload.name,
+        nit: payload.nit,
+        address: payload.address,
+        phone: payload.phone,
+        email: payload.email,
+      })
+
+      const updatedCompany = mapCompany(updated as CompanyApiItem, company)
+      setCompanies((prev) => prev.map((item) => (item.id === company.id ? updatedCompany : item)))
+      setSelectedCompany((prev) => (prev?.id === company.id ? updatedCompany : prev))
+
+      return updatedCompany
+    } catch (e: any) {
+      setCompanyError(e?.message ?? "Error actualizando compañía")
+      throw e
+    }
+  }, [])
+
   const toggleCompanyStatus = useCallback(async (company: Company) => {
     setCompanyError(null)
 
     try {
-      await toggleCompanyStatusRequest(company.id)
+      const nextStatus = company.status === "active" ? "INACTIVE" : "ACTIVE"
+      const updated = await changeCompanyStatus(company.id, { status: nextStatus })
 
-      const updatedCompany: Company = {
-        ...company,
-        status: company.status === "active" ? "inactive" : "active",
-      }
+      const updatedCompany = mapCompany(updated as CompanyApiItem, company)
 
       setCompanies((prev) => prev.map((item) => (item.id === company.id ? updatedCompany : item)))
       setSelectedCompany((prev) => (prev?.id === company.id ? updatedCompany : prev))
@@ -229,6 +262,7 @@ export function useSuperAdmin() {
     refreshCompanies,
     selectCompany,
     createCompany,
+    updateCompany,
     toggleCompanyStatus,
     updateCompanyInList,
   }

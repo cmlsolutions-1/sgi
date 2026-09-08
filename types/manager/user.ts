@@ -34,6 +34,10 @@ export type CreateCompanyAdminDto = {
   password: string
 }
 
+export type UpdateCompanyAdminPasswordDto = {
+  password: string
+}
+
 export type UpdateUserDto = Partial<Omit<CreateUserDto, "password" | "rolesIds">> & {
   rolesIds?: string[];
 };
@@ -52,6 +56,19 @@ export type CreateCompanyAdminResponse = {
   childModulesConsidered: number
   permissionsAssigned: number
   user: {
+    id: string
+    name: string
+    email: string
+    phone: string
+  }
+}
+
+export type UpdateCompanyAdminPasswordResponse = {
+  company: {
+    id: string
+    name: string
+  }
+  admin: {
     id: string
     name: string
     email: string
@@ -86,3 +103,4 @@ export type UserResponse = ApiResponse<User>;
 export type UsersResponse = ApiResponse<User[]>;
 export type CreateCompanyAdminApiResponse = ApiResponse<CreateCompanyAdminResponse>
 export type GetCompanyAdminApiResponse = ApiResponse<GetCompanyAdminResponse>
+export type UpdateCompanyAdminPasswordApiResponse = ApiResponse<UpdateCompanyAdminPasswordResponse>

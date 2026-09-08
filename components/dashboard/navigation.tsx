@@ -22,6 +22,7 @@ import {
   PackageCheck,
   SprayCan,
   Bug,
+  FlameKindling,
 } from "lucide-react"
 import type { ModuleNode } from "@/store/auth.store"
 
@@ -71,10 +72,11 @@ export const navigation: NavigationItem[] = [
     icon: IdCardIcon,
     subItems: [
       { code: "WORKAREA", name: "Áreas de trabajo", href: "/dashboard/work-areas", icon: Users },
-      { code: "JOBS", name: "Puestos de trabajo", href: "/dashboard/jobs", icon: BriefcaseBusiness },
+      { code: "JOBS", name: "Cargos", href: "/dashboard/jobs", icon: BriefcaseBusiness },
       { code: "EMPLOYEE_MANAGEMENT", name: "Gestión Empleados", href: "/dashboard/employees", icon: UserCircle },
       { code: "INCIDENTS", name: "Novedades Laborales", href: "/dashboard/incidents", icon: TriangleAlert },
       { code: "INVESTIGATIONS", name: "Investigaciones", href: "/dashboard/investigations", icon: FileSearch },
+      { code: "SPECIAL_RISK", name: "Riesgo Especial", href: "/dashboard/special-risk", icon: FlameKindling },
       { code: "DATA_AUTHORIZATIONS", name: "Tratamiento de Datos", href: "/dashboard/data-processing", icon: Fingerprint},
     ],
   },
@@ -293,7 +295,7 @@ function isSubItemAllowed(
   if (alwaysVisibleCodes.has(subItem.code)) return true
   if (!parentCode) return isCodeAllowed(subItem.code, allowedCodes)
   if (subItem.code === "INVESTIGATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "ACPM" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "SPECIAL_RISK" && isCodeAllowed(parentCode, allowedCodes)) return true
 
   const parentChildCodes = getDirectChildCodesByParentCode(modules, parentCode)
 

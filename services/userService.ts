@@ -11,13 +11,22 @@ import type {
   GetCompanyAdminResponse,
   GetCompanyAdminApiResponse,
   CreateCompanyAdminResponse,
+  UpdateCompanyAdminPasswordDto,
+  UpdateCompanyAdminPasswordApiResponse,
+  UpdateCompanyAdminPasswordResponse,
 } from "@/types/manager/user";
 
 async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
-  const json = (await res.json().catch(() => null)) as UserResponse | UsersResponse | CreateCompanyAdminApiResponse | GetCompanyAdminApiResponse | null;
+  const json = (await res.json().catch(() => null)) as
+    | UserResponse
+    | UsersResponse
+    | CreateCompanyAdminApiResponse
+    | GetCompanyAdminApiResponse
+    | UpdateCompanyAdminPasswordApiResponse
+    | null;
 
   if (!res.ok || !json?.ok) {
-    const msg = json?.message ?? fallbackMsg;
+    const msg = json?.errors?.find((error) => error.message)?.message ?? json?.message ?? fallbackMsg;
     throw new Error(msg);
   }
 
@@ -100,6 +109,22 @@ export async function createCompanyAdmin(
     })
     return parseOrThrow<CreateCompanyAdminResponse>(res, "No se pudo crear el usuario")
   }
+
+/**
+ * Cambiar contraseña del administrador de la empresa
+ * PUT /api/admin/companies/{companyId}/company-admin/password
+ */
+export async function updateCompanyAdminPassword(
+  companyId: string,
+  dto: UpdateCompanyAdminPasswordDto,
+): Promise<UpdateCompanyAdminPasswordResponse> {
+  const res = await apiFetch(`/api/admin/companies/${companyId}/company-admin/password`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dto),
+  })
+  return parseOrThrow<UpdateCompanyAdminPasswordResponse>(res, "No se pudo cambiar la contraseña")
+}
 
 /**
  * Actualizar usuario por ID

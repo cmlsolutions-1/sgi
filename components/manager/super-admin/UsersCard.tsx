@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CreateUserDialog } from "@/components/manager/super-admin/dialogs/CreateUserDialog"
+import { ChangeCompanyAdminPasswordDialog } from "@/components/manager/super-admin/dialogs/ChangeCompanyAdminPasswordDialog"
 import { Loader2, RefreshCw, AlertTriangle, Settings } from "lucide-react"
 
 type Props = {
@@ -18,7 +19,7 @@ type Props = {
   loading: boolean
   //  Usar CreateCompanyAdminDto
   onCreateUser: (payload: CreateCompanyAdminDto) => Promise<User | null>
-  onUpdateUser: (payload: CreateCompanyAdminDto) => Promise<boolean>
+  onChangeAdminPassword: (password: string) => Promise<boolean>
   onRefresh: () => Promise<void>
   onOpenModules: () => void
 }
@@ -30,7 +31,7 @@ export function UsersCard({
   users,
   loading,
   onCreateUser,
-  onUpdateUser,
+  onChangeAdminPassword,
   onRefresh,
   onOpenModules,
 }: Props) {
@@ -133,13 +134,11 @@ export function UsersCard({
                 </div>
 
                 <div className="flex items-center gap-2 ml-4">
-                  <CreateUserDialog
+                  <ChangeCompanyAdminPasswordDialog
                     disabled={loading}
                     companyName={companyName}
-                    loading={loading}
                     user={u}
-                    onCreate={onCreateUser}
-                    onUpdate={onUpdateUser}
+                    onChangePassword={onChangeAdminPassword}
                   />
                 </div>
               </div>

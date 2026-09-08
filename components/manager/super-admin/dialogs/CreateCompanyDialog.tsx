@@ -1,8 +1,8 @@
 // components/manager/super-admin/dialogs/CreateCompanyDialog.tsx
 "use client"
 
-import { useState } from "react"
-import type { CompanyStatus } from "@/types/manager/super-admin"
+import { type ReactNode, useEffect, useState } from "react"
+import type { Company, CompanyStatus } from "@/types/manager/super-admin"
 
 
 import { Button } from "@/components/ui/button"
@@ -18,51 +18,106 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-import { Plus } from "lucide-react"
+import { Edit, Loader2, Plus } from "lucide-react"
+
+type CompanyForm = {
+  name: string
+  nit: string
+  address: string
+  phone: string
+  email: string
+  status: CompanyStatus
+}
 
 type Props = {
-  onCreate: (payload: {
-    name: string
-    nit: string
-    address: string
-    phone: string
-    email: string
-    status: CompanyStatus
-  }) => Promise<void>
+  company?: Company | null
+  trigger?: ReactNode
+  onCreate?: (payload: CompanyForm) => Promise<void>
+  onUpdate?: (company: Company, payload: Omit<CompanyForm, "status">) => Promise<void>
 }
 
-export function CreateCompanyDialog({ onCreate }: Props) {
-  const [open, setOpen] = useState(false)
+const emptyForm: CompanyForm = {
+  name: "",
+  nit: "",
+  address: "",
+  phone: "",
+  email: "",
+  status: "active",
+}
 
-  const [form, setForm] = useState({
-    name: "",
-    nit: "",
-    address: "",
-    phone: "",
-    email: "",
-    status: "active" as CompanyStatus,
-  })
+export function CreateCompanyDialog({ company, trigger, onCreate, onUpdate }: Props) {
+  const [open, setOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const isEditing = Boolean(company)
+
+  const [form, setForm] = useState<CompanyForm>(emptyForm)
+
+  useEffect(() => {
+    if (!open) return
+
+    setForm(
+      company
+        ? {
+            name: company.name,
+            nit: company.nit,
+            address: company.address,
+            phone: company.phone,
+            email: company.email,
+            status: company.status,
+          }
+        : emptyForm,
+    )
+  }, [company, open])
 
   const submit = async () => {
-  await onCreate(form)
-  setForm({ name: "", nit: "", address: "", phone: "", email: "", status: "active" })
-  setOpen(false)
-}
+    if (!form.name.trim() || !form.nit.trim() || !form.email.trim()) return
+
+    setSaving(true)
+    try {
+      if (company && onUpdate) {
+        await onUpdate(company, {
+          name: form.name.trim(),
+          nit: form.nit.trim(),
+          address: form.address.trim(),
+          phone: form.phone.trim(),
+          email: form.email.trim(),
+        })
+      } else if (onCreate) {
+        await onCreate({
+          ...form,
+          name: form.name.trim(),
+          nit: form.nit.trim(),
+          address: form.address.trim(),
+          phone: form.phone.trim(),
+          email: form.email.trim(),
+        })
+      }
+
+      setForm(emptyForm)
+      setOpen(false)
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-          <Plus className="h-4 w-4 mr-2" />
-          Nueva Empresa
-        </Button>
+        {trigger ?? (
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Plus className="h-4 w-4 mr-2" />
+            Nueva Empresa
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent className="bg-card border-border max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="text-foreground">Crear Nueva Empresa</DialogTitle>
+          <DialogTitle className="text-foreground">{isEditing ? "Actualizar Empresa" : "Crear Nueva Empresa"}</DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Registra la empresa. Luego podrás crear usuarios para ella.
+            {isEditing
+              ? "Actualiza los datos principales de la empresa seleccionada."
+              : "Registra la empresa. Luego podrás crear usuarios para ella."}
           </DialogDescription>
         </DialogHeader>
 
@@ -120,12 +175,24 @@ export function CreateCompanyDialog({ onCreate }: Props) {
           <Button
             variant="outline"
             onClick={() => setOpen(false)}
+            disabled={saving}
             className="border-border text-foreground hover:bg-secondary"
           >
             Cancelar
           </Button>
-          <Button onClick={submit} className="bg-primary text-primary-foreground hover:bg-primary/90">
-            Crear Empresa
+          <Button
+            onClick={submit}
+            disabled={saving || !form.name.trim() || !form.nit.trim() || !form.email.trim()}
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            {saving ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : isEditing ? (
+              <Edit className="h-4 w-4 mr-2" />
+            ) : (
+              <Plus className="h-4 w-4 mr-2" />
+            )}
+            {isEditing ? "Guardar cambios" : "Crear Empresa"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,11 +1,10 @@
 "use client"
 
-import { type FormEvent, useMemo, useState } from "react"
+import { type FormEvent, type ReactNode, useEffect, useMemo, useState } from "react"
 import {
   CalendarDays,
-  CheckCircle2,
-  Clock,
   Download,
+  Edit,
   Eye,
   FileCheck2,
   FileText,
@@ -15,6 +14,7 @@ import {
   Loader2,
   MoreHorizontal,
   Plus,
+  Power,
   Search,
   Upload,
   UserRound,
@@ -43,74 +43,19 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import {
+  changeAcpmStatus,
+  createAcpm,
+  createAcpmFollowUp,
+  listAcpmFollowUps,
+  listAcpms,
+  updateAcpm,
+} from "@/services/acpmService"
+import { listEmployees } from "@/services/employeeService"
+import type { Acpm, AcpmFilters, AcpmFollowUp, AcpmOrigin, AcpmStatus, AcpmType } from "@/types/manager/acpm"
+import type { Employee } from "@/types/manager/employee"
 
 type ViewMode = "cards" | "list"
-type AcpmType = "CORRECTIVA" | "PREVENTIVA" | "MEJORA"
-type AcpmOrigin = "INVESTIGACION" | "AUDITORIA" | "INSPECCION" | "QUEJA" | "INDICADOR" | "OTRO"
-type AcpmStatus = "ABIERTA" | "EN_EJECUCION" | "PENDIENTE_CIERRE" | "CERRADA"
-type NonConformityStatus = "ABIERTA" | "CERRADA"
-type HistoryType = "CREATED" | "DOCUMENT_GENERATED" | "FOLLOW_UP" | "EVIDENCE_UPLOADED" | "CLOSED"
-
-type MockEmployee = {
-  id: string
-  name: string
-  lastName: string
-  job: string
-}
-
-type AcpmEvidence = {
-  fileName: string
-  uploadedAt: string
-  uploadedBy: string
-  isLate: boolean
-}
-
-type AcpmNonConformity = {
-  acpmId: string
-  description: string
-  detectionDate: string
-  source: AcpmOrigin
-  status: NonConformityStatus
-  closureDate?: string
-  relatedDocument: string
-  evidence?: AcpmEvidence
-}
-
-type AcpmFollowUp = {
-  id: string
-  acpmId: string
-  followUpDate: string
-  observations: string
-  progressPercent: number
-  evidence: string
-}
-
-type AcpmHistory = {
-  id: string
-  type: HistoryType
-  title: string
-  description: string
-  actor: string
-  createdAt: string
-}
-
-type Acpm = {
-  id: string
-  consecutive: string
-  year: number
-  creationDate: string
-  type: AcpmType
-  origin: AcpmOrigin
-  name: string
-  description: string
-  responsibleId: string
-  deadline: string
-  status: AcpmStatus
-  evidence?: AcpmEvidence
-  nonConformity: AcpmNonConformity
-  followUps: AcpmFollowUp[]
-  history: AcpmHistory[]
-}
 
 type AcpmForm = {
   year: string
@@ -118,8 +63,8 @@ type AcpmForm = {
   origin: AcpmOrigin
   name: string
   description: string
-  responsibleId: string
-  deadline: string
+  responsibleEmployeeId: string
+  dueDate: string
   nonConformityDescription: string
   detectionDate: string
   relatedDocument: string
@@ -128,42 +73,35 @@ type AcpmForm = {
 type FollowUpForm = {
   followUpDate: string
   observations: string
-  progressPercent: string
+  completionPercentage: string
   evidence: string
 }
 
-const employees: MockEmployee[] = [
-  { id: "emp-1", name: "Laura", lastName: "Martinez", job: "Coordinadora SST" },
-  { id: "emp-2", name: "Andres", lastName: "Rojas", job: "Supervisor operativo" },
-  { id: "emp-3", name: "Camila", lastName: "Gomez", job: "Analista de talento humano" },
-  { id: "emp-4", name: "Julian", lastName: "Perez", job: "Jefe de mantenimiento" },
-]
-
 const currentYear = new Date().getFullYear()
+const yearOptions = Array.from({ length: 5 }, (_, index) => currentYear + index)
 
 const acpmTypeOptions: Array<{ value: AcpmType; label: string }> = [
-  { value: "CORRECTIVA", label: "Correctiva" },
-  { value: "PREVENTIVA", label: "Preventiva" },
-  { value: "MEJORA", label: "Mejora" },
+  { value: "CORRECTIVE", label: "Correctiva" },
+  { value: "PREVENTIVE", label: "Preventiva" },
+  { value: "IMPROVEMENT", label: "Mejora" },
 ]
 
 const acpmOriginOptions: Array<{ value: AcpmOrigin; label: string }> = [
-  { value: "INVESTIGACION", label: "Investigacion" },
-  { value: "AUDITORIA", label: "Auditoria" },
-  { value: "INSPECCION", label: "Inspeccion" },
-  { value: "QUEJA", label: "Queja" },
-  { value: "INDICADOR", label: "Indicador" },
-  { value: "OTRO", label: "Otro" },
+  { value: "INVESTIGATION", label: "Investigacion" },
+  { value: "AUDIT", label: "Auditoria" },
+  { value: "INSPECTION", label: "Inspeccion" },
+  { value: "INDICATOR", label: "Indicador" },
+  { value: "OTHER", label: "Otro" },
 ]
 
 const emptyForm: AcpmForm = {
   year: String(currentYear),
-  type: "CORRECTIVA",
-  origin: "INVESTIGACION",
+  type: "CORRECTIVE",
+  origin: "INVESTIGATION",
   name: "",
   description: "",
-  responsibleId: "",
-  deadline: "",
+  responsibleEmployeeId: "",
+  dueDate: "",
   nonConformityDescription: "",
   detectionDate: "",
   relatedDocument: "",
@@ -172,142 +110,12 @@ const emptyForm: AcpmForm = {
 const emptyFollowUpForm: FollowUpForm = {
   followUpDate: new Date().toISOString().slice(0, 10),
   observations: "",
-  progressPercent: "",
+  completionPercentage: "",
   evidence: "",
 }
 
-const initialAcpms: Acpm[] = [
-  {
-    id: "acpm-1",
-    consecutive: "ACPM-2026-001",
-    year: 2026,
-    creationDate: "2026-08-12T08:30:00",
-    type: "CORRECTIVA",
-    origin: "INSPECCION",
-    name: "Control de senalizacion en pasillos",
-    description: "Corregir ausencia de senalizacion preventiva en zonas de transito peatonal.",
-    responsibleId: "emp-2",
-    deadline: "2026-09-15",
-    status: "EN_EJECUCION",
-    nonConformity: {
-      acpmId: "acpm-1",
-      description: "Durante inspeccion se encontro senalizacion incompleta en pasillo de empaque.",
-      detectionDate: "2026-08-10",
-      source: "INSPECCION",
-      status: "ABIERTA",
-      relatedDocument: "INS-2026-018",
-    },
-    followUps: [
-      {
-        id: "follow-1",
-        acpmId: "acpm-1",
-        followUpDate: "2026-08-28",
-        observations: "Se compro material y se programo instalacion.",
-        progressPercent: 55,
-        evidence: "orden-compra-senalizacion.pdf",
-      },
-    ],
-    history: [
-      {
-        id: "history-1",
-        type: "CREATED",
-        title: "ACPM creado",
-        description: "Se registro la accion correctiva y su no conformidad.",
-        actor: "Sistema",
-        createdAt: "2026-08-12T08:30:00",
-      },
-      {
-        id: "history-2",
-        type: "FOLLOW_UP",
-        title: "Seguimiento registrado",
-        description: "Avance del 55%. Se compro material y se programo instalacion.",
-        actor: "Andres Rojas",
-        createdAt: "2026-08-28T09:10:00",
-      },
-    ],
-  },
-  {
-    id: "acpm-2",
-    consecutive: "ACPM-2026-002",
-    year: 2026,
-    creationDate: "2026-08-20T10:00:00",
-    type: "PREVENTIVA",
-    origin: "INDICADOR",
-    name: "Fortalecer reporte de actos inseguros",
-    description: "Implementar seguimiento preventivo por baja participacion en reportes SST.",
-    responsibleId: "emp-1",
-    deadline: "2026-08-30",
-    status: "CERRADA",
-    evidence: {
-      fileName: "cierre-acpm-reportes.pdf",
-      uploadedAt: "2026-09-02T15:20:00",
-      uploadedBy: "Laura Martinez",
-      isLate: true,
-    },
-    nonConformity: {
-      acpmId: "acpm-2",
-      description: "Indicador mensual mostro baja participacion en reportes preventivos.",
-      detectionDate: "2026-08-18",
-      source: "INDICADOR",
-      status: "CERRADA",
-      closureDate: "2026-09-02T15:20:00",
-      relatedDocument: "IND-SST-2026-08",
-      evidence: {
-        fileName: "cierre-acpm-reportes.pdf",
-        uploadedAt: "2026-09-02T15:20:00",
-        uploadedBy: "Laura Martinez",
-        isLate: true,
-      },
-    },
-    followUps: [
-      {
-        id: "follow-2",
-        acpmId: "acpm-2",
-        followUpDate: "2026-08-26",
-        observations: "Se socializo campana con lideres de proceso.",
-        progressPercent: 100,
-        evidence: "acta-socializacion.pdf",
-      },
-    ],
-    history: [
-      {
-        id: "history-3",
-        type: "CREATED",
-        title: "ACPM creado",
-        description: "Se registro la accion preventiva desde indicador.",
-        actor: "Sistema",
-        createdAt: "2026-08-20T10:00:00",
-      },
-      {
-        id: "history-4",
-        type: "EVIDENCE_UPLOADED",
-        title: "Evidencia cargada con retraso",
-        description: "La evidencia fue cargada despues de la fecha limite.",
-        actor: "Laura Martinez",
-        createdAt: "2026-09-02T15:20:00",
-      },
-      {
-        id: "history-5",
-        type: "CLOSED",
-        title: "No conformidad cerrada",
-        description: "El documento de cierre fue cargado y la ACPM quedo cerrada.",
-        actor: "Laura Martinez",
-        createdAt: "2026-09-02T15:20:00",
-      },
-    ],
-  },
-]
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
-}
-
-function nowIso() {
-  return new Date().toISOString()
+function normalizeNumberInput(value: string) {
+  return value.replace(/\D/g, "")
 }
 
 function formatDate(value?: string | null) {
@@ -327,14 +135,15 @@ function formatDateTime(value?: string | null) {
   }).format(date)
 }
 
-function employeeName(employeeId?: string) {
-  const employee = employees.find((item) => item.id === employeeId)
+function employeeName(employee?: Pick<Employee, "name" | "lastName" | "email"> | null) {
   if (!employee) return "No asignado"
-  return `${employee.name} ${employee.lastName}`
+  return `${employee.name ?? ""} ${employee.lastName ?? ""}`.trim() || employee.email || "No asignado"
 }
 
-function employeeJob(employeeId?: string) {
-  return employees.find((item) => item.id === employeeId)?.job ?? "Cargo no registrado"
+function employeeJob(employee?: Pick<Employee, "job"> | null) {
+  const job = employee?.job
+  if (!job) return "Cargo no registrado"
+  return typeof job === "string" ? job : job.name ?? "Cargo no registrado"
 }
 
 function typeLabel(type: AcpmType) {
@@ -345,22 +154,18 @@ function originLabel(origin: AcpmOrigin) {
   return acpmOriginOptions.find((option) => option.value === origin)?.label ?? origin
 }
 
-function statusLabel(status: AcpmStatus) {
-  if (status === "ABIERTA") return "Abierta"
-  if (status === "EN_EJECUCION") return "En ejecucion"
-  if (status === "PENDIENTE_CIERRE") return "Pendiente cierre"
-  return "Cerrada"
+function getVisualStatus(acpm: Acpm) {
+  if (acpm.status === "INACTIVE") return "Inactivo"
+  if (acpm.currentCompletionPercentage >= 100) return "Cerrada"
+  if (acpm.currentCompletionPercentage > 0) return "En ejecucion"
+  return "Abierta"
 }
 
-function statusClassName(status: AcpmStatus) {
-  if (status === "CERRADA") return "bg-accentActivd text-accentActivd-foreground border-transparent"
-  if (status === "PENDIENTE_CIERRE") return "bg-warning/10 text-warning border-warning/20"
-  if (status === "EN_EJECUCION") return "bg-blue-600 text-white border-transparent"
-  return "bg-secondary text-foreground border-border"
-}
-
-function normalizeNumberInput(value: string) {
-  return value.replace(/\D/g, "")
+function getVisualStatusClassName(acpm: Acpm) {
+  if (acpm.status === "INACTIVE") return "bg-destructive text-white border-transparent"
+  if (acpm.currentCompletionPercentage >= 100) return "bg-accentActivd text-accentActivd-foreground border-transparent"
+  if (acpm.currentCompletionPercentage > 0) return "bg-blue-600 text-white border-transparent"
+  return "bg-warning/10 text-warning border-warning/20"
 }
 
 function getPdfPageCount(doc: jsPDF) {
@@ -370,61 +175,87 @@ function getPdfPageCount(doc: jsPDF) {
   )
 }
 
-function isLateUpload(deadline: string, uploadedAt: string) {
-  return new Date(`${formatDate(uploadedAt)}T00:00:00`) > new Date(`${deadline}T00:00:00`)
+function isLateUpload(acpm: Acpm, followUp?: AcpmFollowUp | null) {
+  if (!followUp || followUp.completionPercentage < 100) return false
+  return new Date(`${formatDate(followUp.followUpDate)}T00:00:00`) > new Date(`${formatDate(acpm.dueDate)}T00:00:00`)
 }
 
-function buildHistory(type: HistoryType, title: string, description: string, actor: string): AcpmHistory {
-  return {
-    id: createId("history"),
-    type,
-    title,
-    description,
-    actor,
-    createdAt: nowIso(),
-  }
+function latestFollowUp(followUps: AcpmFollowUp[]) {
+  return [...followUps].sort((a, b) => new Date(b.followUpDate).getTime() - new Date(a.followUpDate).getTime())[0]
 }
 
 function AcpmDialog({
   open,
+  acpm,
+  employees,
   onClose,
   onSave,
 }: {
   open: boolean
+  acpm: Acpm | null
+  employees: Employee[]
   onClose: () => void
-  onSave: (form: AcpmForm) => void
+  onSave: (form: AcpmForm, acpmId?: string) => Promise<void>
 }) {
   const [form, setForm] = useState<AcpmForm>(emptyForm)
   const [saving, setSaving] = useState(false)
+  const editing = Boolean(acpm)
+
+  useEffect(() => {
+    if (!open) return
+    setForm(
+      acpm
+        ? {
+            year: String(acpm.year),
+            type: acpm.type,
+            origin: acpm.origin,
+            name: acpm.name ?? "",
+            description: acpm.description ?? "",
+            responsibleEmployeeId: acpm.responsibleEmployeeId ?? "",
+            dueDate: formatDate(acpm.dueDate),
+            nonConformityDescription: acpm.nonConformityDescription ?? "",
+            detectionDate: formatDate(acpm.detectionDate),
+            relatedDocument: acpm.relatedDocument ?? "",
+          }
+        : emptyForm,
+    )
+  }, [acpm, open])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const year = Number(form.year)
 
-    if (!Number.isInteger(year) || year < currentYear) return toast.error(`El año debe ser ${currentYear} o posterior`)
+    if (!editing && (!Number.isInteger(year) || year < currentYear)) {
+      return toast.error(`El año debe ser ${currentYear} o posterior`)
+    }
     if (!form.name.trim()) return toast.error("Ingresa el nombre del ACPM")
     if (!form.description.trim()) return toast.error("Ingresa la descripcion")
-    if (!form.responsibleId) return toast.error("Selecciona el responsable")
-    if (!form.deadline) return toast.error("Selecciona la fecha limite")
+    if (!form.responsibleEmployeeId) return toast.error("Selecciona el responsable")
+    if (!editing && !form.dueDate) return toast.error("Selecciona la fecha limite")
     if (!form.nonConformityDescription.trim()) return toast.error("Describe la no conformidad")
-    if (!form.detectionDate) return toast.error("Selecciona la fecha de deteccion")
-    if (form.deadline < form.detectionDate) return toast.error("La fecha limite no puede ser anterior a la deteccion")
+    if (!editing && !form.detectionDate) return toast.error("Selecciona la fecha de deteccion")
+    if (!editing && form.dueDate < form.detectionDate) {
+      return toast.error("La fecha limite no puede ser anterior a la deteccion")
+    }
 
     setSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, 250))
-    onSave(form)
-    setForm(emptyForm)
-    setSaving(false)
-    onClose()
+    try {
+      await onSave(form, acpm?.id)
+      onClose()
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
       <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-6xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-6xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>Nuevo ACPM</DialogTitle>
+          <DialogTitle>{editing ? "Editar ACPM" : "Nuevo ACPM"}</DialogTitle>
           <p className="text-sm text-muted-foreground">
-            Registra la accion y la no conformidad que le da origen. Las fechas quedan fijas despues de crear.
+            {editing
+              ? "Puedes actualizar los datos permitidos. Año, fecha limite y fecha de deteccion permanecen fijos."
+              : "Registra la accion y la no conformidad que le da origen."}
           </p>
         </DialogHeader>
 
@@ -439,15 +270,10 @@ function AcpmDialog({
                     type="number"
                     min={currentYear}
                     value={form.year}
+                    disabled={editing}
                     onChange={(event) =>
                       setForm((current) => ({ ...current, year: normalizeNumberInput(event.target.value).slice(0, 4) }))
                     }
-                    onBlur={() => {
-                      if (form.year && Number(form.year) < currentYear) {
-                        setForm((current) => ({ ...current, year: String(currentYear) }))
-                        toast.error(`El año debe ser ${currentYear} o posterior`)
-                      }
-                    }}
                   />
                 </Label>
                 <label className="block">
@@ -498,21 +324,22 @@ function AcpmDialog({
                     value={form.description}
                     onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
                     rows={4}
-                    placeholder="Describe la accion correctiva, preventiva o de mejora."
                   />
                 </Label>
                 <div className="grid gap-4">
                   <label className="block">
                     <span className="mb-2 block text-sm font-medium text-foreground">Responsable</span>
                     <select
-                      value={form.responsibleId}
-                      onChange={(event) => setForm((current) => ({ ...current, responsibleId: event.target.value }))}
+                      value={form.responsibleEmployeeId}
+                      onChange={(event) =>
+                        setForm((current) => ({ ...current, responsibleEmployeeId: event.target.value }))
+                      }
                       className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     >
                       <option value="">Selecciona responsable</option>
                       {employees.map((employee) => (
                         <option key={employee.id} value={employee.id}>
-                          {employeeName(employee.id)} - {employee.job}
+                          {employeeName(employee)} - {employeeJob(employee)}
                         </option>
                       ))}
                     </select>
@@ -521,8 +348,9 @@ function AcpmDialog({
                     Fecha limite
                     <Input
                       type="date"
-                      value={form.deadline}
-                      onChange={(event) => setForm((current) => ({ ...current, deadline: event.target.value }))}
+                      value={form.dueDate}
+                      disabled={editing}
+                      onChange={(event) => setForm((current) => ({ ...current, dueDate: event.target.value }))}
                     />
                   </Label>
                 </div>
@@ -540,7 +368,6 @@ function AcpmDialog({
                       setForm((current) => ({ ...current, nonConformityDescription: event.target.value }))
                     }
                     rows={4}
-                    placeholder="Registra especificamente la situacion que dio origen al ACPM."
                   />
                 </Label>
                 <Label className="grid gap-2">
@@ -548,6 +375,7 @@ function AcpmDialog({
                   <Input
                     type="date"
                     value={form.detectionDate}
+                    disabled={editing}
                     onChange={(event) => setForm((current) => ({ ...current, detectionDate: event.target.value }))}
                   />
                 </Label>
@@ -569,7 +397,7 @@ function AcpmDialog({
             </Button>
             <Button type="submit" className="gap-2" disabled={saving}>
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-              Crear ACPM
+              {editing ? "Guardar cambios" : "Crear ACPM"}
             </Button>
           </DialogFooter>
         </form>
@@ -580,30 +408,49 @@ function AcpmDialog({
 
 function FollowUpDialog({
   acpm,
+  lastFollowUp,
   onClose,
   onSave,
 }: {
   acpm: Acpm | null
+  lastFollowUp?: AcpmFollowUp
   onClose: () => void
-  onSave: (acpm: Acpm, form: FollowUpForm) => void
+  onSave: (acpm: Acpm, form: FollowUpForm) => Promise<void>
 }) {
   const [form, setForm] = useState<FollowUpForm>(emptyFollowUpForm)
+  const [saving, setSaving] = useState(false)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    if (acpm) setForm(emptyFollowUpForm)
+  }, [acpm])
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!acpm) return
-    const progress = Number(form.progressPercent)
+    const progress = Number(form.completionPercentage)
 
     if (!form.followUpDate) return toast.error("Selecciona la fecha de seguimiento")
     if (!form.observations.trim()) return toast.error("Ingresa las observaciones")
-    if (!Number.isFinite(progress) || progress < 0 || progress > 100) {
+    if (!Number.isInteger(progress) || progress < 0 || progress > 100) {
       return toast.error("El porcentaje debe estar entre 0 y 100")
     }
-    if (!form.evidence.trim()) return toast.error("Registra la evidencia del seguimiento")
+    if (lastFollowUp && progress < lastFollowUp.completionPercentage) {
+      return toast.error("El porcentaje no puede disminuir frente al ultimo seguimiento")
+    }
+    if (form.followUpDate < formatDate(acpm.detectionDate)) {
+      return toast.error("La fecha de seguimiento no puede ser anterior a la fecha de deteccion")
+    }
+    if (lastFollowUp && form.followUpDate < formatDate(lastFollowUp.followUpDate)) {
+      return toast.error("La fecha no puede ser anterior al ultimo seguimiento")
+    }
 
-    onSave(acpm, form)
-    setForm(emptyFollowUpForm)
-    onClose()
+    setSaving(true)
+    try {
+      await onSave(acpm, form)
+      onClose()
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -612,7 +459,7 @@ function FollowUpDialog({
         <DialogHeader>
           <DialogTitle>Agregar seguimiento</DialogTitle>
           <p className="text-sm text-muted-foreground">
-            Puedes registrar varios seguimientos hasta llegar al 100% de cumplimiento.
+            El avance se registra en el historial. Al llegar al 100% queda listo para cierre visual.
           </p>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -621,6 +468,7 @@ function FollowUpDialog({
               Fecha seguimiento
               <Input
                 type="date"
+                min={formatDate(lastFollowUp?.followUpDate ?? acpm?.detectionDate)}
                 value={form.followUpDate}
                 onChange={(event) => setForm((current) => ({ ...current, followUpDate: event.target.value }))}
               />
@@ -629,10 +477,12 @@ function FollowUpDialog({
               % cumplimiento
               <Input
                 type="number"
-                min={0}
+                min={lastFollowUp?.completionPercentage ?? 0}
                 max={100}
-                value={form.progressPercent}
-                onChange={(event) => setForm((current) => ({ ...current, progressPercent: event.target.value }))}
+                value={form.completionPercentage}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, completionPercentage: normalizeNumberInput(event.target.value) }))
+                }
                 placeholder="0"
               />
             </Label>
@@ -650,15 +500,15 @@ function FollowUpDialog({
             <Input
               value={form.evidence}
               onChange={(event) => setForm((current) => ({ ...current, evidence: event.target.value }))}
-              placeholder="Nombre del soporte del seguimiento"
+              placeholder="Nombre o descripcion del soporte"
             />
           </Label>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit" className="gap-2">
-              <Plus className="h-4 w-4" />
+            <Button type="submit" className="gap-2" disabled={saving}>
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               Guardar seguimiento
             </Button>
           </DialogFooter>
@@ -668,25 +518,34 @@ function FollowUpDialog({
   )
 }
 
-function EvidenceDialog({
+function CloseEvidenceDialog({
   acpm,
   onClose,
-  onUpload,
+  onSave,
 }: {
   acpm: Acpm | null
   onClose: () => void
-  onUpload: (acpm: Acpm, fileName: string) => void
+  onSave: (acpm: Acpm, fileName: string) => Promise<void>
 }) {
   const [fileName, setFileName] = useState("")
+  const [saving, setSaving] = useState(false)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    if (acpm) setFileName("")
+  }, [acpm])
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!acpm) return
     if (!fileName.trim()) return toast.error("Sube o registra el documento de cierre")
 
-    onUpload(acpm, fileName.trim())
-    setFileName("")
-    onClose()
+    setSaving(true)
+    try {
+      await onSave(acpm, fileName.trim())
+      onClose()
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -695,33 +554,29 @@ function EvidenceDialog({
         <DialogHeader>
           <DialogTitle>Subir evidencia de cierre</DialogTitle>
           <p className="text-sm text-muted-foreground">
-            Al cargar el documento, la no conformidad se cierra y se valida si fue cargado con retraso.
+            El backend registra la evidencia como seguimiento al 100%. Si la fecha supera el limite se mostrara con retraso.
           </p>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {acpm && (
-            <div className="rounded-md bg-secondary p-3 text-sm text-muted-foreground">
-              Fecha limite: {formatDate(acpm.deadline)}
-            </div>
-          )}
+          {acpm && <div className="rounded-md bg-secondary p-3 text-sm text-muted-foreground">Fecha limite: {formatDate(acpm.dueDate)}</div>}
           <div className="rounded-md border border-dashed border-border bg-secondary p-4">
             <Label className="grid gap-2">
-              Documento firmado o soporte de cierre
+              Documento o soporte
               <Input type="file" onChange={(event) => setFileName(event.target.files?.[0]?.name ?? "")} />
             </Label>
             <Input
               className="mt-3"
               value={fileName}
               onChange={(event) => setFileName(event.target.value)}
-              placeholder="Tambien puedes escribir el nombre del archivo mock"
+              placeholder="Tambien puedes escribir el nombre del archivo"
             />
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit" className="gap-2">
-              <Upload className="h-4 w-4" />
+            <Button type="submit" className="gap-2" disabled={saving}>
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               Cerrar con evidencia
             </Button>
           </DialogFooter>
@@ -733,26 +588,33 @@ function EvidenceDialog({
 
 function DetailDialog({
   acpm,
+  followUps,
+  loading,
   onClose,
 }: {
   acpm: Acpm | null
+  followUps: AcpmFollowUp[]
+  loading: boolean
   onClose: () => void
 }) {
   if (!acpm) return null
+
+  const last = latestFollowUp(followUps)
+  const late = isLateUpload(acpm, last)
 
   return (
     <Dialog open={Boolean(acpm)} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>Detalle {acpm.consecutive}</DialogTitle>
-          <p className="text-sm text-muted-foreground">Consulta no conformidad, seguimientos, evidencia e historial.</p>
+          <DialogTitle>Detalle ACPM</DialogTitle>
+          <p className="text-sm text-muted-foreground">Consulta no conformidad, seguimientos y evidencia registrada.</p>
         </DialogHeader>
         <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
           <div className="grid gap-4 md:grid-cols-4">
             <InfoBlock label="Tipo" value={typeLabel(acpm.type)} />
             <InfoBlock label="Origen" value={originLabel(acpm.origin)} />
-            <InfoBlock label="Responsable" value={employeeName(acpm.responsibleId)} />
-            <InfoBlock label="Fecha limite" value={formatDate(acpm.deadline)} />
+            <InfoBlock label="Responsable" value={employeeName(acpm.responsibleEmployee)} />
+            <InfoBlock label="Fecha limite" value={formatDate(acpm.dueDate)} />
           </div>
 
           <section className="rounded-md border border-border p-4">
@@ -763,44 +625,51 @@ function DetailDialog({
           <section className="rounded-md border border-border p-4">
             <h3 className="mb-3 text-sm font-semibold text-foreground">No conformidad</h3>
             <div className="grid gap-4 md:grid-cols-3">
-              <InfoBlock label="Fecha deteccion" value={formatDate(acpm.nonConformity.detectionDate)} />
-              <InfoBlock label="Fuente" value={originLabel(acpm.nonConformity.source)} />
-              <InfoBlock label="Estado" value={acpm.nonConformity.status === "CERRADA" ? "Cerrada" : "Abierta"} />
+              <InfoBlock label="Fecha deteccion" value={formatDate(acpm.detectionDate)} />
+              <InfoBlock label="Fuente" value={originLabel(acpm.origin)} />
+              <InfoBlock label="Estado" value={acpm.currentCompletionPercentage >= 100 ? "Cerrada" : "Abierta"} />
             </div>
-            <p className="mt-3 text-sm text-muted-foreground">{acpm.nonConformity.description}</p>
+            <p className="mt-3 text-sm text-muted-foreground">{acpm.nonConformityDescription}</p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Documento relacionado: {acpm.nonConformity.relatedDocument || "No registrado"}
+              Documento relacionado: {acpm.relatedDocument || "No registrado"}
             </p>
           </section>
 
           <section className="rounded-md border border-border p-4">
             <h3 className="mb-3 text-sm font-semibold text-foreground">Seguimientos</h3>
-            <div className="space-y-3">
-              {acpm.followUps.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Aun no hay seguimientos registrados.</p>
-              ) : (
-                acpm.followUps.map((followUp) => (
+            {loading ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Cargando seguimientos...
+              </div>
+            ) : followUps.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Aun no hay seguimientos registrados.</p>
+            ) : (
+              <div className="space-y-3">
+                {followUps.map((followUp) => (
                   <div key={followUp.id} className="rounded-md bg-secondary p-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="text-sm font-medium text-foreground">{formatDate(followUp.followUpDate)}</p>
-                      <Badge variant="outline">{followUp.progressPercent}%</Badge>
+                      <Badge variant="outline">{followUp.completionPercentage}%</Badge>
                     </div>
                     <p className="mt-2 text-sm text-muted-foreground">{followUp.observations}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">Evidencia: {followUp.evidence}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Evidencia: {followUp.evidence || "No registrada"}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Registrado: {formatDateTime(followUp.createdAt)}
+                    </p>
                   </div>
-                ))
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </section>
 
           <section className="rounded-md border border-border p-4">
             <h3 className="mb-3 text-sm font-semibold text-foreground">Evidencia de cierre</h3>
-            {acpm.evidence ? (
+            {last && last.completionPercentage >= 100 ? (
               <div className="rounded-md bg-secondary p-3 text-sm">
-                <p className="font-medium text-foreground">{acpm.evidence.fileName}</p>
-                <p className={acpm.evidence.isLate ? "text-destructive" : "text-muted-foreground"}>
-                  {acpm.evidence.isLate ? "Cargado con retraso" : "Cargado a tiempo"} -{" "}
-                  {formatDateTime(acpm.evidence.uploadedAt)}
+                <p className="font-medium text-foreground">{last.evidence || "Evidencia registrada"}</p>
+                <p className={late ? "text-destructive" : "text-muted-foreground"}>
+                  {late ? "Cargado con retraso" : "Cargado a tiempo"} - {formatDate(last.followUpDate)}
                 </p>
               </div>
             ) : (
@@ -814,13 +683,20 @@ function DetailDialog({
               Historial
             </h3>
             <div className="space-y-3">
-              {acpm.history.map((event) => (
-                <div key={event.id} className="border-l-2 border-primary/40 pl-4">
-                  <p className="text-sm font-medium text-foreground">{event.title}</p>
-                  <p className="text-sm text-muted-foreground">{event.description}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {formatDateTime(event.createdAt)} - {event.actor}
+              <div className="border-l-2 border-primary/40 pl-4">
+                <p className="text-sm font-medium text-foreground">ACPM creado</p>
+                <p className="text-sm text-muted-foreground">Se registro el ACPM y la no conformidad asociada.</p>
+                <p className="mt-1 text-xs text-muted-foreground">{formatDate(acpm.detectionDate)}</p>
+              </div>
+              {followUps.map((followUp) => (
+                <div key={`history-${followUp.id}`} className="border-l-2 border-primary/40 pl-4">
+                  <p className="text-sm font-medium text-foreground">
+                    {followUp.completionPercentage >= 100 ? "Evidencia de cierre registrada" : "Seguimiento registrado"}
                   </p>
+                  <p className="text-sm text-muted-foreground">
+                    Avance del {followUp.completionPercentage}%. {followUp.observations}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(followUp.createdAt)}</p>
                 </div>
               ))}
             </div>
@@ -846,170 +722,178 @@ function InfoBlock({ label, value }: { label: string; value: string }) {
 }
 
 export default function AcpmPage() {
-  const [acpms, setAcpms] = useState<Acpm[]>(initialAcpms)
+  const [acpms, setAcpms] = useState<Acpm[]>([])
+  const [total, setTotal] = useState(0)
+  const [employees, setEmployees] = useState<Employee[]>([])
+  const [followUpsByAcpm, setFollowUpsByAcpm] = useState<Record<string, AcpmFollowUp[]>>({})
+  const [loading, setLoading] = useState(true)
+  const [detailLoading, setDetailLoading] = useState(false)
   const [viewMode, setViewMode] = useState<ViewMode>("list")
   const [search, setSearch] = useState("")
-  const [statusFilter, setStatusFilter] = useState<AcpmStatus | "all">("all")
   const [yearFilter, setYearFilter] = useState(String(currentYear))
+  const [typeFilter, setTypeFilter] = useState<AcpmType | "all">("all")
+  const [originFilter, setOriginFilter] = useState<AcpmOrigin | "all">("all")
+  const [statusFilter, setStatusFilter] = useState<AcpmStatus | "all">("all")
+  const [responsibleFilter, setResponsibleFilter] = useState("all")
+  const [startDueDateFilter, setStartDueDateFilter] = useState("")
+  const [endDueDateFilter, setEndDueDateFilter] = useState("")
   const [createOpen, setCreateOpen] = useState(false)
+  const [editingAcpm, setEditingAcpm] = useState<Acpm | null>(null)
   const [followUpAcpm, setFollowUpAcpm] = useState<Acpm | null>(null)
   const [evidenceAcpm, setEvidenceAcpm] = useState<Acpm | null>(null)
   const [detailAcpm, setDetailAcpm] = useState<Acpm | null>(null)
 
-  const filteredAcpms = useMemo(() => {
-    const query = search.trim().toLowerCase()
-
-    return acpms.filter((acpm) => {
-      const matchesSearch =
-        !query ||
-        acpm.consecutive.toLowerCase().includes(query) ||
-        acpm.name.toLowerCase().includes(query) ||
-        acpm.description.toLowerCase().includes(query) ||
-        employeeName(acpm.responsibleId).toLowerCase().includes(query)
-      const matchesStatus = statusFilter === "all" || acpm.status === statusFilter
-      const matchesYear = yearFilter === "all" || String(acpm.year) === yearFilter
-
-      return matchesSearch && matchesStatus && matchesYear
-    })
-  }, [acpms, search, statusFilter, yearFilter])
-
-  const stats = useMemo(() => {
-    return {
-      total: acpms.length,
-      open: acpms.filter((acpm) => acpm.status !== "CERRADA").length,
-      pendingClosure: acpms.filter((acpm) => acpm.status === "PENDIENTE_CIERRE").length,
-      closed: acpms.filter((acpm) => acpm.status === "CERRADA").length,
-      late: acpms.filter((acpm) => acpm.evidence?.isLate).length,
-    }
-  }, [acpms])
-
-  function createAcpm(form: AcpmForm) {
-    const year = Number(form.year) || currentYear
-    const nextNumber = acpms.length + 1
-    const createdAt = nowIso()
-    const id = createId("acpm")
-    const acpm: Acpm = {
-      id,
-      consecutive: `ACPM-${year}-${String(nextNumber).padStart(3, "0")}`,
-      year,
-      creationDate: createdAt,
-      type: form.type,
-      origin: form.origin,
-      name: form.name.trim(),
-      description: form.description.trim(),
-      responsibleId: form.responsibleId,
-      deadline: form.deadline,
-      status: "ABIERTA",
-      nonConformity: {
-        acpmId: id,
-        description: form.nonConformityDescription.trim(),
-        detectionDate: form.detectionDate,
-        source: form.origin,
-        status: "ABIERTA",
-        relatedDocument: form.relatedDocument.trim(),
-      },
-      followUps: [],
-      history: [
-        {
-          id: createId("history"),
-          type: "CREATED",
-          title: "ACPM creado",
-          description: "Se registro el documento ACPM y la no conformidad asociada.",
-          actor: "Sistema",
-          createdAt,
-        },
-      ],
+  async function loadAcpms() {
+    if (startDueDateFilter && endDueDateFilter && endDueDateFilter < startDueDateFilter) {
+      toast.error("La fecha final no puede ser anterior a la fecha inicial")
+      return
     }
 
-    setAcpms((current) => [acpm, ...current])
-    toast.success("ACPM creado")
+    setLoading(true)
+    try {
+      const filters: AcpmFilters = {
+        page: 1,
+        limit: 100,
+        search: search.trim() || undefined,
+        year: yearFilter === "all" ? undefined : Number(yearFilter),
+        type: typeFilter === "all" ? undefined : typeFilter,
+        origin: originFilter === "all" ? undefined : originFilter,
+        status: statusFilter === "all" ? undefined : statusFilter,
+        responsibleEmployeeId: responsibleFilter === "all" ? undefined : responsibleFilter,
+        startDueDate: startDueDateFilter || undefined,
+        endDueDate: endDueDateFilter || undefined,
+      }
+      const [acpmData, employeeData] = await Promise.all([listAcpms(filters), listEmployees()])
+      setAcpms(acpmData.items ?? [])
+      setTotal(acpmData.total ?? 0)
+      setEmployees(employeeData)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar ACPM")
+    } finally {
+      setLoading(false)
+    }
   }
 
-  function addFollowUp(acpm: Acpm, form: FollowUpForm) {
-    const progress = Number(form.progressPercent)
-    const actor = employeeName(acpm.responsibleId)
-    const followUp: AcpmFollowUp = {
-      id: createId("follow"),
-      acpmId: acpm.id,
-      followUpDate: form.followUpDate,
-      observations: form.observations.trim(),
-      progressPercent: progress,
-      evidence: form.evidence.trim(),
+  async function loadFollowUps(acpmId: string) {
+    setDetailLoading(true)
+    try {
+      const followUps = await listAcpmFollowUps(acpmId)
+      setFollowUpsByAcpm((current) => ({ ...current, [acpmId]: followUps }))
+      return followUps
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar los seguimientos")
+      return []
+    } finally {
+      setDetailLoading(false)
     }
-    const nextStatus: AcpmStatus = progress >= 100 ? "PENDIENTE_CIERRE" : "EN_EJECUCION"
-
-    setAcpms((current) =>
-      current.map((item) =>
-        item.id === acpm.id
-          ? {
-              ...item,
-              status: item.status === "CERRADA" ? "CERRADA" : nextStatus,
-              followUps: [followUp, ...item.followUps],
-              history: [
-                buildHistory(
-                  "FOLLOW_UP",
-                  "Seguimiento registrado",
-                  `Avance del ${progress}%. ${form.observations.trim()}`,
-                  actor,
-                ),
-                ...item.history,
-              ],
-            }
-          : item,
-      ),
-    )
-    toast.success(progress >= 100 ? "Seguimiento registrado. Queda pendiente de cierre" : "Seguimiento registrado")
   }
 
-  function uploadEvidence(acpm: Acpm, fileName: string) {
-    const uploadedAt = nowIso()
-    const actor = employeeName(acpm.responsibleId)
-    const late = isLateUpload(acpm.deadline, uploadedAt)
-    const evidence: AcpmEvidence = {
-      fileName,
-      uploadedAt,
-      uploadedBy: actor,
-      isLate: late,
-    }
+  useEffect(() => {
+    loadAcpms()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [yearFilter, typeFilter, originFilter, statusFilter, responsibleFilter, startDueDateFilter, endDueDateFilter])
 
-    setAcpms((current) =>
-      current.map((item) =>
-        item.id === acpm.id
-          ? {
-              ...item,
-              status: "CERRADA",
-              evidence,
-              nonConformity: {
-                ...item.nonConformity,
-                status: "CERRADA",
-                closureDate: uploadedAt,
-                evidence,
-              },
-              history: [
-                buildHistory(
-                  "EVIDENCE_UPLOADED",
-                  late ? "Evidencia cargada con retraso" : "Evidencia cargada",
-                  late
-                    ? "El documento de cierre fue cargado despues de la fecha limite establecida."
-                    : "El documento de cierre fue cargado dentro del plazo establecido.",
-                  actor,
-                ),
-                buildHistory(
-                  "CLOSED",
-                  "No conformidad cerrada",
-                  "La no conformidad se cerro automaticamente al subir la evidencia.",
-                  actor,
-                ),
-                ...item.history,
-              ],
-            }
-          : item,
-      ),
-    )
-    toast.success(late ? "ACPM cerrado con retraso" : "ACPM cerrado con evidencia")
+  async function handleSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    await loadAcpms()
   }
 
-  function generateDocument(acpm: Acpm) {
+  async function openDetail(acpm: Acpm) {
+    setDetailAcpm(acpm)
+    await loadFollowUps(acpm.id)
+  }
+
+  async function openFollowUp(acpm: Acpm) {
+    const followUps = followUpsByAcpm[acpm.id] ?? (await loadFollowUps(acpm.id))
+    if (latestFollowUp(followUps)?.completionPercentage >= 100 || acpm.currentCompletionPercentage >= 100) {
+      toast.error("Este ACPM ya llego al 100% y no permite nuevos seguimientos")
+      return
+    }
+    setFollowUpAcpm(acpm)
+  }
+
+  async function handleSaveAcpm(form: AcpmForm, acpmId?: string) {
+    try {
+      if (acpmId) {
+        await updateAcpm(acpmId, {
+          type: form.type,
+          origin: form.origin,
+          name: form.name.trim(),
+          description: form.description.trim(),
+          responsibleEmployeeId: form.responsibleEmployeeId,
+          nonConformityDescription: form.nonConformityDescription.trim(),
+          relatedDocument: form.relatedDocument.trim() || null,
+        })
+        toast.success("ACPM actualizado")
+      } else {
+        await createAcpm({
+          year: Number(form.year),
+          type: form.type,
+          origin: form.origin,
+          name: form.name.trim(),
+          description: form.description.trim(),
+          responsibleEmployeeId: form.responsibleEmployeeId,
+          dueDate: form.dueDate,
+          nonConformityDescription: form.nonConformityDescription.trim(),
+          detectionDate: form.detectionDate,
+          relatedDocument: form.relatedDocument.trim() || null,
+        })
+        toast.success("ACPM creado")
+      }
+      setEditingAcpm(null)
+      await loadAcpms()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar el ACPM")
+      throw error
+    }
+  }
+
+  async function handleSaveFollowUp(acpm: Acpm, form: FollowUpForm) {
+    try {
+      await createAcpmFollowUp(acpm.id, {
+        followUpDate: form.followUpDate,
+        completionPercentage: Number(form.completionPercentage),
+        observations: form.observations.trim(),
+        evidence: form.evidence.trim() || null,
+      })
+      toast.success("Seguimiento registrado")
+      await Promise.all([loadAcpms(), loadFollowUps(acpm.id)])
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar el seguimiento")
+      throw error
+    }
+  }
+
+  async function handleCloseWithEvidence(acpm: Acpm, fileName: string) {
+    try {
+      const today = new Date().toISOString().slice(0, 10)
+      await createAcpmFollowUp(acpm.id, {
+        followUpDate: today,
+        completionPercentage: 100,
+        observations: "Evidencia de cierre cargada.",
+        evidence: fileName,
+      })
+      toast.success(isLateUpload(acpm, { followUpDate: today, completionPercentage: 100 } as AcpmFollowUp) ? "ACPM cerrado con retraso" : "ACPM cerrado")
+      await Promise.all([loadAcpms(), loadFollowUps(acpm.id)])
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cerrar el ACPM")
+      throw error
+    }
+  }
+
+  async function handleChangeStatus(acpm: Acpm) {
+    const nextStatus: AcpmStatus = acpm.status === "ACTIVE" ? "INACTIVE" : "ACTIVE"
+    try {
+      await changeAcpmStatus(acpm.id, { status: nextStatus })
+      toast.success(nextStatus === "ACTIVE" ? "ACPM activado" : "ACPM inactivado")
+      await loadAcpms()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cambiar el estado")
+    }
+  }
+
+  async function generateDocument(acpm: Acpm) {
+    const followUps = followUpsByAcpm[acpm.id] ?? (await loadFollowUps(acpm.id))
     const doc = new jsPDF("p", "mm", "a4")
     const pageWidth = doc.internal.pageSize.getWidth()
     const pageHeight = doc.internal.pageSize.getHeight()
@@ -1069,7 +953,7 @@ export default function AcpmPage() {
     doc.text("DOCUMENTO ACPM", margin + 5, y + 9)
     doc.setFont("helvetica", "normal")
     doc.setFontSize(9)
-    doc.text(acpm.consecutive, margin + 5, y + 16)
+    doc.text(acpm.name, margin + 5, y + 16)
     doc.text(`Fecha de generacion: ${formatDate(new Date().toISOString())}`, pageWidth - margin - 5, y + 16, {
       align: "right",
     })
@@ -1081,15 +965,15 @@ export default function AcpmPage() {
       theme: "grid",
       margin: { left: margin, right: margin },
       body: [
-        ["Consecutivo", acpm.consecutive],
         ["Ano", String(acpm.year)],
-        ["Fecha creacion", formatDate(acpm.creationDate)],
+        ["Fecha deteccion", formatDate(acpm.detectionDate)],
         ["Tipo", typeLabel(acpm.type)],
         ["Origen", originLabel(acpm.origin)],
         ["Nombre", acpm.name],
-        ["Responsable", `${employeeName(acpm.responsibleId)} - ${employeeJob(acpm.responsibleId)}`],
-        ["Fecha limite", formatDate(acpm.deadline)],
-        ["Estado", statusLabel(acpm.status)],
+        ["Responsable", employeeName(acpm.responsibleEmployee)],
+        ["Fecha limite", formatDate(acpm.dueDate)],
+        ["Avance", `${acpm.currentCompletionPercentage}%`],
+        ["Estado", getVisualStatus(acpm)],
       ],
       styles: { font: "helvetica", fontSize: 8.5, cellPadding: 2.5, lineColor: [220, 226, 224], lineWidth: 0.1 },
       columnStyles: { 0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 48 }, 1: { cellWidth: contentWidth - 48 } },
@@ -1100,16 +984,15 @@ export default function AcpmPage() {
     paragraph(acpm.description)
 
     sectionTitle("No conformidad")
-    paragraph(acpm.nonConformity.description)
+    paragraph(acpm.nonConformityDescription)
     autoTable(doc, {
       startY: y,
       theme: "grid",
       margin: { left: margin, right: margin },
       body: [
-        ["Fecha deteccion", formatDate(acpm.nonConformity.detectionDate)],
-        ["Fuente", originLabel(acpm.nonConformity.source)],
-        ["Documento relacionado", acpm.nonConformity.relatedDocument || "No registrado"],
-        ["Estado", acpm.nonConformity.status === "CERRADA" ? "Cerrada" : "Abierta"],
+        ["Fecha deteccion", formatDate(acpm.detectionDate)],
+        ["Fuente", originLabel(acpm.origin)],
+        ["Documento relacionado", acpm.relatedDocument || "No registrado"],
       ],
       styles: { font: "helvetica", fontSize: 8.5, cellPadding: 2.5, lineColor: [220, 226, 224], lineWidth: 0.1 },
       columnStyles: { 0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 48 }, 1: { cellWidth: contentWidth - 48 } },
@@ -1122,12 +1005,12 @@ export default function AcpmPage() {
       theme: "grid",
       margin: { left: margin, right: margin },
       head: [["Fecha", "Avance", "Observaciones", "Evidencia"]],
-      body: acpm.followUps.length
-        ? acpm.followUps.map((followUp) => [
+      body: followUps.length
+        ? followUps.map((followUp) => [
             formatDate(followUp.followUpDate),
-            `${followUp.progressPercent}%`,
+            `${followUp.completionPercentage}%`,
             followUp.observations,
-            followUp.evidence,
+            followUp.evidence || "",
           ])
         : [["Sin seguimiento", "0%", "No hay seguimientos registrados", ""]],
       styles: { font: "helvetica", fontSize: 8, cellPadding: 2.2, lineColor: [220, 226, 224], lineWidth: 0.1 },
@@ -1142,7 +1025,7 @@ export default function AcpmPage() {
     y = ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? y) + 12
 
     sectionTitle("Cierre y firma")
-    paragraph("La no conformidad se cerrara una vez se cargue la evidencia documental correspondiente.")
+    paragraph("La no conformidad se considera cerrada cuando el seguimiento alcanza el 100% con evidencia registrada.")
     ensureSpace(30)
     doc.setDrawColor(120, 130, 140)
     doc.line(margin, y + 18, margin + 78, y + 18)
@@ -1154,44 +1037,41 @@ export default function AcpmPage() {
     doc.text("Aprobacion / cierre", pageWidth - margin - 78, y + 24)
 
     addFooter()
-    doc.save(`${acpm.consecutive}_${acpm.name.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
-
-    setAcpms((current) =>
-      current.map((item) =>
-        item.id === acpm.id
-          ? {
-              ...item,
-              history: [
-                buildHistory("DOCUMENT_GENERATED", "Documento generado", "Se descargo el documento ACPM en PDF.", "Sistema"),
-                ...item.history,
-              ],
-            }
-          : item,
-      ),
-    )
+    doc.save(`ACPM_${acpm.year}_${acpm.name.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
   }
 
-  function downloadEvidence(acpm: Acpm) {
-    if (!acpm.evidence) {
-      toast.error("Este ACPM aun no tiene evidencia cargada")
+  function downloadEvidence(acpm: Acpm, followUps: AcpmFollowUp[]) {
+    const closeFollowUp = latestFollowUp(followUps.filter((followUp) => followUp.completionPercentage >= 100))
+    if (!closeFollowUp?.evidence) {
+      toast.error("Este ACPM aun no tiene evidencia de cierre")
       return
     }
 
     const blob = new Blob(
       [
-        `Evidencia ACPM mock\nConsecutivo: ${acpm.consecutive}\nArchivo: ${acpm.evidence.fileName}\nFecha carga: ${formatDateTime(
-          acpm.evidence.uploadedAt,
-        )}\nEstado: ${acpm.evidence.isLate ? "Cargado con retraso" : "Cargado a tiempo"}\n`,
+        `Evidencia ACPM\nACPM: ${acpm.name}\nArchivo: ${closeFollowUp.evidence}\nFecha: ${formatDate(
+          closeFollowUp.followUpDate,
+        )}\nEstado: ${isLateUpload(acpm, closeFollowUp) ? "Cargado con retraso" : "Cargado a tiempo"}\n`,
       ],
       { type: "text/plain;charset=utf-8" },
     )
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
     link.href = url
-    link.download = acpm.evidence.fileName
+    link.download = closeFollowUp.evidence
     link.click()
     URL.revokeObjectURL(url)
   }
+
+  const stats = useMemo(() => {
+    return {
+      total,
+      active: acpms.filter((acpm) => acpm.status === "ACTIVE").length,
+      inProgress: acpms.filter((acpm) => acpm.status === "ACTIVE" && acpm.currentCompletionPercentage > 0 && acpm.currentCompletionPercentage < 100).length,
+      closed: acpms.filter((acpm) => acpm.currentCompletionPercentage >= 100).length,
+      inactive: acpms.filter((acpm) => acpm.status === "INACTIVE").length,
+    }
+  }, [acpms, total])
 
   return (
     <main className="space-y-6">
@@ -1199,7 +1079,7 @@ export default function AcpmPage() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">ACPM</h1>
           <p className="text-muted-foreground">
-            Administra acciones correctivas, preventivas y de mejora con seguimiento, cierre e historial.
+            Administra acciones correctivas, preventivas y de mejora con seguimiento y evidencia.
           </p>
         </div>
         <Button type="button" className="gap-2" onClick={() => setCreateOpen(true)}>
@@ -1211,30 +1091,15 @@ export default function AcpmPage() {
       <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
         <div className="flex justify-center overflow-x-auto px-3 py-1">
           <div className="flex w-fit min-w-max items-center gap-2">
-            <div className="rounded-md bg-secondary px-3 py-1.5">
-              <span className="text-sm font-bold text-foreground">{stats.total}</span>
-              <span className="ml-2 text-xs text-muted-foreground">ACPM</span>
-            </div>
-            <div className="rounded-md bg-secondary px-3 py-1.5">
-              <span className="text-sm font-bold text-blue-700">{stats.open}</span>
-              <span className="ml-2 text-xs text-muted-foreground">Abiertos</span>
-            </div>
-            <div className="rounded-md bg-secondary px-3 py-1.5">
-              <span className="text-sm font-bold text-amber-700">{stats.pendingClosure}</span>
-              <span className="ml-2 text-xs text-muted-foreground">Pendiente cierre</span>
-            </div>
-            <div className="rounded-md bg-secondary px-3 py-1.5">
-              <span className="text-sm font-bold text-emerald-700">{stats.closed}</span>
-              <span className="ml-2 text-xs text-muted-foreground">Cerrados</span>
-            </div>
-            <div className="rounded-md bg-secondary px-3 py-1.5">
-              <span className="text-sm font-bold text-destructive">{stats.late}</span>
-              <span className="ml-2 text-xs text-muted-foreground">Con retraso</span>
-            </div>
+            <Metric label="ACPM" value={stats.total} />
+            <Metric label="Activos" value={stats.active} tone="blue" />
+            <Metric label="En ejecucion" value={stats.inProgress} tone="amber" />
+            <Metric label="Cerrados" value={stats.closed} tone="green" />
+            <Metric label="Inactivos" value={stats.inactive} tone="red" />
           </div>
         </div>
 
-        <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_150px_220px]">
+        <form onSubmit={handleSearch} className="mt-4 grid gap-3 xl:grid-cols-[minmax(180px,1fr)_110px_150px_150px_140px_160px_145px_145px_auto]">
           <Label className="grid gap-2">
             Buscar
             <div className="relative">
@@ -1243,70 +1108,97 @@ export default function AcpmPage() {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 className="pl-9"
-                placeholder="Consecutivo, nombre, descripcion o responsable"
+                placeholder="Nombre, descripcion o responsable"
               />
             </div>
           </Label>
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium text-foreground">Año</span>
-            <select
-              value={yearFilter}
-              onChange={(event) => setYearFilter(event.target.value)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            >
-              <option value="all">Todos</option>
-              <option value="2026">2026</option>
-              <option value="2027">2027</option>
-            </select>
-          </label>
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium text-foreground">Estado</span>
-            <select
-              value={statusFilter}
-              onChange={(event) => setStatusFilter(event.target.value as AcpmStatus | "all")}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            >
-              <option value="all">Todos</option>
-              <option value="ABIERTA">Abierta</option>
-              <option value="EN_EJECUCION">En ejecucion</option>
-              <option value="PENDIENTE_CIERRE">Pendiente cierre</option>
-              <option value="CERRADA">Cerrada</option>
-            </select>
-          </label>
-        </div>
+          <FilterSelect label="Año" value={yearFilter} onChange={setYearFilter}>
+            <option value="all">Todos</option>
+            {yearOptions.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </FilterSelect>
+          <FilterSelect label="Tipo" value={typeFilter} onChange={(value) => setTypeFilter(value as AcpmType | "all")}>
+            <option value="all">Todos</option>
+            {acpmTypeOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </FilterSelect>
+          <FilterSelect label="Origen" value={originFilter} onChange={(value) => setOriginFilter(value as AcpmOrigin | "all")}>
+            <option value="all">Todos</option>
+            {acpmOriginOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </FilterSelect>
+          <FilterSelect label="Estado" value={statusFilter} onChange={(value) => setStatusFilter(value as AcpmStatus | "all")}>
+            <option value="all">Todos</option>
+            <option value="ACTIVE">Activos</option>
+            <option value="INACTIVE">Inactivos</option>
+          </FilterSelect>
+          <FilterSelect label="Responsable" value={responsibleFilter} onChange={setResponsibleFilter}>
+            <option value="all">Todos</option>
+            {employees.map((employee) => (
+              <option key={employee.id} value={employee.id}>
+                {employeeName(employee)}
+              </option>
+            ))}
+          </FilterSelect>
+          <Label className="grid gap-2">
+            Desde limite
+            <Input
+              type="date"
+              value={startDueDateFilter}
+              onChange={(event) => setStartDueDateFilter(event.target.value)}
+            />
+          </Label>
+          <Label className="grid gap-2">
+            Hasta limite
+            <Input
+              type="date"
+              min={startDueDateFilter || undefined}
+              value={endDueDateFilter}
+              onChange={(event) => setEndDueDateFilter(event.target.value)}
+            />
+          </Label>
+          <Button type="submit" variant="outline" className="mt-7 gap-2">
+            <Search className="h-4 w-4" />
+            Filtrar
+          </Button>
+        </form>
       </section>
 
       <section className="space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold text-foreground">Lista de ACPM</h2>
-            <p className="text-sm text-muted-foreground">{filteredAcpms.length} registros encontrados</p>
+            <p className="text-sm text-muted-foreground">{acpms.length} registros encontrados</p>
           </div>
           <div className="inline-flex w-fit rounded-md border border-border bg-secondary p-1">
-            <Button
-              type="button"
-              size="sm"
-              variant={viewMode === "cards" ? "default" : "ghost"}
-              className="h-8 gap-2"
-              onClick={() => setViewMode("cards")}
-            >
+            <Button type="button" size="sm" variant={viewMode === "cards" ? "default" : "ghost"} className="h-8 gap-2" onClick={() => setViewMode("cards")}>
               <LayoutGrid className="h-4 w-4" />
               Tarjetas
             </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant={viewMode === "list" ? "default" : "ghost"}
-              className="h-8 gap-2"
-              onClick={() => setViewMode("list")}
-            >
+            <Button type="button" size="sm" variant={viewMode === "list" ? "default" : "ghost"} className="h-8 gap-2" onClick={() => setViewMode("list")}>
               <List className="h-4 w-4" />
               Lista
             </Button>
           </div>
         </div>
 
-        {filteredAcpms.length === 0 ? (
+        {loading ? (
+          <Card>
+            <CardContent className="flex items-center gap-2 p-6 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Cargando ACPM...
+            </CardContent>
+          </Card>
+        ) : acpms.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-sm text-muted-foreground">
               No hay ACPM que coincidan con los filtros actuales.
@@ -1314,69 +1206,45 @@ export default function AcpmPage() {
           </Card>
         ) : viewMode === "cards" ? (
           <div className="grid gap-4 xl:grid-cols-2">
-            {filteredAcpms.map((acpm) => (
-              <Card key={acpm.id} className="border-border bg-card">
-                <CardContent className="space-y-4 p-5">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-semibold text-foreground">{acpm.name}</h3>
-                        <Badge variant="outline" className={statusClassName(acpm.status)}>
-                          {statusLabel(acpm.status)}
-                        </Badge>
-                        {acpm.evidence?.isLate && (
-                          <Badge variant="outline" className="border-destructive bg-destructive/10 text-destructive">
-                            Con retraso
+            {acpms.map((acpm) => {
+              const followUps = followUpsByAcpm[acpm.id] ?? []
+              const last = latestFollowUp(followUps)
+              const late = isLateUpload(acpm, last)
+
+              return (
+                <Card key={acpm.id} className="border-border bg-card">
+                  <CardContent className="space-y-4 p-5">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-semibold text-foreground">{acpm.name}</h3>
+                          <Badge variant="outline" className={getVisualStatusClassName(acpm)}>
+                            {getVisualStatus(acpm)}
                           </Badge>
-                        )}
+                          {late && (
+                            <Badge variant="outline" className="border-destructive bg-destructive/10 text-destructive">
+                              Con retraso
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="mt-1 text-sm text-muted-foreground">{typeLabel(acpm.type)} / {originLabel(acpm.origin)}</p>
                       </div>
-                      <p className="mt-1 text-sm text-muted-foreground">{acpm.consecutive}</p>
+                      <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => openDetail(acpm)}>
+                        <Eye className="h-4 w-4" />
+                        Ver
+                      </Button>
                     </div>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => setDetailAcpm(acpm)}>
-                      <Eye className="h-4 w-4" />
-                      Ver
-                    </Button>
-                  </div>
-                  <p className="line-clamp-2 text-sm text-muted-foreground">{acpm.description}</p>
-                  <div className="grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
-                    <p className="flex items-center gap-2">
-                      <UserRound className="h-4 w-4" />
-                      {employeeName(acpm.responsibleId)}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <CalendarDays className="h-4 w-4" />
-                      Limite: {formatDate(acpm.deadline)}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      {typeLabel(acpm.type)} / {originLabel(acpm.origin)}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      {acpm.followUps[0]?.progressPercent ?? 0}% avance
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap justify-end gap-2 border-t border-border pt-3">
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => generateDocument(acpm)}>
-                      <Download className="h-4 w-4" />
-                      Documento
-                    </Button>
-                    {acpm.status !== "CERRADA" && (
-                      <>
-                        <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => setFollowUpAcpm(acpm)}>
-                          <Plus className="h-4 w-4" />
-                          Seguimiento
-                        </Button>
-                        <Button type="button" size="sm" className="gap-2" onClick={() => setEvidenceAcpm(acpm)}>
-                          <Upload className="h-4 w-4" />
-                          Cerrar
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    <p className="line-clamp-2 text-sm text-muted-foreground">{acpm.description}</p>
+                    <div className="grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
+                      <p className="flex items-center gap-2"><UserRound className="h-4 w-4" />{employeeName(acpm.responsibleEmployee)}</p>
+                      <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />Limite: {formatDate(acpm.dueDate)}</p>
+                      <p className="flex items-center gap-2"><FileText className="h-4 w-4" />Avance: {acpm.currentCompletionPercentage}%</p>
+                      <p className="flex items-center gap-2"><FileCheck2 className="h-4 w-4" />{last?.evidence || "Sin evidencia de cierre"}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
         ) : (
           <div className="overflow-x-auto rounded-md border border-border bg-card">
@@ -1388,46 +1256,33 @@ export default function AcpmPage() {
                   <th className="px-4 py-3 font-medium">Responsable</th>
                   <th className="px-4 py-3 font-medium">Fechas</th>
                   <th className="px-4 py-3 font-medium">Avance</th>
-                  <th className="px-4 py-3 font-medium">Evidencia</th>
                   <th className="px-4 py-3 font-medium">Estado</th>
                   <th className="px-4 py-3 text-right font-medium">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {filteredAcpms.map((acpm) => (
+                {acpms.map((acpm) => (
                   <tr key={acpm.id} className="align-middle">
                     <td className="px-4 py-3">
-                      <p className="max-w-[260px] truncate font-medium text-foreground">{acpm.name}</p>
-                      <p className="text-muted-foreground">{acpm.consecutive}</p>
+                      <p className="max-w-[280px] truncate font-medium text-foreground">{acpm.name}</p>
+                      <p className="max-w-[280px] truncate text-muted-foreground">{acpm.description}</p>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
                       <p>{typeLabel(acpm.type)}</p>
                       <p>{originLabel(acpm.origin)}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <p className="max-w-[190px] truncate font-medium text-foreground">{employeeName(acpm.responsibleId)}</p>
-                      <p className="max-w-[190px] truncate text-muted-foreground">{employeeJob(acpm.responsibleId)}</p>
+                      <p className="max-w-[190px] truncate font-medium text-foreground">{employeeName(acpm.responsibleEmployee)}</p>
+                      <p className="max-w-[190px] truncate text-muted-foreground">{acpm.responsibleEmployee?.email ?? ""}</p>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
-                      <p>Creacion: {formatDate(acpm.creationDate)}</p>
-                      <p>Limite: {formatDate(acpm.deadline)}</p>
+                      <p>Deteccion: {formatDate(acpm.detectionDate)}</p>
+                      <p>Limite: {formatDate(acpm.dueDate)}</p>
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">{acpm.followUps[0]?.progressPercent ?? 0}%</td>
+                    <td className="px-4 py-3 text-muted-foreground">{acpm.currentCompletionPercentage}%</td>
                     <td className="px-4 py-3">
-                      {acpm.evidence ? (
-                        <div>
-                          <p className="max-w-[180px] truncate text-muted-foreground">{acpm.evidence.fileName}</p>
-                          <p className={acpm.evidence.isLate ? "font-medium text-destructive" : "text-muted-foreground"}>
-                            {acpm.evidence.isLate ? "Con retraso" : "A tiempo"}
-                          </p>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">Pendiente</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge variant="outline" className={statusClassName(acpm.status)}>
-                        {statusLabel(acpm.status)}
+                      <Badge variant="outline" className={getVisualStatusClassName(acpm)}>
+                        {getVisualStatus(acpm)}
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -1438,35 +1293,17 @@ export default function AcpmPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuItem onSelect={() => setDetailAcpm(acpm)}>
-                            <Eye className="h-4 w-4" />
-                            Ver detalle
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => generateDocument(acpm)}>
-                            <Download className="h-4 w-4" />
-                            Generar documento
-                          </DropdownMenuItem>
-                          {acpm.status !== "CERRADA" && (
+                          <DropdownMenuItem onSelect={() => openDetail(acpm)}><Eye className="h-4 w-4" />Ver detalle</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => generateDocument(acpm)}><Download className="h-4 w-4" />Generar documento</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => { setEditingAcpm(acpm); setCreateOpen(true) }}><Edit className="h-4 w-4" />Editar</DropdownMenuItem>
+                          {acpm.status === "ACTIVE" && acpm.currentCompletionPercentage < 100 && (
                             <>
-                              <DropdownMenuItem onSelect={() => setFollowUpAcpm(acpm)}>
-                                <Plus className="h-4 w-4" />
-                                Agregar seguimiento
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onSelect={() => setEvidenceAcpm(acpm)}>
-                                <Upload className="h-4 w-4" />
-                                Subir evidencia cierre
-                              </DropdownMenuItem>
+                              <DropdownMenuItem onSelect={() => openFollowUp(acpm)}><Plus className="h-4 w-4" />Agregar seguimiento</DropdownMenuItem>
+                              <DropdownMenuItem onSelect={() => setEvidenceAcpm(acpm)}><Upload className="h-4 w-4" />Subir evidencia cierre</DropdownMenuItem>
                             </>
                           )}
-                          {acpm.evidence && (
-                            <>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onSelect={() => downloadEvidence(acpm)}>
-                                <Download className="h-4 w-4" />
-                                Descargar evidencia
-                              </DropdownMenuItem>
-                            </>
-                          )}
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onSelect={() => handleChangeStatus(acpm)}><Power className="h-4 w-4" />{acpm.status === "ACTIVE" ? "Inactivar" : "Activar"}</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>
@@ -1478,10 +1315,74 @@ export default function AcpmPage() {
         )}
       </section>
 
-      <AcpmDialog open={createOpen} onClose={() => setCreateOpen(false)} onSave={createAcpm} />
-      <FollowUpDialog acpm={followUpAcpm} onClose={() => setFollowUpAcpm(null)} onSave={addFollowUp} />
-      <EvidenceDialog acpm={evidenceAcpm} onClose={() => setEvidenceAcpm(null)} onUpload={uploadEvidence} />
-      <DetailDialog acpm={detailAcpm} onClose={() => setDetailAcpm(null)} />
+      <AcpmDialog
+        open={createOpen}
+        acpm={editingAcpm}
+        employees={employees}
+        onClose={() => {
+          setCreateOpen(false)
+          setEditingAcpm(null)
+        }}
+        onSave={handleSaveAcpm}
+      />
+      <FollowUpDialog
+        acpm={followUpAcpm}
+        lastFollowUp={followUpAcpm ? latestFollowUp(followUpsByAcpm[followUpAcpm.id] ?? []) : undefined}
+        onClose={() => setFollowUpAcpm(null)}
+        onSave={handleSaveFollowUp}
+      />
+      <CloseEvidenceDialog acpm={evidenceAcpm} onClose={() => setEvidenceAcpm(null)} onSave={handleCloseWithEvidence} />
+      <DetailDialog
+        acpm={detailAcpm}
+        followUps={detailAcpm ? followUpsByAcpm[detailAcpm.id] ?? [] : []}
+        loading={detailLoading}
+        onClose={() => setDetailAcpm(null)}
+      />
     </main>
+  )
+}
+
+function Metric({ label, value, tone = "default" }: { label: string; value: number; tone?: "default" | "blue" | "amber" | "green" | "red" }) {
+  const toneClass =
+    tone === "blue"
+      ? "text-blue-700"
+      : tone === "amber"
+        ? "text-amber-700"
+        : tone === "green"
+          ? "text-emerald-700"
+          : tone === "red"
+            ? "text-destructive"
+            : "text-foreground"
+
+  return (
+    <div className="rounded-md bg-secondary px-3 py-1.5">
+      <span className={`text-sm font-bold ${toneClass}`}>{value}</span>
+      <span className="ml-2 text-xs text-muted-foreground">{label}</span>
+    </div>
+  )
+}
+
+function FilterSelect({
+  label,
+  value,
+  onChange,
+  children,
+}: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+  children: ReactNode
+}) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-sm font-medium text-foreground">{label}</span>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+      >
+        {children}
+      </select>
+    </label>
   )
 }

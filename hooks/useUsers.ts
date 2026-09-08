@@ -5,6 +5,7 @@ import { useState, useCallback, useEffect } from "react"
 import {
   getCompanyAdmin,
   createCompanyAdmin,
+  updateCompanyAdminPassword,
 } from "@/services/userService"
 import type {
   User,
@@ -118,6 +119,46 @@ export function useUsers(companyId?: string, autoFetch = true) {
     [companyId, fetchUsers],
   )
 
+  const changeAdminPasswordHandler = useCallback(
+    async (password: string): Promise<boolean> => {
+      if (!companyId) {
+        toast.error("No hay empresa seleccionada")
+        return false
+      }
+
+      setLoading(true)
+      setError(null)
+      try {
+        const response = await updateCompanyAdminPassword(companyId, { password })
+
+        setUsers((current) => {
+          const currentAdmin = current[0]
+          const updatedAdmin: User = {
+            id: response.admin.id,
+            name: response.admin.name,
+            email: response.admin.email,
+            phone: response.admin.phone,
+            description: currentAdmin?.description ?? "",
+            status: currentAdmin?.status ?? "ACTIVE",
+            companyId: response.company.id,
+            roles: currentAdmin?.roles ?? [{ id: "company-admin", name: "Administrador de Empresa" }],
+          }
+
+          return [updatedAdmin]
+        })
+
+        return true
+      } catch (err: any) {
+        setError(err.message ?? "Error al cambiar la contraseña")
+        toast.error(err.message ?? "Error al cambiar la contraseña")
+        return false
+      } finally {
+        setLoading(false)
+      }
+    },
+    [companyId],
+  )
+
   return {
     users,
     loading,
@@ -125,5 +166,6 @@ export function useUsers(companyId?: string, autoFetch = true) {
     fetchUsers,
     createUser: createUserHandler,
     updateUser: updateUserHandler,
+    changeAdminPassword: changeAdminPasswordHandler,
   }
 }

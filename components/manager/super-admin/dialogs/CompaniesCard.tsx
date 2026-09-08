@@ -6,7 +6,7 @@ import type { Company } from "@/types/manager/super-admin"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Building2, CheckCircle2, Loader2, Power, Settings, XCircle } from "lucide-react"
+import { Building2, CheckCircle2, Edit, Loader2, Power, Settings, XCircle } from "lucide-react"
 import { useState } from "react"
 
 import { CreateCompanyDialog } from "@/components/manager/super-admin/dialogs/CreateCompanyDialog"
@@ -23,6 +23,13 @@ type Props = {
     email: string
     status: "active" | "inactive"
   }) => Promise<void>
+  onUpdateCompany: (company: Company, payload: {
+    name: string
+    nit: string
+    address: string
+    phone: string
+    email: string
+  }) => Promise<void>
   onToggleCompanyStatus: (company: Company) => Promise<void>
   getActiveChildModuleCount: (company: Company) => number
   onOpenModules: (company: Company) => void
@@ -33,6 +40,7 @@ export function CompaniesCard({
   selectedCompany,
   onSelect,
   onCreateCompany,
+  onUpdateCompany,
   onToggleCompanyStatus,
   getActiveChildModuleCount,
   onOpenModules,
@@ -112,6 +120,22 @@ export function CompaniesCard({
                 </div>
 
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <CreateCompanyDialog
+                    company={company}
+                    onUpdate={onUpdateCompany}
+                    trigger={
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => e.stopPropagation()}
+                        className="border-border text-foreground hover:bg-secondary"
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        Editar
+                      </Button>
+                    }
+                  />
+
                   <Button
                     variant={company.status === "active" ? "destructive" : "default"}
                     size="sm"
