@@ -26,6 +26,7 @@ import {
   GraduationCap,
   Target,
   ClipboardList,
+  BarChart3,
 } from "lucide-react"
 import type { ModuleNode } from "@/store/auth.store"
 
@@ -117,6 +118,12 @@ export const navigation: NavigationItem[] = [
         name: "Evaluación Inicial",
         href: "/dashboard/initial-evaluation",
         icon: ClipboardList,
+      },
+      {
+        code: "ACCOUNTABILITY",
+        name: "Rendición de Cuentas",
+        href: "/dashboard/accountability",
+        icon: BarChart3,
       },
     ],
   },
@@ -320,6 +327,7 @@ function isSubItemAllowed(
   if (subItem.code === "SST_TRAINING_CERTIFICATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "SST_OBJECTIVES" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "INITIAL_EVALUATION" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "ACCOUNTABILITY" && isCodeAllowed(parentCode, allowedCodes)) return true
 
   const parentChildCodes = getDirectChildCodesByParentCode(modules, parentCode)
 

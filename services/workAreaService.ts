@@ -17,7 +17,7 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
     | null
 
   if (!res.ok || !json?.ok) {
-    throw new Error(json?.message ?? fallbackMsg)
+    throw new Error(json?.errors?.[0]?.message ?? json?.message ?? fallbackMsg)
   }
 
   return json.data as T

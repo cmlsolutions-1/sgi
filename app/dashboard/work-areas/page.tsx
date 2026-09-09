@@ -37,6 +37,8 @@ const emptyForm: FormState = {
   description: "",
 }
 
+const WORK_AREA_DESCRIPTION_MAX_LENGTH = 50
+
 const fieldControlClassName =
   "w-full border-slate-300 bg-white shadow-sm hover:border-slate-400 focus-visible:border-primary focus-visible:ring-primary/25"
 
@@ -94,6 +96,11 @@ export function WorkAreasManager() {
 
     if (!form.name.trim()) {
       toast.error("El nombre del area es requerido")
+      return
+    }
+
+    if (form.description.trim().length > WORK_AREA_DESCRIPTION_MAX_LENGTH) {
+      toast.error(`La descripcion no puede superar ${WORK_AREA_DESCRIPTION_MAX_LENGTH} caracteres`)
       return
     }
 
@@ -189,10 +196,19 @@ export function WorkAreasManager() {
                     id="work-area-description"
                     className={fieldControlClassName}
                     value={form.description}
-                    onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
-                    placeholder="Describe el area de trabajo"
+                    maxLength={WORK_AREA_DESCRIPTION_MAX_LENGTH}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        description: event.target.value.slice(0, WORK_AREA_DESCRIPTION_MAX_LENGTH),
+                      }))
+                    }
+                    placeholder="Describe el area de trabajo en maximo 50 caracteres"
                     rows={3}
                   />
+                  <p className="text-right text-xs text-muted-foreground">
+                    {form.description.length}/{WORK_AREA_DESCRIPTION_MAX_LENGTH} caracteres
+                  </p>
                 </div>
               </div>
               <DialogFooter>
