@@ -23,6 +23,9 @@ import {
   SprayCan,
   Bug,
   FlameKindling,
+  GraduationCap,
+  Target,
+  ClipboardList,
 } from "lucide-react"
 import type { ModuleNode } from "@/store/auth.store"
 
@@ -96,6 +99,24 @@ export const navigation: NavigationItem[] = [
         name: "ACPM",
         href: "/dashboard/acpm",
         icon: FileCheck2,
+      },
+      {
+        code: "SST_TRAINING_CERTIFICATIONS",
+        name: "Formación y Certificaciones",
+        href: "/dashboard/sst-training-certifications",
+        icon: GraduationCap,
+      },
+      {
+        code: "SST_OBJECTIVES",
+        name: "Objetivos SST",
+        href: "/dashboard/sst-objectives",
+        icon: Target,
+      },
+      {
+        code: "INITIAL_EVALUATION",
+        name: "Evaluación Inicial",
+        href: "/dashboard/initial-evaluation",
+        icon: ClipboardList,
       },
     ],
   },
@@ -296,6 +317,9 @@ function isSubItemAllowed(
   if (!parentCode) return isCodeAllowed(subItem.code, allowedCodes)
   if (subItem.code === "INVESTIGATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "SPECIAL_RISK" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "SST_TRAINING_CERTIFICATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "SST_OBJECTIVES" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "INITIAL_EVALUATION" && isCodeAllowed(parentCode, allowedCodes)) return true
 
   const parentChildCodes = getDirectChildCodesByParentCode(modules, parentCode)
 
