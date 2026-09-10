@@ -29,6 +29,9 @@ import {
   BarChart3,
   Archive,
   HeartPulse,
+  Droplets,
+  Recycle,
+  FlaskConical,
 } from "lucide-react"
 import type { ModuleNode } from "@/store/auth.store"
 
@@ -81,6 +84,7 @@ export const navigation: NavigationItem[] = [
       { code: "JOBS", name: "Cargos", href: "/dashboard/jobs", icon: BriefcaseBusiness },
       { code: "EMPLOYEE_MANAGEMENT", name: "Gestión Empleados", href: "/dashboard/employees", icon: UserCircle },
       { code: "INCIDENTS", name: "Novedades Laborales", href: "/dashboard/incidents", icon: TriangleAlert },
+      { code: "EMPLOYEE_ANALYTICS", name: "Estadísticas y Análisis", href: "/dashboard/employee-analytics", icon: BarChart3 },
       //{ code: "CUSTODY", name: "Custodia", href: "/dashboard/custody", icon: Archive },
       //{ code: "INVESTIGATIONS", name: "Investigaciones", href: "/dashboard/investigations", icon: FileSearch },
       //{ code: "SPECIAL_RISK", name: "Riesgo Especial", href: "/dashboard/special-risk", icon: FlameKindling },
@@ -103,6 +107,18 @@ export const navigation: NavigationItem[] = [
         name: "ACPM",
         href: "/dashboard/acpm",
         icon: FileCheck2,
+      },
+      {
+        code: "SST_INDICATORS",
+        name: "Indicadores SST",
+        href: "/dashboard/sst-indicators",
+        icon: BarChart3,
+      },
+      {
+        code: "SST_AUDITS",
+        name: "Auditorías SST",
+        href: "/dashboard/audits",
+        icon: FileSearch,
       },
       /* {
         code: "SST_COMMUNICATIONS",
@@ -162,6 +178,24 @@ export const navigation: NavigationItem[] = [
         code: "PREVENTIVE_MAINTENANCE",
         name: "Mantenimiento Preventivo",
         href: "/dashboard/preventive-maintenance",
+        icon: ClipboardCheck,
+      },
+      {
+        code: "HAZARDOUS_SUBSTANCES",
+        name: "Sustancias Peligrosas",
+        href: "/dashboard/hazardous-substances",
+        icon: FlaskConical,
+      },
+      {
+        code: "ENVIRONMENTAL_MEASUREMENTS",
+        name: "Mediciones Ambientales",
+        href: "/dashboard/environmental-measurements",
+        icon: BarChart3,
+      },
+      {
+        code: "INSPECTIONS",
+        name: "Inspecciones",
+        href: "/dashboard/inspections",
         icon: ClipboardCheck,
       },
       /* {
@@ -233,6 +267,18 @@ export const navigation: NavigationItem[] = [
         name: "Insumos de higiene",
         href: "/dashboard/hygiene-supplies",
         icon: PackageCheck,
+      },
+      {
+        code: "HYGIENE_SERVICES",
+        name: "Servicios de Higiene",
+        href: "/dashboard/hygiene-services",
+        icon: Droplets,
+      },
+      {
+        code: "WASTE_MANAGEMENT",
+        name: "Manejo de Residuos",
+        href: "/dashboard/waste-management",
+        icon: Recycle,
       },
       {
         code: "SANITATION",
@@ -341,13 +387,21 @@ function isSubItemAllowed(
   if (subItem.code === "INVESTIGATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "SPECIAL_RISK" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "CUSTODY" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "EMPLOYEE_ANALYTICS" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "SST_TRAINING_CERTIFICATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "SST_OBJECTIVES" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "SST_INDICATORS" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "SST_AUDITS" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "INITIAL_EVALUATION" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "ACCOUNTABILITY" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "LEGAL_MATRIX" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "SST_COMMUNICATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "HYGIENE_SERVICES" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "WASTE_MANAGEMENT" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "HEALTHY_LIFESTYLE" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "HAZARDOUS_SUBSTANCES" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "ENVIRONMENTAL_MEASUREMENTS" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "INSPECTIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
 
   const parentChildCodes = getDirectChildCodesByParentCode(modules, parentCode)
 
