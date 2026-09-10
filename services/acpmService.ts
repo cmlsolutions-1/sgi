@@ -1,6 +1,9 @@
 import { apiFetch } from "@/lib/apiClient"
 import type {
   Acpm,
+  AcpmClosureEvidence,
+  AcpmClosureEvidenceResponse,
+  AcpmClosureEvidencesResponse,
   AcpmFilters,
   AcpmFollowUp,
   AcpmFollowUpResponse,
@@ -11,6 +14,7 @@ import type {
   ChangeAcpmStatusDto,
   CreateAcpmDto,
   CreateAcpmFollowUpDto,
+  UploadAcpmClosureEvidenceDto,
   UpdateAcpmDto,
 } from "@/types/manager/acpm"
 
@@ -27,6 +31,8 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
     | AcpmListResponse
     | AcpmFollowUpResponse
     | AcpmFollowUpsResponse
+    | AcpmClosureEvidenceResponse
+    | AcpmClosureEvidencesResponse
     | ApiErrorResponse
     | null
 
@@ -49,6 +55,14 @@ function buildQuery(filters: AcpmFilters = {}) {
 
   const query = params.toString()
   return query ? `?${query}` : ""
+}
+
+function createClosureEvidenceFormData(dto: UploadAcpmClosureEvidenceDto) {
+  const formData = new FormData()
+  formData.append("file", dto.file)
+  if (dto.type) formData.append("type", dto.type)
+  formData.append("isConfirmed", String(dto.isConfirmed ?? true))
+  return formData
 }
 
 export async function listAcpms(filters?: AcpmFilters): Promise<AcpmList> {
@@ -105,4 +119,42 @@ export async function listAcpmFollowUps(acpmId: string): Promise<AcpmFollowUp[]>
 export async function getAcpmFollowUp(acpmId: string, followUpId: string): Promise<AcpmFollowUp> {
   const res = await apiFetch(`/api/acpm/${acpmId}/follow-ups/${followUpId}`, { method: "GET" })
   return parseOrThrow<AcpmFollowUp>(res, "No se pudo cargar el seguimiento")
+}
+
+export async function uploadAcpmClosureEvidence(
+  acpmId: string,
+  dto: UploadAcpmClosureEvidenceDto,
+): Promise<AcpmClosureEvidence> {
+  const res = await apiFetch(`/api/acpm/${acpmId}/closure-evidence`, {
+    method: "POST",
+    body: createClosureEvidenceFormData(dto),
+  })
+  return parseOrThrow<AcpmClosureEvidence>(res, "No se pudo subir la evidencia de cierre")
+}
+
+export async function listAcpmClosureEvidence(acpmId: string): Promise<AcpmClosureEvidence[]> {
+  const res = await apiFetch(`/api/acpm/${acpmId}/closure-evidence`, { method: "GET" })
+  return parseOrThrow<AcpmClosureEvidence[]>(res, "No se pudieron cargar las evidencias de cierre")
+}
+
+export async function getAcpmClosureEvidence(acpmId: string, documentId: string): Promise<AcpmClosureEvidence> {
+  const res = await apiFetch(`/api/acpm/${acpmId}/closure-evidence/${documentId}`, { method: "GET" })
+  return parseOrThrow<AcpmClosureEvidence>(res, "No se pudo cargar la evidencia de cierre")
+}
+
+export async function deleteAcpmClosureEvidence(acpmId: string, documentId: string): Promise<void> {
+  const res = await apiFetch(`/api/acpm/${acpmId}/closure-evidence/${documentId}`, { method: "DELETE" })
+  await parseOrThrow<Record<string, never>>(res, "No se pudo eliminar la evidencia de cierre")
+}
+
+export async function downloadAcpmClosureEvidenceFile(downloadUrl: string): Promise<Blob> {
+  const res = await apiFetch(downloadUrl, { method: "GET" })
+
+  if (!res.ok) {
+    const json = (await res.json().catch(() => null)) as ApiErrorResponse | null
+    const detail = json?.errors?.find((error) => error.message)?.message
+    throw new Error(detail ?? json?.message ?? "No se pudo descargar la evidencia")
+  }
+
+  return res.blob()
 }

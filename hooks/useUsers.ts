@@ -5,11 +5,13 @@ import { useState, useCallback, useEffect } from "react"
 import {
   getCompanyAdmin,
   createCompanyAdmin,
+  updateCompanyAdmin,
   updateCompanyAdminPassword,
 } from "@/services/userService"
 import type {
   User,
   CreateCompanyAdminDto,
+  UpdateCompanyAdminDto,
 } from "@/types/manager/user"
 import { toast } from "sonner"
 
@@ -159,6 +161,47 @@ export function useUsers(companyId?: string, autoFetch = true) {
     [companyId],
   )
 
+  const updateAdminHandler = useCallback(
+    async (dto: UpdateCompanyAdminDto): Promise<boolean> => {
+      if (!companyId) {
+        toast.error("No hay empresa seleccionada")
+        return false
+      }
+
+      setLoading(true)
+      setError(null)
+      try {
+        const response = await updateCompanyAdmin(companyId, dto)
+
+        setUsers((current) => {
+          const currentAdmin = current[0]
+          const updatedAdmin: User = {
+            id: response.admin.id,
+            name: response.admin.name,
+            email: response.admin.email,
+            phone: response.admin.phone,
+            description: currentAdmin?.description ?? "",
+            status: currentAdmin?.status ?? "ACTIVE",
+            companyId: response.company.id,
+            roles: currentAdmin?.roles ?? [{ id: "company-admin", name: "Administrador de Empresa" }],
+          }
+
+          return [updatedAdmin]
+        })
+
+        toast.success("Administrador actualizado correctamente")
+        return true
+      } catch (err: any) {
+        setError(err.message ?? "Error al actualizar administrador")
+        toast.error(err.message ?? "Error al actualizar administrador")
+        return false
+      } finally {
+        setLoading(false)
+      }
+    },
+    [companyId],
+  )
+
   return {
     users,
     loading,
@@ -166,6 +209,7 @@ export function useUsers(companyId?: string, autoFetch = true) {
     fetchUsers,
     createUser: createUserHandler,
     updateUser: updateUserHandler,
+    updateAdmin: updateAdminHandler,
     changeAdminPassword: changeAdminPasswordHandler,
   }
 }

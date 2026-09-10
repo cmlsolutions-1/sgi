@@ -27,6 +27,8 @@ import {
   Target,
   ClipboardList,
   BarChart3,
+  Archive,
+  HeartPulse,
 } from "lucide-react"
 import type { ModuleNode } from "@/store/auth.store"
 
@@ -79,6 +81,7 @@ export const navigation: NavigationItem[] = [
       { code: "JOBS", name: "Cargos", href: "/dashboard/jobs", icon: BriefcaseBusiness },
       { code: "EMPLOYEE_MANAGEMENT", name: "Gestión Empleados", href: "/dashboard/employees", icon: UserCircle },
       { code: "INCIDENTS", name: "Novedades Laborales", href: "/dashboard/incidents", icon: TriangleAlert },
+      //{ code: "CUSTODY", name: "Custodia", href: "/dashboard/custody", icon: Archive },
       //{ code: "INVESTIGATIONS", name: "Investigaciones", href: "/dashboard/investigations", icon: FileSearch },
       //{ code: "SPECIAL_RISK", name: "Riesgo Especial", href: "/dashboard/special-risk", icon: FlameKindling },
       { code: "DATA_AUTHORIZATIONS", name: "Tratamiento de Datos", href: "/dashboard/data-processing", icon: Fingerprint},
@@ -101,6 +104,12 @@ export const navigation: NavigationItem[] = [
         href: "/dashboard/acpm",
         icon: FileCheck2,
       },
+      /* {
+        code: "SST_COMMUNICATIONS",
+        name: "Comunicaciones SST",
+        href: "/dashboard/sst-communications",
+        icon: MessageSquare,
+      }, */
       /* {
         code: "SST_TRAINING_CERTIFICATIONS",
         name: "Formación y Certificaciones",
@@ -134,6 +143,7 @@ export const navigation: NavigationItem[] = [
     subItems: [
       { code: "TRAINING", name: "Capacitaciones", href: "/dashboard/trainingPlan", icon: Brain },
       //{ code: "WORK_PLAN", name: "Plan de Trabajo", href: "/dashboard/work-plan", icon: ClipboardCheck },
+      { code: "HEALTHY_LIFESTYLE", name: "Estilos de Vida Saludable", href: "/dashboard/healthy-lifestyles", icon: HeartPulse },
     ],
   },
   {
@@ -154,6 +164,12 @@ export const navigation: NavigationItem[] = [
         href: "/dashboard/preventive-maintenance",
         icon: ClipboardCheck,
       },
+      /* {
+        code: "LEGAL_MATRIX",
+        name: "Matriz Legal",
+        href: "/dashboard/legal-matrix",
+        icon: ScrollText,
+      }, */
     ],
   },
   {
@@ -324,10 +340,14 @@ function isSubItemAllowed(
   if (!parentCode) return isCodeAllowed(subItem.code, allowedCodes)
   if (subItem.code === "INVESTIGATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "SPECIAL_RISK" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "CUSTODY" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "SST_TRAINING_CERTIFICATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "SST_OBJECTIVES" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "INITIAL_EVALUATION" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "ACCOUNTABILITY" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "LEGAL_MATRIX" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "SST_COMMUNICATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "HEALTHY_LIFESTYLE" && isCodeAllowed(parentCode, allowedCodes)) return true
 
   const parentChildCodes = getDirectChildCodesByParentCode(modules, parentCode)
 

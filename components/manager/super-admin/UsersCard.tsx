@@ -2,12 +2,13 @@
 "use client"
 
 // Importar CreateCompanyAdminDto en lugar de CreateUserDto
-import type { User, CreateCompanyAdminDto } from "@/types/manager/user"
+import type { User, CreateCompanyAdminDto, UpdateCompanyAdminDto } from "@/types/manager/user"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CreateUserDialog } from "@/components/manager/super-admin/dialogs/CreateUserDialog"
 import { ChangeCompanyAdminPasswordDialog } from "@/components/manager/super-admin/dialogs/ChangeCompanyAdminPasswordDialog"
+import { EditCompanyAdminDialog } from "@/components/manager/super-admin/dialogs/EditCompanyAdminDialog"
 import { Loader2, RefreshCw, AlertTriangle, Settings } from "lucide-react"
 
 type Props = {
@@ -19,6 +20,7 @@ type Props = {
   loading: boolean
   //  Usar CreateCompanyAdminDto
   onCreateUser: (payload: CreateCompanyAdminDto) => Promise<User | null>
+  onUpdateAdmin: (payload: UpdateCompanyAdminDto) => Promise<boolean>
   onChangeAdminPassword: (password: string) => Promise<boolean>
   onRefresh: () => Promise<void>
   onOpenModules: () => void
@@ -31,6 +33,7 @@ export function UsersCard({
   users,
   loading,
   onCreateUser,
+  onUpdateAdmin,
   onChangeAdminPassword,
   onRefresh,
   onOpenModules,
@@ -134,6 +137,12 @@ export function UsersCard({
                 </div>
 
                 <div className="flex items-center gap-2 ml-4">
+                  <EditCompanyAdminDialog
+                    disabled={loading}
+                    companyName={companyName}
+                    user={u}
+                    onUpdateAdmin={onUpdateAdmin}
+                  />
                   <ChangeCompanyAdminPasswordDialog
                     disabled={loading}
                     companyName={companyName}

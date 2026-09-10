@@ -85,6 +85,24 @@ export type AcpmFollowUp = {
   createdBy?: string | null
 }
 
+export type AcpmClosureEvidence = {
+  id: string
+  companyId: string
+  ownerType: string
+  ownerId: string
+  referenceType: string
+  referenceId: string
+  type: string
+  originalName: string
+  mimeType: string
+  size: number
+  storageProvider: string
+  isConfirmed: boolean
+  downloadUrl: string
+  createdAt: string
+  createdBy: string
+}
+
 export type CreateAcpmFollowUpDto = {
   followUpDate: string
   completionPercentage: number
@@ -92,7 +110,15 @@ export type CreateAcpmFollowUpDto = {
   evidence?: string | null
 }
 
+export type UploadAcpmClosureEvidenceDto = {
+  file: File
+  type?: string
+  isConfirmed?: boolean
+}
+
 export type AcpmResponse = ApiResponse<Acpm>
 export type AcpmListResponse = ApiResponse<AcpmList>
 export type AcpmFollowUpResponse = ApiResponse<AcpmFollowUp>
 export type AcpmFollowUpsResponse = ApiResponse<AcpmFollowUp[]>
+export type AcpmClosureEvidenceResponse = ApiResponse<AcpmClosureEvidence>
+export type AcpmClosureEvidencesResponse = ApiResponse<AcpmClosureEvidence[]>

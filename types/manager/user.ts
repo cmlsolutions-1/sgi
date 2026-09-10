@@ -38,6 +38,12 @@ export type UpdateCompanyAdminPasswordDto = {
   password: string
 }
 
+export type UpdateCompanyAdminDto = {
+  name: string
+  email: string
+  phone: string
+}
+
 export type UpdateUserDto = Partial<Omit<CreateUserDto, "password" | "rolesIds">> & {
   rolesIds?: string[];
 };
@@ -76,6 +82,8 @@ export type UpdateCompanyAdminPasswordResponse = {
   }
 }
 
+export type UpdateCompanyAdminResponse = UpdateCompanyAdminPasswordResponse
+
 // Respuesta del GET (tiene 'admin')
 export type GetCompanyAdminResponse = {
   company: {
@@ -104,3 +112,4 @@ export type UsersResponse = ApiResponse<User[]>;
 export type CreateCompanyAdminApiResponse = ApiResponse<CreateCompanyAdminResponse>
 export type GetCompanyAdminApiResponse = ApiResponse<GetCompanyAdminResponse>
 export type UpdateCompanyAdminPasswordApiResponse = ApiResponse<UpdateCompanyAdminPasswordResponse>
+export type UpdateCompanyAdminApiResponse = ApiResponse<UpdateCompanyAdminResponse>

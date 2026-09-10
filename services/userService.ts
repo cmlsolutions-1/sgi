@@ -11,6 +11,9 @@ import type {
   GetCompanyAdminResponse,
   GetCompanyAdminApiResponse,
   CreateCompanyAdminResponse,
+  UpdateCompanyAdminDto,
+  UpdateCompanyAdminApiResponse,
+  UpdateCompanyAdminResponse,
   UpdateCompanyAdminPasswordDto,
   UpdateCompanyAdminPasswordApiResponse,
   UpdateCompanyAdminPasswordResponse,
@@ -22,6 +25,7 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
     | UsersResponse
     | CreateCompanyAdminApiResponse
     | GetCompanyAdminApiResponse
+    | UpdateCompanyAdminApiResponse
     | UpdateCompanyAdminPasswordApiResponse
     | null;
 
@@ -124,6 +128,22 @@ export async function updateCompanyAdminPassword(
     body: JSON.stringify(dto),
   })
   return parseOrThrow<UpdateCompanyAdminPasswordResponse>(res, "No se pudo cambiar la contraseña")
+}
+
+/**
+ * Actualizar datos del administrador de la empresa
+ * PUT /api/admin/companies/{companyId}/company-admin
+ */
+export async function updateCompanyAdmin(
+  companyId: string,
+  dto: UpdateCompanyAdminDto,
+): Promise<UpdateCompanyAdminResponse> {
+  const res = await apiFetch(`/api/admin/companies/${companyId}/company-admin`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dto),
+  })
+  return parseOrThrow<UpdateCompanyAdminResponse>(res, "No se pudo actualizar el administrador")
 }
 
 /**

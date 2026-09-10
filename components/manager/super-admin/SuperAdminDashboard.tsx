@@ -130,6 +130,7 @@ export default function SuperAdminDashboard() {
     loading: usersLoading,
     fetchUsers,
     createUser,
+    updateAdmin,
     changeAdminPassword,
   } = useUsers(selectedCompany?.id, false)
 
@@ -447,6 +448,7 @@ export default function SuperAdminDashboard() {
             users={users}
             loading={usersLoading}
             onCreateUser={createUser}
+            onUpdateAdmin={updateAdmin}
             onChangeAdminPassword={changeAdminPassword}
             onRefresh={fetchUsers}
             onOpenModules={() => setModulesOpen(true)}

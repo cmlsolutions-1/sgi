@@ -16,6 +16,7 @@ import {
   Plus,
   Power,
   Search,
+  Trash2,
   Upload,
   UserRound,
 } from "lucide-react"
@@ -47,12 +48,16 @@ import {
   changeAcpmStatus,
   createAcpm,
   createAcpmFollowUp,
+  deleteAcpmClosureEvidence,
+  downloadAcpmClosureEvidenceFile,
+  listAcpmClosureEvidence,
   listAcpmFollowUps,
   listAcpms,
   updateAcpm,
+  uploadAcpmClosureEvidence,
 } from "@/services/acpmService"
 import { listEmployees } from "@/services/employeeService"
-import type { Acpm, AcpmFilters, AcpmFollowUp, AcpmOrigin, AcpmStatus, AcpmType } from "@/types/manager/acpm"
+import type { Acpm, AcpmClosureEvidence, AcpmFilters, AcpmFollowUp, AcpmOrigin, AcpmStatus, AcpmType } from "@/types/manager/acpm"
 import type { Employee } from "@/types/manager/employee"
 
 type ViewMode = "cards" | "list"
@@ -75,6 +80,13 @@ type FollowUpForm = {
   observations: string
   completionPercentage: string
   evidence: string
+}
+
+type ClosureEvidencePreviewState = {
+  title: string
+  url: string
+  mimeType: string
+  fileName: string
 }
 
 const currentYear = new Date().getFullYear()
@@ -154,16 +166,22 @@ function originLabel(origin: AcpmOrigin) {
   return acpmOriginOptions.find((option) => option.value === origin)?.label ?? origin
 }
 
-function getVisualStatus(acpm: Acpm) {
+function hasClosureEvidence(evidences: AcpmClosureEvidence[] = []) {
+  return evidences.length > 0
+}
+
+function getVisualStatus(acpm: Acpm, evidences: AcpmClosureEvidence[] = []) {
   if (acpm.status === "INACTIVE") return "Inactivo"
-  if (acpm.currentCompletionPercentage >= 100) return "Cerrada"
+  if (acpm.currentCompletionPercentage >= 100 && hasClosureEvidence(evidences)) return "Cerrada"
+  if (acpm.currentCompletionPercentage >= 100) return "Pendiente documento cierre"
   if (acpm.currentCompletionPercentage > 0) return "En ejecucion"
   return "Abierta"
 }
 
-function getVisualStatusClassName(acpm: Acpm) {
+function getVisualStatusClassName(acpm: Acpm, evidences: AcpmClosureEvidence[] = []) {
   if (acpm.status === "INACTIVE") return "bg-destructive text-white border-transparent"
-  if (acpm.currentCompletionPercentage >= 100) return "bg-accentActivd text-accentActivd-foreground border-transparent"
+  if (acpm.currentCompletionPercentage >= 100 && hasClosureEvidence(evidences)) return "bg-accentActivd text-accentActivd-foreground border-transparent"
+  if (acpm.currentCompletionPercentage >= 100) return "bg-amber-500 text-white border-transparent"
   if (acpm.currentCompletionPercentage > 0) return "bg-blue-600 text-white border-transparent"
   return "bg-warning/10 text-warning border-warning/20"
 }
@@ -180,8 +198,21 @@ function isLateUpload(acpm: Acpm, followUp?: AcpmFollowUp | null) {
   return new Date(`${formatDate(followUp.followUpDate)}T00:00:00`) > new Date(`${formatDate(acpm.dueDate)}T00:00:00`)
 }
 
+function isLateClosureEvidence(acpm: Acpm, evidence?: AcpmClosureEvidence | null) {
+  if (!evidence) return false
+  return new Date(`${formatDate(evidence.createdAt)}T00:00:00`) > new Date(`${formatDate(acpm.dueDate)}T00:00:00`)
+}
+
+function canEmbedPreview(mimeType: string) {
+  return mimeType.startsWith("application/pdf") || mimeType.startsWith("image/")
+}
+
 function latestFollowUp(followUps: AcpmFollowUp[]) {
   return [...followUps].sort((a, b) => new Date(b.followUpDate).getTime() - new Date(a.followUpDate).getTime())[0]
+}
+
+function latestClosureEvidence(evidences: AcpmClosureEvidence[]) {
+  return [...evidences].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
 }
 
 function AcpmDialog({
@@ -525,23 +556,26 @@ function CloseEvidenceDialog({
 }: {
   acpm: Acpm | null
   onClose: () => void
-  onSave: (acpm: Acpm, fileName: string) => Promise<void>
+  onSave: (acpm: Acpm, file: File, isConfirmed: boolean) => Promise<void>
 }) {
-  const [fileName, setFileName] = useState("")
+  const [file, setFile] = useState<File | null>(null)
+  const [isConfirmed, setIsConfirmed] = useState(true)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    if (acpm) setFileName("")
+    if (!acpm) return
+    setFile(null)
+    setIsConfirmed(true)
   }, [acpm])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!acpm) return
-    if (!fileName.trim()) return toast.error("Sube o registra el documento de cierre")
+    if (!file) return toast.error("Selecciona el documento de cierre")
 
     setSaving(true)
     try {
-      await onSave(acpm, fileName.trim())
+      await onSave(acpm, file, isConfirmed)
       onClose()
     } finally {
       setSaving(false)
@@ -554,22 +588,39 @@ function CloseEvidenceDialog({
         <DialogHeader>
           <DialogTitle>Subir evidencia de cierre</DialogTitle>
           <p className="text-sm text-muted-foreground">
-            El backend registra la evidencia como seguimiento al 100%. Si la fecha supera el limite se mostrara con retraso.
+            Adjunta el soporte final del ACPM. Esta accion solo esta disponible cuando el avance del ACPM ya esta en 100%.
           </p>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {acpm && <div className="rounded-md bg-secondary p-3 text-sm text-muted-foreground">Fecha limite: {formatDate(acpm.dueDate)}</div>}
+          {acpm && (
+            <div className="rounded-md bg-secondary p-3 text-sm text-muted-foreground">
+              <p>Fecha limite: {formatDate(acpm.dueDate)}</p>
+              <p>Avance actual: {acpm.currentCompletionPercentage}%</p>
+            </div>
+          )}
           <div className="rounded-md border border-dashed border-border bg-secondary p-4">
             <Label className="grid gap-2">
-              Documento o soporte
-              <Input type="file" onChange={(event) => setFileName(event.target.files?.[0]?.name ?? "")} />
+              Documento de cierre
+              <Input
+                type="file"
+                accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx"
+                onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+              />
             </Label>
-            <Input
-              className="mt-3"
-              value={fileName}
-              onChange={(event) => setFileName(event.target.value)}
-              placeholder="Tambien puedes escribir el nombre del archivo"
-            />
+            {file && (
+              <div className="mt-3 rounded-md bg-card px-3 py-2 text-sm text-muted-foreground">
+                Archivo seleccionado: <span className="font-medium text-foreground">{file.name}</span>
+              </div>
+            )}
+            <Label className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={isConfirmed}
+                onChange={(event) => setIsConfirmed(event.target.checked)}
+                className="h-4 w-4 rounded border-border"
+              />
+              Confirmar evidencia de cierre
+            </Label>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
@@ -589,18 +640,27 @@ function CloseEvidenceDialog({
 function DetailDialog({
   acpm,
   followUps,
+  closureEvidences,
   loading,
+  closureEvidenceLoading,
+  previewLoadingId,
   onClose,
+  onViewClosureEvidence,
+  onDownloadClosureEvidence,
+  onDeleteClosureEvidence,
 }: {
   acpm: Acpm | null
   followUps: AcpmFollowUp[]
+  closureEvidences: AcpmClosureEvidence[]
   loading: boolean
+  closureEvidenceLoading: boolean
+  previewLoadingId: string | null
   onClose: () => void
+  onViewClosureEvidence: (evidence: AcpmClosureEvidence) => void
+  onDownloadClosureEvidence: (evidence: AcpmClosureEvidence) => void
+  onDeleteClosureEvidence: (evidence: AcpmClosureEvidence) => void
 }) {
   if (!acpm) return null
-
-  const last = latestFollowUp(followUps)
-  const late = isLateUpload(acpm, last)
 
   return (
     <Dialog open={Boolean(acpm)} onOpenChange={(open) => !open && onClose()}>
@@ -627,7 +687,7 @@ function DetailDialog({
             <div className="grid gap-4 md:grid-cols-3">
               <InfoBlock label="Fecha deteccion" value={formatDate(acpm.detectionDate)} />
               <InfoBlock label="Fuente" value={originLabel(acpm.origin)} />
-              <InfoBlock label="Estado" value={acpm.currentCompletionPercentage >= 100 ? "Cerrada" : "Abierta"} />
+              <InfoBlock label="Estado" value={getVisualStatus(acpm, closureEvidences)} />
             </div>
             <p className="mt-3 text-sm text-muted-foreground">{acpm.nonConformityDescription}</p>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -665,12 +725,54 @@ function DetailDialog({
 
           <section className="rounded-md border border-border p-4">
             <h3 className="mb-3 text-sm font-semibold text-foreground">Evidencia de cierre</h3>
-            {last && last.completionPercentage >= 100 ? (
-              <div className="rounded-md bg-secondary p-3 text-sm">
-                <p className="font-medium text-foreground">{last.evidence || "Evidencia registrada"}</p>
-                <p className={late ? "text-destructive" : "text-muted-foreground"}>
-                  {late ? "Cargado con retraso" : "Cargado a tiempo"} - {formatDate(last.followUpDate)}
-                </p>
+            {closureEvidenceLoading ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Cargando evidencias de cierre...
+              </div>
+            ) : closureEvidences.length > 0 ? (
+              <div className="space-y-3">
+                {closureEvidences.map((evidence) => {
+                  const evidenceLate = isLateClosureEvidence(acpm, evidence)
+                  return (
+                    <div key={evidence.id} className="flex flex-col gap-3 rounded-md bg-secondary p-3 text-sm md:flex-row md:items-center md:justify-between">
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-foreground">{evidence.originalName}</p>
+                        <p className={evidenceLate ? "text-destructive" : "text-muted-foreground"}>
+                          {evidenceLate ? "Cargado con retraso" : "Cargado a tiempo"} - {formatDateTime(evidence.createdAt)}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {evidence.mimeType || "Archivo"} · {evidence.isConfirmed ? "Confirmado" : "Sin confirmar"}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {evidence.downloadUrl && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="gap-2"
+                            disabled={previewLoadingId === evidence.id}
+                            onClick={() => onViewClosureEvidence(evidence)}
+                          >
+                            {previewLoadingId === evidence.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
+                            Ver
+                          </Button>
+                        )}
+                        {evidence.downloadUrl && (
+                          <Button type="button" size="sm" variant="outline" className="gap-2" onClick={() => onDownloadClosureEvidence(evidence)}>
+                            <Download className="h-4 w-4" />
+                            Descargar
+                          </Button>
+                        )}
+                        <Button type="button" size="sm" variant="outline" className="gap-2 text-destructive" onClick={() => onDeleteClosureEvidence(evidence)}>
+                          <Trash2 className="h-4 w-4" />
+                          Eliminar
+                        </Button>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">No hay evidencia de cierre cargada.</p>
@@ -697,6 +799,15 @@ function DetailDialog({
                     Avance del {followUp.completionPercentage}%. {followUp.observations}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(followUp.createdAt)}</p>
+                </div>
+              ))}
+              {closureEvidences.map((evidence) => (
+                <div key={`closure-evidence-${evidence.id}`} className="border-l-2 border-primary/40 pl-4">
+                  <p className="text-sm font-medium text-foreground">Evidencia de cierre cargada</p>
+                  <p className="text-sm text-muted-foreground">
+                    {evidence.originalName}. {isLateClosureEvidence(acpm, evidence) ? "Se cargo con retraso." : "Se cargo dentro del tiempo establecido."}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(evidence.createdAt)}</p>
                 </div>
               ))}
             </div>
@@ -726,8 +837,11 @@ export default function AcpmPage() {
   const [total, setTotal] = useState(0)
   const [employees, setEmployees] = useState<Employee[]>([])
   const [followUpsByAcpm, setFollowUpsByAcpm] = useState<Record<string, AcpmFollowUp[]>>({})
+  const [closureEvidenceByAcpm, setClosureEvidenceByAcpm] = useState<Record<string, AcpmClosureEvidence[]>>({})
   const [loading, setLoading] = useState(true)
   const [detailLoading, setDetailLoading] = useState(false)
+  const [closureEvidenceLoading, setClosureEvidenceLoading] = useState(false)
+  const [previewLoadingId, setPreviewLoadingId] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<ViewMode>("list")
   const [search, setSearch] = useState("")
   const [yearFilter, setYearFilter] = useState(String(currentYear))
@@ -742,6 +856,7 @@ export default function AcpmPage() {
   const [followUpAcpm, setFollowUpAcpm] = useState<Acpm | null>(null)
   const [evidenceAcpm, setEvidenceAcpm] = useState<Acpm | null>(null)
   const [detailAcpm, setDetailAcpm] = useState<Acpm | null>(null)
+  const [preview, setPreview] = useState<ClosureEvidencePreviewState | null>(null)
 
   async function loadAcpms() {
     if (startDueDateFilter && endDueDateFilter && endDueDateFilter < startDueDateFilter) {
@@ -764,9 +879,25 @@ export default function AcpmPage() {
         endDueDate: endDueDateFilter || undefined,
       }
       const [acpmData, employeeData] = await Promise.all([listAcpms(filters), listEmployees()])
-      setAcpms(acpmData.items ?? [])
+      const items = acpmData.items ?? []
+      setAcpms(items)
       setTotal(acpmData.total ?? 0)
       setEmployees(employeeData)
+
+      const readyForClosure = items.filter((acpm) => acpm.currentCompletionPercentage >= 100)
+      if (readyForClosure.length > 0) {
+        const evidenceResults = await Promise.allSettled(
+          readyForClosure.map(async (acpm) => [acpm.id, await listAcpmClosureEvidence(acpm.id)] as const),
+        )
+        const evidenceMap = evidenceResults.reduce<Record<string, AcpmClosureEvidence[]>>((acc, result) => {
+          if (result.status === "fulfilled") {
+            const [acpmId, evidences] = result.value
+            acc[acpmId] = evidences
+          }
+          return acc
+        }, {})
+        setClosureEvidenceByAcpm((current) => ({ ...current, ...evidenceMap }))
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo cargar ACPM")
     } finally {
@@ -788,6 +919,20 @@ export default function AcpmPage() {
     }
   }
 
+  async function loadClosureEvidence(acpmId: string) {
+    setClosureEvidenceLoading(true)
+    try {
+      const evidences = await listAcpmClosureEvidence(acpmId)
+      setClosureEvidenceByAcpm((current) => ({ ...current, [acpmId]: evidences }))
+      return evidences
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar las evidencias de cierre")
+      return []
+    } finally {
+      setClosureEvidenceLoading(false)
+    }
+  }
+
   useEffect(() => {
     loadAcpms()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -800,7 +945,7 @@ export default function AcpmPage() {
 
   async function openDetail(acpm: Acpm) {
     setDetailAcpm(acpm)
-    await loadFollowUps(acpm.id)
+    await Promise.all([loadFollowUps(acpm.id), loadClosureEvidence(acpm.id)])
   }
 
   async function openFollowUp(acpm: Acpm) {
@@ -864,21 +1009,88 @@ export default function AcpmPage() {
     }
   }
 
-  async function handleCloseWithEvidence(acpm: Acpm, fileName: string) {
+  async function handleCloseWithEvidence(acpm: Acpm, file: File, isConfirmed: boolean) {
     try {
-      const today = new Date().toISOString().slice(0, 10)
-      await createAcpmFollowUp(acpm.id, {
-        followUpDate: today,
-        completionPercentage: 100,
-        observations: "Evidencia de cierre cargada.",
-        evidence: fileName,
+      if (acpm.currentCompletionPercentage < 100) {
+        toast.error("Primero registra un seguimiento con avance del 100% para poder subir la evidencia de cierre")
+        return
+      }
+
+      const evidence = await uploadAcpmClosureEvidence(acpm.id, {
+        file,
+        isConfirmed,
       })
-      toast.success(isLateUpload(acpm, { followUpDate: today, completionPercentage: 100 } as AcpmFollowUp) ? "ACPM cerrado con retraso" : "ACPM cerrado")
-      await Promise.all([loadAcpms(), loadFollowUps(acpm.id)])
+      toast.success(isLateClosureEvidence(acpm, evidence) ? "ACPM cerrado con evidencia cargada con retraso" : "ACPM cerrado con evidencia")
+      await Promise.all([loadAcpms(), loadFollowUps(acpm.id), loadClosureEvidence(acpm.id)])
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "No se pudo cerrar el ACPM")
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar la evidencia de cierre")
       throw error
     }
+  }
+
+  async function handleViewClosureEvidence(evidence: AcpmClosureEvidence) {
+    if (!evidence.downloadUrl) return
+    setPreviewLoadingId(evidence.id)
+    try {
+      const blob = await downloadAcpmClosureEvidenceFile(evidence.downloadUrl)
+      setPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return {
+          title: evidence.originalName,
+          fileName: evidence.originalName,
+          mimeType: blob.type || evidence.mimeType || "",
+          url: URL.createObjectURL(blob),
+        }
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo abrir la evidencia")
+    } finally {
+      setPreviewLoadingId(null)
+    }
+  }
+
+  async function handleDownloadClosureEvidence(evidence: AcpmClosureEvidence) {
+    if (!evidence.downloadUrl) return
+    try {
+      const blob = await downloadAcpmClosureEvidenceFile(evidence.downloadUrl)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = evidence.originalName
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar la evidencia")
+    }
+  }
+
+  async function handleDeleteClosureEvidence(evidence: AcpmClosureEvidence) {
+    const acpmId = detailAcpm?.id ?? evidence.ownerId
+    if (!acpmId) return
+    if (!window.confirm(`Eliminar la evidencia "${evidence.originalName}"?`)) return
+
+    try {
+      await deleteAcpmClosureEvidence(acpmId, evidence.id)
+      toast.success("Evidencia de cierre eliminada")
+      await Promise.all([loadAcpms(), loadClosureEvidence(acpmId)])
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar la evidencia")
+    }
+  }
+
+  function closePreview() {
+    setPreview((current) => {
+      if (current?.url) URL.revokeObjectURL(current.url)
+      return null
+    })
+  }
+
+  function handleDownloadPreview() {
+    if (!preview) return
+    const link = document.createElement("a")
+    link.href = preview.url
+    link.download = preview.fileName
+    link.click()
   }
 
   async function handleChangeStatus(acpm: Acpm) {
@@ -973,7 +1185,7 @@ export default function AcpmPage() {
         ["Responsable", employeeName(acpm.responsibleEmployee)],
         ["Fecha limite", formatDate(acpm.dueDate)],
         ["Avance", `${acpm.currentCompletionPercentage}%`],
-        ["Estado", getVisualStatus(acpm)],
+        ["Estado", getVisualStatus(acpm, closureEvidenceByAcpm[acpm.id] ?? [])],
       ],
       styles: { font: "helvetica", fontSize: 8.5, cellPadding: 2.5, lineColor: [220, 226, 224], lineWidth: 0.1 },
       columnStyles: { 0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 48 }, 1: { cellWidth: contentWidth - 48 } },
@@ -1040,38 +1252,16 @@ export default function AcpmPage() {
     doc.save(`ACPM_${acpm.year}_${acpm.name.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
   }
 
-  function downloadEvidence(acpm: Acpm, followUps: AcpmFollowUp[]) {
-    const closeFollowUp = latestFollowUp(followUps.filter((followUp) => followUp.completionPercentage >= 100))
-    if (!closeFollowUp?.evidence) {
-      toast.error("Este ACPM aun no tiene evidencia de cierre")
-      return
-    }
-
-    const blob = new Blob(
-      [
-        `Evidencia ACPM\nACPM: ${acpm.name}\nArchivo: ${closeFollowUp.evidence}\nFecha: ${formatDate(
-          closeFollowUp.followUpDate,
-        )}\nEstado: ${isLateUpload(acpm, closeFollowUp) ? "Cargado con retraso" : "Cargado a tiempo"}\n`,
-      ],
-      { type: "text/plain;charset=utf-8" },
-    )
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.href = url
-    link.download = closeFollowUp.evidence
-    link.click()
-    URL.revokeObjectURL(url)
-  }
-
   const stats = useMemo(() => {
     return {
       total,
       active: acpms.filter((acpm) => acpm.status === "ACTIVE").length,
       inProgress: acpms.filter((acpm) => acpm.status === "ACTIVE" && acpm.currentCompletionPercentage > 0 && acpm.currentCompletionPercentage < 100).length,
-      closed: acpms.filter((acpm) => acpm.currentCompletionPercentage >= 100).length,
+      pendingClosure: acpms.filter((acpm) => acpm.currentCompletionPercentage >= 100 && !hasClosureEvidence(closureEvidenceByAcpm[acpm.id] ?? [])).length,
+      closed: acpms.filter((acpm) => acpm.currentCompletionPercentage >= 100 && hasClosureEvidence(closureEvidenceByAcpm[acpm.id] ?? [])).length,
       inactive: acpms.filter((acpm) => acpm.status === "INACTIVE").length,
     }
-  }, [acpms, total])
+  }, [acpms, closureEvidenceByAcpm, total])
 
   return (
     <main className="space-y-6">
@@ -1094,6 +1284,7 @@ export default function AcpmPage() {
             <Metric label="ACPM" value={stats.total} />
             <Metric label="Activos" value={stats.active} tone="blue" />
             <Metric label="En ejecucion" value={stats.inProgress} tone="amber" />
+            <Metric label="Pendiente cierre" value={stats.pendingClosure} tone="amber" />
             <Metric label="Cerrados" value={stats.closed} tone="green" />
             <Metric label="Inactivos" value={stats.inactive} tone="red" />
           </div>
@@ -1208,8 +1399,10 @@ export default function AcpmPage() {
           <div className="grid gap-4 xl:grid-cols-2">
             {acpms.map((acpm) => {
               const followUps = followUpsByAcpm[acpm.id] ?? []
+              const closureEvidences = closureEvidenceByAcpm[acpm.id] ?? []
               const last = latestFollowUp(followUps)
-              const late = isLateUpload(acpm, last)
+              const lastClosureEvidence = latestClosureEvidence(closureEvidences)
+              const late = isLateClosureEvidence(acpm, lastClosureEvidence) || isLateUpload(acpm, last)
 
               return (
                 <Card key={acpm.id} className="border-border bg-card">
@@ -1218,8 +1411,8 @@ export default function AcpmPage() {
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <h3 className="font-semibold text-foreground">{acpm.name}</h3>
-                          <Badge variant="outline" className={getVisualStatusClassName(acpm)}>
-                            {getVisualStatus(acpm)}
+                          <Badge variant="outline" className={getVisualStatusClassName(acpm, closureEvidences)}>
+                            {getVisualStatus(acpm, closureEvidences)}
                           </Badge>
                           {late && (
                             <Badge variant="outline" className="border-destructive bg-destructive/10 text-destructive">
@@ -1239,7 +1432,7 @@ export default function AcpmPage() {
                       <p className="flex items-center gap-2"><UserRound className="h-4 w-4" />{employeeName(acpm.responsibleEmployee)}</p>
                       <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />Limite: {formatDate(acpm.dueDate)}</p>
                       <p className="flex items-center gap-2"><FileText className="h-4 w-4" />Avance: {acpm.currentCompletionPercentage}%</p>
-                      <p className="flex items-center gap-2"><FileCheck2 className="h-4 w-4" />{last?.evidence || "Sin evidencia de cierre"}</p>
+                      <p className="flex items-center gap-2"><FileCheck2 className="h-4 w-4" />{lastClosureEvidence?.originalName || last?.evidence || "Sin evidencia de cierre"}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -1261,7 +1454,9 @@ export default function AcpmPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {acpms.map((acpm) => (
+                {acpms.map((acpm) => {
+                  const closureEvidences = closureEvidenceByAcpm[acpm.id] ?? []
+                  return (
                   <tr key={acpm.id} className="align-middle">
                     <td className="px-4 py-3">
                       <p className="max-w-[280px] truncate font-medium text-foreground">{acpm.name}</p>
@@ -1281,8 +1476,8 @@ export default function AcpmPage() {
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{acpm.currentCompletionPercentage}%</td>
                     <td className="px-4 py-3">
-                      <Badge variant="outline" className={getVisualStatusClassName(acpm)}>
-                        {getVisualStatus(acpm)}
+                      <Badge variant="outline" className={getVisualStatusClassName(acpm, closureEvidences)}>
+                        {getVisualStatus(acpm, closureEvidences)}
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -1296,10 +1491,24 @@ export default function AcpmPage() {
                           <DropdownMenuItem onSelect={() => openDetail(acpm)}><Eye className="h-4 w-4" />Ver detalle</DropdownMenuItem>
                           <DropdownMenuItem onSelect={() => generateDocument(acpm)}><Download className="h-4 w-4" />Generar documento</DropdownMenuItem>
                           <DropdownMenuItem onSelect={() => { setEditingAcpm(acpm); setCreateOpen(true) }}><Edit className="h-4 w-4" />Editar</DropdownMenuItem>
-                          {acpm.status === "ACTIVE" && acpm.currentCompletionPercentage < 100 && (
+                          {acpm.status === "ACTIVE" && (
                             <>
-                              <DropdownMenuItem onSelect={() => openFollowUp(acpm)}><Plus className="h-4 w-4" />Agregar seguimiento</DropdownMenuItem>
-                              <DropdownMenuItem onSelect={() => setEvidenceAcpm(acpm)}><Upload className="h-4 w-4" />Subir evidencia cierre</DropdownMenuItem>
+                              {acpm.currentCompletionPercentage < 100 && (
+                                <DropdownMenuItem onSelect={() => openFollowUp(acpm)}><Plus className="h-4 w-4" />Agregar seguimiento</DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem
+                                disabled={acpm.currentCompletionPercentage < 100}
+                                onSelect={() => {
+                                  if (acpm.currentCompletionPercentage < 100) {
+                                    toast.error("Debes registrar primero un seguimiento con avance del 100%")
+                                    return
+                                  }
+                                  setEvidenceAcpm(acpm)
+                                }}
+                              >
+                                <Upload className="h-4 w-4" />
+                                {acpm.currentCompletionPercentage < 100 ? "Requiere avance 100%" : "Subir evidencia cierre"}
+                              </DropdownMenuItem>
                             </>
                           )}
                           <DropdownMenuSeparator />
@@ -1308,7 +1517,8 @@ export default function AcpmPage() {
                       </DropdownMenu>
                     </td>
                   </tr>
-                ))}
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -1335,9 +1545,65 @@ export default function AcpmPage() {
       <DetailDialog
         acpm={detailAcpm}
         followUps={detailAcpm ? followUpsByAcpm[detailAcpm.id] ?? [] : []}
+        closureEvidences={detailAcpm ? closureEvidenceByAcpm[detailAcpm.id] ?? [] : []}
         loading={detailLoading}
+        closureEvidenceLoading={closureEvidenceLoading}
+        previewLoadingId={previewLoadingId}
         onClose={() => setDetailAcpm(null)}
+        onViewClosureEvidence={handleViewClosureEvidence}
+        onDownloadClosureEvidence={handleDownloadClosureEvidence}
+        onDeleteClosureEvidence={handleDeleteClosureEvidence}
       />
+      <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && closePreview()}>
+        <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">
+          <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
+            <DialogTitle>{preview?.title ?? "Evidencia de cierre"}</DialogTitle>
+          </DialogHeader>
+          <div className="min-h-0 flex-1 overflow-auto p-4">
+            {preview && canEmbedPreview(preview.mimeType) ? (
+              preview.mimeType.startsWith("image/") ? (
+                <img
+                  src={preview.url}
+                  alt={preview.title}
+                  className="mx-auto max-h-[70dvh] max-w-full rounded-md object-contain"
+                />
+              ) : (
+                <iframe
+                  title={preview.title}
+                  src={preview.url}
+                  className="h-[70dvh] w-full rounded-md border border-border"
+                />
+              )
+            ) : (
+              <div className="flex min-h-[280px] flex-col items-center justify-center rounded-md border border-dashed border-border text-center text-muted-foreground">
+                <FileText className="mb-3 h-10 w-10" />
+                <p className="font-medium">Vista previa no disponible</p>
+                <p className="text-sm">Puedes abrir o descargar este archivo.</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter className="shrink-0 border-t border-border px-6 py-4">
+            {preview && (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => window.open(preview.url, "_blank", "noopener,noreferrer")}
+                >
+                  Abrir en otra pestaña
+                </Button>
+                <Button type="button" variant="outline" className="gap-2" onClick={handleDownloadPreview}>
+                  <Download className="h-4 w-4" />
+                  Descargar
+                </Button>
+              </>
+            )}
+            <Button type="button" onClick={closePreview}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }
