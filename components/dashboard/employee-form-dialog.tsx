@@ -230,205 +230,207 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-3xl bg-card border-border">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
+      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-3xl flex-col gap-0 overflow-hidden border-border bg-card p-0 sm:max-w-3xl">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
             <DialogTitle>{employee ? "Editar funcionario" : "Crear funcionario"}</DialogTitle>
           </DialogHeader>
 
-          {loadingOptions ? (
-            <div className="flex min-h-[260px] items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : (
-            <div className="grid gap-4 py-4">
-              {isCreateMode && (
-                <Alert className="border-primary/30 bg-primary/5">
-                  <Info className="h-4 w-4" />
-                  <AlertTitle>Antes de crear el funcionario</AlertTitle>
-                  <AlertDescription>
-                    Recuerda que debes tener creadas las areas de trabajo y los puestos de trabajo para poder enlazarlos al funcionario.
-                  </AlertDescription>
-                </Alert>
-              )}
+          <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
+            {loadingOptions ? (
+              <div className="flex min-h-[260px] items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {isCreateMode && (
+                  <Alert className="border-primary/30 bg-primary/5">
+                    <Info className="h-4 w-4" />
+                    <AlertTitle>Antes de crear el funcionario</AlertTitle>
+                    <AlertDescription>
+                      Recuerda que debes tener creadas las areas de trabajo y los puestos de trabajo para poder enlazarlos al funcionario.
+                    </AlertDescription>
+                  </Alert>
+                )}
 
-              {missingSetup && (
-                <Alert variant="destructive">
-                  <Info className="h-4 w-4" />
-                  <AlertTitle>Configuracion requerida</AlertTitle>
-                  <AlertDescription>
-                    Crea primero {workAreas.length === 0 ? "un area de trabajo" : "un puesto de trabajo"} en el modulo Empleados.
-                  </AlertDescription>
-                </Alert>
-              )}
+                {missingSetup && (
+                  <Alert variant="destructive">
+                    <Info className="h-4 w-4" />
+                    <AlertTitle>Configuracion requerida</AlertTitle>
+                    <AlertDescription>
+                      Crea primero {workAreas.length === 0 ? "un area de trabajo" : "un puesto de trabajo"} en el modulo Empleados.
+                    </AlertDescription>
+                  </Alert>
+                )}
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="employee-name">Nombre</Label>
-                  <Input
-                    id="employee-name"
-                    className={fieldControlClassName}
-                    value={formData.name}
-                    onChange={(event) => updateField("name", event.target.value)}
-                    placeholder="Nombre"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="employee-lastName">Apellido</Label>
-                  <Input
-                    id="employee-lastName"
-                    className={fieldControlClassName}
-                    value={formData.lastName}
-                    onChange={(event) => updateField("lastName", event.target.value)}
-                    placeholder="Apellido"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="employee-phone">Telefono</Label>
-                  <Input
-                    id="employee-phone"
-                    className={fieldControlClassName}
-                    value={formData.phone}
-                    onChange={(event) => updateField("phone", event.target.value)}
-                    placeholder="Telefono de contacto"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="employee-email">Correo</Label>
-                  <Input
-                    id="employee-email"
-                    className={fieldControlClassName}
-                    type="email"
-                    value={formData.email}
-                    onChange={(event) => updateField("email", event.target.value)}
-                    placeholder="correo@empresa.com"
-                    required
-                  />
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="employee-name">Nombre</Label>
+                    <Input
+                      id="employee-name"
+                      className={fieldControlClassName}
+                      value={formData.name}
+                      onChange={(event) => updateField("name", event.target.value)}
+                      placeholder="Nombre"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="employee-lastName">Apellido</Label>
+                    <Input
+                      id="employee-lastName"
+                      className={fieldControlClassName}
+                      value={formData.lastName}
+                      onChange={(event) => updateField("lastName", event.target.value)}
+                      placeholder="Apellido"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="employee-phone">Telefono</Label>
+                    <Input
+                      id="employee-phone"
+                      className={fieldControlClassName}
+                      value={formData.phone}
+                      onChange={(event) => updateField("phone", event.target.value)}
+                      placeholder="Telefono de contacto"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="employee-email">Correo</Label>
+                    <Input
+                      id="employee-email"
+                      className={fieldControlClassName}
+                      type="email"
+                      value={formData.email}
+                      onChange={(event) => updateField("email", event.target.value)}
+                      placeholder="correo@empresa.com"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Tipo de documento</Label>
+                    <Select
+                      value={formData.documentType}
+                      onValueChange={(value) => updateField("documentType", value as EmployeeDocumentType)}
+                    >
+                      <SelectTrigger className={fieldControlClassName}>
+                        <SelectValue placeholder="Selecciona el tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {documentTypeOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label} - {option.description}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="employee-documentNumber">Numero de documento</Label>
+                    <Input
+                      id="employee-documentNumber"
+                      className={fieldControlClassName}
+                      value={formData.documentNumber}
+                      onChange={(event) => updateField("documentNumber", event.target.value)}
+                      placeholder="Numero de documento"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="employee-birthDate">Fecha de nacimiento</Label>
+                    <Input
+                      id="employee-birthDate"
+                      className={fieldControlClassName}
+                      type="date"
+                      value={formData.birthDate}
+                      onChange={(event) => updateField("birthDate", event.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Genero</Label>
+                    <Select value={formData.gender} onValueChange={(value) => updateField("gender", value as EmployeeGender)}>
+                      <SelectTrigger className={fieldControlClassName}>
+                        <SelectValue placeholder="Selecciona el genero" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {genderOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Estado</Label>
+                    <Select value={String(formData.status)} onValueChange={(value) => updateField("status", value === "true")}>
+                      <SelectTrigger className={fieldControlClassName}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="true">Activo</SelectItem>
+                        <SelectItem value="false">Inactivo</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="employee-address">Direccion</Label>
+                    <Input
+                      id="employee-address"
+                      className={fieldControlClassName}
+                      value={formData.address}
+                      onChange={(event) => updateField("address", event.target.value)}
+                      placeholder="Direccion de residencia"
+                      required
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Tipo de documento</Label>
-                  <Select
-                    value={formData.documentType}
-                    onValueChange={(value) => updateField("documentType", value as EmployeeDocumentType)}
-                  >
-                    <SelectTrigger className={fieldControlClassName}>
-                      <SelectValue placeholder="Selecciona el tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {documentTypeOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label} - {option.description}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="employee-documentNumber">Numero de documento</Label>
-                  <Input
-                    id="employee-documentNumber"
-                    className={fieldControlClassName}
-                    value={formData.documentNumber}
-                    onChange={(event) => updateField("documentNumber", event.target.value)}
-                    placeholder="Numero de documento"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="employee-birthDate">Fecha de nacimiento</Label>
-                  <Input
-                    id="employee-birthDate"
-                    className={fieldControlClassName}
-                    type="date"
-                    value={formData.birthDate}
-                    onChange={(event) => updateField("birthDate", event.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Genero</Label>
-                  <Select value={formData.gender} onValueChange={(value) => updateField("gender", value as EmployeeGender)}>
-                    <SelectTrigger className={fieldControlClassName}>
-                      <SelectValue placeholder="Selecciona el genero" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {genderOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Estado</Label>
-                  <Select value={String(formData.status)} onValueChange={(value) => updateField("status", value === "true")}>
-                    <SelectTrigger className={fieldControlClassName}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">Activo</SelectItem>
-                      <SelectItem value="false">Inactivo</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="employee-address">Direccion</Label>
-                  <Input
-                    id="employee-address"
-                    className={fieldControlClassName}
-                    value={formData.address}
-                    onChange={(event) => updateField("address", event.target.value)}
-                    placeholder="Direccion de residencia"
-                    required
-                  />
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Area de trabajo</Label>
+                    <Select value={formData.workAreaId} onValueChange={(value) => updateField("workAreaId", value)}>
+                      <SelectTrigger className={fieldControlClassName}>
+                        <SelectValue placeholder="Selecciona un area" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {workAreas.map((area) => (
+                          <SelectItem key={area.id} value={area.id}>
+                            {area.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Puesto de trabajo</Label>
+                    <Select
+                      value={formData.jobId}
+                      onValueChange={(value) => updateField("jobId", value)}
+                      disabled={!formData.workAreaId || availableJobs.length === 0}
+                    >
+                      <SelectTrigger className={fieldControlClassName}>
+                        <SelectValue placeholder="Selecciona un puesto" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableJobs.map((job) => (
+                          <SelectItem key={job.id} value={job.id}>
+                            {job.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
+            )}
+          </div>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Area de trabajo</Label>
-                  <Select value={formData.workAreaId} onValueChange={(value) => updateField("workAreaId", value)}>
-                    <SelectTrigger className={fieldControlClassName}>
-                      <SelectValue placeholder="Selecciona un area" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {workAreas.map((area) => (
-                        <SelectItem key={area.id} value={area.id}>
-                          {area.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Puesto de trabajo</Label>
-                  <Select
-                    value={formData.jobId}
-                    onValueChange={(value) => updateField("jobId", value)}
-                    disabled={!formData.workAreaId || availableJobs.length === 0}
-                  >
-                    <SelectTrigger className={fieldControlClassName}>
-                      <SelectValue placeholder="Selecciona un puesto" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableJobs.map((job) => (
-                        <SelectItem key={job.id} value={job.id}>
-                          {job.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <DialogFooter>
+          <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>

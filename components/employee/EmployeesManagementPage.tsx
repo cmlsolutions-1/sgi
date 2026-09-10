@@ -1996,9 +1996,9 @@ export default function EmployeesPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border">
-            <CardHeader className="flex flex-col gap-3 pb-3 md:flex-row md:items-center md:justify-between">
-              <CardTitle className="flex items-center gap-2 text-base font-medium">
+          <Card className="border-border bg-card">
+            <CardHeader className="flex flex-col gap-2 px-4 pb-2 pt-3 md:flex-row md:items-center md:justify-between">
+              <CardTitle className="flex items-center gap-2 text-sm font-medium">
                 <Download className="h-5 w-5" />
                 Generar reporte de empleados
               </CardTitle>
@@ -2006,14 +2006,14 @@ export default function EmployeesPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full sm:w-auto"
+                  className="h-9 w-full sm:w-auto"
                   onClick={clearEmployeeReportFilters}
                 >
                   Limpiar
                 </Button>
                 <Button
                   type="button"
-                  className="w-full gap-2 sm:w-auto"
+                  className="h-9 w-full gap-2 sm:w-auto"
                   onClick={handleExportEmployees}
                   disabled={exportingEmployees}
                 >
@@ -2022,12 +2022,12 @@ export default function EmployeesPage() {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
-                <div className="space-y-2">
-                  <Label>Genero</Label>
+            <CardContent className="px-4 pb-3 pt-0">
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(118px,1fr))] gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs">Genero</Label>
                   <Select value={reportGender} onValueChange={setReportGender}>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-9">
                       <SelectValue placeholder="Genero" />
                     </SelectTrigger>
                     <SelectContent>
@@ -2040,10 +2040,10 @@ export default function EmployeesPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label>Nivel ARL</Label>
+                <div className="space-y-1">
+                  <Label className="text-xs">Nivel ARL</Label>
                   <Select value={reportArlRiskLevel} onValueChange={setReportArlRiskLevel}>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-9">
                       <SelectValue placeholder="Nivel ARL" />
                     </SelectTrigger>
                     <SelectContent>
@@ -2056,10 +2056,11 @@ export default function EmployeesPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="employee-report-min-age">Edad minima</Label>
+                <div className="space-y-1">
+                  <Label htmlFor="employee-report-min-age" className="text-xs">Edad minima</Label>
                   <Input
                     id="employee-report-min-age"
+                    className="h-9"
                     type="number"
                     min="0"
                     value={reportMinAge}
@@ -2067,10 +2068,11 @@ export default function EmployeesPage() {
                     placeholder="Min."
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="employee-report-max-age">Edad maxima</Label>
+                <div className="space-y-1">
+                  <Label htmlFor="employee-report-max-age" className="text-xs">Edad maxima</Label>
                   <Input
                     id="employee-report-max-age"
+                    className="h-9"
                     type="number"
                     min="0"
                     value={reportMaxAge}
@@ -2078,10 +2080,10 @@ export default function EmployeesPage() {
                     placeholder="Max."
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Tipo contrato</Label>
+                <div className="space-y-1">
+                  <Label className="text-xs">Tipo contrato</Label>
                   <Select value={reportContractType} onValueChange={setReportContractType}>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-9">
                       <SelectValue placeholder="Contrato" />
                     </SelectTrigger>
                     <SelectContent>
@@ -2094,10 +2096,11 @@ export default function EmployeesPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="employee-report-page">Pagina</Label>
+                <div className="space-y-1">
+                  <Label htmlFor="employee-report-page" className="text-xs">Pagina</Label>
                   <Input
                     id="employee-report-page"
+                    className="h-9"
                     type="number"
                     min="1"
                     value={reportPage}
@@ -2105,10 +2108,11 @@ export default function EmployeesPage() {
                     placeholder="Pag."
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="employee-report-limit">Limite</Label>
+                <div className="space-y-1">
+                  <Label htmlFor="employee-report-limit" className="text-xs">Limite</Label>
                   <Input
                     id="employee-report-limit"
+                    className="h-9"
                     type="number"
                     min="1"
                     value={reportLimit}
