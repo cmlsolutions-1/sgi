@@ -79,8 +79,8 @@ export const navigation: NavigationItem[] = [
       { code: "JOBS", name: "Cargos", href: "/dashboard/jobs", icon: BriefcaseBusiness },
       { code: "EMPLOYEE_MANAGEMENT", name: "Gestión Empleados", href: "/dashboard/employees", icon: UserCircle },
       { code: "INCIDENTS", name: "Novedades Laborales", href: "/dashboard/incidents", icon: TriangleAlert },
-      { code: "INVESTIGATIONS", name: "Investigaciones", href: "/dashboard/investigations", icon: FileSearch },
-      { code: "SPECIAL_RISK", name: "Riesgo Especial", href: "/dashboard/special-risk", icon: FlameKindling },
+      //{ code: "INVESTIGATIONS", name: "Investigaciones", href: "/dashboard/investigations", icon: FileSearch },
+      //{ code: "SPECIAL_RISK", name: "Riesgo Especial", href: "/dashboard/special-risk", icon: FlameKindling },
       { code: "DATA_AUTHORIZATIONS", name: "Tratamiento de Datos", href: "/dashboard/data-processing", icon: Fingerprint},
     ],
   },
@@ -101,19 +101,19 @@ export const navigation: NavigationItem[] = [
         href: "/dashboard/acpm",
         icon: FileCheck2,
       },
-      {
+      /* {
         code: "SST_TRAINING_CERTIFICATIONS",
         name: "Formación y Certificaciones",
         href: "/dashboard/sst-training-certifications",
         icon: GraduationCap,
-      },
-      {
+      }, */
+      /* {
         code: "SST_OBJECTIVES",
         name: "Objetivos SST",
         href: "/dashboard/sst-objectives",
         icon: Target,
-      },
-      {
+      }, */
+      /* {
         code: "INITIAL_EVALUATION",
         name: "Evaluación Inicial",
         href: "/dashboard/initial-evaluation",
@@ -124,7 +124,7 @@ export const navigation: NavigationItem[] = [
         name: "Rendición de Cuentas",
         href: "/dashboard/accountability",
         icon: BarChart3,
-      },
+      }, */
     ],
   },
   {
@@ -133,7 +133,7 @@ export const navigation: NavigationItem[] = [
     icon: CalendarDays,
     subItems: [
       { code: "TRAINING", name: "Capacitaciones", href: "/dashboard/trainingPlan", icon: Brain },
-      { code: "WORK_PLAN", name: "Plan de Trabajo", href: "/dashboard/work-plan", icon: ClipboardCheck },
+      //{ code: "WORK_PLAN", name: "Plan de Trabajo", href: "/dashboard/work-plan", icon: ClipboardCheck },
     ],
   },
   {
