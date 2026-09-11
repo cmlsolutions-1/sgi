@@ -86,7 +86,7 @@ export const navigation: NavigationItem[] = [
       { code: "INCIDENTS", name: "Novedades Laborales", href: "/dashboard/incidents", icon: TriangleAlert },
       //{ code: "EMPLOYEE_ANALYTICS", name: "Estadísticas y Análisis", href: "/dashboard/employee-analytics", icon: BarChart3 },
       //{ code: "CUSTODY", name: "Custodia", href: "/dashboard/custody", icon: Archive },
-      //{ code: "INVESTIGATIONS", name: "Investigaciones", href: "/dashboard/investigations", icon: FileSearch },
+      { code: "INVESTIGATIONS", name: "Investigaciones", href: "/dashboard/investigations", icon: FileSearch },
       //{ code: "SPECIAL_RISK", name: "Riesgo Especial", href: "/dashboard/special-risk", icon: FlameKindling },
       { code: "DATA_AUTHORIZATIONS", name: "Tratamiento de Datos", href: "/dashboard/data-processing", icon: Fingerprint},
     ],
