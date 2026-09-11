@@ -53,6 +53,19 @@ function formatDate(date?: string) {
   return date.split("T")[0]
 }
 
+function todayDateString() {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, "0")
+  const day = String(today.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
+}
+
+function isNextVisitExpired(date?: string) {
+  if (!date) return false
+  return formatDate(date) < todayDateString()
+}
+
 function PestControlDialog({
   open,
   record,
@@ -168,7 +181,7 @@ export default function PestControlPage() {
 
   const activeCount = useMemo(() => records.filter((record) => record.status === "ACTIVE").length, [records])
   const scheduledCount = useMemo(() => {
-    const today = new Date().toISOString().slice(0, 10)
+    const today = todayDateString()
     return records.filter((record) => formatDate(record.nextVisitDate) >= today).length
   }, [records])
 
@@ -352,6 +365,11 @@ export default function PestControlPage() {
                           <CalendarDays className="h-4 w-4 text-muted-foreground" />
                           <span>
                             <span className="font-medium">Próxima visita:</span> {formatDate(record.nextVisitDate)}
+                            {isNextVisitExpired(record.nextVisitDate) && (
+                              <span className="mt-1 block text-xs font-semibold text-destructive">
+                                Próxima visita vencida
+                              </span>
+                            )}
                           </span>
                         </p>
                       </div>
@@ -403,7 +421,12 @@ export default function PestControlPage() {
                     <tr key={record.id} className="align-middle">
                       <td className="px-4 py-3 font-medium">{record.serviceProviderCompanyName}</td>
                       <td className="px-4 py-3 text-muted-foreground">{formatDate(record.date)}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{formatDate(record.nextVisitDate)}</td>
+                      <td className="px-4 py-3">
+                        <p className="text-muted-foreground">{formatDate(record.nextVisitDate)}</p>
+                        {isNextVisitExpired(record.nextVisitDate) && (
+                          <p className="mt-1 text-xs font-semibold text-destructive">Próxima visita vencida</p>
+                        )}
+                      </td>
                       <td className="px-4 py-3">
                         <Badge className={statusClassName(record.status)}>{statusLabel(record.status)}</Badge>
                       </td>

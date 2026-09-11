@@ -28,10 +28,10 @@ import {
   ClipboardList,
   BarChart3,
   Archive,
-  HeartPulse,
   Droplets,
   Recycle,
   FlaskConical,
+  HeartPulse,
 } from "lucide-react"
 import type { ModuleNode } from "@/store/auth.store"
 
@@ -84,7 +84,7 @@ export const navigation: NavigationItem[] = [
       { code: "JOBS", name: "Cargos", href: "/dashboard/jobs", icon: BriefcaseBusiness },
       { code: "EMPLOYEE_MANAGEMENT", name: "Gestión Empleados", href: "/dashboard/employees", icon: UserCircle },
       { code: "INCIDENTS", name: "Novedades Laborales", href: "/dashboard/incidents", icon: TriangleAlert },
-      { code: "EMPLOYEE_ANALYTICS", name: "Estadísticas y Análisis", href: "/dashboard/employee-analytics", icon: BarChart3 },
+      //{ code: "EMPLOYEE_ANALYTICS", name: "Estadísticas y Análisis", href: "/dashboard/employee-analytics", icon: BarChart3 },
       //{ code: "CUSTODY", name: "Custodia", href: "/dashboard/custody", icon: Archive },
       //{ code: "INVESTIGATIONS", name: "Investigaciones", href: "/dashboard/investigations", icon: FileSearch },
       //{ code: "SPECIAL_RISK", name: "Riesgo Especial", href: "/dashboard/special-risk", icon: FlameKindling },
@@ -108,18 +108,18 @@ export const navigation: NavigationItem[] = [
         href: "/dashboard/acpm",
         icon: FileCheck2,
       },
-      {
+      /* {
         code: "SST_INDICATORS",
         name: "Indicadores SST",
         href: "/dashboard/sst-indicators",
         icon: BarChart3,
-      },
-      {
+      }, */
+      /* {
         code: "SST_AUDITS",
         name: "Auditorías SST",
         href: "/dashboard/audits",
         icon: FileSearch,
-      },
+      }, */
       /* {
         code: "SST_COMMUNICATIONS",
         name: "Comunicaciones SST",
@@ -159,7 +159,7 @@ export const navigation: NavigationItem[] = [
     subItems: [
       { code: "TRAINING", name: "Capacitaciones", href: "/dashboard/trainingPlan", icon: Brain },
       //{ code: "WORK_PLAN", name: "Plan de Trabajo", href: "/dashboard/work-plan", icon: ClipboardCheck },
-      { code: "HEALTHY_LIFESTYLE", name: "Estilos de Vida Saludable", href: "/dashboard/healthy-lifestyles", icon: HeartPulse },
+      //{ code: "HEALTHY_LIFESTYLES", name: "Estilos de Vida Saludable", href: "/dashboard/healthy-lifestyles", icon: HeartPulse },
     ],
   },
   {
@@ -180,24 +180,24 @@ export const navigation: NavigationItem[] = [
         href: "/dashboard/preventive-maintenance",
         icon: ClipboardCheck,
       },
-      {
+      /* {
         code: "HAZARDOUS_SUBSTANCES",
         name: "Sustancias Peligrosas",
         href: "/dashboard/hazardous-substances",
         icon: FlaskConical,
-      },
-      {
+      }, */
+      /* {
         code: "ENVIRONMENTAL_MEASUREMENTS",
         name: "Mediciones Ambientales",
         href: "/dashboard/environmental-measurements",
         icon: BarChart3,
-      },
-      {
+      }, */
+      /* {
         code: "INSPECTIONS",
         name: "Inspecciones",
         href: "/dashboard/inspections",
         icon: ClipboardCheck,
-      },
+      }, */
       /* {
         code: "LEGAL_MATRIX",
         name: "Matriz Legal",
@@ -268,18 +268,18 @@ export const navigation: NavigationItem[] = [
         href: "/dashboard/hygiene-supplies",
         icon: PackageCheck,
       },
-      {
+      /* {
         code: "HYGIENE_SERVICES",
         name: "Servicios de Higiene",
         href: "/dashboard/hygiene-services",
         icon: Droplets,
-      },
-      {
+      }, */
+      /* {
         code: "WASTE_MANAGEMENT",
         name: "Manejo de Residuos",
         href: "/dashboard/waste-management",
         icon: Recycle,
-      },
+      }, */
       {
         code: "SANITATION",
         name: "Saneamiento",
@@ -396,9 +396,9 @@ function isSubItemAllowed(
   if (subItem.code === "ACCOUNTABILITY" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "LEGAL_MATRIX" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "SST_COMMUNICATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "HEALTHY_LIFESTYLES" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "HYGIENE_SERVICES" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "WASTE_MANAGEMENT" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "HEALTHY_LIFESTYLE" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "HAZARDOUS_SUBSTANCES" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "ENVIRONMENTAL_MEASUREMENTS" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "INSPECTIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
