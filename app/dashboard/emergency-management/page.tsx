@@ -144,8 +144,8 @@ function EmergencyManagementDialog({ open, plan, onClose, onSave }: EmergencyMan
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto bg-white">
+        <DialogHeader className="border-b border-border pb-4">
           <DialogTitle>{plan ? "Editar plan de emergencia" : "Nuevo plan de emergencia"}</DialogTitle>
         </DialogHeader>
 
@@ -196,7 +196,7 @@ function EmergencyManagementDialog({ open, plan, onClose, onSave }: EmergencyMan
             />
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="border-t border-border pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
@@ -300,57 +300,55 @@ export default function EmergencyManagementPage() {
         </Button>
       </div>
 
-      <Card>
-        <CardContent className="space-y-5 p-5">
-          <div className="overflow-x-auto px-3 py-1">
-            <div className="flex min-w-max items-center justify-center gap-2">
-              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
-                <span className="text-xs text-muted-foreground">Total</span>
-                <span className="text-sm font-semibold">{plans.length}</span>
-              </div>
-              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
-                <span className="text-xs text-muted-foreground">Activos</span>
-                <span className="text-sm font-semibold text-green-600">{activePlans}</span>
-              </div>
-              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
-                <span className="text-xs text-muted-foreground">Inactivos</span>
-                <span className="text-sm font-semibold">{plans.length - activePlans}</span>
-              </div>
-            </div>
+      <div className="overflow-x-auto px-3 py-1">
+        <div className="flex min-w-max items-center justify-center gap-2">
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Total</span>
+            <span className="text-sm font-semibold">{plans.length}</span>
           </div>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Activos</span>
+            <span className="text-sm font-semibold text-green-600">{activePlans}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Inactivos</span>
+            <span className="text-sm font-semibold">{plans.length - activePlans}</span>
+          </div>
+        </div>
+      </div>
 
-          <form onSubmit={handleFilter} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_160px_160px_160px_auto]">
-            <div className="grid gap-2">
-              <Label>Buscar</Label>
-              <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Nombre o versión" />
-            </div>
-            <div className="grid gap-2">
-              <Label>Desde</Label>
-              <Input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
-            </div>
-            <div className="grid gap-2">
-              <Label>Hasta</Label>
-              <Input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} />
-            </div>
-            <div className="grid gap-2">
-              <Label>Estado</Label>
-              <select
-                value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value as EmergencyStatus | "all")}
-                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="all">Todos</option>
-                <option value="ACTIVE">Activos</option>
-                <option value="INACTIVE">Inactivos</option>
-              </select>
-            </div>
-            <Button type="submit" variant="outline" className="mt-8 gap-2">
-              <Search className="h-4 w-4" />
-              Filtrar
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+      <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
+        <form onSubmit={handleFilter} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_160px_160px_160px_auto]">
+          <div className="grid gap-2">
+            <Label>Buscar</Label>
+            <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Nombre o versión" />
+          </div>
+          <div className="grid gap-2">
+            <Label>Desde</Label>
+            <Input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
+          </div>
+          <div className="grid gap-2">
+            <Label>Hasta</Label>
+            <Input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} />
+          </div>
+          <div className="grid gap-2">
+            <Label>Estado</Label>
+            <select
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value as EmergencyStatus | "all")}
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+            >
+              <option value="all">Todos</option>
+              <option value="ACTIVE">Activos</option>
+              <option value="INACTIVE">Inactivos</option>
+            </select>
+          </div>
+          <Button type="submit" variant="outline" className="mt-8 gap-2">
+            <Search className="h-4 w-4" />
+            Filtrar
+          </Button>
+        </form>
+      </section>
 
       {loading ? (
         <Card>

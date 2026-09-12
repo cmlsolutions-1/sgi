@@ -1,7 +1,7 @@
 "use client"
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
-import { Download, Edit, LayoutGrid, List, Loader2, MoreHorizontal, Plus, Power, Search, SprayCan, Upload } from "lucide-react"
+import { Download, Edit, LayoutGrid, List, Loader2, MoreHorizontal, Plus, Power, Search, Upload } from "lucide-react"
 import { toast } from "sonner"
 
 import { SanitaryDocumentPanel } from "@/components/sanitary/SanitaryDocumentPanel"
@@ -155,7 +155,7 @@ function SanitationDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[90dvh] w-[calc(100vw-2rem)] max-w-3xl overflow-y-auto p-0">
+      <DialogContent className="max-h-[90dvh] w-[calc(100vw-2rem)] max-w-3xl overflow-y-auto bg-white p-0">
         <DialogHeader>
           <div className="border-b border-slate-200 px-5 py-4">
             <DialogTitle>{record ? "Editar saneamiento" : "Nueva actividad de saneamiento"}</DialogTitle>
@@ -166,7 +166,7 @@ function SanitationDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5 px-5 pb-5">
-          <section className="rounded-lg border border-slate-200 bg-slate-50/60 p-4">
+          <section className="rounded-lg border border-slate-200 bg-white p-4">
             <h3 className="mb-3 text-sm font-semibold text-slate-900">Datos de la actividad</h3>
             <div className="grid gap-4 md:grid-cols-3">
               <div className="grid min-w-0 gap-2 md:col-span-1">
@@ -274,7 +274,7 @@ function SanitationDialog({
                 <h3 className="text-sm font-semibold text-slate-900">Insumos utilizados</h3>
                 <p className="text-xs text-muted-foreground">Selecciona los insumos aplicados durante la actividad.</p>
               </div>
-              <div className="grid max-h-56 gap-2 overflow-y-auto rounded-md border border-slate-200 bg-slate-50/50 p-3 sm:grid-cols-2">
+              <div className="grid max-h-56 gap-2 overflow-y-auto rounded-md border border-slate-200 bg-white p-3 sm:grid-cols-2">
                 {supplies.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No hay insumos activos disponibles.</p>
                 ) : (
@@ -441,9 +441,17 @@ export default function SanitationPage() {
         </Button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Card className="rounded-lg"><CardContent className="flex items-center justify-between p-4"><div><p className="text-xs font-medium text-muted-foreground">Actividades</p><p className="mt-1 text-2xl font-bold">{records.length}</p></div><SprayCan className="h-6 w-6 text-primary" /></CardContent></Card>
-        <Card className="rounded-lg"><CardContent className="p-4"><p className="text-xs font-medium text-muted-foreground">Activas</p><p className="mt-1 text-2xl font-bold">{activeCount}</p></CardContent></Card>
+      <div className="overflow-x-auto px-3 py-1">
+        <div className="flex min-w-max items-center justify-center gap-2">
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Actividades</span>
+            <span className="text-sm font-semibold">{records.length}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Activas</span>
+            <span className="text-sm font-semibold text-emerald-700">{activeCount}</span>
+          </div>
+        </div>
       </div>
 
       <Card className="rounded-lg">

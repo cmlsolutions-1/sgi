@@ -1,7 +1,7 @@
 "use client"
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
-import { Edit, LayoutGrid, List, Loader2, MoreHorizontal, PackageCheck, Plus, Power, Search, Upload } from "lucide-react"
+import { Edit, LayoutGrid, List, Loader2, MoreHorizontal, Plus, Power, Search, Upload } from "lucide-react"
 import { toast } from "sonner"
 
 import { SanitaryDocumentPanel } from "@/components/sanitary/SanitaryDocumentPanel"
@@ -115,8 +115,8 @@ function SupplyDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto bg-white">
+        <DialogHeader className="border-b border-border pb-4">
           <DialogTitle>{supply ? "Editar insumo de higiene" : "Nuevo insumo de higiene"}</DialogTitle>
         </DialogHeader>
 
@@ -154,7 +154,7 @@ function SupplyDialog({
               onChange={(event) => setForm((current) => ({ ...current, contraindications: event.target.value }))}
             />
           </div>
-          <DialogFooter>
+          <DialogFooter className="border-t border-border pt-4">
             <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
               Cancelar
             </Button>
@@ -239,30 +239,21 @@ export default function HygieneSuppliesPage() {
         </Button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Card className="rounded-lg">
-          <CardContent className="flex items-center justify-between gap-3 p-4">
-            <div>
-              <p className="text-xs font-medium text-muted-foreground">Total insumos</p>
-              <p className="mt-1 text-2xl font-bold text-slate-900">{supplies.length}</p>
-            </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary">
-              <PackageCheck className="h-5 w-5" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="rounded-lg">
-          <CardContent className="p-4">
-            <p className="text-xs font-medium text-muted-foreground">Activos</p>
-            <p className="mt-1 text-2xl font-bold text-slate-900">{activeCount}</p>
-          </CardContent>
-        </Card>
-        <Card className="rounded-lg">
-          <CardContent className="p-4">
-            <p className="text-xs font-medium text-muted-foreground">Vencidos</p>
-            <p className="mt-1 text-2xl font-bold text-slate-900">{expiredCount}</p>
-          </CardContent>
-        </Card>
+      <div className="overflow-x-auto px-3 py-1">
+        <div className="flex min-w-max items-center justify-center gap-2">
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Total insumos</span>
+            <span className="text-sm font-semibold">{supplies.length}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Activos</span>
+            <span className="text-sm font-semibold text-emerald-700">{activeCount}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Vencidos</span>
+            <span className="text-sm font-semibold text-destructive">{expiredCount}</span>
+          </div>
+        </div>
       </div>
 
       <Card className="rounded-lg">

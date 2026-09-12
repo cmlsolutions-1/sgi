@@ -372,7 +372,7 @@ function InvestigationDialog({
     setForm((current) => ({
       ...current,
       acpmId,
-      acpmReference: acpm ? `ACPM-${acpm.year} - ${acpm.name}` : current.acpmReference,
+      acpmReference: acpm ? `ACPM-${acpm.year} - ${acpm.name}` : "",
     }))
   }
 
@@ -381,7 +381,7 @@ function InvestigationDialog({
     setForm((current) => ({
       ...current,
       documentManagementId: documentId,
-      acpmReference: document ? `${document.code} - ${document.name}` : current.acpmReference,
+      acpmReference: document ? `${document.code} - ${document.name}` : "",
     }))
   }
 
@@ -396,8 +396,8 @@ function InvestigationDialog({
     if (!form.responsibleEmployeeId) return toast.error("Selecciona el funcionario responsable")
     if (!hasValidReviewer) return toast.error("Agrega al menos una persona investigadora")
     if (!form.causeAnalysis.trim()) return toast.error("Diligencia el análisis de causas")
-    if (form.acpmSource === "ACPM" && !form.acpmId && !form.acpmReference.trim()) {
-      return toast.error("Selecciona o escribe la referencia ACPM")
+    if (form.acpmSource === "ACPM" && !form.acpmId) {
+      return toast.error("Selecciona la ACPM relacionada")
     }
     if (form.acpmSource === "DOCUMENT_MANAGEMENT" && !form.documentManagementId) {
       return toast.error("Selecciona el documento de gestión documental")
@@ -427,15 +427,26 @@ function InvestigationDialog({
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Datos principales</h3>
-              <div className="grid gap-4 md:grid-cols-2">
-                <label className="block">
-                  <span className="mb-1 block text-sm font-semibold text-foreground">Novedad laboral</span>
+            <section className="rounded-xl border border-slate-300 bg-white p-4 shadow-sm">
+              <div className="mb-4 flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <FileText className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground">Datos principales</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Selecciona la novedad laboral asociada y el funcionario responsable de la investigación.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <label className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
+                  <span className="text-xs font-semibold text-muted-foreground">Novedad laboral</span>
                   <select
                     value={form.incidentId}
                     onChange={(event) => setForm((current) => ({ ...current, incidentId: event.target.value }))}
-                    className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs outline-none transition-colors hover:border-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="">Selecciona una novedad</option>
                     {incidents.map((incident) => (
@@ -446,14 +457,14 @@ function InvestigationDialog({
                   </select>
                 </label>
 
-                <label className="block">
-                  <span className="mb-1 block text-sm font-semibold text-foreground">Funcionario responsable</span>
+                <label className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
+                  <span className="text-xs font-semibold text-muted-foreground">Funcionario responsable</span>
                   <select
                     value={form.responsibleEmployeeId}
                     onChange={(event) =>
                       setForm((current) => ({ ...current, responsibleEmployeeId: event.target.value }))
                     }
-                    className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs outline-none transition-colors hover:border-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="">Selecciona responsable</option>
                     {employees.map((employee) => (
@@ -466,12 +477,22 @@ function InvestigationDialog({
               </div>
             </section>
 
-            <section className="rounded-md border border-border p-4">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-foreground">Equipo investigador</h3>
-                <Button type="button" variant="outline" size="sm" className="gap-2" onClick={addReviewer}>
+            <section className="rounded-xl border border-slate-300 bg-white p-4 shadow-sm">
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <UserRound className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-foreground">Equipo investigador</h3>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Agrega funcionarios o personas externas que participan en la investigación.
+                    </p>
+                  </div>
+                </div>
+                <Button type="button" size="sm" className="gap-2 self-start sm:self-auto" onClick={addReviewer}>
                   <Plus className="h-4 w-4" />
-                  Agregar
+                  Agregar investigador
                 </Button>
               </div>
 
@@ -479,46 +500,56 @@ function InvestigationDialog({
                 {form.reviewers.map((reviewer, index) => (
                   <div
                     key={reviewer.id}
-                    className="grid gap-3 rounded-md bg-secondary p-3 lg:grid-cols-[190px_minmax(0,1fr)_44px]"
+                    className="grid gap-3 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs lg:grid-cols-[190px_minmax(0,1fr)_44px] lg:items-end"
                   >
-                    <select
-                      value={reviewer.type}
-                      onChange={(event) =>
-                        updateReviewer(reviewer.id, { type: event.target.value as InvestigationReviewerType })
-                      }
-                      className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
-                      aria-label={`Tipo de investigador ${index + 1}`}
-                    >
-                      <option value="EMPLOYEE">Funcionario</option>
-                      <option value="EXTERNAL">Externo</option>
-                    </select>
+                    <label className="grid gap-1.5">
+                      <span className="text-xs font-semibold text-muted-foreground">Tipo</span>
+                      <select
+                        value={reviewer.type}
+                        onChange={(event) =>
+                          updateReviewer(reviewer.id, { type: event.target.value as InvestigationReviewerType })
+                        }
+                        className="h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs outline-none transition-colors hover:border-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                        aria-label={`Tipo de investigador ${index + 1}`}
+                      >
+                        <option value="EMPLOYEE">Funcionario</option>
+                        <option value="EXTERNAL">Externo</option>
+                      </select>
+                    </label>
 
                     {reviewer.type === "EMPLOYEE" ? (
-                      <select
-                        value={reviewer.employeeId}
-                        onChange={(event) => updateReviewer(reviewer.id, { employeeId: event.target.value })}
-                        className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
-                        aria-label={`Funcionario investigador ${index + 1}`}
-                      >
-                        <option value="">Selecciona funcionario</option>
-                        {employees.map((employee) => (
-                          <option key={employee.id} value={employee.id}>
-                            {employeeLabel(employee)}
-                          </option>
-                        ))}
-                      </select>
+                      <label className="grid gap-1.5">
+                        <span className="text-xs font-semibold text-muted-foreground">Investigador</span>
+                        <select
+                          value={reviewer.employeeId}
+                          onChange={(event) => updateReviewer(reviewer.id, { employeeId: event.target.value })}
+                          className="h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs outline-none transition-colors hover:border-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                          aria-label={`Funcionario investigador ${index + 1}`}
+                        >
+                          <option value="">Selecciona funcionario</option>
+                          {employees.map((employee) => (
+                            <option key={employee.id} value={employee.id}>
+                              {employeeLabel(employee)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
                     ) : (
-                      <Input
-                        value={reviewer.externalName}
-                        onChange={(event) => updateReviewer(reviewer.id, { externalName: event.target.value })}
-                        placeholder="Nombre completo de la persona externa"
-                      />
+                      <label className="grid gap-1.5">
+                        <span className="text-xs font-semibold text-muted-foreground">Persona externa</span>
+                        <Input
+                          value={reviewer.externalName}
+                          onChange={(event) => updateReviewer(reviewer.id, { externalName: event.target.value })}
+                          placeholder="Nombre completo de la persona externa"
+                        />
+                      </label>
                     )}
 
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="destructive"
                       size="icon"
+                      className="h-10 w-10"
                       onClick={() => removeReviewer(reviewer.id)}
                       aria-label="Quitar investigador"
                     >
@@ -580,11 +611,22 @@ function InvestigationDialog({
               </div>
             </section>
 
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Relación y cierre</h3>
-              <div className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)_240px]">
-                <label className="block">
-                  <span className="mb-1 block text-sm font-semibold text-foreground">Origen ACPM</span>
+            <section className="rounded-xl border border-slate-300 bg-white p-4 shadow-sm">
+              <div className="mb-4 flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <CheckCircle2 className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground">Relación y cierre</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Vincula la investigación con ACPM, gestión documental u otra referencia y define la fecha estimada de cierre.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-3 lg:grid-cols-[240px_minmax(0,1fr)_240px]">
+                <label className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
+                  <span className="text-xs font-semibold text-muted-foreground">Origen ACPM</span>
                   <select
                     value={form.acpmSource}
                     onChange={(event) =>
@@ -596,7 +638,7 @@ function InvestigationDialog({
                         acpmReference: "",
                       }))
                     }
-                    className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs outline-none transition-colors hover:border-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="ACPM">ACPM</option>
                     <option value="DOCUMENT_MANAGEMENT">Gestión documental</option>
@@ -605,14 +647,14 @@ function InvestigationDialog({
                 </label>
 
                 {form.acpmSource === "ACPM" ? (
-                  <label className="block">
-                    <span className="mb-1 block text-sm font-semibold text-foreground">ACPM relacionada</span>
+                  <label className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
+                    <span className="text-xs font-semibold text-muted-foreground">ACPM relacionada</span>
                     <select
                       value={form.acpmId}
                       onChange={(event) => handleAcpmChange(event.target.value)}
-                      className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs outline-none transition-colors hover:border-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                     >
-                      <option value="">Selecciona ACPM o escribe referencia manual</option>
+                      <option value="">Selecciona ACPM relacionada</option>
                       {acpms.map((acpm) => (
                         <option key={acpm.id} value={acpm.id}>
                           {acpm.year} - {acpm.name}
@@ -621,12 +663,12 @@ function InvestigationDialog({
                     </select>
                   </label>
                 ) : form.acpmSource === "DOCUMENT_MANAGEMENT" ? (
-                  <label className="block">
-                    <span className="mb-1 block text-sm font-semibold text-foreground">Documento relacionado</span>
+                  <label className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
+                    <span className="text-xs font-semibold text-muted-foreground">Documento relacionado</span>
                     <select
                       value={form.documentManagementId}
                       onChange={(event) => handleDocumentChange(event.target.value)}
-                      className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs outline-none transition-colors hover:border-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                     >
                       <option value="">Selecciona documento</option>
                       {documents.map((document) => (
@@ -637,7 +679,7 @@ function InvestigationDialog({
                     </select>
                   </label>
                 ) : (
-                  <Label className="grid gap-2">
+                  <Label className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 text-xs font-semibold text-muted-foreground shadow-xs">
                     Referencia
                     <Input
                       value={form.acpmReference}
@@ -647,7 +689,7 @@ function InvestigationDialog({
                   </Label>
                 )}
 
-                <Label className="grid gap-2">
+                <Label className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 text-xs font-semibold text-muted-foreground shadow-xs">
                   Fecha estimada de cierre
                   <Input
                     type="date"
@@ -659,16 +701,6 @@ function InvestigationDialog({
                 </Label>
               </div>
 
-              {form.acpmSource !== "OTHER" && (
-                <Label className="mt-4 grid gap-2">
-                  Referencia enviada al backend
-                  <Input
-                    value={form.acpmReference}
-                    onChange={(event) => setForm((current) => ({ ...current, acpmReference: event.target.value }))}
-                    placeholder="Referencia visible para trazabilidad"
-                  />
-                </Label>
-              )}
             </section>
           </div>
 
@@ -1243,27 +1275,29 @@ export default function InvestigationsPage() {
         </Button>
       </div>
 
-      <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        <div className="grid gap-3 md:grid-cols-4">
-          <div className="rounded-md bg-secondary px-4 py-3">
-            <p className="text-xl font-bold text-foreground">{computedSummary.total}</p>
-            <p className="text-xs text-muted-foreground">Investigaciones</p>
+      <div className="overflow-x-auto px-3 py-1">
+        <div className="flex min-w-max items-center justify-center gap-2">
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Investigaciones</span>
+            <span className="text-sm font-semibold">{computedSummary.total}</span>
           </div>
-          <div className="rounded-md bg-secondary px-4 py-3">
-            <p className="text-xl font-bold text-blue-700">{computedSummary.reported}</p>
-            <p className="text-xs text-muted-foreground">Reportadas</p>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Reportadas</span>
+            <span className="text-sm font-semibold text-blue-700">{computedSummary.reported}</span>
           </div>
-          <div className="rounded-md bg-secondary px-4 py-3">
-            <p className="text-xl font-bold text-amber-700">{computedSummary.pendingVerification}</p>
-            <p className="text-xs text-muted-foreground">Por verificar</p>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Por verificar</span>
+            <span className="text-sm font-semibold text-amber-700">{computedSummary.pendingVerification}</span>
           </div>
-          <div className="rounded-md bg-secondary px-4 py-3">
-            <p className="text-xl font-bold text-emerald-700">{computedSummary.closedEffective}</p>
-            <p className="text-xs text-muted-foreground">Cerradas eficaces</p>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Cerradas eficaces</span>
+            <span className="text-sm font-semibold text-emerald-700">{computedSummary.closedEffective}</span>
           </div>
         </div>
+      </div>
 
-        <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_200px_180px_220px_160px_160px_auto]">
+      <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_200px_180px_220px_160px_160px_auto]">
           <Label className="grid gap-2">
             Buscar
             <div className="relative">
@@ -1480,15 +1514,58 @@ export default function InvestigationsPage() {
         )}
       </section>
 
-      <section className="rounded-lg border border-border bg-card p-5 shadow-sm">
-        <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-foreground">
-          <ClipboardCheck className="h-5 w-5" />
-          Flujo de verificación
-        </h2>
+      <section className="rounded-xl border border-slate-300 bg-white p-5 shadow-sm">
+        <div className="mb-5 flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <ClipboardCheck className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Flujo de verificación</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Visualiza el recorrido de una investigación desde su reporte hasta el cierre por eficacia.
+            </p>
+          </div>
+        </div>
+
         <div className="grid gap-3 md:grid-cols-3">
-          <InfoBlock label="Reportado" value="La investigación está creada y requiere avanzar con acciones o soportes." />
-          <InfoBlock label="Pendiente de verificación" value="El equipo debe revisar la eficacia de las acciones registradas." />
-          <InfoBlock label="Eficaz" value="La verificación fue aprobada y la investigación queda cerrada." />
+          <div className="relative rounded-xl border border-blue-200 bg-blue-50/70 p-4 shadow-xs">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+                <ClipboardCheck className="h-4 w-4" />
+              </div>
+              <span className="rounded-full bg-white/80 px-2.5 py-1 text-xs font-semibold text-blue-700">Paso 1</span>
+            </div>
+            <h3 className="text-sm font-semibold text-foreground">Reportado</h3>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              La investigación está creada y requiere avanzar con acciones, soportes o análisis de causa.
+            </p>
+          </div>
+
+          <div className="relative rounded-xl border border-amber-200 bg-amber-50/70 p-4 shadow-xs">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                <History className="h-4 w-4" />
+              </div>
+              <span className="rounded-full bg-white/80 px-2.5 py-1 text-xs font-semibold text-amber-700">Paso 2</span>
+            </div>
+            <h3 className="text-sm font-semibold text-foreground">Pendiente de verificación</h3>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              El equipo revisa la eficacia de las acciones registradas antes de confirmar el resultado.
+            </p>
+          </div>
+
+          <div className="relative rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 shadow-xs">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                <CheckCircle2 className="h-4 w-4" />
+              </div>
+              <span className="rounded-full bg-white/80 px-2.5 py-1 text-xs font-semibold text-emerald-700">Paso 3</span>
+            </div>
+            <h3 className="text-sm font-semibold text-foreground">Eficaz</h3>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              La verificación fue aprobada y la investigación queda cerrada con trazabilidad del resultado.
+            </p>
+          </div>
         </div>
       </section>
 

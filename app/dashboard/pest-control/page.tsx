@@ -1,7 +1,7 @@
 "use client"
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
-import { Bug, CalendarDays, Edit, LayoutGrid, List, Loader2, MoreHorizontal, Plus, Power, Search, Upload } from "lucide-react"
+import { CalendarDays, Edit, LayoutGrid, List, Loader2, MoreHorizontal, Plus, Power, Search, Upload } from "lucide-react"
 import { toast } from "sonner"
 
 import { SanitaryDocumentPanel } from "@/components/sanitary/SanitaryDocumentPanel"
@@ -37,6 +37,8 @@ const emptyForm: CreatePestControlRequest = {
   serviceProviderCompanyName: "",
   nextVisitDate: "",
 }
+
+const SERVICE_PROVIDER_COMPANY_NAME_MAX_LENGTH = 200
 
 function statusLabel(status: RecordStatus) {
   return status === "ACTIVE" ? "Activo" : "Inactivo"
@@ -99,6 +101,9 @@ function PestControlDialog({
     const providerName = form.serviceProviderCompanyName.trim()
     if (!form.date) return toast.error("Selecciona la fecha del control")
     if (!providerName) return toast.error("Ingresa la empresa prestadora del servicio")
+    if (providerName.length > SERVICE_PROVIDER_COMPANY_NAME_MAX_LENGTH) {
+      return toast.error(`La empresa prestadora no puede superar ${SERVICE_PROVIDER_COMPANY_NAME_MAX_LENGTH} caracteres`)
+    }
     if (!form.nextVisitDate) return toast.error("Selecciona la fecha de próxima visita")
     if (form.nextVisitDate < form.date) return toast.error("La próxima visita no puede ser anterior a la fecha del control")
 
@@ -117,8 +122,8 @@ function PestControlDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[90dvh] max-w-xl overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-h-[90dvh] max-w-xl overflow-y-auto bg-white">
+        <DialogHeader className="border-b border-border pb-4">
           <DialogTitle>{record ? "Editar control de plagas" : "Nuevo control de plagas"}</DialogTitle>
         </DialogHeader>
 
@@ -147,12 +152,21 @@ function PestControlDialog({
             <Label>Empresa prestadora del servicio</Label>
             <Input
               value={form.serviceProviderCompanyName}
-              onChange={(event) => setForm((current) => ({ ...current, serviceProviderCompanyName: event.target.value }))}
+              maxLength={SERVICE_PROVIDER_COMPANY_NAME_MAX_LENGTH}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  serviceProviderCompanyName: event.target.value.slice(0, SERVICE_PROVIDER_COMPANY_NAME_MAX_LENGTH),
+                }))
+              }
               placeholder="Nombre de la empresa"
             />
+            <p className="text-right text-xs text-muted-foreground">
+              {form.serviceProviderCompanyName.length}/{SERVICE_PROVIDER_COMPANY_NAME_MAX_LENGTH} caracteres
+            </p>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="border-t border-border pt-4">
             <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
               Cancelar
             </Button>
@@ -256,30 +270,21 @@ export default function PestControlPage() {
         </Button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Card className="rounded-lg">
-          <CardContent className="flex items-center justify-between gap-3 p-4">
-            <div>
-              <p className="text-xs font-medium text-muted-foreground">Controles</p>
-              <p className="mt-1 text-2xl font-bold text-slate-900">{records.length}</p>
-            </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary">
-              <Bug className="h-5 w-5" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="rounded-lg">
-          <CardContent className="p-4">
-            <p className="text-xs font-medium text-muted-foreground">Activos</p>
-            <p className="mt-1 text-2xl font-bold text-slate-900">{activeCount}</p>
-          </CardContent>
-        </Card>
-        <Card className="rounded-lg">
-          <CardContent className="p-4">
-            <p className="text-xs font-medium text-muted-foreground">Próximas visitas</p>
-            <p className="mt-1 text-2xl font-bold text-slate-900">{scheduledCount}</p>
-          </CardContent>
-        </Card>
+      <div className="overflow-x-auto px-3 py-1">
+        <div className="flex min-w-max items-center justify-center gap-2">
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Controles</span>
+            <span className="text-sm font-semibold">{records.length}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Activos</span>
+            <span className="text-sm font-semibold text-emerald-700">{activeCount}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Próximas visitas</span>
+            <span className="text-sm font-semibold text-blue-700">{scheduledCount}</span>
+          </div>
+        </div>
       </div>
 
       <Card className="rounded-lg">

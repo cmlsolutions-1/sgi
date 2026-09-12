@@ -17,7 +17,7 @@ import {
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -488,28 +488,26 @@ export function JobsManager() {
         </Card>
       )}
 
-      <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        <div className="flex justify-center overflow-x-auto px-3 py-1">
-          <div className="flex w-fit min-w-max items-center gap-2">
-            <div className="rounded-md bg-secondary px-3 py-1.5">
-              <span className="text-sm font-bold text-foreground">{stats.total}</span>
-              <span className="ml-2 text-xs text-muted-foreground">Cargos</span>
-            </div>
-            <div className="rounded-md bg-secondary px-3 py-1.5">
-              <span className="text-sm font-bold text-emerald-700">{stats.active}</span>
-              <span className="ml-2 text-xs text-muted-foreground">Activos</span>
-            </div>
-            <div className="rounded-md bg-secondary px-3 py-1.5">
-              <span className="text-sm font-bold text-destructive">{stats.inactive}</span>
-              <span className="ml-2 text-xs text-muted-foreground">Inactivos</span>
-            </div>
-            <div className="rounded-md bg-secondary px-3 py-1.5">
-              <span className="text-sm font-bold text-blue-700">{stats.withEvidence}</span>
-              <span className="ml-2 text-xs text-muted-foreground">Con evidencia</span>
-            </div>
+      <div className="overflow-x-auto px-3 py-1">
+        <div className="flex min-w-max items-center justify-center gap-2">
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Cargos</span>
+            <span className="text-sm font-semibold">{stats.total}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Activos</span>
+            <span className="text-sm font-semibold text-emerald-700">{stats.active}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Inactivos</span>
+            <span className="text-sm font-semibold text-destructive">{stats.inactive}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <span className="text-xs text-muted-foreground">Con evidencia</span>
+            <span className="text-sm font-semibold text-blue-700">{stats.withEvidence}</span>
           </div>
         </div>
-      </section>
+      </div>
 
       <Card className="border-border bg-card">
         <CardContent className="p-4">
@@ -540,114 +538,114 @@ export function JobsManager() {
         </CardContent>
       </Card>
 
-      <Card className="border-border bg-card">
-        <CardHeader>
-          <CardTitle className="text-base font-medium">{filteredJobs.length} cargos encontrados</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground">Cargo</th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground">Area</th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground">Tareas</th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground">Medio de labor</th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground">Nivel de riesgo</th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground">Estado</th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground">Evidencias</th>
-                  <th className="px-2 py-3 text-right text-xs font-medium text-muted-foreground">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredJobs.map((job) => {
-                  const metadata = profileMetadata[job.id] ?? defaultProfileMetadata(job)
-                  const lastEvidence = metadata.evidences[0]
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Lista de cargos</h2>
+          <p className="text-sm text-muted-foreground">{filteredJobs.length} cargos encontrados</p>
+        </div>
 
-                  return (
-                    <tr key={job.id} className="border-b border-border/50 hover:bg-secondary/50">
-                      <td className="px-2 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                            <BriefcaseBusiness className="h-4 w-4" />
-                          </div>
-                          <span className="text-sm font-medium">{job.name}</span>
+        <div className="overflow-x-auto rounded-md border border-border bg-card">
+          <table className="w-full min-w-[1180px] text-sm">
+            <thead className="border-b border-border bg-secondary text-left text-xs font-medium uppercase text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3 font-medium">Cargo</th>
+                <th className="px-4 py-3 font-medium">Área</th>
+                <th className="px-4 py-3 font-medium">Tareas</th>
+                <th className="px-4 py-3 font-medium">Medio de labor</th>
+                <th className="px-4 py-3 font-medium">Nivel de riesgo</th>
+                <th className="px-4 py-3 font-medium">Estado</th>
+                <th className="px-4 py-3 font-medium">Evidencias</th>
+                <th className="px-4 py-3 text-right font-medium">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {filteredJobs.map((job) => {
+                const metadata = profileMetadata[job.id] ?? defaultProfileMetadata(job)
+                const lastEvidence = metadata.evidences[0]
+
+                return (
+                  <tr key={job.id} className="align-middle">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                          <BriefcaseBusiness className="h-4 w-4" />
                         </div>
-                      </td>
-                      <td className="px-2 py-3 text-sm">{job.workArea?.name ?? "Sin area"}</td>
-                      <td className="px-2 py-3 text-sm text-muted-foreground">
-                        <p className="max-w-[240px] truncate">{job.description || "Sin descripcion"}</p>
-                      </td>
-                      <td className="px-2 py-3 text-sm text-muted-foreground">
-                        <p className="max-w-[220px] truncate">{metadata.workEnvironment || "No registrado"}</p>
-                      </td>
-                      <td className="px-2 py-3 text-sm text-muted-foreground">{riskLevelLabel(metadata.riskLevel)}</td>
-                      <td className="px-2 py-3">
-                        <Badge variant={job.status === "ACTIVE" ? "accentActivd" : "destructive"}>
-                          {job.status === "ACTIVE" ? "Activo" : "Inactivo"}
-                        </Badge>
-                      </td>
-                      <td className="px-2 py-3 text-sm text-muted-foreground">{metadata.evidences.length}</td>
-                      <td className="px-2 py-3 text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-60">
-                            <DropdownMenuItem onSelect={() => setDetailJob(job)}>
-                              <Eye className="h-4 w-4" />
-                              Ver detalle
+                        <span className="font-medium text-foreground">{job.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">{job.workArea?.name ?? "Sin área"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      <p className="max-w-[240px] truncate">{job.description || "Sin descripción"}</p>
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      <p className="max-w-[220px] truncate">{metadata.workEnvironment || "No registrado"}</p>
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">{riskLevelLabel(metadata.riskLevel)}</td>
+                    <td className="px-4 py-3">
+                      <Badge variant={job.status === "ACTIVE" ? "accentActivd" : "destructive"}>
+                        {job.status === "ACTIVE" ? "Activo" : "Inactivo"}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">{metadata.evidences.length}</td>
+                    <td className="px-4 py-3 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-60">
+                          <DropdownMenuItem onSelect={() => setDetailJob(job)}>
+                            <Eye className="h-4 w-4" />
+                            Ver detalle
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => openEditDialog(job)}>
+                            <Edit className="h-4 w-4" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onSelect={() => {
+                              setEvidenceJob(job)
+                              setEvidenceForm(emptyEvidenceForm)
+                            }}
+                          >
+                            <Upload className="h-4 w-4" />
+                            Cargar evidencia
+                          </DropdownMenuItem>
+                          {lastEvidence && (
+                            <DropdownMenuItem onSelect={() => downloadEvidence(lastEvidence, job)}>
+                              <Download className="h-4 w-4" />
+                              Descargar ultima evidencia
                             </DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => openEditDialog(job)}>
-                              <Edit className="h-4 w-4" />
-                              Editar
+                          )}
+                          <DropdownMenuSeparator />
+                          {job.status !== "ACTIVE" && (
+                            <DropdownMenuItem onSelect={() => handleActivate(job)}>
+                              <BriefcaseBusiness className="h-4 w-4" />
+                              Activar
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onSelect={() => {
-                                setEvidenceJob(job)
-                                setEvidenceForm(emptyEvidenceForm)
-                              }}
-                            >
-                              <Upload className="h-4 w-4" />
-                              Cargar evidencia
-                            </DropdownMenuItem>
-                            {lastEvidence && (
-                              <DropdownMenuItem onSelect={() => downloadEvidence(lastEvidence, job)}>
-                                <Download className="h-4 w-4" />
-                                Descargar ultima evidencia
-                              </DropdownMenuItem>
-                            )}
-                            <DropdownMenuSeparator />
-                            {job.status !== "ACTIVE" && (
-                              <DropdownMenuItem onSelect={() => handleActivate(job)}>
-                                <BriefcaseBusiness className="h-4 w-4" />
-                                Activar
-                              </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem variant="destructive" onSelect={() => handleDelete(job)}>
-                              <Trash2 className="h-4 w-4" />
-                              Eliminar
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
-                    </tr>
-                  )
-                })}
-                {filteredJobs.length === 0 && (
-                  <tr>
-                    <td colSpan={9} className="px-2 py-10 text-center text-sm text-muted-foreground">
-                      No hay cargos para mostrar.
+                          )}
+                          <DropdownMenuItem variant="destructive" onSelect={() => handleDelete(job)}>
+                            <Trash2 className="h-4 w-4" />
+                            Eliminar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+                )
+              })}
+              {filteredJobs.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                    No hay cargos para mostrar.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <Dialog open={Boolean(evidenceJob)} onOpenChange={(nextOpen) => !nextOpen && setEvidenceJob(null)}>
         <DialogContent className="max-w-2xl bg-card">

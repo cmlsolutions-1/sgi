@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
-import { Edit, Loader2, Plus, Search, Trash2, Users } from "lucide-react"
+import { Edit, Loader2, MoreHorizontal, Plus, Search, Trash2, Users } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -238,70 +245,78 @@ export function WorkAreasManager() {
         </CardContent>
       </Card>
 
-      <Card className="border-border bg-card">
-        <CardHeader>
-          <CardTitle className="text-base font-medium">{filteredWorkAreas.length} areas encontradas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground">Area</th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground">Descripcion</th>
-                  <th className="px-2 py-3 text-left text-xs font-medium text-muted-foreground">Estado</th>
-                  <th className="px-2 py-3 text-right text-xs font-medium text-muted-foreground">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredWorkAreas.map((area) => (
-                  <tr key={area.id} className="border-b border-border/50 hover:bg-secondary/50">
-                    <td className="px-2 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                          <Users className="h-4 w-4" />
-                        </div>
-                        <span className="text-sm font-medium">{area.name}</span>
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Lista de áreas de trabajo</h2>
+          <p className="text-sm text-muted-foreground">{filteredWorkAreas.length} áreas encontradas</p>
+        </div>
+
+        <div className="overflow-x-auto rounded-md border border-border bg-card">
+          <table className="w-full min-w-[860px] text-sm">
+            <thead className="border-b border-border bg-secondary text-left text-xs font-medium uppercase text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3 font-medium">Área</th>
+                <th className="px-4 py-3 font-medium">Descripción</th>
+                <th className="px-4 py-3 font-medium">Estado</th>
+                <th className="px-4 py-3 text-right font-medium">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {filteredWorkAreas.map((area) => (
+                <tr key={area.id} className="align-middle">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <Users className="h-4 w-4" />
                       </div>
-                    </td>
-                    <td className="px-2 py-3 text-sm text-muted-foreground">{area.description || "Sin descripcion"}</td>
-                    <td className="px-2 py-3 ">
-                      <Badge variant={area.status === "ACTIVE" ? "accentActivd" : "destructive"}>{area.status}</Badge>
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="flex justify-end gap-1">
+                      <span className="font-medium text-foreground">{area.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">{area.description || "Sin descripción"}</td>
+                  <td className="px-4 py-3">
+                    <Badge variant={area.status === "ACTIVE" ? "accentActivd" : "destructive"}>
+                      {area.status === "ACTIVE" ? "Activo" : "Inactivo"}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
                         {area.status !== "ACTIVE" && (
-                          <Button variant="accentActivd" size="sm" onClick={() => handleActivate(area)}>
+                          <DropdownMenuItem onSelect={() => handleActivate(area)}>
+                            <Users className="h-4 w-4" />
                             Activar
-                          </Button>
+                          </DropdownMenuItem>
                         )}
-                        <Button variant="action" size="icon" className="h-8 w-8" onClick={() => openEditDialog(area)}>
+                        <DropdownMenuItem onSelect={() => openEditDialog(area)}>
                           <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => handleDelete(area)}
-                        >
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem variant="destructive" onSelect={() => handleDelete(area)}>
                           <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {filteredWorkAreas.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="px-2 py-10 text-center text-sm text-muted-foreground">
-                      No hay areas de trabajo para mostrar.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+                          Eliminar
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </td>
+                </tr>
+              ))}
+              {filteredWorkAreas.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                    No hay áreas de trabajo para mostrar.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   )
 }
