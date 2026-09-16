@@ -9,6 +9,7 @@ import {
   FileSearch,
   TriangleAlert,
   UserCircle,
+  UserCheck,
   ShieldCheck,
   BrickWallIcon,
   CalendarDays,
@@ -32,6 +33,8 @@ import {
   Recycle,
   FlaskConical,
   HeartPulse,
+  FileSignature,
+  Handshake,
 } from "lucide-react"
 import type { ModuleNode } from "@/store/auth.store"
 
@@ -160,6 +163,43 @@ export const navigation: NavigationItem[] = [
       { code: "TRAINING", name: "Capacitaciones", href: "/dashboard/trainingPlan", icon: Brain },
       //{ code: "WORK_PLAN", name: "Plan de Trabajo", href: "/dashboard/work-plan", icon: ClipboardCheck },
       //{ code: "HEALTHY_LIFESTYLES", name: "Estilos de Vida Saludable", href: "/dashboard/healthy-lifestyles", icon: HeartPulse },
+    ],
+  },
+  {
+    code: "PESV",
+    name: "PESV",
+    icon: ShieldCheck,
+    subItems: [
+      {
+        code: "PESV_RESPONSIBLE",
+        name: "Responsable PESV",
+        href: "/dashboard/pesv-responsible",
+        icon: UserCheck,
+      },
+      {
+        code: "PESV_COMMITTEE",
+        name: "Comité de Seguridad Vial",
+        href: "/dashboard/pesv-committee",
+        icon: UsersRound,
+      },
+      {
+        code: "PESV_POLICY",
+        name: "Política de Seguridad Vial",
+        href: "/dashboard/pesv-policy",
+        icon: FileSignature,
+      },
+      {
+        code: "PESV_LEADERSHIP",
+        name: "Liderazgo Directivo",
+        href: "/dashboard/pesv-leadership",
+        icon: Handshake,
+      },
+      {
+        code: "PESV_DIAGNOSIS",
+        name: "Diagnóstico PESV",
+        href: "/dashboard/pesv-diagnosis",
+        icon: ClipboardList,
+      },
     ],
   },
   {
@@ -325,7 +365,16 @@ function collectModuleCodes(modules: ModuleNode[]): Set<string> {
   return codes
 }
 
-const alwaysVisibleCodes = new Set<string>(["DATA_PROCESSING", "DATA_AUTHORIZATIONS"])
+const alwaysVisibleCodes = new Set<string>([
+  "DATA_PROCESSING",
+  "DATA_AUTHORIZATIONS",
+  "PESV",
+  "PESV_RESPONSIBLE",
+  "PESV_COMMITTEE",
+  "PESV_POLICY",
+  "PESV_LEADERSHIP",
+  "PESV_DIAGNOSIS",
+])
 
 const moduleCodeAliases: Record<string, string[]> = {
   DOCUMENTS: ["DOCUMENTS", "DOCUMENT", "DOCUMENT_MANAGEMENT", "DOCUMENTAL_MANAGEMENT"],
@@ -402,6 +451,11 @@ function isSubItemAllowed(
   if (subItem.code === "HAZARDOUS_SUBSTANCES" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "ENVIRONMENTAL_MEASUREMENTS" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "INSPECTIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "PESV_RESPONSIBLE" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "PESV_COMMITTEE" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "PESV_POLICY" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "PESV_LEADERSHIP" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "PESV_DIAGNOSIS" && isCodeAllowed(parentCode, allowedCodes)) return true
 
   const parentChildCodes = getDirectChildCodesByParentCode(modules, parentCode)
 
