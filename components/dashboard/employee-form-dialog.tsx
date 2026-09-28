@@ -144,7 +144,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
   useEffect(() => {
     if (!open || !isCreateMode) return
 
-    toast.info("Recuerda que debes tener creadas las areas y puestos de trabajo para enlazarlos al funcionario.")
+    toast.info("Recuerda que debes tener creadas las areas y cargos de trabajo para enlazarlos al funcionario.")
   }, [isCreateMode, open])
 
   function updateField<K extends keyof EmployeeFormValues>(field: K, value: EmployeeFormValues[K]) {
@@ -166,7 +166,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
     }
 
     if (missingSetup) {
-      toast.error("Primero crea al menos un area de trabajo y un puesto de trabajo")
+      toast.error("Primero crea al menos un area de trabajo y un cargo de trabajo")
       return
     }
 
@@ -176,7 +176,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
     }
 
     if (!formData.jobId) {
-      toast.error("Selecciona un puesto de trabajo")
+      toast.error("Selecciona un cargo de trabajo")
       return
     }
 
@@ -248,7 +248,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                     <Info className="h-4 w-4" />
                     <AlertTitle>Antes de crear el funcionario</AlertTitle>
                     <AlertDescription>
-                      Recuerda que debes tener creadas las areas de trabajo y los puestos de trabajo para poder enlazarlos al funcionario.
+                      Recuerda que debes tener creadas las areas de trabajo y los cargos de trabajo para poder enlazarlos al funcionario.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -258,7 +258,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                     <Info className="h-4 w-4" />
                     <AlertTitle>Configuracion requerida</AlertTitle>
                     <AlertDescription>
-                      Crea primero {workAreas.length === 0 ? "un area de trabajo" : "un puesto de trabajo"} en el modulo Empleados.
+                      Crea primero {workAreas.length === 0 ? "un area de trabajo" : "un cargo de trabajo"} en el modulo Empleados.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -407,7 +407,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Puesto de trabajo</Label>
+                    <Label>Cargo de trabajo</Label>
                     <Select
                       value={formData.jobId}
                       onValueChange={(value) => updateField("jobId", value)}

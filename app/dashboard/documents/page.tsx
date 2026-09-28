@@ -315,7 +315,7 @@ export default function DocumentsPage() {
     }
 
     if (!form.jobId) {
-      toast.error("Selecciona un puesto de trabajo")
+      toast.error("Selecciona un cargo de trabajo")
       return
     }
 
@@ -610,7 +610,7 @@ export default function DocumentsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Puesto de trabajo</Label>
+                <Label>Cargo de trabajo</Label>
                 <Select
                   value={form.jobId}
                   onValueChange={(value) => setForm((current) => ({ ...current, jobId: value }))}

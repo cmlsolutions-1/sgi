@@ -600,7 +600,7 @@ function IncidentDialog({
                 </Select>
               </div>
               <div className="grid gap-2">
-                <Label>Puesto de trabajo</Label>
+                <Label>Cargo de trabajo</Label>
                 <Select value={form.jobId} onValueChange={(value) => setForm((current) => ({ ...current, jobId: value }))}>
                   <SelectTrigger className={incidentFieldControlClassName}>
                     <SelectValue placeholder="Selecciona un puesto" />

@@ -1,3 +1,28 @@
+pedidosfr.com
+asesoredwinferrelectricos@gmail.com
+70420564
+vendedor
+
+asesorivanferrelectricos@gmail.com
+4519698
+---------------------------------------------
+STAGING DATING
+
+nataliacarrillo
+nataliacarrillo28@gmail.com
+12345678
+
+empleado
+natalia@salon.com
+12345678
+
+
+https://staging.datingsaas.tech/demo
+demo@demo.com
+12345678
+
+---------------------------------------------
+
 API_URL=http://localhost:3000
 
 
@@ -12,11 +37,12 @@ wilson@alfonsilla.com
 #163947
 
 SGI
+cmlsolutions3@gmail.com
 
 administrador super admin
 admin@safecloud.com
 123456
-"userId": "2b236f82-ece0-4190-a357-173a22df9c84"
+"userId": "900529e5-e0c2-4a2e-9524-b941f6a954e6"
 
 (todos los modulos completos)
 alfonso@alfonso.com
@@ -39,11 +65,15 @@ cacorrolfo@alfonso.com
 
 
 
-tomas@tomas.com
+tomas@tomas.com 	modulos con la fase 2
+tomas1@tomas.com 123456789
 12345678
 userId 6ef499ac-d33d-4e57-82f2-299c67bdc165
 "companyId": 198edf2b-d697-485d-832f-15d11a54038b
 
+
+1094514214
+2026-08-25
 
 alfonso@alfonso.com
 12345678
@@ -57,3 +87,28 @@ tomi@tomi.com
 correo de notificaciones
 notificacionesdating@gmail.com
 Colombia1234
+
+
+------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

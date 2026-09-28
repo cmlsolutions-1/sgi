@@ -170,7 +170,7 @@ export function WorkAreasManager() {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Areas de trabajo</h1>
-          <p className="text-muted-foreground">Crea las areas antes de registrar puestos de trabajo.</p>
+          <p className="text-muted-foreground">Crea las areas antes de registrar cargos de trabajo.</p>
         </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
