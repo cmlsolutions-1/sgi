@@ -6,13 +6,16 @@ import {
   Download,
   Edit,
   Eye,
+  ExternalLink,
   FileText,
   FlameKindling,
   LayoutGrid,
   List,
+  Loader2,
   MoreHorizontal,
   Plus,
   Search,
+  Trash2,
   Upload,
   UserRound,
 } from "lucide-react"
@@ -38,46 +41,29 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { listEmployees } from "@/services/employeeService"
+import {
+  createSpecialRisk,
+  deleteSpecialRiskDocument,
+  downloadSpecialRiskDocumentFile,
+  listSpecialRiskActivities,
+  listSpecialRiskDocuments,
+  listSpecialRisks,
+  updateSpecialRisk,
+  uploadSpecialRiskDocument,
+} from "@/services/specialRiskService"
+import type { Employee } from "@/types/manager/employee"
+import type {
+  SpecialRisk,
+  SpecialRiskActivity,
+  SpecialRiskDocument,
+  SpecialRiskStatus,
+  UpsertSpecialRiskDto,
+} from "@/types/manager/special-risk"
 
 type ViewMode = "cards" | "list"
-type SpecialRiskStatus = "ACTIVE" | "FINISHED"
-type SpecialRiskActivity =
-  | "MINERIA_SUBTERRANEA"
-  | "ALTAS_TEMPERATURAS"
-  | "RADIACIONES_IONIZANTES"
-  | "BOMBEROS"
-  | "AVIACION"
-  | "TRABAJO_TUNELES"
-  | "SUSTANCIAS_PELIGROSAS"
-  | "OTRA"
-
-type MockEmployee = {
-  id: string
-  name: string
-  lastName: string
-  job: string
-}
-
-type SpecialRiskEvidence = {
-  id: string
-  fileName: string
-  description: string
-  uploadedAt: string
-}
-
-type SpecialRiskRecord = {
-  id: string
-  employeeId: string
-  job: string
-  activity: SpecialRiskActivity
-  customActivity?: string
-  startDate: string
-  endDate: string
-  specialContribution: boolean
-  status: SpecialRiskStatus
-  evidences: SpecialRiskEvidence[]
-  observations: string
-}
+type SpecialRiskRecord = SpecialRisk & { evidences: SpecialRiskDocument[] }
+type ActivityOption = { value: SpecialRiskActivity; label: string }
 
 type SpecialRiskForm = {
   employeeId: string
@@ -91,18 +77,19 @@ type SpecialRiskForm = {
 }
 
 type EvidenceForm = {
+  file: File | null
   fileName: string
   description: string
+  observation: string
 }
 
-const employees: MockEmployee[] = [
-  { id: "emp-1", name: "Carlos", lastName: "Ramirez", job: "Operario de mantenimiento" },
-  { id: "emp-2", name: "Diana", lastName: "Mendoza", job: "Supervisora SST" },
-  { id: "emp-3", name: "Mauricio", lastName: "Lopez", job: "Tecnico electricista" },
-  { id: "emp-4", name: "Valentina", lastName: "Suarez", job: "Auxiliar operativo" },
-]
+type EvidencePreview = {
+  document: SpecialRiskDocument
+  url: string
+  mimeType: string
+}
 
-const activityOptions: Array<{ value: SpecialRiskActivity; label: string }> = [
+const defaultActivityOptions: ActivityOption[] = [
   { value: "MINERIA_SUBTERRANEA", label: "Mineria subterranea" },
   { value: "ALTAS_TEMPERATURAS", label: "Exposicion a altas temperaturas" },
   { value: "RADIACIONES_IONIZANTES", label: "Exposicion a radiaciones ionizantes" },
@@ -125,70 +112,25 @@ const emptyForm: SpecialRiskForm = {
 }
 
 const emptyEvidenceForm: EvidenceForm = {
+  file: null,
   fileName: "",
   description: "",
+  observation: "",
 }
 
-const initialRecords: SpecialRiskRecord[] = [
-  {
-    id: "sr-1",
-    employeeId: "emp-1",
-    job: "Operario de mantenimiento",
-    activity: "ALTAS_TEMPERATURAS",
-    startDate: "2026-02-01",
-    endDate: "2026-08-31",
-    specialContribution: true,
-    status: "ACTIVE",
-    observations: "Exposicion programada por labores en area de calderas.",
-    evidences: [
-      {
-        id: "ev-1",
-        fileName: "matriz-exposicion-calderas.pdf",
-        description: "Soporte de identificacion de exposicion a calor.",
-        uploadedAt: "2026-02-03T09:15:00",
-      },
-    ],
-  },
-  {
-    id: "sr-2",
-    employeeId: "emp-3",
-    job: "Tecnico electricista",
-    activity: "RADIACIONES_IONIZANTES",
-    startDate: "2026-03-12",
-    endDate: "2026-04-15",
-    specialContribution: false,
-    status: "FINISHED",
-    observations: "Actividad finalizada con seguimiento documental completo.",
-    evidences: [
-      {
-        id: "ev-2",
-        fileName: "certificado-control-radiacion.pdf",
-        description: "Certificado de control de exposicion.",
-        uploadedAt: "2026-04-16T11:20:00",
-      },
-    ],
-  },
-]
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
+function employeeName(record: Pick<SpecialRiskRecord, "employee">) {
+  if (!record.employee) return "Funcionario no asignado"
+  return `${record.employee.name} ${record.employee.lastName}`.trim()
 }
 
-function employeeName(employeeId?: string) {
-  const employee = employees.find((item) => item.id === employeeId)
-  if (!employee) return "Funcionario no asignado"
-  return `${employee.name} ${employee.lastName}`
+function employeeJob(employees: Employee[], employeeId?: string) {
+  return employees.find((item) => item.id === employeeId)?.job?.name ?? "Cargo no registrado"
 }
 
-function employeeJob(employeeId?: string) {
-  return employees.find((item) => item.id === employeeId)?.job ?? "Cargo no registrado"
-}
-
-function activityLabel(record: Pick<SpecialRiskRecord, "activity" | "customActivity">) {
+function activityLabel(
+  record: Pick<SpecialRiskRecord, "activity" | "customActivity">,
+  activityOptions: ActivityOption[],
+) {
   if (record.activity === "OTRA") return record.customActivity?.trim() || "Otra actividad"
   return activityOptions.find((option) => option.value === record.activity)?.label ?? record.activity
 }
@@ -210,6 +152,10 @@ function formatDateTime(value?: string | null) {
   }).format(date)
 }
 
+function canPreviewEvidence(mimeType: string) {
+  return mimeType.startsWith("image/") || mimeType === "application/pdf"
+}
+
 function statusLabel(status: SpecialRiskStatus) {
   return status === "ACTIVE" ? "Activo" : "Finalizado"
 }
@@ -223,13 +169,17 @@ function statusClassName(status: SpecialRiskStatus) {
 function RiskDialog({
   open,
   record,
+  employees,
+  activityOptions,
   onClose,
   onSave,
 }: {
   open: boolean
   record: SpecialRiskRecord | null
+  employees: Employee[]
+  activityOptions: ActivityOption[]
   onClose: () => void
-  onSave: (form: SpecialRiskForm, recordId?: string) => void
+  onSave: (form: SpecialRiskForm, recordId?: string) => Promise<void>
 }) {
   const [form, setForm] = useState<SpecialRiskForm>(emptyForm)
   const editing = Boolean(record)
@@ -247,13 +197,13 @@ function RiskDialog({
             endDate: record.endDate,
             specialContribution: record.specialContribution ? "YES" : "NO",
             status: record.status,
-            observations: record.observations,
+            observations: record.observations ?? "",
           }
         : emptyForm,
     )
   }, [open, record])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     if (!form.employeeId) return toast.error("Selecciona el funcionario")
@@ -264,8 +214,12 @@ function RiskDialog({
       return toast.error("Ingresa la actividad especial")
     }
 
-    onSave(form, record?.id)
-    onClose()
+    try {
+      await onSave(form, record?.id)
+      onClose()
+    } catch {
+      // El contenedor presenta el mensaje del backend y mantiene abierto el formulario.
+    }
   }
 
   return (
@@ -298,7 +252,7 @@ function RiskDialog({
                     <option value="">Selecciona funcionario</option>
                     {employees.map((employee) => (
                       <option key={employee.id} value={employee.id}>
-                        {employee.name} {employee.lastName} - {employee.job}
+                        {employee.name} {employee.lastName} - {employee.job?.name ?? "Cargo no registrado"}
                       </option>
                     ))}
                   </select>
@@ -306,7 +260,7 @@ function RiskDialog({
 
                 <Label className="grid gap-2">
                   Cargo
-                  <Input value={employeeJob(form.employeeId)} disabled className="bg-secondary" />
+                  <Input value={employeeJob(employees, form.employeeId)} disabled className="bg-secondary" />
                 </Label>
 
                 <label className="block">
@@ -420,18 +374,22 @@ function EvidenceDialog({
 }: {
   record: SpecialRiskRecord | null
   onClose: () => void
-  onSave: (record: SpecialRiskRecord, form: EvidenceForm) => void
+  onSave: (record: SpecialRiskRecord, form: EvidenceForm) => Promise<void>
 }) {
   const [form, setForm] = useState<EvidenceForm>(emptyEvidenceForm)
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!record) return
-    if (!form.fileName.trim()) return toast.error("Selecciona o registra el archivo")
+    if (!form.file) return toast.error("Selecciona el archivo")
 
-    onSave(record, form)
-    setForm(emptyEvidenceForm)
-    onClose()
+    try {
+      await onSave(record, form)
+      setForm(emptyEvidenceForm)
+      onClose()
+    } catch {
+      // El contenedor presenta el mensaje del backend y mantiene abierto el formulario.
+    }
   }
 
   return (
@@ -447,7 +405,10 @@ function EvidenceDialog({
               Seleccionar archivo
               <Input
                 type="file"
-                onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.files?.[0]?.name ?? "" }))}
+                onChange={(event) => {
+                  const file = event.target.files?.[0] ?? null
+                  setForm((current) => ({ ...current, file, fileName: file?.name ?? "" }))
+                }}
               />
             </Label>
             <Label className="grid gap-2">
@@ -468,6 +429,15 @@ function EvidenceDialog({
               placeholder="Describe el soporte cargado"
             />
           </Label>
+          <Label className="grid gap-2">
+            Observacion
+            <Textarea
+              value={form.observation}
+              onChange={(event) => setForm((current) => ({ ...current, observation: event.target.value }))}
+              rows={3}
+              placeholder="Agrega una observacion sobre la evidencia"
+            />
+          </Label>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
@@ -485,12 +455,22 @@ function EvidenceDialog({
 
 function DetailDialog({
   record,
+  activityOptions,
   onClose,
+  onPreviewEvidence,
   onDownloadEvidence,
+  onDeleteEvidence,
+  previewLoadingId,
+  deletingEvidenceId,
 }: {
   record: SpecialRiskRecord | null
+  activityOptions: ActivityOption[]
   onClose: () => void
-  onDownloadEvidence: (evidence: SpecialRiskEvidence) => void
+  onPreviewEvidence: (evidence: SpecialRiskDocument) => void
+  onDownloadEvidence: (evidence: SpecialRiskDocument) => void
+  onDeleteEvidence: (evidence: SpecialRiskDocument) => void
+  previewLoadingId: string | null
+  deletingEvidenceId: string | null
 }) {
   if (!record) return null
 
@@ -504,15 +484,15 @@ function DetailDialog({
 
         <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
           <div className="grid gap-4 md:grid-cols-4">
-            <InfoBlock label="Funcionario" value={employeeName(record.employeeId)} />
-            <InfoBlock label="Cargo" value={record.job} />
+            <InfoBlock label="Funcionario" value={employeeName(record)} />
+            <InfoBlock label="Cargo" value={record.job?.name ?? "Cargo no registrado"} />
             <InfoBlock label="Estado" value={statusLabel(record.status)} />
             <InfoBlock label="Cotizacion especial" value={record.specialContribution ? "Si" : "No"} />
           </div>
 
           <section className="rounded-md border border-border p-4">
             <h3 className="mb-3 text-sm font-semibold text-foreground">Actividad</h3>
-            <p className="text-sm text-muted-foreground">{activityLabel(record)}</p>
+            <p className="text-sm text-muted-foreground">{activityLabel(record, activityOptions)}</p>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               <InfoBlock label="Fecha inicio" value={formatDate(record.startDate)} />
               <InfoBlock label="Fecha finalizacion" value={formatDate(record.endDate)} />
@@ -536,14 +516,49 @@ function DetailDialog({
                     className="flex flex-col gap-3 rounded-md bg-secondary p-3 sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div>
-                      <p className="font-medium text-foreground">{evidence.fileName}</p>
+                      <p className="font-medium text-foreground">{evidence.originalName}</p>
                       <p className="text-sm text-muted-foreground">{evidence.description || "Sin descripcion."}</p>
-                      <p className="text-xs text-muted-foreground">Cargado: {formatDateTime(evidence.uploadedAt)}</p>
+                      {evidence.observation ? (
+                        <p className="text-sm text-muted-foreground">Observacion: {evidence.observation}</p>
+                      ) : null}
+                      <p className="text-xs text-muted-foreground">Cargado: {formatDateTime(evidence.createdAt)}</p>
                     </div>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onDownloadEvidence(evidence)}>
-                      <Download className="h-4 w-4" />
-                      Descargar
-                    </Button>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="gap-2"
+                        disabled={previewLoadingId === evidence.id}
+                        onClick={() => onPreviewEvidence(evidence)}
+                      >
+                        {previewLoadingId === evidence.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                        Ver
+                      </Button>
+                      <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onDownloadEvidence(evidence)}>
+                        <Download className="h-4 w-4" />
+                        Descargar
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="gap-2"
+                        disabled={deletingEvidenceId === evidence.id}
+                        onClick={() => onDeleteEvidence(evidence)}
+                      >
+                        {deletingEvidenceId === evidence.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                        Eliminar
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -589,7 +604,9 @@ function Metric({ label, value, tone = "default" }: { label: string; value: numb
 }
 
 export default function SpecialRiskPage() {
-  const [records, setRecords] = useState<SpecialRiskRecord[]>(initialRecords)
+  const [records, setRecords] = useState<SpecialRiskRecord[]>([])
+  const [employees, setEmployees] = useState<Employee[]>([])
+  const [activityOptions, setActivityOptions] = useState<ActivityOption[]>(defaultActivityOptions)
   const [search, setSearch] = useState("")
   const [activityFilter, setActivityFilter] = useState<SpecialRiskActivity | "all">("all")
   const [statusFilter, setStatusFilter] = useState<SpecialRiskStatus | "all">("all")
@@ -598,6 +615,42 @@ export default function SpecialRiskPage() {
   const [editingRecord, setEditingRecord] = useState<SpecialRiskRecord | null>(null)
   const [evidenceRecord, setEvidenceRecord] = useState<SpecialRiskRecord | null>(null)
   const [detailRecord, setDetailRecord] = useState<SpecialRiskRecord | null>(null)
+  const [evidencePreview, setEvidencePreview] = useState<EvidencePreview | null>(null)
+  const [previewLoadingId, setPreviewLoadingId] = useState<string | null>(null)
+  const [deletingEvidenceId, setDeletingEvidenceId] = useState<string | null>(null)
+
+  async function loadData() {
+    try {
+      const [riskData, employeeData, activityData] = await Promise.all([
+        listSpecialRisks({ limit: 100 }),
+        listEmployees(),
+        listSpecialRiskActivities(),
+      ])
+
+      setEmployees(employeeData)
+      if (activityData.length > 0) {
+        setActivityOptions(activityData.map((item) => ({ value: item.code, label: item.name })))
+      }
+      setRecords((current) =>
+        riskData.items.map((record) => ({
+          ...record,
+          evidences: current.find((item) => item.id === record.id)?.evidences ?? [],
+        })),
+      )
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar los riesgos especiales")
+    }
+  }
+
+  useEffect(() => {
+    void loadData()
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (evidencePreview?.url) URL.revokeObjectURL(evidencePreview.url)
+    }
+  }, [evidencePreview])
 
   const filteredRecords = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -605,16 +658,16 @@ export default function SpecialRiskPage() {
     return records.filter((record) => {
       const matchesSearch =
         !query ||
-        employeeName(record.employeeId).toLowerCase().includes(query) ||
-        record.job.toLowerCase().includes(query) ||
-        activityLabel(record).toLowerCase().includes(query)
+        employeeName(record).toLowerCase().includes(query) ||
+        (record.job?.name ?? "").toLowerCase().includes(query) ||
+        activityLabel(record, activityOptions).toLowerCase().includes(query)
 
       const matchesActivity = activityFilter === "all" || record.activity === activityFilter
       const matchesStatus = statusFilter === "all" || record.status === statusFilter
 
       return matchesSearch && matchesActivity && matchesStatus
     })
-  }, [activityFilter, records, search, statusFilter])
+  }, [activityFilter, activityOptions, records, search, statusFilter])
 
   const stats = useMemo(() => {
     return {
@@ -625,13 +678,11 @@ export default function SpecialRiskPage() {
     }
   }, [records])
 
-  function handleSave(form: SpecialRiskForm, recordId?: string) {
-    const employee = employees.find((item) => item.id === form.employeeId)
-    const payload = {
+  async function handleSave(form: SpecialRiskForm, recordId?: string) {
+    const payload: UpsertSpecialRiskDto = {
       employeeId: form.employeeId,
-      job: employee?.job ?? "Cargo no registrado",
       activity: form.activity,
-      customActivity: form.activity === "OTRA" ? form.customActivity.trim() : undefined,
+      ...(form.activity === "OTRA" ? { customActivity: form.customActivity.trim() } : {}),
       startDate: form.startDate,
       endDate: form.endDate,
       specialContribution: form.specialContribution === "YES",
@@ -639,74 +690,107 @@ export default function SpecialRiskPage() {
       observations: form.observations.trim(),
     }
 
-    if (recordId) {
-      setRecords((current) =>
-        current.map((record) =>
-          record.id === recordId
-            ? {
-                ...record,
-                ...payload,
-              }
-            : record,
-        ),
-      )
-      toast.success("Riesgo especial actualizado")
-      return
+    try {
+      if (recordId) {
+        await updateSpecialRisk(recordId, payload)
+        toast.success("Riesgo especial actualizado")
+      } else {
+        await createSpecialRisk(payload)
+        toast.success("Riesgo especial creado")
+      }
+      await loadData()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar el riesgo especial")
+      throw error
     }
-
-    setRecords((current) => [
-      {
-        id: createId("special-risk"),
-        ...payload,
-        evidences: [],
-      },
-      ...current,
-    ])
-    toast.success("Riesgo especial creado")
   }
 
-  function handleSaveEvidence(record: SpecialRiskRecord, form: EvidenceForm) {
-    const evidence: SpecialRiskEvidence = {
-      id: createId("evidence"),
-      fileName: form.fileName.trim(),
-      description: form.description.trim(),
-      uploadedAt: new Date().toISOString(),
-    }
-
-    setRecords((current) =>
-      current.map((item) =>
-        item.id === record.id
-          ? {
-              ...item,
-              evidences: [evidence, ...item.evidences],
-            }
-          : item,
-      ),
-    )
-
-    setDetailRecord((current) =>
-      current?.id === record.id
-        ? {
-            ...current,
-            evidences: [evidence, ...current.evidences],
-          }
-        : current,
-    )
-
-    toast.success("Evidencia cargada")
+  async function loadEvidence(record: SpecialRiskRecord) {
+    const evidences = await listSpecialRiskDocuments(record.id)
+    setRecords((current) => current.map((item) => (item.id === record.id ? { ...item, evidences } : item)))
+    setDetailRecord((current) => (current?.id === record.id ? { ...current, evidences } : current))
+    return evidences
   }
 
-  function downloadEvidence(evidence: SpecialRiskEvidence) {
-    const blob = new Blob(
-      [`Evidencia riesgo especial\nArchivo: ${evidence.fileName}\nDescripcion: ${evidence.description}\nCargado: ${formatDateTime(evidence.uploadedAt)}\n`],
-      { type: "text/plain;charset=utf-8" },
-    )
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.href = url
-    link.download = evidence.fileName
-    link.click()
-    URL.revokeObjectURL(url)
+  async function openDetail(record: SpecialRiskRecord) {
+    setDetailRecord(record)
+    try {
+      await loadEvidence(record)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar las evidencias")
+    }
+  }
+
+  async function handleSaveEvidence(record: SpecialRiskRecord, form: EvidenceForm) {
+    if (!form.file) throw new Error("Selecciona el archivo")
+    try {
+      await uploadSpecialRiskDocument(record.id, {
+        file: form.file,
+        isConfirmed: true,
+        observation: form.observation,
+        description: form.description,
+      })
+      await Promise.all([loadEvidence(record), loadData()])
+      toast.success("Evidencia cargada")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar la evidencia")
+      throw error
+    }
+  }
+
+  async function downloadEvidence(evidence: SpecialRiskDocument) {
+    if (!evidence.downloadUrl) return
+    try {
+      const blob = await downloadSpecialRiskDocumentFile(evidence.downloadUrl)
+      const url = URL.createObjectURL(blob)
+      const link = window.document.createElement("a")
+      link.href = url
+      link.download = evidence.originalName || "evidencia-riesgo-especial"
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar la evidencia")
+    }
+  }
+
+  async function previewEvidence(evidence: SpecialRiskDocument) {
+    if (!evidence.downloadUrl) return toast.error("La evidencia no tiene un archivo disponible")
+
+    setPreviewLoadingId(evidence.id)
+    try {
+      const blob = await downloadSpecialRiskDocumentFile(evidence.downloadUrl)
+      const mimeType = blob.type || evidence.mimeType || "application/octet-stream"
+      const url = URL.createObjectURL(blob)
+      setEvidencePreview({ document: evidence, url, mimeType })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo previsualizar la evidencia")
+    } finally {
+      setPreviewLoadingId(null)
+    }
+  }
+
+  async function handleDeleteEvidence(record: SpecialRiskRecord, evidence: SpecialRiskDocument) {
+    if (!window.confirm(`¿Eliminar la evidencia ${evidence.originalName}?`)) return
+
+    setDeletingEvidenceId(evidence.id)
+    try {
+      await deleteSpecialRiskDocument(record.id, evidence.id)
+      await Promise.all([loadEvidence(record), loadData()])
+      toast.success("Evidencia eliminada")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar la evidencia")
+    } finally {
+      setDeletingEvidenceId(null)
+    }
+  }
+
+  async function downloadLatestEvidence(record: SpecialRiskRecord) {
+    try {
+      const evidences = record.evidences.length > 0 ? record.evidences : await loadEvidence(record)
+      if (evidences[0]) await downloadEvidence(evidences[0])
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar la evidencia")
+    }
   }
 
   return (
@@ -828,7 +912,7 @@ export default function SpecialRiskPage() {
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-semibold text-foreground">{employeeName(record.employeeId)}</h3>
+                        <h3 className="font-semibold text-foreground">{employeeName(record)}</h3>
                         <Badge variant="outline" className={statusClassName(record.status)}>
                           {statusLabel(record.status)}
                         </Badge>
@@ -838,15 +922,15 @@ export default function SpecialRiskPage() {
                           </Badge>
                         )}
                       </div>
-                      <p className="mt-1 text-sm text-muted-foreground">{record.job}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{record.job?.name ?? "Cargo no registrado"}</p>
                     </div>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => setDetailRecord(record)}>
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void openDetail(record)}>
                       <Eye className="h-4 w-4" />
                       Ver
                     </Button>
                   </div>
 
-                  <p className="line-clamp-2 text-sm text-muted-foreground">{activityLabel(record)}</p>
+                  <p className="line-clamp-2 text-sm text-muted-foreground">{activityLabel(record, activityOptions)}</p>
 
                   <div className="grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
                     <p className="flex items-center gap-2">
@@ -859,7 +943,7 @@ export default function SpecialRiskPage() {
                     </p>
                     <p className="flex items-center gap-2">
                       <FileText className="h-4 w-4" />
-                      {record.evidences.length} evidencias
+                      {record.evidenceCount} evidencias
                     </p>
                     <p className="flex items-center gap-2">
                       <FlameKindling className="h-4 w-4" />
@@ -890,11 +974,11 @@ export default function SpecialRiskPage() {
                 {filteredRecords.map((record) => (
                   <tr key={record.id} className="align-middle">
                     <td className="px-4 py-3">
-                      <p className="font-medium text-foreground">{employeeName(record.employeeId)}</p>
+                      <p className="font-medium text-foreground">{employeeName(record)}</p>
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">{record.job}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{record.job?.name ?? "Cargo no registrado"}</td>
                     <td className="px-4 py-3">
-                      <p className="max-w-[260px] truncate text-muted-foreground">{activityLabel(record)}</p>
+                      <p className="max-w-[260px] truncate text-muted-foreground">{activityLabel(record, activityOptions)}</p>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{formatDate(record.startDate)}</td>
                     <td className="px-4 py-3 text-muted-foreground">{formatDate(record.endDate)}</td>
@@ -904,7 +988,7 @@ export default function SpecialRiskPage() {
                         {statusLabel(record.status)}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">{record.evidences.length}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{record.evidenceCount}</td>
                     <td className="px-4 py-3 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -913,7 +997,7 @@ export default function SpecialRiskPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuItem onSelect={() => setDetailRecord(record)}>
+                          <DropdownMenuItem onSelect={() => void openDetail(record)}>
                             <Eye className="h-4 w-4" />
                             Ver detalle
                           </DropdownMenuItem>
@@ -930,10 +1014,10 @@ export default function SpecialRiskPage() {
                             <Upload className="h-4 w-4" />
                             Cargar evidencia
                           </DropdownMenuItem>
-                          {record.evidences.length > 0 && (
+                          {record.evidenceCount > 0 && (
                             <>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem onSelect={() => downloadEvidence(record.evidences[0])}>
+                              <DropdownMenuItem onSelect={() => void downloadLatestEvidence(record)}>
                                 <Download className="h-4 w-4" />
                                 Descargar ultima evidencia
                               </DropdownMenuItem>
@@ -953,6 +1037,8 @@ export default function SpecialRiskPage() {
       <RiskDialog
         open={dialogOpen}
         record={editingRecord}
+        employees={employees}
+        activityOptions={activityOptions}
         onClose={() => {
           setDialogOpen(false)
           setEditingRecord(null)
@@ -960,7 +1046,70 @@ export default function SpecialRiskPage() {
         onSave={handleSave}
       />
       <EvidenceDialog record={evidenceRecord} onClose={() => setEvidenceRecord(null)} onSave={handleSaveEvidence} />
-      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownloadEvidence={downloadEvidence} />
+      <DetailDialog
+        record={detailRecord}
+        activityOptions={activityOptions}
+        onClose={() => setDetailRecord(null)}
+        onPreviewEvidence={(evidence) => void previewEvidence(evidence)}
+        onDownloadEvidence={(evidence) => void downloadEvidence(evidence)}
+        onDeleteEvidence={(evidence) => {
+          if (detailRecord) void handleDeleteEvidence(detailRecord, evidence)
+        }}
+        previewLoadingId={previewLoadingId}
+        deletingEvidenceId={deletingEvidenceId}
+      />
+      <Dialog open={Boolean(evidencePreview)} onOpenChange={(open) => !open && setEvidencePreview(null)}>
+        <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+          <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
+            <DialogTitle>{evidencePreview?.document.originalName ?? "Vista previa de evidencia"}</DialogTitle>
+            <p className="text-sm text-muted-foreground">Previsualizacion del documento asociado al riesgo especial.</p>
+          </DialogHeader>
+
+          <div className="min-h-0 flex-1 overflow-auto bg-muted/30 p-4">
+            {evidencePreview?.mimeType.startsWith("image/") ? (
+              <img
+                src={evidencePreview.url}
+                alt={evidencePreview.document.originalName}
+                className="mx-auto max-h-[70dvh] max-w-full rounded-md object-contain"
+              />
+            ) : evidencePreview?.mimeType === "application/pdf" ? (
+              <iframe
+                src={evidencePreview.url}
+                title={evidencePreview.document.originalName}
+                className="h-[70dvh] min-h-[28rem] w-full rounded-md border border-border bg-white"
+              />
+            ) : evidencePreview ? (
+              <div className="flex min-h-64 flex-col items-center justify-center gap-3 text-center">
+                <FileText className="h-12 w-12 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
+                  Este tipo de archivo no admite vista previa. Puedes abrirlo o descargarlo.
+                </p>
+              </div>
+            ) : null}
+          </div>
+
+          <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+            {evidencePreview && canPreviewEvidence(evidencePreview.mimeType) ? (
+              <Button type="button" variant="outline" className="gap-2" onClick={() => window.open(evidencePreview.url, "_blank", "noopener,noreferrer")}>
+                <ExternalLink className="h-4 w-4" />
+                Abrir en pestaña
+              </Button>
+            ) : null}
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2"
+              onClick={() => evidencePreview && void downloadEvidence(evidencePreview.document)}
+            >
+              <Download className="h-4 w-4" />
+              Descargar
+            </Button>
+            <Button type="button" onClick={() => setEvidencePreview(null)}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }

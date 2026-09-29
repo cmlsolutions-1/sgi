@@ -6,6 +6,7 @@ import {
   BriefcaseBusiness,
   Download,
   Edit,
+  ExternalLink,
   Eye,
   FileText,
   Loader2,
@@ -68,6 +69,12 @@ type EvidenceForm = {
   isConfirmed: boolean
 }
 
+type DocumentPreviewState = {
+  document: JobDocument
+  url: string
+  mimeType: string
+}
+
 const emptyForm: FormState = {
   name: "",
   description: "",
@@ -109,6 +116,10 @@ function riskLevelLabel(value: JobRiskLevel) {
   return riskLevelOptions.find((option) => option.value === value)?.label ?? value
 }
 
+function canEmbedPreview(mimeType: string) {
+  return mimeType.startsWith("application/pdf") || mimeType.startsWith("image/")
+}
+
 export function JobsManager() {
   const [jobs, setJobs] = useState<Job[]>([])
   const [workAreas, setWorkAreas] = useState<WorkAreaOption[]>([])
@@ -124,6 +135,8 @@ export function JobsManager() {
   const [saving, setSaving] = useState(false)
   const [uploadingEvidence, setUploadingEvidence] = useState(false)
   const [deletingDocumentId, setDeletingDocumentId] = useState<string | null>(null)
+  const [preview, setPreview] = useState<DocumentPreviewState | null>(null)
+  const [previewLoadingId, setPreviewLoadingId] = useState<string | null>(null)
 
   const filteredJobs = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -169,6 +182,12 @@ export function JobsManager() {
   useEffect(() => {
     loadData()
   }, [])
+
+  useEffect(() => {
+    return () => {
+      if (preview?.url) URL.revokeObjectURL(preview.url)
+    }
+  }, [preview?.url])
 
   function openCreateDialog() {
     setForm(emptyForm)
@@ -319,6 +338,48 @@ export function JobsManager() {
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo descargar la evidencia")
     }
+  }
+
+  async function previewEvidence(document: JobDocument) {
+    if (!document.downloadUrl) {
+      toast.error("La evidencia no tiene un archivo disponible")
+      return
+    }
+
+    setPreviewLoadingId(document.id)
+    try {
+      const blob = await downloadJobDocumentFile(document.downloadUrl)
+      const url = URL.createObjectURL(blob)
+      setPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return {
+          document,
+          url,
+          mimeType: blob.type || document.mimeType || "",
+        }
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo abrir la evidencia")
+    } finally {
+      setPreviewLoadingId(null)
+    }
+  }
+
+  function closePreview() {
+    setPreview((current) => {
+      if (current?.url) URL.revokeObjectURL(current.url)
+      return null
+    })
+  }
+
+  function downloadPreview() {
+    if (!preview) return
+    const link = window.document.createElement("a")
+    link.href = preview.url
+    link.download = preview.document.originalName || "evidencia-cargo"
+    window.document.body.appendChild(link)
+    link.click()
+    link.remove()
   }
 
   async function handleDeleteDocument(jobId: string, document: JobDocument) {
@@ -703,6 +764,20 @@ export function JobsManager() {
                         <p className="text-xs text-muted-foreground">{formatDateTime(document.createdAt)}</p>
                       </div>
                       <div className="flex shrink-0 gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          disabled={previewLoadingId === document.id}
+                          aria-label={`Previsualizar ${document.originalName}`}
+                          onClick={() => void previewEvidence(document)}
+                        >
+                          {previewLoadingId === document.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
                         <Button type="button" variant="ghost" size="icon" onClick={() => void downloadEvidence(document)}>
                           <Download className="h-4 w-4" />
                         </Button>
@@ -794,6 +869,21 @@ export function JobsManager() {
                                   variant="outline"
                                   size="sm"
                                   className="gap-2"
+                                  disabled={previewLoadingId === document.id}
+                                  onClick={() => void previewEvidence(document)}
+                                >
+                                  {previewLoadingId === document.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Eye className="h-4 w-4" />
+                                  )}
+                                  {previewLoadingId === document.id ? "Cargando" : "Ver"}
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  className="gap-2"
                                   onClick={() => void downloadEvidence(document)}
                                 >
                                   <Download className="h-4 w-4" />
@@ -829,6 +919,67 @@ export function JobsManager() {
             </DialogFooter>
           </DialogContent>
         )}
+      </Dialog>
+
+      <Dialog open={Boolean(preview)} onOpenChange={(nextOpen) => !nextOpen && closePreview()}>
+        <DialogContent className="!flex max-h-[90dvh] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+          <DialogHeader className="shrink-0 border-b border-border px-4 py-3 pr-12">
+            <DialogTitle className="truncate text-base">
+              {preview?.document.originalName || "Evidencia del cargo"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="min-h-0 flex-1 overflow-hidden px-4 py-3">
+            {preview && canEmbedPreview(preview.mimeType) ? (
+              preview.mimeType.startsWith("image/") ? (
+                <div className="flex h-[65dvh] items-center justify-center overflow-auto rounded-md border bg-muted/30 p-3">
+                  <img
+                    src={preview.url}
+                    alt={preview.document.originalName || "Evidencia del cargo"}
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </div>
+              ) : (
+                <iframe
+                  title={preview.document.originalName || "Evidencia del cargo"}
+                  src={preview.url}
+                  className="h-[65dvh] w-full rounded-md border bg-background"
+                />
+              )
+            ) : (
+              <div className="flex h-[45dvh] flex-col items-center justify-center rounded-md border border-dashed bg-muted/30 px-4 text-center">
+                <FileText className="h-10 w-10 text-muted-foreground" />
+                <p className="mt-3 text-sm font-medium">Vista previa no disponible</p>
+                <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+                  Este formato no puede mostrarse dentro del navegador, pero puedes abrirlo o descargarlo.
+                </p>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="shrink-0 border-t border-border bg-card px-4 py-3">
+            {preview && (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => window.open(preview.url, "_blank", "noopener,noreferrer")}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Abrir en pestaña
+                </Button>
+                <Button type="button" variant="outline" className="gap-2" onClick={downloadPreview}>
+                  <Download className="h-4 w-4" />
+                  Descargar
+                </Button>
+              </>
+            )}
+            <Button type="button" onClick={closePreview}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
     </div>
   )
