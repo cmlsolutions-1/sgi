@@ -2,7 +2,10 @@
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
 import {
+  BadgeCheck,
+  BriefcaseBusiness,
   CalendarDays,
+  Coins,
   Download,
   Edit,
   Eye,
@@ -40,6 +43,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
 import {
@@ -183,6 +187,7 @@ function RiskDialog({
 }) {
   const [form, setForm] = useState<SpecialRiskForm>(emptyForm)
   const editing = Boolean(record)
+  const selectedEmployee = employees.find((employee) => employee.id === form.employeeId)
 
   useEffect(() => {
     if (!open) return
@@ -224,7 +229,7 @@ function RiskDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <DialogTitle>{editing ? "Editar riesgo especial" : "Nuevo riesgo especial"}</DialogTitle>
           <p className="text-sm text-muted-foreground">
@@ -234,55 +239,75 @@ function RiskDialog({
 
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Funcionario y actividad</h3>
+            <section className="rounded-xl border border-slate-300 bg-white p-4 shadow-sm">
+              <div className="mb-4 flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <UserRound className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground">Funcionario y actividad</h3>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Selecciona a la persona y la actividad que origina el riesgo especial.
+                  </p>
+                </div>
+              </div>
+
               <div className="grid gap-4 lg:grid-cols-2">
-                <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-foreground">Funcionario</span>
-                  <select
+                <div className="space-y-2">
+                  <Label htmlFor="special-risk-employee">Funcionario</Label>
+                  <Select
                     value={form.employeeId}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        employeeId: event.target.value,
-                      }))
-                    }
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    onValueChange={(employeeId) => setForm((current) => ({ ...current, employeeId }))}
                   >
-                    <option value="">Selecciona funcionario</option>
-                    {employees.map((employee) => (
-                      <option key={employee.id} value={employee.id}>
-                        {employee.name} {employee.lastName} - {employee.job?.name ?? "Cargo no registrado"}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                    <SelectTrigger id="special-risk-employee" className="h-11 w-full bg-white">
+                      <SelectValue placeholder="Selecciona un funcionario" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-72 bg-white">
+                      {employees.map((employee) => (
+                        <SelectItem key={employee.id} value={employee.id}>
+                          {employee.name} {employee.lastName} - {employee.job?.name ?? "Cargo no registrado"}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">El cargo se completa según el funcionario elegido.</p>
+                </div>
 
-                <Label className="grid gap-2">
-                  Cargo
-                  <Input value={employeeJob(employees, form.employeeId)} disabled className="bg-secondary" />
-                </Label>
+                <div className="space-y-2">
+                  <Label>Cargo asociado</Label>
+                  <div className="flex min-h-11 items-center gap-3 rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm">
+                    <BriefcaseBusiness className="h-4 w-4 shrink-0 text-primary" />
+                    <span className={selectedEmployee ? "text-sm text-foreground" : "text-sm text-muted-foreground"}>
+                      {employeeJob(employees, form.employeeId)}
+                    </span>
+                  </div>
+                </div>
 
-                <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-foreground">Tipo de actividad</span>
-                  <select
+                <div className="space-y-2">
+                  <Label htmlFor="special-risk-activity">Tipo de actividad</Label>
+                  <Select
                     value={form.activity}
-                    onChange={(event) =>
+                    onValueChange={(activity) =>
                       setForm((current) => ({
                         ...current,
-                        activity: event.target.value as SpecialRiskActivity,
-                        customActivity: event.target.value === "OTRA" ? current.customActivity : "",
+                        activity: activity as SpecialRiskActivity,
+                        customActivity: activity === "OTRA" ? current.customActivity : "",
                       }))
                     }
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
-                    {activityOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                    <SelectTrigger id="special-risk-activity" className="h-11 w-full bg-white">
+                      <SelectValue placeholder="Selecciona una actividad" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      {activityOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">Elige la actividad de alto riesgo aplicable.</p>
+                </div>
 
                 {form.activity === "OTRA" && (
                   <Label className="grid gap-2">
@@ -297,8 +322,16 @@ function RiskDialog({
               </div>
             </section>
 
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Vigencia y estado</h3>
+            <section className="rounded-xl border border-slate-300 bg-white p-4 shadow-sm">
+              <div className="mb-4 flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <CalendarDays className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground">Vigencia y estado</h3>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Define el periodo, la cotización y el estado del registro.</p>
+                </div>
+              </div>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Label className="grid gap-2">
                   Fecha inicio
@@ -317,34 +350,50 @@ function RiskDialog({
                     onChange={(event) => setForm((current) => ({ ...current, endDate: event.target.value }))}
                   />
                 </Label>
-                <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-foreground">Cotizacion especial</span>
-                  <select
+                <div className="space-y-2">
+                  <Label htmlFor="special-risk-contribution" className="flex items-center gap-2">
+                    <Coins className="h-4 w-4 text-muted-foreground" />
+                    Cotizacion especial
+                  </Label>
+                  <Select
                     value={form.specialContribution}
-                    onChange={(event) =>
-                      setForm((current) => ({ ...current, specialContribution: event.target.value as "YES" | "NO" }))
+                    onValueChange={(specialContribution) =>
+                      setForm((current) => ({ ...current, specialContribution: specialContribution as "YES" | "NO" }))
                     }
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
-                    <option value="YES">Si</option>
-                    <option value="NO">No</option>
-                  </select>
-                </label>
-                <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-foreground">Estado</span>
-                  <select
+                    <SelectTrigger id="special-risk-contribution" className="h-10 w-full bg-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="YES">Si</SelectItem>
+                      <SelectItem value="NO">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="special-risk-status" className="flex items-center gap-2">
+                    <BadgeCheck className="h-4 w-4 text-muted-foreground" />
+                    Estado
+                  </Label>
+                  <Select
                     value={form.status}
-                    onChange={(event) => setForm((current) => ({ ...current, status: event.target.value as SpecialRiskStatus }))}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    onValueChange={(status) =>
+                      setForm((current) => ({ ...current, status: status as SpecialRiskStatus }))
+                    }
                   >
-                    <option value="ACTIVE">Activo</option>
-                    <option value="FINISHED">Finalizado</option>
-                  </select>
-                </label>
+                    <SelectTrigger id="special-risk-status" className="h-10 w-full bg-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="ACTIVE">Activo</SelectItem>
+                      <SelectItem value="FINISHED">Finalizado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </section>
 
-            <section className="rounded-md border border-border p-4">
+            <section className="rounded-xl border border-slate-300 bg-white p-4 shadow-sm">
               <h3 className="mb-3 text-sm font-semibold text-foreground">Observaciones</h3>
               <Textarea
                 value={form.observations}
@@ -355,7 +404,7 @@ function RiskDialog({
             </section>
           </div>
 
-          <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+          <DialogFooter className="shrink-0 border-t border-border bg-white px-6 py-4">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
@@ -596,9 +645,9 @@ function Metric({ label, value, tone = "default" }: { label: string; value: numb
           : "text-foreground"
 
   return (
-    <div className="rounded-md bg-secondary px-3 py-1.5">
-      <span className={`text-sm font-bold ${toneClass}`}>{value}</span>
-      <span className="ml-2 text-xs text-muted-foreground">{label}</span>
+    <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className={`text-sm font-semibold ${toneClass}`}>{value}</span>
     </div>
   )
 }
@@ -815,17 +864,17 @@ export default function SpecialRiskPage() {
         </Button>
       </div>
 
-      <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        <div className="flex justify-center overflow-x-auto px-3 py-1">
-          <div className="flex w-fit min-w-max items-center gap-2">
-            <Metric label="Registros" value={stats.total} />
-            <Metric label="Activos" value={stats.active} tone="blue" />
-            <Metric label="Finalizados" value={stats.finished} tone="green" />
-            <Metric label="Con cotizacion especial" value={stats.specialContribution} tone="amber" />
-          </div>
+      <div className="overflow-x-auto px-3 py-1">
+        <div className="flex min-w-max items-center justify-center gap-2">
+          <Metric label="Registros" value={stats.total} />
+          <Metric label="Activos" value={stats.active} tone="green" />
+          <Metric label="Finalizados" value={stats.finished} tone="blue" />
+          <Metric label="Con cotizacion especial" value={stats.specialContribution} tone="amber" />
         </div>
+      </div>
 
-        <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(220px,1fr)_260px_180px]">
+      <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
+        <div className="grid gap-3 lg:grid-cols-[minmax(220px,1fr)_260px_180px]">
           <Label className="grid gap-2">
             Buscar
             <div className="relative">
