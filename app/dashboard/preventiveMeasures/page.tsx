@@ -20,6 +20,7 @@ import {
   Plus,
   Search,
   Clock,
+  CircleAlert,
   CheckCircle,
   LayoutGrid,
   Pencil,
@@ -114,6 +115,13 @@ const statusConfig = {
   DONE: { icon: CheckCircle, color: "text-accentActivd", badge: "bg-accentActivd text-accentActivd-foreground border-transparent", label: "Cumplida" },
 } satisfies Record<PreventiveMeasureStatus, { icon: typeof Clock; color: string; badge: string; label: string }>
 
+const overdueStatusConfig = {
+  icon: CircleAlert,
+  color: "text-red-700",
+  badge: "border-red-200 bg-red-50 text-red-700",
+  label: "Vencida",
+}
+
 const keyLabels: Record<PreventiveMeasureKey, string> = {
   ELIMINACION: "Eliminación",
   SUSTITUCION: "Sustitución",
@@ -134,6 +142,18 @@ function riskLabel(risk: Risk) {
 
 function procedureLabel(procedure: ManagedDocument) {
   return [procedure.code, procedure.name, procedure.workArea?.name].filter(Boolean).join(" / ")
+}
+
+function localDateKey(date = new Date()) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
+}
+
+function isMeasureOverdue(measure: PreventiveMeasure) {
+  if (measure.status !== "PENDING" || measure.type !== "DATE" || !measure.dueDate) return false
+  return measure.dueDate.slice(0, 10) < localDateKey()
 }
 
 function formatFileSize(size: number) {
@@ -431,7 +451,9 @@ export default function PreventiveMeasuresPage() {
     const [measureResult, riskResult, procedureResult] = await Promise.allSettled([
       listPreventiveMeasures({
         ...(search.trim() ? { search: search.trim() } : {}),
-        ...(statusFilter !== "all" ? { status: statusFilter as PreventiveMeasureStatus } : {}),
+        ...(statusFilter !== "all" && statusFilter !== "OVERDUE"
+          ? { status: statusFilter as PreventiveMeasureStatus }
+          : {}),
         ...(actionFilter !== "all" ? { accion: actionFilter as PreventiveMeasureAction } : {}),
         ...(keyFilter !== "all" ? { key: keyFilter as PreventiveMeasureKey } : {}),
         ...(typeFilter !== "all" ? { type: typeFilter as PreventiveMeasureType } : {}),
@@ -485,7 +507,9 @@ export default function PreventiveMeasuresPage() {
         measure.description.toLowerCase().includes(query) ||
         riskText.includes(query)
 
-      const matchesStatus = statusFilter === "all" || measure.status === statusFilter
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "OVERDUE" ? isMeasureOverdue(measure) : measure.status === statusFilter)
       const matchesAction = actionFilter === "all" || measure.accion === actionFilter
       const matchesKey = keyFilter === "all" || measure.key === keyFilter
       const matchesType = typeFilter === "all" || measure.type === typeFilter
@@ -502,6 +526,7 @@ export default function PreventiveMeasuresPage() {
     return {
       total: measures.length,
       pending: measures.filter((measure) => measure.status === "PENDING").length,
+      overdue: measures.filter(isMeasureOverdue).length,
       done: measures.filter((measure) => measure.status === "DONE").length,
       riskBased: measures.filter((measure) => Boolean(measure.riskId)).length,
     }
@@ -872,6 +897,10 @@ export default function PreventiveMeasuresPage() {
             <span className="text-xs text-muted-foreground">Pendientes</span>
             <span className="text-sm font-semibold text-warning">{stats.pending}</span>
           </div>
+          <div className="flex items-center gap-2 rounded-md bg-red-50 px-3 py-1.5">
+            <span className="text-xs text-red-700">Vencidas</span>
+            <span className="text-sm font-semibold text-red-700">{stats.overdue}</span>
+          </div>
           <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
             <span className="text-xs text-muted-foreground">Cumplidas</span>
             <span className="text-sm font-semibold text-green-600">{stats.done}</span>
@@ -903,6 +932,7 @@ export default function PreventiveMeasuresPage() {
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
                 <SelectItem value="PENDING">Pendiente</SelectItem>
+                <SelectItem value="OVERDUE">Vencida</SelectItem>
                 <SelectItem value="DONE">Cumplida</SelectItem>
               </SelectContent>
             </Select>
@@ -1006,7 +1036,8 @@ export default function PreventiveMeasuresPage() {
           {viewMode === "cards" ? (
             <div className="space-y-4">
               {filtered.map((measure) => {
-                const status = statusConfig[measure.status]
+                const overdue = isMeasureOverdue(measure)
+                const status = overdue ? overdueStatusConfig : statusConfig[measure.status]
                 const StatusIcon = status.icon
 
                 return (
@@ -1053,10 +1084,17 @@ export default function PreventiveMeasuresPage() {
                       </div>
 
                       <div className="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-border flex-wrap">
-                        <span className="text-xs text-muted-foreground">
-                          {measure.type === "DATE" ? `Fecha límite: ${measure.dueDate || "Sin fecha"}` : "Medida permanente"}
-                          {measure.doneDate ? ` · Cumplida: ${measure.doneDate}` : ""}
-                        </span>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={cn("text-xs", overdue ? "font-semibold text-red-700" : "text-muted-foreground")}>
+                            {measure.type === "DATE" ? `Fecha límite: ${measure.dueDate || "Sin fecha"}` : "Medida permanente"}
+                            {measure.doneDate ? ` · Cumplida: ${measure.doneDate}` : ""}
+                          </span>
+                          {overdue ? (
+                            <Badge variant="outline" className="border-red-200 bg-red-50 text-xs text-red-700">
+                              Vencida
+                            </Badge>
+                          ) : null}
+                        </div>
 
                         <div className="flex items-center gap-2">
                           <Button variant="action" size="sm" className="gap-2" onClick={() => openEditModal(measure)}>
@@ -1091,7 +1129,8 @@ export default function PreventiveMeasuresPage() {
                 </thead>
                 <tbody className="divide-y divide-border">
                   {filtered.map((measure) => {
-                    const status = statusConfig[measure.status]
+                    const overdue = isMeasureOverdue(measure)
+                    const status = overdue ? overdueStatusConfig : statusConfig[measure.status]
 
                     return (
                       <tr key={measure.id} className="align-middle">
@@ -1109,9 +1148,18 @@ export default function PreventiveMeasuresPage() {
                         <td className="px-4 py-3">
                           <Badge variant="outline">{actionLabels[measure.accion]}</Badge>
                         </td>
-                        <td className="px-4 py-3 text-muted-foreground">
-                          {measure.type === "DATE" ? measure.dueDate || "Sin fecha" : "Permanente"}
-                          {measure.doneDate ? ` · ${measure.doneDate}` : ""}
+                        <td className={cn("px-4 py-3", overdue ? "font-medium text-red-700" : "text-muted-foreground")}>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span>
+                              {measure.type === "DATE" ? measure.dueDate || "Sin fecha" : "Permanente"}
+                              {measure.doneDate ? ` · ${measure.doneDate}` : ""}
+                            </span>
+                            {overdue ? (
+                              <Badge variant="outline" className="border-red-200 bg-red-50 text-xs text-red-700">
+                                Vencida
+                              </Badge>
+                            ) : null}
+                          </div>
                         </td>
                         <td className="px-4 py-3">
                           <Badge variant="outline" className={cn("text-xs", status.badge)}>

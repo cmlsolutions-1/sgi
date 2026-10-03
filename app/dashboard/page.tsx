@@ -37,6 +37,9 @@ import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { KpiCard } from "@/components/dashboard/kpi-card"
+import { IntelligenceCenter } from "@/components/intelligence/intelligence-center"
+import { buildDashboardInsights } from "@/lib/intelligence-engine"
+import { askSafeCloud } from "@/lib/safecloud-assistant"
 import {
   buildReportPdf,
   defaultDateRangeFilter,
@@ -435,6 +438,8 @@ export default function DashboardPage() {
     }
   }, [data, range.endDate, range.startDate])
 
+  const intelligenceInsights = useMemo(() => buildDashboardInsights(data), [data])
+
   const metrics = useMemo(() => {
     const activeEmployees = filteredData.employees.filter((employee) => employee.status).length
     const inactiveEmployees = filteredData.employees.length - activeEmployees
@@ -704,6 +709,27 @@ export default function DashboardPage() {
           </AlertDescription>
         </Alert>
       ) : null}
+
+      <IntelligenceCenter
+        insights={intelligenceInsights}
+        contextLabel="el Dashboard SGI"
+        onAsk={(question) =>
+          askSafeCloud(question, {
+            data: errors.length === 0 ? data : undefined,
+            insights: intelligenceInsights,
+          })
+        }
+        assistantSuggestions={[
+          "¿Cuántos empleados tengo?",
+          "¿Quién tiene afiliaciones incompletas?",
+          "¿Qué debo atender primero?",
+        ]}
+        description={
+          intelligenceInsights.length > 0
+            ? `Hemos detectado ${intelligenceInsights.length} ${intelligenceInsights.length === 1 ? "situacion que requiere" : "situaciones que requieren"} tu atencion en todo el sistema.`
+            : undefined
+        }
+      />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
         <KpiCard

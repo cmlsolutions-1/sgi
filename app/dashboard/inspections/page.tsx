@@ -35,6 +35,9 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { IntelligenceCenter } from "@/components/intelligence/intelligence-center"
+import { buildInspectionInsights } from "@/lib/intelligence-engine"
+import { askSafeCloud } from "@/lib/safecloud-assistant"
 import { listEmployees } from "@/services/employeeService"
 import { listWorkAreaOptions } from "@/services/workAreaService"
 import type { Employee } from "@/types/manager/employee"
@@ -617,7 +620,8 @@ export default function InspectionsPage() {
     return records.filter((record) => {
       const matchesAction = actionFilter === "ALL" || record.action === actionFilter
       const matchesResult = resultFilter === "ALL" || record.result === resultFilter
-      const searchable = `${record.elementName} ${record.description} ${record.workAreaName} ${record.responsibleName} ${record.observations}`
+      const participationLabel = record.copasstParticipated ? "Con COPASST" : "Sin COPASST"
+      const searchable = `${record.elementName} ${record.description} ${record.workAreaName} ${record.responsibleName} ${record.observations} ${participationLabel}`
       const matchesSearch = !normalizedSearch || searchable.toLowerCase().includes(normalizedSearch)
       return matchesAction && matchesResult && matchesSearch
     })
@@ -627,6 +631,7 @@ export default function InspectionsPage() {
   const maintenanceCount = records.filter((record) => record.action === "MAINTENANCE").length
   const withEvidenceCount = records.filter((record) => record.evidence).length
   const pendingCount = records.filter((record) => record.result !== "COMPLIES").length
+  const intelligenceInsights = useMemo(() => buildInspectionInsights(records), [records])
 
   function handleSave(form: InspectionForm, recordId?: string) {
     const responsibleName = findEmployeeName(employees, form.responsibleEmployeeId)
@@ -673,6 +678,47 @@ export default function InspectionsPage() {
     setDialogOpen(true)
   }
 
+  function focusRecords() {
+    window.setTimeout(() => {
+      document.getElementById("inspection-records")?.scrollIntoView({ behavior: "smooth", block: "start" })
+    }, 0)
+  }
+
+  function handleIntelligenceAction(actionId: string) {
+    if (actionId === "upload-evidence") {
+      const record =
+        records.find((item) => !item.evidence && item.elementName.toLowerCase().includes("extintor")) ??
+        records.find((item) => !item.evidence)
+      if (record) setEvidenceRecord(record)
+      return
+    }
+
+    if (actionId === "schedule-follow-up") {
+      setEditingRecord(null)
+      setDialogOpen(true)
+      return
+    }
+
+    if (actionId === "review-non-compliant") {
+      setResultFilter("DOES_NOT_COMPLY")
+      focusRecords()
+      return
+    }
+
+    if (actionId === "review-partial") {
+      setResultFilter("PARTIAL")
+      focusRecords()
+      return
+    }
+
+    if (actionId === "review-copasst") {
+      setActionFilter("ALL")
+      setResultFilter("ALL")
+      setSearch("Sin COPASST")
+      focusRecords()
+    }
+  }
+
   return (
     <main className="flex flex-1 flex-col gap-6 p-4 md:p-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -684,6 +730,19 @@ export default function InspectionsPage() {
           <Plus className="h-4 w-4" />Nueva inspección
         </Button>
       </div>
+
+      <IntelligenceCenter
+        insights={intelligenceInsights}
+        contextLabel="Inspecciones"
+        title="Analisis inteligente de inspecciones"
+        onAction={(action) => handleIntelligenceAction(action.id)}
+        onAsk={(question) => askSafeCloud(question, { insights: intelligenceInsights })}
+        assistantSuggestions={[
+          "¿Hay evidencias pendientes?",
+          "¿Cuántos empleados tengo?",
+          "¿Qué puedo preguntarte?",
+        ]}
+      />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Inspecciones</p><p className="mt-2 text-2xl font-bold text-foreground">{inspectionsCount}</p></CardContent></Card>
@@ -725,7 +784,7 @@ export default function InspectionsPage() {
         </div>
       </section>
 
-      <section>
+      <section id="inspection-records" className="scroll-mt-20">
         {viewMode === "cards" ? (
           <div className="grid gap-4 xl:grid-cols-2">
             {filteredRecords.map((record) => (

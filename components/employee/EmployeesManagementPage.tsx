@@ -50,6 +50,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import {
   activateIncident,
   createIncident,
@@ -109,6 +110,53 @@ function formatEmployeeDocument(employee: Employee) {
 
   if (documentType && documentNumber) return `${documentType} ${documentNumber}`
   return documentNumber || documentType || "No registrado"
+}
+
+const socialSecurityAffiliations = [
+  { key: "epsId", label: "EPS" },
+  { key: "arlId", label: "ARL" },
+  { key: "pensionId", label: "Pensión" },
+  { key: "compensationId", label: "Caja de compensación" },
+] as const
+
+function getMissingAffiliations(employee: Employee) {
+  return socialSecurityAffiliations
+    .filter(({ key }) => !employee[key])
+    .map(({ label }) => label)
+}
+
+function EmployeeCompletionIndicator({ employee, className }: { employee: Employee; className?: string }) {
+  const missingAffiliations = getMissingAffiliations(employee)
+  if (!employee.status || missingAffiliations.length === 0) return null
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            "inline-flex w-fit cursor-help items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800 outline-none transition-colors hover:border-amber-300 hover:bg-amber-100 focus-visible:ring-2 focus-visible:ring-amber-400/40",
+            className,
+          )}
+          aria-label={`Información incompleta. Falta completar: ${missingAffiliations.join(", ")}`}
+        >
+          <TriangleAlert className="h-3.5 w-3.5" />
+          Información incompleta
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side="top" sideOffset={8} className="max-w-72 bg-slate-950 px-3 py-2.5 text-white">
+        <p className="font-semibold">Falta completar:</p>
+        <ul className="mt-1 space-y-1 text-white/85">
+          {missingAffiliations.map((affiliation) => (
+            <li key={affiliation} className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+              {affiliation}
+            </li>
+          ))}
+        </ul>
+      </TooltipContent>
+    </Tooltip>
+  )
 }
 
 const employeeGenderOptions: Array<{ value: EmployeeGender; label: string }> = [
@@ -2175,6 +2223,7 @@ export default function EmployeesPage() {
                               {employee.name} {employee.lastName}
                             </h3>
                             <p className="text-sm text-muted-foreground">{employee.job?.name ?? "Sin puesto"}</p>
+                            <EmployeeCompletionIndicator employee={employee} className="mt-2" />
                           </div>
                           <Badge
                             variant="secondary"
@@ -2284,6 +2333,7 @@ export default function EmployeesPage() {
                               <p className="max-w-[240px] truncate text-muted-foreground">
                                 {employee.email || "Correo no registrado"}
                               </p>
+                              <EmployeeCompletionIndicator employee={employee} className="mt-1.5" />
                             </div>
                           </div>
                         </td>
