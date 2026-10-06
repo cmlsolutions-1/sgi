@@ -6,6 +6,7 @@ import {
   Download,
   Edit,
   Eye,
+  ExternalLink,
   FileText,
   GraduationCap,
   LayoutGrid,
@@ -14,6 +15,7 @@ import {
   MoreHorizontal,
   Plus,
   Search,
+  Trash2,
   Upload,
   UserRound,
 } from "lucide-react"
@@ -40,17 +42,31 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { getSgiResponsible } from "@/services/employeeService"
+import {
+  createSstTrainingCertification,
+  deleteSstTrainingCertification,
+  deleteSstTrainingCertificationDocument,
+  downloadSstTrainingCertificationDocument,
+  getSstTrainingCertificationSummary,
+  listSstTrainingCertificationDocuments,
+  listSstTrainingCertifications,
+  listSstTrainingCompetenceTypes,
+  updateSstTrainingCertification,
+  uploadSstTrainingCertificationDocument,
+} from "@/services/sstTrainingCertificationService"
+import type {
+  SstTrainingCertification,
+  SstTrainingCertificationDocument,
+  SstTrainingCertificationStatus,
+  SstTrainingCertificationSummary,
+  SstTrainingCompetenceOption,
+  SstTrainingCompetenceType,
+  UpsertSstTrainingCertificationDto,
+} from "@/types/manager/sst-training-certification"
 
 type ViewMode = "cards" | "list"
-type CompetenceType =
-  | "COURSE_50_HOURS"
-  | "COURSE_20_HOURS"
-  | "SST_LICENSE"
-  | "SST_DIPLOMA"
-  | "SST_SPECIALIZATION"
-  | "OTHER"
-
-type CertificationStatus = "VALID" | "EXPIRED"
+type CompetenceType = SstTrainingCompetenceType
+type CertificationStatus = SstTrainingCertificationStatus
 
 type ResponsibleSummary = {
   id: string
@@ -59,23 +75,9 @@ type ResponsibleSummary = {
   email: string
 }
 
-type CertificationEvidence = {
-  id: string
-  fileName: string
-  description: string
-  uploadedAt: string
-}
-
-type CertificationRecord = {
-  id: string
+type CertificationRecord = SstTrainingCertification & {
   responsible: ResponsibleSummary
-  competenceType: CompetenceType
-  customCompetenceType?: string
-  approvalDate: string
-  certifyingEntity: string
-  certificateNumber?: string
-  expirationDate: string
-  evidences: CertificationEvidence[]
+  evidences: SstTrainingCertificationDocument[]
 }
 
 type CertificationForm = {
@@ -88,18 +90,26 @@ type CertificationForm = {
 }
 
 type EvidenceForm = {
+  file: File | null
   fileName: string
   description: string
+  observation: string
 }
 
-const fallbackResponsible: ResponsibleSummary = {
-  id: "mock-responsible",
-  name: "Responsable SG-SST",
-  job: "Coordinador SG-SST",
-  email: "responsable@empresa.com",
+type EvidencePreview = {
+  document: SstTrainingCertificationDocument
+  url: string
+  mimeType: string
 }
 
-const competenceOptions: Array<{ value: CompetenceType; label: string }> = [
+const emptyResponsible: ResponsibleSummary = {
+  id: "",
+  name: "Responsable no asignado",
+  job: "Sin cargo registrado",
+  email: "Sin correo registrado",
+}
+
+const defaultCompetenceOptions: Array<{ value: CompetenceType; label: string }> = [
   { value: "COURSE_50_HOURS", label: "Curso Virtual 50 Horas SST" },
   { value: "COURSE_20_HOURS", label: "Curso de Actualizacion 20 Horas SST" },
   { value: "SST_LICENSE", label: "Licencia SST" },
@@ -118,19 +128,16 @@ const emptyForm: CertificationForm = {
 }
 
 const emptyEvidenceForm: EvidenceForm = {
+  file: null,
   fileName: "",
   description: "",
+  observation: "",
 }
 
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
-}
-
-function competenceLabel(record: Pick<CertificationRecord, "competenceType" | "customCompetenceType">) {
+function competenceLabel(
+  record: Pick<CertificationRecord, "competenceType" | "customCompetenceType">,
+  competenceOptions = defaultCompetenceOptions,
+) {
   if (record.competenceType === "OTHER") return record.customCompetenceType?.trim() || "Otra competencia"
   return competenceOptions.find((option) => option.value === record.competenceType)?.label ?? record.competenceType
 }
@@ -153,9 +160,7 @@ function formatDateTime(value?: string | null) {
 }
 
 function getStatus(record: CertificationRecord): CertificationStatus {
-  const today = new Date(new Date().toISOString().slice(0, 10))
-  const expirationDate = new Date(`${formatDate(record.expirationDate)}T00:00:00`)
-  return expirationDate < today ? "EXPIRED" : "VALID"
+  return record.status
 }
 
 function statusLabel(status: CertificationStatus) {
@@ -168,50 +173,41 @@ function statusClassName(status: CertificationStatus) {
     : "bg-destructive text-white border-transparent"
 }
 
-function buildInitialRecords(responsible: ResponsibleSummary): CertificationRecord[] {
-  return [
-    {
-      id: "cert-1",
-      responsible,
-      competenceType: "COURSE_50_HOURS",
-      approvalDate: "2026-01-15",
-      certifyingEntity: "ARL Sura",
-      certificateNumber: "SST-50H-2026-014",
-      expirationDate: "2029-01-15",
-      evidences: [
-        {
-          id: "ev-cert-1",
-          fileName: "curso-50-horas-sst.pdf",
-          description: "Certificado del curso virtual de 50 horas SST.",
-          uploadedAt: "2026-01-16T09:30:00",
-        },
-      ],
+function canPreviewEvidence(mimeType: string) {
+  return mimeType.startsWith("image/") || mimeType === "application/pdf"
+}
+
+function toCertificationRecord(
+  certification: SstTrainingCertification,
+  evidences: SstTrainingCertificationDocument[] = [],
+): CertificationRecord {
+  const employee = certification.responsibleEmployee
+  return {
+    ...certification,
+    responsible: {
+      id: employee.id,
+      name: `${employee.name} ${employee.lastName}`.trim(),
+      job: employee.job?.name ?? "Responsable SG-SST",
+      email: employee.email,
     },
-    {
-      id: "cert-2",
-      responsible,
-      competenceType: "SST_LICENSE",
-      approvalDate: "2024-08-20",
-      certifyingEntity: "Secretaria de Salud",
-      certificateNumber: "LIC-SST-78521",
-      expirationDate: "2026-08-20",
-      evidences: [],
-    },
-  ]
+    evidences,
+  }
 }
 
 function CertificationDialog({
   open,
   record,
   responsible,
+  competenceOptions,
   onClose,
   onSave,
 }: {
   open: boolean
   record: CertificationRecord | null
   responsible: ResponsibleSummary
+  competenceOptions: Array<{ value: CompetenceType; label: string }>
   onClose: () => void
-  onSave: (form: CertificationForm, recordId?: string) => void
+  onSave: (form: CertificationForm, recordId?: string) => Promise<void>
 }) {
   const [form, setForm] = useState<CertificationForm>(emptyForm)
   const editing = Boolean(record)
@@ -233,7 +229,7 @@ function CertificationDialog({
     )
   }, [open, record])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     if (!form.approvalDate) return toast.error("Selecciona la fecha de aprobacion")
@@ -246,8 +242,12 @@ function CertificationDialog({
       return toast.error("Escribe el tipo de competencia")
     }
 
-    onSave(form, record?.id)
-    onClose()
+    try {
+      await onSave(form, record?.id)
+      onClose()
+    } catch {
+      // El contenedor muestra el error del backend y conserva el formulario abierto.
+    }
   }
 
   return (
@@ -365,7 +365,7 @@ function EvidenceDialog({
 }: {
   record: CertificationRecord | null
   onClose: () => void
-  onSave: (record: CertificationRecord, form: EvidenceForm) => void
+  onSave: (record: CertificationRecord, form: EvidenceForm) => Promise<void>
 }) {
   const [form, setForm] = useState<EvidenceForm>(emptyEvidenceForm)
 
@@ -373,13 +373,17 @@ function EvidenceDialog({
     if (record) setForm(emptyEvidenceForm)
   }, [record])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!record) return
-    if (!form.fileName.trim()) return toast.error("Selecciona o registra el archivo")
+    if (!form.file) return toast.error("Selecciona el archivo")
 
-    onSave(record, form)
-    onClose()
+    try {
+      await onSave(record, form)
+      onClose()
+    } catch {
+      // El contenedor muestra el error del backend y conserva el formulario abierto.
+    }
   }
 
   return (
@@ -395,7 +399,10 @@ function EvidenceDialog({
               Seleccionar archivo
               <Input
                 type="file"
-                onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.files?.[0]?.name ?? "" }))}
+                onChange={(event) => {
+                  const file = event.target.files?.[0] ?? null
+                  setForm((current) => ({ ...current, file, fileName: file?.name ?? "" }))
+                }}
               />
             </Label>
             <Label className="grid gap-2">
@@ -416,6 +423,15 @@ function EvidenceDialog({
               placeholder="Describe el soporte cargado"
             />
           </Label>
+          <Label className="grid gap-2">
+            Observacion
+            <Textarea
+              value={form.observation}
+              onChange={(event) => setForm((current) => ({ ...current, observation: event.target.value }))}
+              rows={3}
+              placeholder="Agrega una observacion sobre la evidencia"
+            />
+          </Label>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
@@ -433,12 +449,22 @@ function EvidenceDialog({
 
 function DetailDialog({
   record,
+  competenceOptions,
   onClose,
+  onPreviewEvidence,
   onDownloadEvidence,
+  onDeleteEvidence,
+  previewLoadingId,
+  deletingEvidenceId,
 }: {
   record: CertificationRecord | null
+  competenceOptions: Array<{ value: CompetenceType; label: string }>
   onClose: () => void
-  onDownloadEvidence: (record: CertificationRecord, evidence: CertificationEvidence) => void
+  onPreviewEvidence: (evidence: SstTrainingCertificationDocument) => void
+  onDownloadEvidence: (evidence: SstTrainingCertificationDocument) => void
+  onDeleteEvidence: (evidence: SstTrainingCertificationDocument) => void
+  previewLoadingId: string | null
+  deletingEvidenceId: string | null
 }) {
   if (!record) return null
 
@@ -455,7 +481,7 @@ function DetailDialog({
         <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
           <div className="grid gap-4 md:grid-cols-4">
             <InfoBlock label="Responsable" value={record.responsible.name} />
-            <InfoBlock label="Competencia" value={competenceLabel(record)} />
+            <InfoBlock label="Competencia" value={competenceLabel(record, competenceOptions)} />
             <InfoBlock label="Entidad" value={record.certifyingEntity} />
             <div className="rounded-md bg-secondary p-3">
               <p className="text-xs font-medium uppercase text-muted-foreground">Estado</p>
@@ -489,14 +515,49 @@ function DetailDialog({
                     className="flex flex-col gap-3 rounded-md bg-secondary p-3 sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div>
-                      <p className="font-medium text-foreground">{evidence.fileName}</p>
+                      <p className="font-medium text-foreground">{evidence.originalName}</p>
                       <p className="text-sm text-muted-foreground">{evidence.description || "Sin descripcion."}</p>
-                      <p className="text-xs text-muted-foreground">Cargado: {formatDateTime(evidence.uploadedAt)}</p>
+                      {evidence.observation ? (
+                        <p className="text-sm text-muted-foreground">Observacion: {evidence.observation}</p>
+                      ) : null}
+                      <p className="text-xs text-muted-foreground">Cargado: {formatDateTime(evidence.createdAt)}</p>
                     </div>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onDownloadEvidence(record, evidence)}>
-                      <Download className="h-4 w-4" />
-                      Descargar
-                    </Button>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="gap-2"
+                        disabled={previewLoadingId === evidence.id}
+                        onClick={() => onPreviewEvidence(evidence)}
+                      >
+                        {previewLoadingId === evidence.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                        Ver
+                      </Button>
+                      <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onDownloadEvidence(evidence)}>
+                        <Download className="h-4 w-4" />
+                        Descargar
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="gap-2"
+                        disabled={deletingEvidenceId === evidence.id}
+                        onClick={() => onDeleteEvidence(evidence)}
+                      >
+                        {deletingEvidenceId === evidence.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                        Eliminar
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -542,9 +603,16 @@ function Metric({ label, value, tone = "default" }: { label: string; value: numb
 }
 
 export default function SstTrainingCertificationsPage() {
-  const [responsible, setResponsible] = useState<ResponsibleSummary>(fallbackResponsible)
+  const [responsible, setResponsible] = useState<ResponsibleSummary>(emptyResponsible)
   const [loadingResponsible, setLoadingResponsible] = useState(true)
-  const [records, setRecords] = useState<CertificationRecord[]>(() => buildInitialRecords(fallbackResponsible))
+  const [records, setRecords] = useState<CertificationRecord[]>([])
+  const [summary, setSummary] = useState<SstTrainingCertificationSummary>({
+    total: 0,
+    valid: 0,
+    expired: 0,
+    withEvidence: 0,
+  })
+  const [competenceOptions, setCompetenceOptions] = useState(defaultCompetenceOptions)
   const [search, setSearch] = useState("")
   const [competenceFilter, setCompetenceFilter] = useState<CompetenceType | "all">("all")
   const [statusFilter, setStatusFilter] = useState<CertificationStatus | "all">("all")
@@ -553,6 +621,39 @@ export default function SstTrainingCertificationsPage() {
   const [editingRecord, setEditingRecord] = useState<CertificationRecord | null>(null)
   const [evidenceRecord, setEvidenceRecord] = useState<CertificationRecord | null>(null)
   const [detailRecord, setDetailRecord] = useState<CertificationRecord | null>(null)
+  const [evidencePreview, setEvidencePreview] = useState<EvidencePreview | null>(null)
+  const [previewLoadingId, setPreviewLoadingId] = useState<string | null>(null)
+  const [deletingEvidenceId, setDeletingEvidenceId] = useState<string | null>(null)
+
+  async function loadData() {
+    try {
+      const [certificationData, summaryData, competenceData] = await Promise.all([
+        listSstTrainingCertifications({ limit: 100 }),
+        getSstTrainingCertificationSummary(),
+        listSstTrainingCompetenceTypes(),
+      ])
+
+      setSummary(summaryData)
+      if (competenceData.length > 0) {
+        setCompetenceOptions(
+          competenceData.map((option: SstTrainingCompetenceOption) => ({
+            value: option.code,
+            label: option.name,
+          })),
+        )
+      }
+      setRecords((current) =>
+        certificationData.items.map((certification) =>
+          toCertificationRecord(
+            certification,
+            current.find((record) => record.id === certification.id)?.evidences ?? [],
+          ),
+        ),
+      )
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar las formaciones y certificaciones")
+    }
+  }
 
   useEffect(() => {
     let mounted = true
@@ -570,15 +671,9 @@ export default function SstTrainingCertificationsPage() {
 
         if (!mounted) return
         setResponsible(nextResponsible)
-        setRecords((current) =>
-          current.map((record) => ({
-            ...record,
-            responsible: nextResponsible,
-          })),
-        )
       } catch {
         if (!mounted) return
-        setResponsible(fallbackResponsible)
+        setResponsible(emptyResponsible)
       } finally {
         if (mounted) setLoadingResponsible(false)
       }
@@ -590,6 +685,16 @@ export default function SstTrainingCertificationsPage() {
     }
   }, [])
 
+  useEffect(() => {
+    void loadData()
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (evidencePreview?.url) URL.revokeObjectURL(evidencePreview.url)
+    }
+  }, [evidencePreview])
+
   const filteredRecords = useMemo(() => {
     const query = search.trim().toLowerCase()
 
@@ -598,7 +703,7 @@ export default function SstTrainingCertificationsPage() {
       const matchesSearch =
         !query ||
         record.responsible.name.toLowerCase().includes(query) ||
-        competenceLabel(record).toLowerCase().includes(query) ||
+        competenceLabel(record, competenceOptions).toLowerCase().includes(query) ||
         record.certifyingEntity.toLowerCase().includes(query) ||
         (record.certificateNumber ?? "").toLowerCase().includes(query)
       const matchesCompetence = competenceFilter === "all" || record.competenceType === competenceFilter
@@ -606,20 +711,17 @@ export default function SstTrainingCertificationsPage() {
 
       return matchesSearch && matchesCompetence && matchesStatus
     })
-  }, [competenceFilter, records, search, statusFilter])
+  }, [competenceFilter, competenceOptions, records, search, statusFilter])
 
-  const stats = useMemo(() => {
-    return {
-      total: records.length,
-      valid: records.filter((record) => getStatus(record) === "VALID").length,
-      expired: records.filter((record) => getStatus(record) === "EXPIRED").length,
-      withEvidence: records.filter((record) => record.evidences.length > 0).length,
+  async function saveRecord(form: CertificationForm, recordId?: string) {
+    if (!responsible.id) {
+      const message = "Debes asignar un responsable SG-SST antes de crear una certificacion"
+      toast.error(message)
+      throw new Error(message)
     }
-  }, [records])
 
-  function saveRecord(form: CertificationForm, recordId?: string) {
-    const payload = {
-      responsible,
+    const payload: UpsertSstTrainingCertificationDto = {
+      responsibleEmployeeId: responsible.id,
       competenceType: form.competenceType,
       customCompetenceType: form.competenceType === "OTHER" ? form.customCompetenceType.trim() : undefined,
       approvalDate: form.approvalDate,
@@ -628,78 +730,120 @@ export default function SstTrainingCertificationsPage() {
       expirationDate: form.expirationDate,
     }
 
-    if (recordId) {
-      setRecords((current) =>
-        current.map((record) =>
-          record.id === recordId
-            ? {
-                ...record,
-                ...payload,
-              }
-            : record,
-        ),
-      )
-      toast.success("Certificacion actualizada")
-      return
+    try {
+      if (recordId) {
+        await updateSstTrainingCertification(recordId, payload)
+        toast.success("Certificacion actualizada")
+      } else {
+        await createSstTrainingCertification(payload)
+        toast.success("Certificacion creada")
+      }
+      await loadData()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar la certificacion")
+      throw error
     }
-
-    setRecords((current) => [
-      {
-        id: createId("certification"),
-        ...payload,
-        evidences: [],
-      },
-      ...current,
-    ])
-    toast.success("Certificacion creada")
   }
 
-  function saveEvidence(record: CertificationRecord, form: EvidenceForm) {
-    const evidence: CertificationEvidence = {
-      id: createId("certification-evidence"),
-      fileName: form.fileName.trim(),
-      description: form.description.trim(),
-      uploadedAt: new Date().toISOString(),
-    }
-
-    setRecords((current) =>
-      current.map((item) =>
-        item.id === record.id
-          ? {
-              ...item,
-              evidences: [evidence, ...item.evidences],
-            }
-          : item,
-      ),
-    )
-    setDetailRecord((current) =>
-      current?.id === record.id
-        ? {
-            ...current,
-            evidences: [evidence, ...current.evidences],
-          }
-        : current,
-    )
-    toast.success("Evidencia cargada")
+  async function loadEvidence(record: CertificationRecord) {
+    const evidences = await listSstTrainingCertificationDocuments(record.id)
+    setRecords((current) => current.map((item) => (item.id === record.id ? { ...item, evidences } : item)))
+    setDetailRecord((current) => (current?.id === record.id ? { ...current, evidences } : current))
+    return evidences
   }
 
-  function downloadEvidence(record: CertificationRecord, evidence: CertificationEvidence) {
-    const blob = new Blob(
-      [
-        `Formacion y certificaciones SG-SST\nResponsable: ${record.responsible.name}\nCompetencia: ${competenceLabel(
-          record,
-        )}\nEvidencia: ${evidence.fileName}\nDescripcion: ${evidence.description || "Sin descripcion"}\nCargado: ${formatDateTime(
-          evidence.uploadedAt,
-        )}\n`,
-      ],
-      { type: "text/plain;charset=utf-8" },
-    )
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.href = url
-    link.download = evidence.fileName
-    link.click()
-    URL.revokeObjectURL(url)
+  async function openDetail(record: CertificationRecord) {
+    setDetailRecord(record)
+    try {
+      await loadEvidence(record)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar las evidencias")
+    }
+  }
+
+  async function saveEvidence(record: CertificationRecord, form: EvidenceForm) {
+    if (!form.file) throw new Error("Selecciona el archivo")
+    try {
+      await uploadSstTrainingCertificationDocument(record.id, {
+        file: form.file,
+        isConfirmed: true,
+        description: form.description,
+        observation: form.observation,
+      })
+      await Promise.all([loadEvidence(record), loadData()])
+      toast.success("Evidencia cargada")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar la evidencia")
+      throw error
+    }
+  }
+
+  async function downloadEvidence(evidence: SstTrainingCertificationDocument) {
+    if (!evidence.downloadUrl) return toast.error("La evidencia no tiene un archivo disponible")
+    try {
+      const blob = await downloadSstTrainingCertificationDocument(evidence.downloadUrl)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = evidence.originalName || "evidencia-certificacion-sst"
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar la evidencia")
+    }
+  }
+
+  async function previewEvidence(evidence: SstTrainingCertificationDocument) {
+    if (!evidence.downloadUrl) return toast.error("La evidencia no tiene un archivo disponible")
+    setPreviewLoadingId(evidence.id)
+    try {
+      const blob = await downloadSstTrainingCertificationDocument(evidence.downloadUrl)
+      setEvidencePreview({
+        document: evidence,
+        url: URL.createObjectURL(blob),
+        mimeType: blob.type || evidence.mimeType || "application/octet-stream",
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo previsualizar la evidencia")
+    } finally {
+      setPreviewLoadingId(null)
+    }
+  }
+
+  async function removeEvidence(record: CertificationRecord, evidence: SstTrainingCertificationDocument) {
+    if (!window.confirm(`¿Eliminar la evidencia ${evidence.originalName}?`)) return
+    setDeletingEvidenceId(evidence.id)
+    try {
+      await deleteSstTrainingCertificationDocument(record.id, evidence.id)
+      await Promise.all([loadEvidence(record), loadData()])
+      toast.success("Evidencia eliminada")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar la evidencia")
+    } finally {
+      setDeletingEvidenceId(null)
+    }
+  }
+
+  async function removeCertification(record: CertificationRecord) {
+    if (!window.confirm(`¿Eliminar ${competenceLabel(record, competenceOptions)}?`)) return
+    try {
+      await deleteSstTrainingCertification(record.id)
+      if (detailRecord?.id === record.id) setDetailRecord(null)
+      await loadData()
+      toast.success("Certificacion eliminada")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar la certificacion")
+    }
+  }
+
+  async function downloadLatestEvidence(record: CertificationRecord) {
+    try {
+      const evidences = record.evidences.length > 0 ? record.evidences : await loadEvidence(record)
+      if (!evidences[0]) return toast.error("La certificacion no tiene evidencias cargadas")
+      await downloadEvidence(evidences[0])
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar la evidencia")
+    }
   }
 
   return (
@@ -739,10 +883,10 @@ export default function SstTrainingCertificationsPage() {
           </div>
           <div className="flex justify-center overflow-x-auto px-1 py-1">
             <div className="flex w-fit min-w-max items-center gap-2">
-              <Metric label="Registros" value={stats.total} />
-              <Metric label="Vigentes" value={stats.valid} tone="green" />
-              <Metric label="Vencidos" value={stats.expired} tone="red" />
-              <Metric label="Con evidencia" value={stats.withEvidence} tone="blue" />
+              <Metric label="Registros" value={summary.total} />
+              <Metric label="Vigentes" value={summary.valid} tone="green" />
+              <Metric label="Vencidos" value={summary.expired} tone="red" />
+              <Metric label="Con evidencia" value={summary.withEvidence} tone="blue" />
             </div>
           </div>
         </div>
@@ -837,14 +981,14 @@ export default function SstTrainingCertificationsPage() {
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="font-semibold text-foreground">{competenceLabel(record)}</h3>
+                          <h3 className="font-semibold text-foreground">{competenceLabel(record, competenceOptions)}</h3>
                           <Badge variant="outline" className={statusClassName(status)}>
                             {statusLabel(status)}
                           </Badge>
                         </div>
                         <p className="mt-1 text-sm text-muted-foreground">{record.certifyingEntity}</p>
                       </div>
-                      <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => setDetailRecord(record)}>
+                      <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void openDetail(record)}>
                         <Eye className="h-4 w-4" />
                         Ver
                       </Button>
@@ -865,7 +1009,7 @@ export default function SstTrainingCertificationsPage() {
                       </p>
                       <p className="flex items-center gap-2">
                         <Upload className="h-4 w-4" />
-                        {record.evidences.length} evidencias
+                        {record.evidenceCount} evidencias
                       </p>
                     </div>
                   </CardContent>
@@ -892,8 +1036,6 @@ export default function SstTrainingCertificationsPage() {
               <tbody className="divide-y divide-border">
                 {filteredRecords.map((record) => {
                   const status = getStatus(record)
-                  const lastEvidence = record.evidences[0]
-
                   return (
                     <tr key={record.id} className="align-middle">
                       <td className="px-4 py-3">
@@ -901,7 +1043,7 @@ export default function SstTrainingCertificationsPage() {
                         <p className="text-muted-foreground">{record.responsible.email}</p>
                       </td>
                       <td className="px-4 py-3">
-                        <p className="max-w-[250px] truncate text-muted-foreground">{competenceLabel(record)}</p>
+                        <p className="max-w-[250px] truncate text-muted-foreground">{competenceLabel(record, competenceOptions)}</p>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">{formatDate(record.approvalDate)}</td>
                       <td className="px-4 py-3 text-muted-foreground">{record.certifyingEntity}</td>
@@ -912,7 +1054,7 @@ export default function SstTrainingCertificationsPage() {
                           {statusLabel(status)}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground">{record.evidences.length}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{record.evidenceCount}</td>
                       <td className="px-4 py-3 text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -921,7 +1063,7 @@ export default function SstTrainingCertificationsPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-56">
-                            <DropdownMenuItem onSelect={() => setDetailRecord(record)}>
+                            <DropdownMenuItem onSelect={() => void openDetail(record)}>
                               <Eye className="h-4 w-4" />
                               Ver detalle
                             </DropdownMenuItem>
@@ -938,15 +1080,20 @@ export default function SstTrainingCertificationsPage() {
                               <Upload className="h-4 w-4" />
                               Cargar evidencia
                             </DropdownMenuItem>
-                            {lastEvidence && (
+                            {record.evidenceCount > 0 && (
                               <>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onSelect={() => downloadEvidence(record, lastEvidence)}>
+                                <DropdownMenuItem onSelect={() => void downloadLatestEvidence(record)}>
                                   <Download className="h-4 w-4" />
                                   Descargar última evidencia
                                 </DropdownMenuItem>
                               </>
                             )}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => void removeCertification(record)}>
+                              <Trash2 className="h-4 w-4" />
+                              Eliminar
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>
@@ -963,6 +1110,7 @@ export default function SstTrainingCertificationsPage() {
         open={dialogOpen}
         record={editingRecord}
         responsible={responsible}
+        competenceOptions={competenceOptions}
         onClose={() => {
           setDialogOpen(false)
           setEditingRecord(null)
@@ -970,7 +1118,68 @@ export default function SstTrainingCertificationsPage() {
         onSave={saveRecord}
       />
       <EvidenceDialog record={evidenceRecord} onClose={() => setEvidenceRecord(null)} onSave={saveEvidence} />
-      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownloadEvidence={downloadEvidence} />
+      <DetailDialog
+        record={detailRecord}
+        competenceOptions={competenceOptions}
+        onClose={() => setDetailRecord(null)}
+        onPreviewEvidence={(evidence) => void previewEvidence(evidence)}
+        onDownloadEvidence={(evidence) => void downloadEvidence(evidence)}
+        onDeleteEvidence={(evidence) => {
+          if (detailRecord) void removeEvidence(detailRecord, evidence)
+        }}
+        previewLoadingId={previewLoadingId}
+        deletingEvidenceId={deletingEvidenceId}
+      />
+      <Dialog open={Boolean(evidencePreview)} onOpenChange={(open) => !open && setEvidencePreview(null)}>
+        <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+          <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
+            <DialogTitle>{evidencePreview?.document.originalName ?? "Vista previa de evidencia"}</DialogTitle>
+            <p className="text-sm text-muted-foreground">Previsualizacion del soporte de formacion o certificacion SST.</p>
+          </DialogHeader>
+          <div className="min-h-0 flex-1 overflow-auto bg-muted/30 p-4">
+            {evidencePreview?.mimeType.startsWith("image/") ? (
+              <img
+                src={evidencePreview.url}
+                alt={evidencePreview.document.originalName}
+                className="mx-auto max-h-[70dvh] max-w-full rounded-md object-contain"
+              />
+            ) : evidencePreview?.mimeType === "application/pdf" ? (
+              <iframe
+                src={evidencePreview.url}
+                title={evidencePreview.document.originalName}
+                className="h-[70dvh] min-h-[28rem] w-full rounded-md border border-border bg-white"
+              />
+            ) : evidencePreview ? (
+              <div className="flex min-h-64 flex-col items-center justify-center gap-3 text-center">
+                <FileText className="h-12 w-12 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
+                  Este tipo de archivo no admite vista previa. Puedes abrirlo o descargarlo.
+                </p>
+              </div>
+            ) : null}
+          </div>
+          <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+            {evidencePreview && canPreviewEvidence(evidencePreview.mimeType) ? (
+              <Button type="button" variant="outline" className="gap-2" onClick={() => window.open(evidencePreview.url, "_blank", "noopener,noreferrer")}>
+                <ExternalLink className="h-4 w-4" />
+                Abrir en pestaña
+              </Button>
+            ) : null}
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2"
+              onClick={() => evidencePreview && void downloadEvidence(evidencePreview.document)}
+            >
+              <Download className="h-4 w-4" />
+              Descargar
+            </Button>
+            <Button type="button" onClick={() => setEvidencePreview(null)}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }

@@ -129,25 +129,25 @@ export const navigation: NavigationItem[] = [
         href: "/dashboard/sst-communications",
         icon: MessageSquare,
       }, */
-      /* {
+      {
         code: "SST_TRAINING_CERTIFICATIONS",
         name: "Formación y Certificaciones",
         href: "/dashboard/sst-training-certifications",
         icon: GraduationCap,
-      }, */
-      /* {
+      },
+      {
         code: "SST_OBJECTIVES",
         name: "Objetivos SST",
         href: "/dashboard/sst-objectives",
         icon: Target,
-      }, */
-      /* {
+      },
+      {
         code: "INITIAL_EVALUATION",
         name: "Evaluación Inicial",
         href: "/dashboard/initial-evaluation",
         icon: ClipboardList,
       },
-      {
+      /* {
         code: "ACCOUNTABILITY",
         name: "Rendición de Cuentas",
         href: "/dashboard/accountability",

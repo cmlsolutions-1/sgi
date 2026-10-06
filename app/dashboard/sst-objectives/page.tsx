@@ -5,14 +5,17 @@ import {
   CalendarDays,
   Download,
   Edit,
+  ExternalLink,
   Eye,
   FileText,
   LayoutGrid,
   List,
+  Loader2,
   MoreHorizontal,
   Plus,
   Search,
   Target,
+  Trash2,
   Upload,
 } from "lucide-react"
 import { toast } from "sonner"
@@ -37,67 +40,51 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { createSstPolicy, listSstPolicies } from "@/services/sstPolicyService"
+import {
+  createSstObjective,
+  createSstObjectiveDiffusion,
+  createSstObjectiveFollowUp,
+  deleteSstObjective,
+  downloadSstObjectiveDocument,
+  getSstObjective,
+  getSstObjectiveSummary,
+  listSstObjectiveDiffusionDocuments,
+  listSstObjectiveFollowUpDocuments,
+  listSstObjectives,
+  updateSstObjective,
+  uploadSstObjectiveDiffusionDocument,
+  uploadSstObjectiveFollowUpDocument,
+} from "@/services/sstObjectiveService"
+import type {
+  SstObjective as SstObjectiveApi,
+  SstObjectiveDiffusion,
+  SstObjectiveDocument,
+  SstObjectiveFollowUp,
+  SstObjectiveStatus,
+  SstObjectiveSummary,
+  SstObjectiveType,
+  UpsertSstObjectiveDto,
+} from "@/types/manager/sst-objective"
+import type { SstPolicy } from "@/types/manager/sst-policy"
 
 type ViewMode = "cards" | "list"
-type ObjectiveType =
-  | "ACCIDENTALITY"
-  | "TRAINING"
-  | "RISKS"
-  | "PREVENTIVE_MEDICINE"
-  | "INSPECTIONS"
-  | "EMERGENCIES"
-  | "COPASST"
-  | "PPE"
-  | "OTHER"
-type ObjectiveStatus = "PENDING" | "IN_PROGRESS" | "FULFILLED"
+type ObjectiveType = SstObjectiveType
+type ObjectiveStatus = SstObjectiveStatus
 
-type Policy = {
-  id: string
-  name: string
-  description: string
-  createdAt: string
-}
+type Policy = SstPolicy
 
-type Evidence = {
-  id: string
-  fileName: string
-  description: string
-  uploadedAt: string
-}
-
-type FollowUp = {
-  id: string
-  date: string
-  progress: number
-  observations: string
-  evidence?: Evidence
-}
-
-type Diffusion = {
-  id: string
-  medium: string
-  date: string
-  evidence?: Evidence
-}
-
-type SstObjective = {
-  id: string
-  name: string
-  year: number
-  description: string
-  type: ObjectiveType
-  customType?: string
-  goal: string
-  indicator: number
-  measurementUnit: string
-  expectedValue: string
-  policyId: string
-  trackingResponsible: string
-  startDate: string
-  endDate: string
-  observations: string
+type FollowUp = Omit<SstObjectiveFollowUp, "evidences"> & { evidences: SstObjectiveDocument[] }
+type Diffusion = Omit<SstObjectiveDiffusion, "evidences"> & { evidences: SstObjectiveDocument[] }
+type SstObjective = Omit<SstObjectiveApi, "followUps" | "diffusions"> & {
   followUps: FollowUp[]
   diffusions: Diffusion[]
+}
+
+type EvidencePreview = {
+  document: SstObjectiveDocument
+  url: string
+  mimeType: string
 }
 
 type ObjectiveForm = {
@@ -126,6 +113,7 @@ type FollowUpForm = {
   date: string
   progress: string
   observations: string
+  evidenceFile: File | null
   evidenceFileName: string
   evidenceDescription: string
 }
@@ -133,6 +121,7 @@ type FollowUpForm = {
 type DiffusionForm = {
   medium: string
   date: string
+  evidenceFile: File | null
   evidenceFileName: string
   evidenceDescription: string
 }
@@ -175,6 +164,7 @@ const emptyObjectiveForm: ObjectiveForm = {
 
 const emptyFollowUpForm: FollowUpForm = {
   date: new Date().toISOString().slice(0, 10),
+  evidenceFile: null,
   progress: "",
   observations: "",
   evidenceFileName: "",
@@ -184,101 +174,9 @@ const emptyFollowUpForm: FollowUpForm = {
 const emptyDiffusionForm: DiffusionForm = {
   medium: "",
   date: new Date().toISOString().slice(0, 10),
+  evidenceFile: null,
   evidenceFileName: "",
   evidenceDescription: "",
-}
-
-const initialPolicies: Policy[] = [
-  {
-    id: "policy-1",
-    name: "Politica de Seguridad y Salud en el Trabajo",
-    description: "Compromiso de prevencion de lesiones, enfermedades laborales y mejora continua del SG-SST.",
-    createdAt: "2026-01-08T08:30:00",
-  },
-  {
-    id: "policy-2",
-    name: "Politica de prevencion de accidentalidad",
-    description: "Lineamientos para reducir eventos laborales mediante controles, formacion y seguimiento.",
-    createdAt: "2026-02-14T10:00:00",
-  },
-]
-
-const initialObjectives: SstObjective[] = [
-  {
-    id: "objective-1",
-    name: "Reducir la accidentalidad laboral",
-    year: 2026,
-    description: "Disminuir la ocurrencia de accidentes mediante intervencion de riesgos prioritarios.",
-    type: "ACCIDENTALITY",
-    goal: "Reducir en 15% los accidentes frente al periodo anterior.",
-    indicator: 80,
-    measurementUnit: "%",
-    expectedValue: "85%",
-    policyId: "policy-2",
-    trackingResponsible: "Coordinador SG-SST",
-    startDate: "2026-01-15",
-    endDate: "2026-12-20",
-    observations: "Seguimiento mensual por accidentalidad e investigacion de eventos.",
-    followUps: [
-      {
-        id: "follow-1",
-        date: "2026-03-30",
-        progress: 35,
-        observations: "Se socializaron controles de seguridad en areas operativas.",
-        evidence: {
-          id: "evidence-1",
-          fileName: "seguimiento-accidentalidad-marzo.pdf",
-          description: "Acta y registro fotografico del seguimiento.",
-          uploadedAt: "2026-03-30T11:20:00",
-        },
-      },
-      {
-        id: "follow-2",
-        date: "2026-06-30",
-        progress: 80,
-        observations: "Avance por cierre de acciones de inspeccion y capacitacion.",
-      },
-    ],
-    diffusions: [
-      {
-        id: "diffusion-1",
-        medium: "Comité COPASST",
-        date: "2026-02-01",
-        evidence: {
-          id: "diffusion-evidence-1",
-          fileName: "difusion-politica-copasst.pdf",
-          description: "Acta de socializacion de la politica relacionada.",
-          uploadedAt: "2026-02-01T09:00:00",
-        },
-      },
-    ],
-  },
-  {
-    id: "objective-2",
-    name: "Cumplir el plan de capacitacion SST",
-    year: 2026,
-    description: "Asegurar que los trabajadores reciban formacion en peligros y controles.",
-    type: "TRAINING",
-    goal: "Capacitar minimo al 90% del personal activo.",
-    indicator: 20,
-    measurementUnit: "%",
-    expectedValue: "90%",
-    policyId: "policy-1",
-    trackingResponsible: "Talento humano",
-    startDate: "2026-02-01",
-    endDate: "2026-11-30",
-    observations: "Pendiente programacion de grupos operativos.",
-    followUps: [],
-    diffusions: [],
-  },
-]
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
 }
 
 function normalizeNumber(value: string) {
@@ -307,9 +205,7 @@ function typeLabel(objective: Pick<SstObjective, "type" | "customType">) {
 }
 
 function getStatus(objective: SstObjective): ObjectiveStatus {
-  if (objective.indicator >= 100) return "FULFILLED"
-  if (objective.followUps.length > 0 || objective.indicator > 0) return "IN_PROGRESS"
-  return "PENDING"
+  return objective.status
 }
 
 function statusLabel(status: ObjectiveStatus) {
@@ -330,17 +226,6 @@ function policyName(policies: Policy[], policyId: string) {
 
 function latestFollowUp(objective: SstObjective) {
   return [...objective.followUps].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]
-}
-
-function buildEvidence(prefix: string, fileName: string, description: string): Evidence | undefined {
-  if (!fileName.trim()) return undefined
-
-  return {
-    id: createId(prefix),
-    fileName: fileName.trim(),
-    description: description.trim(),
-    uploadedAt: new Date().toISOString(),
-  }
 }
 
 function InfoBlock({ label, value }: { label: string; value: string }) {
@@ -377,18 +262,26 @@ function PolicyDialog({
 }: {
   open: boolean
   onClose: () => void
-  onSave: (form: PolicyForm) => void
+  onSave: (form: PolicyForm) => Promise<void>
 }) {
   const [form, setForm] = useState<PolicyForm>(emptyPolicyForm)
+  const [saving, setSaving] = useState(false)
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!form.name.trim()) return toast.error("Ingresa el nombre de la politica SST")
     if (!form.description.trim()) return toast.error("Ingresa la descripcion de la politica")
 
-    onSave(form)
-    setForm(emptyPolicyForm)
-    onClose()
+    try {
+      setSaving(true)
+      await onSave(form)
+      setForm(emptyPolicyForm)
+      onClose()
+    } catch {
+      // El contenedor muestra el mensaje del backend y conserva los datos diligenciados.
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -418,10 +311,12 @@ function PolicyDialog({
             />
           </Label>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
               Cancelar
             </Button>
-            <Button type="submit">Crear política</Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Creando..." : "Crear política"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -440,7 +335,7 @@ function ObjectiveDialog({
   objective: SstObjective | null
   policies: Policy[]
   onClose: () => void
-  onSave: (form: ObjectiveForm, objectiveId?: string) => void
+  onSave: (form: ObjectiveForm, objectiveId?: string) => Promise<void>
 }) {
   const [form, setForm] = useState<ObjectiveForm>(emptyObjectiveForm)
   const editing = Boolean(objective)
@@ -470,7 +365,7 @@ function ObjectiveDialog({
     )
   }, [objective, open, policies])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const indicator = Number(form.indicator)
     const year = Number(form.year)
@@ -492,8 +387,12 @@ function ObjectiveDialog({
     if (!form.endDate) return toast.error("Selecciona la fecha fin")
     if (form.endDate < form.startDate) return toast.error("La fecha fin no puede ser anterior al inicio")
 
-    onSave(form, objective?.id)
-    onClose()
+    try {
+      await onSave(form, objective?.id)
+      onClose()
+    } catch {
+      // El contenedor conserva el formulario abierto y muestra el error del backend.
+    }
   }
 
   return (
@@ -689,11 +588,11 @@ function FollowUpDialog({
   objective: SstObjective | null
   lastProgress: number
   onClose: () => void
-  onSave: (objective: SstObjective, form: FollowUpForm) => void
+  onSave: (objective: SstObjective, form: FollowUpForm) => Promise<void>
 }) {
   const [form, setForm] = useState<FollowUpForm>(emptyFollowUpForm)
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!objective) return
     const progress = Number(form.progress)
@@ -703,9 +602,13 @@ function FollowUpDialog({
     if (progress < lastProgress) return toast.error("El avance no puede disminuir frente al seguimiento anterior")
     if (!form.observations.trim()) return toast.error("Ingresa las observaciones")
 
-    onSave(objective, form)
-    setForm(emptyFollowUpForm)
-    onClose()
+    try {
+      await onSave(objective, form)
+      setForm(emptyFollowUpForm)
+      onClose()
+    } catch {
+      // El contenedor conserva el formulario abierto y muestra el error del backend.
+    }
   }
 
   return (
@@ -749,9 +652,10 @@ function FollowUpDialog({
               Evidencia
               <Input
                 type="file"
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, evidenceFileName: event.target.files?.[0]?.name ?? "" }))
-                }
+                onChange={(event) => {
+                  const file = event.target.files?.[0] ?? null
+                  setForm((current) => ({ ...current, evidenceFile: file, evidenceFileName: file?.name ?? "" }))
+                }}
               />
             </Label>
             <Label className="grid gap-2">
@@ -790,19 +694,23 @@ function DiffusionDialog({
 }: {
   objective: SstObjective | null
   onClose: () => void
-  onSave: (objective: SstObjective, form: DiffusionForm) => void
+  onSave: (objective: SstObjective, form: DiffusionForm) => Promise<void>
 }) {
   const [form, setForm] = useState<DiffusionForm>(emptyDiffusionForm)
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!objective) return
     if (!form.medium.trim()) return toast.error("Ingresa el medio de difusión")
     if (!form.date) return toast.error("Selecciona la fecha de difusión")
 
-    onSave(objective, form)
-    setForm(emptyDiffusionForm)
-    onClose()
+    try {
+      await onSave(objective, form)
+      setForm(emptyDiffusionForm)
+      onClose()
+    } catch {
+      // El contenedor conserva el formulario abierto y muestra el error del backend.
+    }
   }
 
   return (
@@ -836,9 +744,10 @@ function DiffusionDialog({
               Evidencia
               <Input
                 type="file"
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, evidenceFileName: event.target.files?.[0]?.name ?? "" }))
-                }
+                onChange={(event) => {
+                  const file = event.target.files?.[0] ?? null
+                  setForm((current) => ({ ...current, evidenceFile: file, evidenceFileName: file?.name ?? "" }))
+                }}
               />
             </Label>
             <Label className="grid gap-2">
@@ -874,12 +783,16 @@ function DetailDialog({
   objective,
   policies,
   onClose,
+  onPreviewEvidence,
   onDownloadEvidence,
+  previewLoadingId,
 }: {
   objective: SstObjective | null
   policies: Policy[]
   onClose: () => void
-  onDownloadEvidence: (evidence: Evidence, context: string) => void
+  onPreviewEvidence: (evidence: SstObjectiveDocument) => void
+  onDownloadEvidence: (evidence: SstObjectiveDocument) => void
+  previewLoadingId: string | null
 }) {
   if (!objective) return null
   const status = getStatus(objective)
@@ -935,18 +848,44 @@ function DetailDialog({
                       <Badge variant="outline">{followUp.progress}%</Badge>
                     </div>
                     <p className="mt-2 text-sm text-muted-foreground">{followUp.observations}</p>
-                    {followUp.evidence && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="mt-3 gap-2"
-                        onClick={() => onDownloadEvidence(followUp.evidence as Evidence, `seguimiento-${objective.name}`)}
+                    {followUp.evidences.map((evidence) => (
+                      <div
+                        key={evidence.id}
+                        className="mt-3 flex flex-col gap-3 rounded-md border border-border bg-card px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
                       >
-                        <Download className="h-4 w-4" />
-                        Descargar evidencia
-                      </Button>
-                    )}
+                        <div className="flex min-w-0 items-center gap-2">
+                          <FileText className="h-4 w-4 shrink-0 text-primary" />
+                          <span className="truncate text-sm font-medium text-foreground">{evidence.originalName}</span>
+                        </div>
+                        <div className="flex shrink-0 flex-wrap gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="gap-2"
+                            disabled={previewLoadingId === evidence.id}
+                            onClick={() => onPreviewEvidence(evidence)}
+                          >
+                            {previewLoadingId === evidence.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                            {previewLoadingId === evidence.id ? "Cargando" : "Ver"}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="gap-2"
+                            onClick={() => onDownloadEvidence(evidence)}
+                          >
+                            <Download className="h-4 w-4" />
+                            Descargar
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
@@ -965,18 +904,44 @@ function DetailDialog({
                       <p className="text-sm font-medium text-foreground">{diffusion.medium}</p>
                       <p className="text-sm text-muted-foreground">{formatDate(diffusion.date)}</p>
                     </div>
-                    {diffusion.evidence && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="mt-3 gap-2"
-                        onClick={() => onDownloadEvidence(diffusion.evidence as Evidence, `difusion-${objective.name}`)}
+                    {diffusion.evidences.map((evidence) => (
+                      <div
+                        key={evidence.id}
+                        className="mt-3 flex flex-col gap-3 rounded-md border border-border bg-card px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
                       >
-                        <Download className="h-4 w-4" />
-                        Descargar evidencia
-                      </Button>
-                    )}
+                        <div className="flex min-w-0 items-center gap-2">
+                          <FileText className="h-4 w-4 shrink-0 text-primary" />
+                          <span className="truncate text-sm font-medium text-foreground">{evidence.originalName}</span>
+                        </div>
+                        <div className="flex shrink-0 flex-wrap gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="gap-2"
+                            disabled={previewLoadingId === evidence.id}
+                            onClick={() => onPreviewEvidence(evidence)}
+                          >
+                            {previewLoadingId === evidence.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                            {previewLoadingId === evidence.id ? "Cargando" : "Ver"}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="gap-2"
+                            onClick={() => onDownloadEvidence(evidence)}
+                          >
+                            <Download className="h-4 w-4" />
+                            Descargar
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
@@ -994,8 +959,15 @@ function DetailDialog({
 }
 
 export default function SstObjectivesPage() {
-  const [policies, setPolicies] = useState<Policy[]>(initialPolicies)
-  const [objectives, setObjectives] = useState<SstObjective[]>(initialObjectives)
+  const [policies, setPolicies] = useState<Policy[]>([])
+  const [objectives, setObjectives] = useState<SstObjective[]>([])
+  const [summary, setSummary] = useState<SstObjectiveSummary>({
+    policies: 0,
+    total: 0,
+    pending: 0,
+    inProgress: 0,
+    fulfilled: 0,
+  })
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<ObjectiveType | "all">("all")
   const [statusFilter, setStatusFilter] = useState<ObjectiveStatus | "all">("all")
@@ -1006,6 +978,41 @@ export default function SstObjectivesPage() {
   const [followUpObjective, setFollowUpObjective] = useState<SstObjective | null>(null)
   const [diffusionObjective, setDiffusionObjective] = useState<SstObjective | null>(null)
   const [detailObjective, setDetailObjective] = useState<SstObjective | null>(null)
+  const [evidencePreview, setEvidencePreview] = useState<EvidencePreview | null>(null)
+  const [previewLoadingId, setPreviewLoadingId] = useState<string | null>(null)
+
+  function normalizeObjective(objective: SstObjectiveApi): SstObjective {
+    return {
+      ...objective,
+      followUps: (objective.followUps ?? []).map((followUp) => ({ ...followUp, evidences: followUp.evidences ?? [] })),
+      diffusions: (objective.diffusions ?? []).map((diffusion) => ({ ...diffusion, evidences: diffusion.evidences ?? [] })),
+    }
+  }
+
+  async function loadData() {
+    try {
+      const [objectiveData, summaryData, policyData] = await Promise.all([
+        listSstObjectives({ limit: 100 }),
+        getSstObjectiveSummary(),
+        listSstPolicies({ limit: 100 }),
+      ])
+      setObjectives(objectiveData.items.map(normalizeObjective))
+      setSummary(summaryData)
+      setPolicies(policyData.items)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar los objetivos SST")
+    }
+  }
+
+  useEffect(() => {
+    void loadData()
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (evidencePreview?.url) URL.revokeObjectURL(evidencePreview.url)
+    }
+  }, [evidencePreview?.url])
 
   const filteredObjectives = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -1026,30 +1033,22 @@ export default function SstObjectivesPage() {
     })
   }, [objectives, policies, search, statusFilter, typeFilter])
 
-  const stats = useMemo(() => {
-    return {
-      policies: policies.length,
-      total: objectives.length,
-      pending: objectives.filter((objective) => getStatus(objective) === "PENDING").length,
-      inProgress: objectives.filter((objective) => getStatus(objective) === "IN_PROGRESS").length,
-      fulfilled: objectives.filter((objective) => getStatus(objective) === "FULFILLED").length,
+  async function savePolicy(form: PolicyForm) {
+    try {
+      await createSstPolicy({
+        name: form.name.trim(),
+        description: form.description.trim(),
+      })
+      toast.success("Politica SST creada")
+      await loadData()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo crear la politica SST")
+      throw error
     }
-  }, [objectives, policies.length])
-
-  function savePolicy(form: PolicyForm) {
-    const policy: Policy = {
-      id: createId("policy"),
-      name: form.name.trim(),
-      description: form.description.trim(),
-      createdAt: new Date().toISOString(),
-    }
-
-    setPolicies((current) => [policy, ...current])
-    toast.success("Politica SST creada")
   }
 
-  function saveObjective(form: ObjectiveForm, objectiveId?: string) {
-    const payload = {
+  async function saveObjective(form: ObjectiveForm, objectiveId?: string) {
+    const payload: UpsertSstObjectiveDto = {
       name: form.name.trim(),
       year: Number(form.year),
       description: form.description.trim(),
@@ -1066,109 +1065,140 @@ export default function SstObjectivesPage() {
       observations: form.observations.trim(),
     }
 
-    if (objectiveId) {
-      setObjectives((current) =>
-        current.map((objective) =>
-          objective.id === objectiveId
-            ? {
-                ...objective,
-                ...payload,
-              }
-            : objective,
-        ),
+    try {
+      if (objectiveId) {
+        await updateSstObjective(objectiveId, payload)
+        toast.success("Objetivo SST actualizado")
+      } else {
+        await createSstObjective(payload)
+        toast.success("Objetivo SST creado")
+      }
+      await loadData()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar el objetivo SST")
+      throw error
+    }
+  }
+
+  async function openDetail(objective: SstObjective) {
+    setDetailObjective(objective)
+    try {
+      const detail = normalizeObjective(await getSstObjective(objective.id))
+      const followUps = await Promise.all(
+        detail.followUps.map(async (followUp) => ({
+          ...followUp,
+          evidences: await listSstObjectiveFollowUpDocuments(detail.id, followUp.id),
+        })),
       )
-      toast.success("Objetivo SST actualizado")
-      return
+      const diffusions = await Promise.all(
+        detail.diffusions.map(async (diffusion) => ({
+          ...diffusion,
+          evidences: await listSstObjectiveDiffusionDocuments(detail.id, diffusion.id),
+        })),
+      )
+      setDetailObjective({ ...detail, followUps, diffusions })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el detalle del objetivo")
     }
-
-    setObjectives((current) => [
-      {
-        id: createId("objective"),
-        ...payload,
-        followUps: [],
-        diffusions: [],
-      },
-      ...current,
-    ])
-    toast.success("Objetivo SST creado")
   }
 
-  function saveFollowUp(objective: SstObjective, form: FollowUpForm) {
-    const followUp: FollowUp = {
-      id: createId("follow-up"),
-      date: form.date,
-      progress: Number(form.progress),
-      observations: form.observations.trim(),
-      evidence: buildEvidence("follow-up-evidence", form.evidenceFileName, form.evidenceDescription),
+  async function saveFollowUp(objective: SstObjective, form: FollowUpForm) {
+    try {
+      const followUp = await createSstObjectiveFollowUp(objective.id, {
+        date: form.date,
+        progress: Number(form.progress),
+        observations: form.observations.trim(),
+      })
+      if (form.evidenceFile) {
+        await uploadSstObjectiveFollowUpDocument(objective.id, followUp.id, {
+          file: form.evidenceFile,
+          isConfirmed: true,
+          description: form.evidenceDescription,
+        })
+      }
+      await loadData()
+      if (detailObjective?.id === objective.id) await openDetail(objective)
+      toast.success(followUp.progress >= 100 ? "Objetivo cumplido" : "Seguimiento registrado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo registrar el seguimiento")
+      throw error
     }
-
-    setObjectives((current) =>
-      current.map((item) =>
-        item.id === objective.id
-          ? {
-              ...item,
-              indicator: followUp.progress,
-              followUps: [followUp, ...item.followUps],
-            }
-          : item,
-      ),
-    )
-    setDetailObjective((current) =>
-      current?.id === objective.id
-        ? {
-            ...current,
-            indicator: followUp.progress,
-            followUps: [followUp, ...current.followUps],
-          }
-        : current,
-    )
-    toast.success(followUp.progress >= 100 ? "Objetivo cumplido" : "Seguimiento registrado")
   }
 
-  function saveDiffusion(objective: SstObjective, form: DiffusionForm) {
-    const diffusion: Diffusion = {
-      id: createId("diffusion"),
-      medium: form.medium.trim(),
-      date: form.date,
-      evidence: buildEvidence("diffusion-evidence", form.evidenceFileName, form.evidenceDescription),
+  async function saveDiffusion(objective: SstObjective, form: DiffusionForm) {
+    try {
+      const diffusion = await createSstObjectiveDiffusion(objective.id, {
+        medium: form.medium.trim(),
+        date: form.date,
+      })
+      if (form.evidenceFile) {
+        await uploadSstObjectiveDiffusionDocument(objective.id, diffusion.id, {
+          file: form.evidenceFile,
+          isConfirmed: true,
+          description: form.evidenceDescription,
+        })
+      }
+      await loadData()
+      if (detailObjective?.id === objective.id) await openDetail(objective)
+      toast.success("Difusion registrada")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo registrar la difusion")
+      throw error
     }
-
-    setObjectives((current) =>
-      current.map((item) =>
-        item.id === objective.id
-          ? {
-              ...item,
-              diffusions: [diffusion, ...item.diffusions],
-            }
-          : item,
-      ),
-    )
-    setDetailObjective((current) =>
-      current?.id === objective.id
-        ? {
-            ...current,
-            diffusions: [diffusion, ...current.diffusions],
-          }
-        : current,
-    )
-    toast.success("Difusion registrada")
   }
 
-  function downloadEvidence(evidence: Evidence, context: string) {
-    const blob = new Blob(
-      [
-        `Evidencia Objetivos SST\nContexto: ${context}\nArchivo: ${evidence.fileName}\nDescripcion: ${
-          evidence.description || "Sin descripcion"
-        }\nCargado: ${formatDateTime(evidence.uploadedAt)}\n`,
-      ],
-      { type: "text/plain;charset=utf-8" },
-    )
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.href = url
-    link.download = evidence.fileName
-    link.click()
-    URL.revokeObjectURL(url)
+  async function downloadEvidence(evidence: SstObjectiveDocument) {
+    try {
+      const blob = await downloadSstObjectiveDocument(evidence.downloadUrl)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = evidence.originalName || "evidencia-objetivo-sst"
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar la evidencia")
+    }
+  }
+
+  async function previewEvidence(evidence: SstObjectiveDocument) {
+    if (!evidence.downloadUrl) return toast.error("La evidencia no tiene un archivo disponible")
+
+    setPreviewLoadingId(evidence.id)
+    try {
+      const blob = await downloadSstObjectiveDocument(evidence.downloadUrl)
+      const url = URL.createObjectURL(blob)
+      setEvidencePreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return {
+          document: evidence,
+          url,
+          mimeType: blob.type || evidence.mimeType || "application/octet-stream",
+        }
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo previsualizar la evidencia")
+    } finally {
+      setPreviewLoadingId(null)
+    }
+  }
+
+  function closeEvidencePreview() {
+    setEvidencePreview((current) => {
+      if (current?.url) URL.revokeObjectURL(current.url)
+      return null
+    })
+  }
+
+  async function removeObjective(objective: SstObjective) {
+    if (!window.confirm(`¿Eliminar el objetivo ${objective.name}?`)) return
+    try {
+      await deleteSstObjective(objective.id)
+      await loadData()
+      toast.success("Objetivo SST eliminado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar el objetivo SST")
+    }
   }
 
   return (
@@ -1189,7 +1219,7 @@ export default function SstObjectivesPage() {
             type="button"
             className="gap-2"
             onClick={() => {
-              if (policies.length === 0) {
+              if (!policies.some((policy) => policy.status === "ACTIVE")) {
                 toast.error("Primero crea una politica SST")
                 return
               }
@@ -1206,11 +1236,11 @@ export default function SstObjectivesPage() {
       <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
         <div className="flex justify-center overflow-x-auto px-3 py-1">
           <div className="flex w-fit min-w-max items-center gap-2">
-            <Metric label="Políticas" value={stats.policies} />
-            <Metric label="Objetivos" value={stats.total} />
-            <Metric label="Pendientes" value={stats.pending} tone="amber" />
-            <Metric label="En ejecución" value={stats.inProgress} tone="blue" />
-            <Metric label="Cumplidos" value={stats.fulfilled} tone="green" />
+            <Metric label="Políticas" value={summary.policies} />
+            <Metric label="Objetivos" value={summary.total} />
+            <Metric label="Pendientes" value={summary.pending} tone="amber" />
+            <Metric label="En ejecución" value={summary.inProgress} tone="blue" />
+            <Metric label="Cumplidos" value={summary.fulfilled} tone="green" />
           </div>
         </div>
 
@@ -1312,7 +1342,7 @@ export default function SstObjectivesPage() {
                         </div>
                         <p className="mt-1 text-sm text-muted-foreground">{typeLabel(objective)} · {objective.year}</p>
                       </div>
-                      <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => setDetailObjective(objective)}>
+                      <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void openDetail(objective)}>
                         <Eye className="h-4 w-4" />
                         Ver
                       </Button>
@@ -1321,8 +1351,8 @@ export default function SstObjectivesPage() {
                     <div className="grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
                       <p className="flex items-center gap-2"><Target className="h-4 w-4" />Indicador: {objective.indicator}%</p>
                       <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />Fin: {formatDate(objective.endDate)}</p>
-                      <p className="flex items-center gap-2"><FileText className="h-4 w-4" />{objective.followUps.length} seguimientos</p>
-                      <p className="flex items-center gap-2"><Upload className="h-4 w-4" />{objective.diffusions.length} difusiones</p>
+                      <p className="flex items-center gap-2"><FileText className="h-4 w-4" />{objective.followUpsCount} seguimientos</p>
+                      <p className="flex items-center gap-2"><Upload className="h-4 w-4" />{objective.diffusionsCount} difusiones</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -1385,7 +1415,7 @@ export default function SstObjectivesPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-56">
-                            <DropdownMenuItem onSelect={() => setDetailObjective(objective)}>
+                            <DropdownMenuItem onSelect={() => void openDetail(objective)}>
                               <Eye className="h-4 w-4" />
                               Ver detalle
                             </DropdownMenuItem>
@@ -1406,17 +1436,11 @@ export default function SstObjectivesPage() {
                               <Upload className="h-4 w-4" />
                               Registrar difusión
                             </DropdownMenuItem>
-                            {(last?.evidence || objective.diffusions.find((diffusion) => diffusion.evidence)?.evidence) && (
-                              <>
-                                <DropdownMenuSeparator />
-                                {last?.evidence && (
-                                  <DropdownMenuItem onSelect={() => downloadEvidence(last.evidence as Evidence, `seguimiento-${objective.name}`)}>
-                                    <Download className="h-4 w-4" />
-                                    Descargar evidencia seguimiento
-                                  </DropdownMenuItem>
-                                )}
-                              </>
-                            )}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => void removeObjective(objective)}>
+                              <Trash2 className="h-4 w-4" />
+                              Eliminar
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>
@@ -1429,16 +1453,20 @@ export default function SstObjectivesPage() {
         )}
       </section>
 
-      <PolicyDialog open={policyOpen} onClose={() => setPolicyOpen(false)} onSave={savePolicy} />
       <ObjectiveDialog
         open={objectiveOpen}
         objective={editingObjective}
-        policies={policies}
+        policies={policies.filter((policy) => policy.status === "ACTIVE")}
         onClose={() => {
           setObjectiveOpen(false)
           setEditingObjective(null)
         }}
         onSave={saveObjective}
+      />
+      <PolicyDialog
+        open={policyOpen}
+        onClose={() => setPolicyOpen(false)}
+        onSave={savePolicy}
       />
       <FollowUpDialog
         objective={followUpObjective}
@@ -1455,8 +1483,70 @@ export default function SstObjectivesPage() {
         objective={detailObjective}
         policies={policies}
         onClose={() => setDetailObjective(null)}
+        onPreviewEvidence={(evidence) => void previewEvidence(evidence)}
         onDownloadEvidence={downloadEvidence}
+        previewLoadingId={previewLoadingId}
       />
+      <Dialog open={Boolean(evidencePreview)} onOpenChange={(open) => !open && closeEvidencePreview()}>
+        <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+          <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
+            <DialogTitle className="truncate">
+              {evidencePreview?.document.originalName || "Vista previa de evidencia"}
+            </DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              Evidencia registrada en el seguimiento o la difusión del objetivo SST.
+            </p>
+          </DialogHeader>
+          <div className="min-h-0 flex-1 overflow-auto bg-muted/30 p-4">
+            {evidencePreview?.mimeType.startsWith("image/") ? (
+              <div className="flex min-h-[24rem] items-center justify-center rounded-md border border-border bg-card p-3">
+                <img
+                  src={evidencePreview.url}
+                  alt={evidencePreview.document.originalName || "Evidencia del objetivo SST"}
+                  className="max-h-[70dvh] max-w-full object-contain"
+                />
+              </div>
+            ) : evidencePreview?.mimeType.startsWith("application/pdf") ? (
+              <iframe
+                src={evidencePreview.url}
+                title={evidencePreview.document.originalName || "Evidencia del objetivo SST"}
+                className="h-[70dvh] min-h-[28rem] w-full rounded-md border border-border bg-white"
+              />
+            ) : evidencePreview ? (
+              <div className="flex min-h-[24rem] flex-col items-center justify-center rounded-md border border-dashed border-border bg-card p-6 text-center">
+                <FileText className="h-12 w-12 text-muted-foreground" />
+                <p className="mt-3 text-sm font-medium text-foreground">Vista previa no disponible</p>
+                <p className="mt-1 max-w-md text-sm text-muted-foreground">
+                  Este formato no puede mostrarse dentro del aplicativo. Puedes abrirlo en una pestaña nueva o descargarlo.
+                </p>
+              </div>
+            ) : null}
+          </div>
+          <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+            {evidencePreview ? (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => window.open(evidencePreview.url, "_blank", "noopener,noreferrer")}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Abrir en pestaña
+                </Button>
+                <Button
+                  type="button"
+                  className="gap-2"
+                  onClick={() => void downloadEvidence(evidencePreview.document)}
+                >
+                  <Download className="h-4 w-4" />
+                  Descargar
+                </Button>
+              </>
+            ) : null}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }
