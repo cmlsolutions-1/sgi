@@ -6,7 +6,7 @@
 - Archivo principal: `app/dashboard/accountability/page.tsx`
 - Modulo padre actual en navegacion: `Gestion del SG-SST`
 - Codigo de modulo hijo usado en navegacion: `ACCOUNTABILITY`
-- Estado actual: implementacion funcional mockeada en frontend con `useState`.
+- Estado actual: integrado con los endpoints del backend; no conserva registros ni indicadores mockeados.
 
 La pantalla actual permite:
 
@@ -744,7 +744,7 @@ Modulo hijo:
 }
 ```
 
-## 18. Servicios frontend a crear cuando exista backend
+## 18. Servicios frontend integrados
 
 - `services/accountabilityService.ts`
 - `types/manager/accountability.ts`
@@ -766,15 +766,11 @@ deleteAccountabilityReportDocument(accountabilityReportId, documentId)
 getAccountabilitySummary(filters)
 ```
 
-## 19. Ajustes frontend pendientes cuando backend este listo
+## 19. Integracion frontend completada
 
-1. Reemplazar `initialAccountabilities` por `GET /api/accountability-reports`.
-2. Reemplazar representantes legales mockeados por endpoint real.
-3. Reemplazar responsable SG-SST quemado por `GET /api/employee/sgi-responsible`.
-4. Enviar creacion real mediante `POST /api/accountability-reports`.
-5. Conectar indicadores automaticos calculados desde backend.
-6. Conectar descarga PDF real o conservar PDF frontend segun decision tecnica.
-7. Reemplazar carga simulada por `multipart/form-data`.
-8. Agregar vista/preview de documento cargado usando componente comun de documentos.
-9. Agregar permisos por accion.
-10. Agregar filtros por vigencia, estado y tipo de ejecucion.
+1. El listado, creación, detalle e indicadores consumen el backend.
+2. El responsable SG-SST se obtiene de `/api/employee/sgi-responsible`.
+3. El representante legal se selecciona desde los empleados activos de la empresa.
+4. El PDF se descarga desde `/api/accountability-reports/{id}/pdf`.
+5. Los documentos usan `multipart/form-data` y permiten listar, previsualizar, descargar y eliminar.
+6. Permanecen disponibles en el servicio las operaciones de actualización, estado, eliminación y recálculo para futuras acciones de interfaz.

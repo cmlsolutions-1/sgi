@@ -1,11 +1,13 @@
 "use client"
 
-import { type FormEvent, useMemo, useState } from "react"
+import { type FormEvent, useEffect, useMemo, useState } from "react"
 import {
+  AlertTriangle,
   BarChart3,
   CalendarDays,
   CheckCircle2,
   Download,
+  ExternalLink,
   Eye,
   FileText,
   LayoutGrid,
@@ -14,13 +16,21 @@ import {
   MoreHorizontal,
   Plus,
   Search,
+  Trash2,
   Upload,
 } from "lucide-react"
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -40,108 +50,58 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import {
+  createAccountabilityReport,
+  deleteAccountabilityDocument,
+  deleteAccountabilityReport,
+  downloadAccountabilityDocument,
+  downloadAccountabilityReportPdf,
+  getAccountabilityReport,
+  listAccountabilityDocuments,
+  listAccountabilityReports,
+  uploadAccountabilityDocument,
+} from "@/services/accountabilityService"
+import { getSgiResponsible, listEmployees } from "@/services/employeeService"
+import type {
+  AccountabilityDocument,
+  AccountabilityExecutionType as ExecutionType,
+  AccountabilityReport as AccountabilityRecord,
+  AccountabilityReportDetail,
+  AccountabilityResult,
+  AccountabilityStatus,
+  UpsertAccountabilityReportDto,
+} from "@/types/manager/accountability"
+import type { Employee, EmployeeSgiResponsible } from "@/types/manager/employee"
 
 type ViewMode = "cards" | "list"
-type ExecutionType = "MANUAL" | "AUTOMATIC"
-type AccountabilityStatus = "PENDING_DOCUMENT" | "DOCUMENT_UPLOADED" | "SIGNED"
-
-type AccountabilityResult = {
-  annualPlanExecution: number
-  trainingsCompleted: number
-  trainingsPlanned: number
-  accidentsReported: number
-  copasstMeetings: number
-  riskMatrixUpdated: boolean
-  preventiveMeasuresImplementation: number
-}
-
-type AccountabilityDocument = {
-  id: string
-  fileName: string
-  uploadedAt: string
-  isConfirmed: boolean
-}
-
-type AccountabilityRecord = {
-  id: string
-  year: number
-  renditionDate: string
-  sgiResponsible: string
-  legalRepresentative: string
-  executionType: ExecutionType
-  status: AccountabilityStatus
-  observations: string
-  result: AccountabilityResult
-  document?: AccountabilityDocument
-  createdAt: string
-}
 
 type AccountabilityForm = {
   year: string
   renditionDate: string
-  legalRepresentative: string
+  legalRepresentativeEmployeeId: string
+  legalRepresentativeName: string
   executionType: ExecutionType
   observations: string
 }
 
 type UploadForm = {
-  fileName: string
+  file: File | null
   isConfirmed: boolean
+  observation: string
+  description: string
 }
 
+type DocumentPreview = { document: AccountabilityDocument; url: string; mimeType: string }
+
 const currentYear = new Date().getFullYear()
-
-const legalRepresentatives = [
-  "Carlos Rodriguez",
-  "Andrea Gutierrez",
-  "Marcela Herrera",
-]
-
-const sgiResponsible = "Responsable SG-SST"
 
 const emptyForm: AccountabilityForm = {
   year: String(currentYear),
   renditionDate: new Date().toISOString().slice(0, 10),
-  legalRepresentative: "",
+  legalRepresentativeEmployeeId: "",
+  legalRepresentativeName: "",
   executionType: "AUTOMATIC",
   observations: "",
-}
-
-const initialAccountabilities: AccountabilityRecord[] = [
-  {
-    id: "accountability-1",
-    year: 2026,
-    renditionDate: "2026-12-20",
-    sgiResponsible,
-    legalRepresentative: "Carlos Rodriguez",
-    executionType: "AUTOMATIC",
-    status: "DOCUMENT_UPLOADED",
-    observations: "Rendición consolidada con base en los módulos del SG-SST.",
-    result: {
-      annualPlanExecution: 82,
-      trainingsCompleted: 24,
-      trainingsPlanned: 30,
-      accidentsReported: 3,
-      copasstMeetings: 10,
-      riskMatrixUpdated: true,
-      preventiveMeasuresImplementation: 75,
-    },
-    document: {
-      id: "document-1",
-      fileName: "rendicion-cuentas-2026-firmada.pdf",
-      uploadedAt: "2026-12-21T09:30:00.000Z",
-      isConfirmed: true,
-    },
-    createdAt: "2026-12-20T14:00:00.000Z",
-  },
-]
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
 }
 
 function formatDate(value?: string | null) {
@@ -160,6 +120,12 @@ function formatDateTime(value?: string | null) {
   }).format(date)
 }
 
+function fileSize(size: number) {
+  if (size < 1024) return `${size} B`
+  if (size < 1048576) return `${(size / 1024).toFixed(1)} KB`
+  return `${(size / 1048576).toFixed(1)} MB`
+}
+
 function executionTypeLabel(type: ExecutionType) {
   return type === "AUTOMATIC" ? "Automático" : "Manual"
 }
@@ -167,42 +133,15 @@ function executionTypeLabel(type: ExecutionType) {
 function statusLabel(status: AccountabilityStatus) {
   if (status === "SIGNED") return "Firmada"
   if (status === "DOCUMENT_UPLOADED") return "Documento cargado"
+  if (status === "INACTIVE") return "Inactiva"
   return "Pendiente documento"
 }
 
 function statusClassName(status: AccountabilityStatus) {
   if (status === "SIGNED") return "bg-accentActivd text-accentActivd-foreground border-transparent"
   if (status === "DOCUMENT_UPLOADED") return "bg-blue-600 text-white border-transparent"
+  if (status === "INACTIVE") return "bg-slate-200 text-slate-700 border-slate-300"
   return "bg-warning/10 text-warning border-warning/20"
-}
-
-function generateAutomaticResult(year: number): AccountabilityResult {
-  const variation = Math.abs(year - currentYear)
-  const annualPlanExecution = Math.max(68, Math.min(96, 82 - variation * 2))
-  const trainingsPlanned = 30
-  const trainingsCompleted = Math.round((trainingsPlanned * annualPlanExecution) / 100)
-
-  return {
-    annualPlanExecution,
-    trainingsCompleted,
-    trainingsPlanned,
-    accidentsReported: year === currentYear ? 3 : Math.max(0, 4 - variation),
-    copasstMeetings: year === currentYear ? 10 : 8,
-    riskMatrixUpdated: true,
-    preventiveMeasuresImplementation: Math.max(60, Math.min(92, 75 + variation)),
-  }
-}
-
-function emptyManualResult(): AccountabilityResult {
-  return {
-    annualPlanExecution: 0,
-    trainingsCompleted: 0,
-    trainingsPlanned: 0,
-    accidentsReported: 0,
-    copasstMeetings: 0,
-    riskMatrixUpdated: false,
-    preventiveMeasuresImplementation: 0,
-  }
 }
 
 function resultItems(result: AccountabilityResult) {
@@ -234,78 +173,6 @@ function resultItems(result: AccountabilityResult) {
   ]
 }
 
-function downloadAccountabilityPdf(record: AccountabilityRecord) {
-  const doc = new jsPDF("p", "mm", "a4")
-  const pageWidth = doc.internal.pageSize.getWidth()
-  const margin = 14
-  const primaryColor: [number, number, number] = [31, 92, 77]
-
-  doc.setFillColor(...primaryColor)
-  doc.roundedRect(margin, 12, pageWidth - margin * 2, 24, 3, 3, "F")
-  doc.setTextColor(255, 255, 255)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(13)
-  doc.text("RENDICIÓN DE CUENTAS SG-SST", margin + 5, 23)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(8)
-  doc.text(`Vigencia ${record.year} · Fecha: ${formatDate(record.renditionDate)}`, margin + 5, 30)
-
-  autoTable(doc, {
-    startY: 44,
-    theme: "grid",
-    margin: { left: margin, right: margin },
-    body: [
-      ["Año / Vigencia", String(record.year), "Tipo de ejecución", executionTypeLabel(record.executionType)],
-      ["Responsable SG-SST", record.sgiResponsible, "Representante legal", record.legalRepresentative],
-      ["Estado", statusLabel(record.status), "Documento soporte", record.document?.fileName ?? "Pendiente"],
-    ],
-    styles: { font: "helvetica", fontSize: 9, cellPadding: 2.5, lineColor: [220, 226, 224], lineWidth: 0.1 },
-    columnStyles: {
-      0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 38 },
-      2: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 42 },
-    },
-  })
-
-  autoTable(doc, {
-    startY: ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 74) + 8,
-    theme: "grid",
-    margin: { left: margin, right: margin },
-    head: [["Indicador", "Resultado"]],
-    body: resultItems(record.result).map((item) => [item.label, item.value]),
-    styles: { font: "helvetica", fontSize: 9, cellPadding: 2.5, lineColor: [220, 226, 224], lineWidth: 0.1 },
-    headStyles: { fillColor: primaryColor, textColor: 255, fontStyle: "bold" },
-    columnStyles: {
-      0: { cellWidth: 62, fontStyle: "bold" },
-    },
-  })
-
-  const observationY = ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 120) + 12
-  doc.setTextColor(30, 41, 59)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(10)
-  doc.text("Observaciones", margin, observationY)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(9)
-  doc.text(doc.splitTextToSize(record.observations || "Sin observaciones.", pageWidth - margin * 2), margin, observationY + 7)
-
-  const signatureY = 250
-  doc.setDrawColor(120, 130, 140)
-  doc.line(margin, signatureY, margin + 76, signatureY)
-  doc.line(pageWidth - margin - 76, signatureY, pageWidth - margin, signatureY)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(8)
-  doc.text("Responsable SG-SST", margin, signatureY + 6)
-  doc.text("Representante legal", pageWidth - margin - 76, signatureY + 6)
-
-  doc.setDrawColor(220, 226, 224)
-  doc.line(margin, 280, pageWidth - margin, 280)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(7)
-  doc.setTextColor(100, 116, 139)
-  doc.text("Documento generado desde SafeCloud - Sistema de Gestión Integral", margin, 286)
-
-  doc.save(`rendicion-cuentas-sg-sst-${record.year}.pdf`)
-}
 
 function InfoBlock({ label, value }: { label: string; value: string }) {
   return (
@@ -336,12 +203,16 @@ function Metric({ label, value, tone = "default" }: { label: string; value: stri
 
 function AccountabilityDialog({
   open,
+  employees,
+  responsible,
   onClose,
   onSave,
 }: {
   open: boolean
+  employees: Employee[]
+  responsible: EmployeeSgiResponsible | null
   onClose: () => void
-  onSave: (form: AccountabilityForm) => void
+  onSave: (form: AccountabilityForm) => Promise<void>
 }) {
   const [form, setForm] = useState<AccountabilityForm>(emptyForm)
   const [saving, setSaving] = useState(false)
@@ -352,14 +223,17 @@ function AccountabilityDialog({
 
     if (!Number.isInteger(year) || year < 2019) return toast.error("Ingresa una vigencia válida")
     if (!form.renditionDate) return toast.error("Selecciona la fecha de rendición")
-    if (!form.legalRepresentative) return toast.error("Selecciona el representante legal")
+    if (!responsible?.employeeId) return toast.error("Primero debes asignar el responsable del SG-SST")
+    if (!form.legalRepresentativeEmployeeId) return toast.error("Selecciona el representante legal")
 
-    setSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, 300))
-    onSave(form)
-    setSaving(false)
-    setForm(emptyForm)
-    onClose()
+    try {
+      setSaving(true)
+      await onSave(form)
+      setForm(emptyForm)
+      onClose()
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -395,19 +269,26 @@ function AccountabilityDialog({
                 </Label>
                 <Label className="grid gap-2">
                   Responsable SG-SST
-                  <Input value={sgiResponsible} disabled />
+                  <Input value={responsible ? `${responsible.employee.name} ${responsible.employee.lastName}`.trim() : "Sin responsable asignado"} disabled />
                 </Label>
                 <label className="grid gap-2">
                   <span className="text-sm font-medium text-foreground">Representante legal</span>
                   <select
-                    value={form.legalRepresentative}
-                    onChange={(event) => setForm((current) => ({ ...current, legalRepresentative: event.target.value }))}
+                    value={form.legalRepresentativeEmployeeId}
+                    onChange={(event) => {
+                      const employee = employees.find((item) => item.id === event.target.value)
+                      setForm((current) => ({
+                        ...current,
+                        legalRepresentativeEmployeeId: event.target.value,
+                        legalRepresentativeName: employee ? `${employee.name} ${employee.lastName}`.trim() : "",
+                      }))
+                    }}
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
                     <option value="">Selecciona representante</option>
-                    {legalRepresentatives.map((representative) => (
-                      <option key={representative} value={representative}>
-                        {representative}
+                    {employees.map((employee) => (
+                      <option key={employee.id} value={employee.id}>
+                        {employee.name} {employee.lastName}
                       </option>
                     ))}
                   </select>
@@ -473,18 +354,24 @@ function UploadDialog({
 }: {
   record: AccountabilityRecord | null
   onClose: () => void
-  onUpload: (recordId: string, form: UploadForm) => void
+  onUpload: (recordId: string, form: UploadForm) => Promise<void>
 }) {
-  const [form, setForm] = useState<UploadForm>({ fileName: "", isConfirmed: true })
+  const [form, setForm] = useState<UploadForm>({ file: null, isConfirmed: true, observation: "", description: "" })
+  const [uploading, setUploading] = useState(false)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!record) return
-    if (!form.fileName.trim()) return toast.error("Selecciona el documento firmado")
+    if (!form.file) return toast.error("Selecciona el documento firmado")
 
-    onUpload(record.id, form)
-    setForm({ fileName: "", isConfirmed: true })
-    onClose()
+    try {
+      setUploading(true)
+      await onUpload(record.id, form)
+      setForm({ file: null, isConfirmed: true, observation: "", description: "" })
+      onClose()
+    } finally {
+      setUploading(false)
+    }
   }
 
   return (
@@ -502,15 +389,14 @@ function UploadDialog({
               Archivo
               <Input
                 type="file"
-                onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.files?.[0]?.name ?? "" }))}
+                onChange={(event) => setForm((current) => ({ ...current, file: event.target.files?.[0] ?? null }))}
               />
             </Label>
-            <Input
-              className="mt-3"
-              value={form.fileName}
-              onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.value }))}
-              placeholder="También puedes escribir el nombre del archivo mock"
-            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Label className="grid gap-2">Descripción<Input value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} placeholder="Descripción del soporte" /></Label>
+            <Label className="grid gap-2">Observación<Input value={form.observation} onChange={(event) => setForm((current) => ({ ...current, observation: event.target.value }))} placeholder="Observación opcional" /></Label>
           </div>
 
           <label className="flex items-center gap-2 text-sm text-foreground">
@@ -527,9 +413,9 @@ function UploadDialog({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit" className="gap-2">
-              <Upload className="h-4 w-4" />
-              Subir documento
+            <Button type="submit" className="gap-2" disabled={uploading}>
+              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+              {uploading ? "Subiendo..." : "Subir documento"}
             </Button>
           </DialogFooter>
         </form>
@@ -540,12 +426,22 @@ function UploadDialog({
 
 function DetailDialog({
   record,
+  documents,
+  loadingDocumentId,
   onClose,
   onDownload,
+  onPreviewDocument,
+  onDownloadDocument,
+  onDeleteDocument,
 }: {
-  record: AccountabilityRecord | null
+  record: AccountabilityReportDetail | null
+  documents: AccountabilityDocument[]
+  loadingDocumentId: string | null
   onClose: () => void
   onDownload: (record: AccountabilityRecord) => void
+  onPreviewDocument: (document: AccountabilityDocument) => void
+  onDownloadDocument: (document: AccountabilityDocument) => void
+  onDeleteDocument: (document: AccountabilityDocument) => void
 }) {
   if (!record) return null
 
@@ -568,8 +464,8 @@ function DetailDialog({
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <InfoBlock label="Responsable SG-SST" value={record.sgiResponsible} />
-            <InfoBlock label="Representante legal" value={record.legalRepresentative} />
+            <InfoBlock label="Responsable SG-SST" value={record.sgiResponsibleName} />
+            <InfoBlock label="Representante legal" value={record.legalRepresentativeName} />
           </div>
 
           <section className="rounded-md border border-border p-4">
@@ -588,17 +484,8 @@ function DetailDialog({
           </section>
 
           <section className="rounded-md border border-border p-4">
-            <h3 className="mb-2 text-sm font-semibold text-foreground">Documento soporte</h3>
-            {record.document ? (
-              <div className="rounded-md bg-secondary p-3 text-sm">
-                <p className="font-medium text-foreground">{record.document.fileName}</p>
-                <p className="text-muted-foreground">
-                  Cargado: {formatDateTime(record.document.uploadedAt)} · {record.document.isConfirmed ? "Confirmado" : "Sin confirmar"}
-                </p>
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">Aún no hay documento firmado cargado.</p>
-            )}
+            <h3 className="mb-2 text-sm font-semibold text-foreground">Documentos soporte</h3>
+            {!documents.length ? <p className="text-sm text-muted-foreground">Aún no hay documentos firmados cargados.</p> : <div className="space-y-2">{documents.map((document) => <div key={document.id} className="flex flex-col gap-3 rounded-md bg-secondary p-3 sm:flex-row sm:items-center sm:justify-between"><div className="min-w-0"><p className="truncate text-sm font-medium text-foreground">{document.originalName}</p><p className="text-xs text-muted-foreground">{fileSize(document.size)} · {formatDateTime(document.createdAt)}{document.description ? ` · ${document.description}` : ""}</p></div><div className="flex flex-wrap gap-2"><Button type="button" size="sm" variant="outline" className="gap-2" disabled={loadingDocumentId === document.id} onClick={() => onPreviewDocument(document)}>{loadingDocumentId === document.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}Ver</Button><Button type="button" size="sm" variant="outline" className="gap-2" onClick={() => onDownloadDocument(document)}><Download className="h-4 w-4" />Descargar</Button><Button type="button" size="sm" variant="destructive" className="gap-2" onClick={() => onDeleteDocument(document)}><Trash2 className="h-4 w-4" />Eliminar</Button></div></div>)}</div>}
           </section>
 
           <section className="rounded-md border border-border p-4">
@@ -622,12 +509,43 @@ function DetailDialog({
 }
 
 export default function AccountabilityPage() {
-  const [records, setRecords] = useState<AccountabilityRecord[]>(initialAccountabilities)
+  const [records, setRecords] = useState<AccountabilityRecord[]>([])
+  const [employees, setEmployees] = useState<Employee[]>([])
+  const [responsible, setResponsible] = useState<EmployeeSgiResponsible | null>(null)
   const [search, setSearch] = useState("")
   const [viewMode, setViewMode] = useState<ViewMode>("list")
   const [createOpen, setCreateOpen] = useState(false)
-  const [detailRecord, setDetailRecord] = useState<AccountabilityRecord | null>(null)
+  const [detailRecord, setDetailRecord] = useState<AccountabilityReportDetail | null>(null)
+  const [documents, setDocuments] = useState<AccountabilityDocument[]>([])
   const [uploadRecord, setUploadRecord] = useState<AccountabilityRecord | null>(null)
+  const [reportToDelete, setReportToDelete] = useState<AccountabilityRecord | null>(null)
+  const [deletingReport, setDeletingReport] = useState(false)
+  const [preview, setPreview] = useState<DocumentPreview | null>(null)
+  const [loadingDocumentId, setLoadingDocumentId] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  async function loadData() {
+    setLoading(true)
+    try {
+      const [reportsResult, employeesResult, responsibleResult] = await Promise.allSettled([
+        listAccountabilityReports({ limit: 100 }),
+        listEmployees(),
+        getSgiResponsible(),
+      ])
+      if (reportsResult.status === "rejected") throw reportsResult.reason
+      setRecords(reportsResult.value.items)
+      if (employeesResult.status === "fulfilled") setEmployees(employeesResult.value.filter((employee) => employee.status))
+      if (responsibleResult.status === "fulfilled") setResponsible(responsibleResult.value)
+      else setResponsible(null)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar las rendiciones de cuentas")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { void loadData() }, [])
+  useEffect(() => () => { if (preview?.url) URL.revokeObjectURL(preview.url) }, [preview?.url])
 
   const filteredRecords = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -636,8 +554,8 @@ export default function AccountabilityPage() {
     return records.filter(
       (record) =>
         String(record.year).includes(query) ||
-        record.legalRepresentative.toLowerCase().includes(query) ||
-        record.sgiResponsible.toLowerCase().includes(query) ||
+        record.legalRepresentativeName.toLowerCase().includes(query) ||
+        record.sgiResponsibleName.toLowerCase().includes(query) ||
         executionTypeLabel(record.executionType).toLowerCase().includes(query) ||
         statusLabel(record.status).toLowerCase().includes(query),
     )
@@ -659,47 +577,129 @@ export default function AccountabilityPage() {
     }
   }, [records])
 
-  function handleCreate(form: AccountabilityForm) {
-    const year = Number(form.year)
-    const record: AccountabilityRecord = {
-      id: createId("accountability"),
-      year,
+  async function handleCreate(form: AccountabilityForm) {
+    if (!responsible?.employeeId) throw new Error("No hay responsable SG-SST asignado")
+    const payload: UpsertAccountabilityReportDto = {
+      year: Number(form.year),
       renditionDate: form.renditionDate,
-      sgiResponsible,
-      legalRepresentative: form.legalRepresentative,
+      sgiResponsibleEmployeeId: responsible.employeeId,
+      legalRepresentativeEmployeeId: form.legalRepresentativeEmployeeId,
+      legalRepresentativeName: form.legalRepresentativeName,
       executionType: form.executionType,
-      status: "PENDING_DOCUMENT",
-      observations: form.observations.trim(),
-      result: form.executionType === "AUTOMATIC" ? generateAutomaticResult(year) : emptyManualResult(),
-      createdAt: new Date().toISOString(),
+      observations: form.observations.trim() || undefined,
     }
-
-    setRecords((current) => [record, ...current])
-    toast.success(
-      form.executionType === "AUTOMATIC"
-        ? "Rendición creada con indicadores automáticos"
-        : "Rendición manual creada. Ya puedes cargar el documento firmado.",
-    )
+    try {
+      await createAccountabilityReport(payload)
+      await loadData()
+      toast.success(form.executionType === "AUTOMATIC" ? "Rendición creada con indicadores automáticos" : "Rendición manual creada. Ya puedes cargar el documento firmado.")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo crear la rendición")
+      throw error
+    }
   }
 
-  function handleUpload(recordId: string, form: UploadForm) {
-    setRecords((current) =>
-      current.map((record) =>
-        record.id === recordId
-          ? {
-              ...record,
-              status: form.isConfirmed ? "DOCUMENT_UPLOADED" : "PENDING_DOCUMENT",
-              document: {
-                id: createId("document"),
-                fileName: form.fileName.trim(),
-                uploadedAt: new Date().toISOString(),
-                isConfirmed: form.isConfirmed,
-              },
-            }
-          : record,
-      ),
-    )
-    toast.success("Documento de rendición cargado")
+  async function handleUpload(recordId: string, form: UploadForm) {
+    if (!form.file) return
+    try {
+      await uploadAccountabilityDocument(recordId, { file: form.file, isConfirmed: form.isConfirmed, observation: form.observation, description: form.description })
+      await loadData()
+      if (detailRecord?.id === recordId) setDocuments(await listAccountabilityDocuments(recordId))
+      toast.success("Documento de rendición cargado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el documento")
+      throw error
+    }
+  }
+
+  async function openDetail(id: string) {
+    try {
+      const [record, reportDocuments] = await Promise.all([getAccountabilityReport(id), listAccountabilityDocuments(id)])
+      setDetailRecord(record)
+      setDocuments(reportDocuments)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el detalle")
+    }
+  }
+
+  async function downloadPdf(record: AccountabilityRecord) {
+    try {
+      const blob = await downloadAccountabilityReportPdf(record.id)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `rendicion-cuentas-sg-sst-${record.year}.pdf`
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar el PDF")
+    }
+  }
+
+  async function getDocumentBlob(document: AccountabilityDocument) {
+    if (!document.downloadUrl) throw new Error("El documento no tiene archivo disponible")
+    return downloadAccountabilityDocument(document.downloadUrl)
+  }
+
+  async function previewDocument(document: AccountabilityDocument) {
+    setLoadingDocumentId(document.id)
+    try {
+      const blob = await getDocumentBlob(document)
+      const url = URL.createObjectURL(blob)
+      setPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return { document, url, mimeType: blob.type || document.mimeType || "application/octet-stream" }
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo previsualizar el documento")
+    } finally {
+      setLoadingDocumentId(null)
+    }
+  }
+
+  async function downloadDocument(document: AccountabilityDocument) {
+    try {
+      const blob = await getDocumentBlob(document)
+      const url = URL.createObjectURL(blob)
+      const link = window.document.createElement("a")
+      link.href = url
+      link.download = document.originalName || "documento-rendicion"
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar el documento")
+    }
+  }
+
+  async function removeDocument(document: AccountabilityDocument) {
+    if (!detailRecord || !window.confirm(`¿Eliminar ${document.originalName}?`)) return
+    try {
+      await deleteAccountabilityDocument(detailRecord.id, document.id)
+      setDocuments((current) => current.filter((item) => item.id !== document.id))
+      await loadData()
+      toast.success("Documento de rendición eliminado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar el documento")
+    }
+  }
+
+  async function removeReport() {
+    if (!reportToDelete) return
+    const record = reportToDelete
+    try {
+      setDeletingReport(true)
+      await deleteAccountabilityReport(record.id)
+      if (detailRecord?.id === record.id) {
+        setDetailRecord(null)
+        setDocuments([])
+      }
+      await loadData()
+      toast.success("Rendición de cuentas eliminada")
+      setReportToDelete(null)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar la rendición")
+    } finally {
+      setDeletingReport(false)
+    }
   }
 
   return (
@@ -711,7 +711,7 @@ export default function AccountabilityPage() {
             Consolida la rendición anual del SG-SST, genera el documento y conserva el soporte firmado.
           </p>
         </div>
-        <Button type="button" className="gap-2" onClick={() => setCreateOpen(true)}>
+        <Button type="button" className="gap-2" disabled={loading} onClick={() => setCreateOpen(true)}>
           <Plus className="h-4 w-4" />
           Nueva rendición
         </Button>
@@ -736,7 +736,7 @@ export default function AccountabilityPage() {
             type="button"
             variant="outline"
             className="gap-2"
-            onClick={() => latestRecord && downloadAccountabilityPdf(latestRecord)}
+            onClick={() => latestRecord && void downloadPdf(latestRecord)}
             disabled={!latestRecord}
           >
             <Download className="h-4 w-4" />
@@ -829,7 +829,7 @@ export default function AccountabilityPage() {
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">{executionTypeLabel(record.executionType)}</p>
                     </div>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => setDetailRecord(record)}>
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void openDetail(record.id)}>
                       <Eye className="h-4 w-4" />
                       Ver
                     </Button>
@@ -847,7 +847,7 @@ export default function AccountabilityPage() {
                   </div>
 
                   <div className="flex flex-wrap justify-end gap-2 border-t border-border pt-3">
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => downloadAccountabilityPdf(record)}>
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void downloadPdf(record)}>
                       <Download className="h-4 w-4" />
                       PDF
                     </Button>
@@ -883,8 +883,8 @@ export default function AccountabilityPage() {
                       <p className="text-muted-foreground">Creada: {formatDate(record.createdAt)}</p>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{formatDate(record.renditionDate)}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{record.sgiResponsible}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{record.legalRepresentative}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{record.sgiResponsibleName}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{record.legalRepresentativeName}</td>
                     <td className="px-4 py-3 text-muted-foreground">{executionTypeLabel(record.executionType)}</td>
                     <td className="px-4 py-3 text-muted-foreground">{record.result.annualPlanExecution}%</td>
                     <td className="px-4 py-3">
@@ -900,11 +900,11 @@ export default function AccountabilityPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuItem onSelect={() => setDetailRecord(record)}>
+                          <DropdownMenuItem onSelect={() => void openDetail(record.id)}>
                             <Eye className="h-4 w-4" />
                             Ver detalle
                           </DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => downloadAccountabilityPdf(record)}>
+                          <DropdownMenuItem onSelect={() => void downloadPdf(record)}>
                             <Download className="h-4 w-4" />
                             Descargar PDF
                           </DropdownMenuItem>
@@ -913,27 +913,61 @@ export default function AccountabilityPage() {
                             <Upload className="h-4 w-4" />
                             Cargar documento firmado
                           </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => setReportToDelete(record)}>
+                            <Trash2 className="h-4 w-4" />
+                            Eliminar rendición
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>
                   </tr>
                 ))}
-                {filteredRecords.length === 0 && (
+                {!loading && filteredRecords.length === 0 && (
                   <tr>
                     <td colSpan={8} className="px-4 py-10 text-center text-sm text-muted-foreground">
                       No hay rendiciones de cuentas para mostrar.
                     </td>
                   </tr>
                 )}
+                {loading && <tr><td colSpan={8} className="px-4 py-10"><Loader2 className="mx-auto h-5 w-5 animate-spin" /></td></tr>}
               </tbody>
             </table>
           </div>
         )}
       </section>
 
-      <AccountabilityDialog open={createOpen} onClose={() => setCreateOpen(false)} onSave={handleCreate} />
+      <AccountabilityDialog open={createOpen} employees={employees} responsible={responsible} onClose={() => setCreateOpen(false)} onSave={handleCreate} />
       <UploadDialog record={uploadRecord} onClose={() => setUploadRecord(null)} onUpload={handleUpload} />
-      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={downloadAccountabilityPdf} />
+      <DetailDialog record={detailRecord} documents={documents} loadingDocumentId={loadingDocumentId} onClose={() => { setDetailRecord(null); setDocuments([]) }} onDownload={(record) => void downloadPdf(record)} onPreviewDocument={(document) => void previewDocument(document)} onDownloadDocument={(document) => void downloadDocument(document)} onDeleteDocument={(document) => void removeDocument(document)} />
+      <AlertDialog open={Boolean(reportToDelete)} onOpenChange={(open) => { if (!open && !deletingReport) setReportToDelete(null) }}>
+        <AlertDialogContent className="overflow-hidden p-0 sm:max-w-md">
+          <AlertDialogHeader className="border-b bg-destructive/5 px-6 py-5 text-left">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+              <div className="space-y-1">
+                <AlertDialogTitle>Eliminar rendición de cuentas</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta acción eliminará la rendición de la vigencia <strong className="text-foreground">{reportToDelete?.year}</strong>.
+                </AlertDialogDescription>
+              </div>
+            </div>
+          </AlertDialogHeader>
+          <div className="px-6 py-4 text-sm text-muted-foreground">
+            ¿Estás seguro de continuar? El registro dejará de aparecer en el listado de rendiciones.
+          </div>
+          <AlertDialogFooter className="border-t bg-muted/30 px-6 py-4">
+            <AlertDialogCancel disabled={deletingReport}>Cancelar</AlertDialogCancel>
+            <Button type="button" variant="destructive" className="gap-2" disabled={deletingReport} onClick={() => void removeReport()}>
+              {deletingReport ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+              {deletingReport ? "Eliminando..." : "Sí, eliminar"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <Dialog open={Boolean(preview)} onOpenChange={(nextOpen) => !nextOpen && setPreview(null)}><DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl"><DialogHeader className="shrink-0 border-b px-6 py-4 pr-12"><DialogTitle className="truncate">{preview?.document.originalName || "Vista previa"}</DialogTitle></DialogHeader><div className="min-h-0 flex-1 overflow-auto bg-muted/30 p-4">{preview?.mimeType.startsWith("image/") ? <div className="flex min-h-[24rem] items-center justify-center rounded-md border bg-card p-3"><img src={preview.url} alt={preview.document.originalName} className="max-h-[70dvh] max-w-full object-contain" /></div> : preview?.mimeType.startsWith("application/pdf") ? <iframe src={preview.url} title={preview.document.originalName} className="h-[70dvh] min-h-[28rem] w-full rounded-md border bg-white" /> : preview ? <div className="flex min-h-[24rem] flex-col items-center justify-center rounded-md border border-dashed bg-card"><FileText className="h-12 w-12 text-muted-foreground" /><p className="mt-3 font-medium">Vista previa no disponible</p></div> : null}</div><DialogFooter className="border-t px-6 py-4">{preview && <><Button variant="outline" className="gap-2" onClick={() => window.open(preview.url, "_blank", "noopener,noreferrer")}><ExternalLink className="h-4 w-4" />Abrir</Button><Button className="gap-2" onClick={() => void downloadDocument(preview.document)}><Download className="h-4 w-4" />Descargar</Button></>}</DialogFooter></DialogContent></Dialog>
     </main>
   )
 }

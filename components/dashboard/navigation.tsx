@@ -87,7 +87,7 @@ export const navigation: NavigationItem[] = [
       { code: "JOBS", name: "Cargos de trabajo", href: "/dashboard/jobs", icon: BriefcaseBusiness },
       { code: "EMPLOYEE_MANAGEMENT", name: "Gestión Empleados", href: "/dashboard/employees", icon: UserCircle },
       { code: "INCIDENTS", name: "Novedades Laborales", href: "/dashboard/incidents", icon: TriangleAlert },
-      //{ code: "EMPLOYEE_ANALYTICS", name: "Estadísticas y Análisis", href: "/dashboard/employee-analytics", icon: BarChart3 },
+      { code: "EMPLOYEE_ANALYTICS", name: "Estadísticas y Análisis", href: "/dashboard/employee-analytics", icon: BarChart3 },
       //{ code: "CUSTODY", name: "Custodia", href: "/dashboard/custody", icon: Archive },
       { code: "INVESTIGATIONS", name: "Investigaciones", href: "/dashboard/investigations", icon: FileSearch },
       { code: "SPECIAL_RISK", name: "Riesgo Especial", href: "/dashboard/special-risk", icon: FlameKindling },
@@ -147,12 +147,12 @@ export const navigation: NavigationItem[] = [
         href: "/dashboard/initial-evaluation",
         icon: ClipboardList,
       },
-      /* {
+      {
         code: "ACCOUNTABILITY",
         name: "Rendición de Cuentas",
         href: "/dashboard/accountability",
         icon: BarChart3,
-      }, */
+      },
     ],
   },
   {

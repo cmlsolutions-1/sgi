@@ -1,6 +1,6 @@
 # Contrato frontend/backend - Estadísticas y Análisis
 
-Este documento describe el contrato requerido para conectar el modulo hijo **Estadísticas y Análisis** con backend. Actualmente el modulo esta implementado con datos mockeados en frontend, calcula indicadores localmente y conserva los registros solo en memoria.
+Este documento describe el contrato utilizado para conectar el modulo hijo **Estadísticas y Análisis** con backend. El frontend ya consume la API y el backend es la fuente de los registros, indicadores, acciones de mejora, evidencias y archivos exportados.
 
 ## Ubicacion en frontend
 
@@ -27,19 +27,15 @@ El modulo contempla:
 
 ## Estado actual de implementacion
 
-Todo el modulo esta mockeado en frontend:
+El modulo está integrado con backend:
 
-- registros iniciales;
-- generacion local de indicadores;
-- consulta de funcionarios reales desde `GET /api/employees`;
-- filtros por busqueda y tipo de novedad;
-- vista en tarjetas/lista;
-- graficas con componentes locales;
-- accion de mejora en memoria;
-- evidencia simulada por nombre de archivo;
-- PDF generado en frontend con `jsPDF` y `jspdf-autotable`.
-
-No existe servicio dedicado en `services/` ni tipos compartidos en `types/manager/` para este modulo.
+- consulta, creación y edición de análisis mediante `/api/employee-analytics`;
+- indicadores calculados y entregados por backend;
+- acción de mejora persistida por análisis;
+- carga, consulta, previsualización, descarga y eliminación de evidencias;
+- PDF individual y CSV consolidado generados por backend;
+- servicio dedicado en `services/employeeAnalyticsService.ts`;
+- contratos compartidos en `types/manager/employee-analytics.ts`.
 
 ## Entidades sugeridas
 

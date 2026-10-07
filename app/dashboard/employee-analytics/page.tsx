@@ -3,11 +3,13 @@
 import { type FormEvent, useEffect, useMemo, useState } from "react"
 import {
   Activity,
+  AlertTriangle,
   BarChart3,
   CalendarDays,
   Download,
   Edit,
   Eye,
+  ExternalLink,
   FileText,
   LayoutGrid,
   List,
@@ -16,14 +18,22 @@ import {
   Plus,
   Search,
   Target,
+  Trash2,
   Upload,
   UserRound,
 } from "lucide-react"
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
 
 import { AnalyticsBarChart, AnalyticsChartCard, AnalyticsDonutChart } from "@/components/dashboard/analytics-charts"
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -45,11 +55,31 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
+import {
+  createEmployeeAnalytics,
+  deleteEmployeeAnalytics,
+  deleteEmployeeAnalyticsDocument,
+  downloadEmployeeAnalyticsDocument,
+  exportEmployeeAnalyticsCsv,
+  exportEmployeeAnalyticsPdf,
+  getEmployeeAnalytics,
+  listEmployeeAnalytics,
+  listEmployeeAnalyticsDocuments,
+  saveEmployeeAnalyticsImprovement,
+  updateEmployeeAnalytics,
+  uploadEmployeeAnalyticsDocument,
+} from "@/services/employeeAnalyticsService"
 import type { Employee } from "@/types/manager/employee"
+import type {
+  EmployeeAnalyticsDocument,
+  EmployeeAnalyticsIndicator,
+  EmployeeAnalyticsPeriodicity,
+  EmployeeAnalyticsReport,
+} from "@/types/manager/employee-analytics"
 import type { IncidentType } from "@/types/manager/incident"
 
 type ViewMode = "cards" | "list"
-type Periodicity = "ANNUAL" | "SEMESTER" | "QUARTER" | "BIMONTHLY" | "MONTHLY"
+type Periodicity = EmployeeAnalyticsPeriodicity
 
 type EmployeeOption = {
   id: string
@@ -57,28 +87,14 @@ type EmployeeOption = {
   email?: string
 }
 
-type Evidence = {
-  id: string
-  fileName: string
-  description: string
-  uploadedAt: string
-  isConfirmed: boolean
-}
-
 type ImprovementAction = {
   description: string
   responsible: string
   dueDate: string
+  status?: "OPEN" | "CLOSED"
 }
 
-type Indicator = {
-  id: string
-  name: string
-  value: number
-  unit: string
-  description: string
-  chartData: Array<{ name: string; total: number }>
-}
+type Indicator = EmployeeAnalyticsIndicator
 
 type AnalysisRecord = {
   id: string
@@ -90,8 +106,10 @@ type AnalysisRecord = {
   analysisDate: string
   incidentType: IncidentType
   indicators: Indicator[]
-  improvementAction?: ImprovementAction
-  evidence?: Evidence
+  improvementAction?: ImprovementAction | null
+  evidence?: EmployeeAnalyticsDocument | null
+  evidences?: EmployeeAnalyticsDocument[]
+  evidenceCount: number
   createdAt: string
 }
 
@@ -111,9 +129,15 @@ type ImprovementForm = {
 }
 
 type EvidenceForm = {
-  fileName: string
+  file: File | null
   description: string
   isConfirmed: boolean
+}
+
+type DocumentPreview = {
+  document: EmployeeAnalyticsDocument
+  url: string
+  mimeType: string
 }
 
 const currentYear = String(new Date().getFullYear())
@@ -134,7 +158,7 @@ const emptyImprovementForm: ImprovementForm = {
 }
 
 const emptyEvidenceForm: EvidenceForm = {
-  fileName: "",
+  file: null,
   description: "",
   isConfirmed: true,
 }
@@ -154,41 +178,6 @@ const incidentTypeOptions: Array<{ value: IncidentType; label: string }> = [
   { value: "RECOMENDACION_DE_LA_ARL", label: "Recomendacion de la ARL" },
 ]
 
-const initialRecords: AnalysisRecord[] = [
-  {
-    id: "analysis-1",
-    periodicity: "ANNUAL",
-    year: "2026",
-    period: "YEAR",
-    responsibleEmployeeId: "mock-employee-1",
-    responsibleName: "Responsable SG-SST",
-    analysisDate: "2026-09-10",
-    incidentType: "ACCIDENTE",
-    indicators: generateIndicators("ANNUAL", "ACCIDENTE"),
-    improvementAction: {
-      description: "Reforzar inspecciones de condiciones inseguras y seguimiento a acciones correctivas.",
-      responsible: "Responsable SG-SST",
-      dueDate: "2026-10-15",
-    },
-    evidence: {
-      id: "evidence-1",
-      fileName: "analisis-accidentalidad-2026.pdf",
-      description: "Informe estadístico firmado por responsable SG-SST.",
-      uploadedAt: "2026-09-10T14:00:00.000Z",
-      isConfirmed: true,
-    },
-    createdAt: "2026-09-10T14:00:00.000Z",
-  },
-]
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
-}
-
 function employeeFullName(employee: Employee) {
   return `${employee.name ?? ""} ${employee.lastName ?? ""}`.trim() || employee.email || "Funcionario sin nombre"
 }
@@ -203,6 +192,31 @@ function toEmployeeOptions(employees: Employee[]): EmployeeOption[] {
 
 function findEmployeeName(employees: EmployeeOption[], employeeId: string) {
   return employees.find((employee) => employee.id === employeeId)?.name ?? ""
+}
+
+function reportEmployeeName(report: EmployeeAnalyticsReport) {
+  return `${report.responsibleEmployee?.name ?? ""} ${report.responsibleEmployee?.lastName ?? ""}`.trim()
+    || report.responsibleEmployee?.email
+    || "Responsable sin nombre"
+}
+
+function toAnalysisRecord(report: EmployeeAnalyticsReport): AnalysisRecord {
+  return {
+    id: report.id,
+    periodicity: report.periodicity,
+    year: String(report.year),
+    period: report.period,
+    responsibleEmployeeId: report.responsibleEmployeeId,
+    responsibleName: reportEmployeeName(report),
+    analysisDate: report.analysisDate,
+    incidentType: report.incidentType,
+    indicators: report.indicators ?? [],
+    improvementAction: report.improvementAction,
+    evidence: report.latestEvidence,
+    evidences: report.evidences,
+    evidenceCount: report.evidenceCount ?? report.evidences?.length ?? 0,
+    createdAt: report.createdAt,
+  }
 }
 
 function formatDate(value?: string | null) {
@@ -245,70 +259,23 @@ function periodLabel(record: Pick<AnalysisRecord, "periodicity" | "year" | "peri
   return record.periodicity === "ANNUAL" ? record.year : `${record.year} · ${record.period}`
 }
 
-function generateIndicators(periodicity: Periodicity, incidentType: IncidentType): Indicator[] {
-  const multiplier = periodicity === "ANNUAL" ? 6 : periodicity === "SEMESTER" ? 4 : periodicity === "QUARTER" ? 3 : periodicity === "BIMONTHLY" ? 2 : 1
-  const isAbsenceType = ["INCAPACIDAD_MEDICA", "LICENCIA_MATERNIDAD", "LICENCIA_PATERNIDAD", "VACACIONES", "DIAS_NO_REMUNERADO", "DIA_REMUNERADO"].includes(incidentType)
-  const isIllnessType = incidentType === "ENFERMEDAD_LABORAL"
-  const base = incidentType === "ACCIDENTE" ? 4 : incidentType === "INCIDENTE" ? 3 : isIllnessType ? 2 : isAbsenceType ? 5 : 1
-  const labels = periodicity === "ANNUAL" ? ["Ene", "Mar", "May", "Jul", "Sep", "Nov"] : ["Periodo 1", "Periodo 2", "Periodo 3", "Periodo 4"]
-
-  function chart(seed: number) {
-    return labels.map((label, index) => ({
-      name: label,
-      total: Math.max(0, Math.round(seed + index * (base / 2) + multiplier / 2)),
-    }))
-  }
-
-  return [
-    {
-      id: "frequency",
-      name: "Frecuencia de accidentalidad",
-      value: base * multiplier,
-      unit: "casos",
-      description: "Cantidad de eventos reportados para el tipo de novedad seleccionado.",
-      chartData: chart(base),
-    },
-    {
-      id: "severity",
-      name: "Severidad",
-      value: isAbsenceType || incidentType === "ACCIDENTE" ? base * multiplier * 3 : base * multiplier,
-      unit: "dias",
-      description: "Calcula automaticamente los dias asociados a incapacidades o ausencia laboral.",
-      chartData: chart(base * 2),
-    },
-    {
-      id: "mortality",
-      name: "Mortalidad",
-      value: incidentType === "ACCIDENTE" && multiplier > 4 ? 1 : 0,
-      unit: "casos",
-      description: "Cuenta automaticamente los eventos marcados como mortales.",
-      chartData: chart(incidentType === "ACCIDENTE" ? 0.2 : 0),
-    },
-    {
-      id: "prevalence",
-      name: "Prevalencia",
-      value: isIllnessType ? base * multiplier : 0,
-      unit: "casos",
-      description: "Relaciona los casos existentes de enfermedad laboral dentro del periodo analizado.",
-      chartData: chart(isIllnessType ? base : 0),
-    },
-    {
-      id: "incidence",
-      name: "Incidencia",
-      value: Math.max(1, base * multiplier - 1),
-      unit: "nuevos",
-      description: "Calcula los eventos nuevos reportados durante el periodo.",
-      chartData: chart(base + 1),
-    },
-    {
-      id: "absenteeism",
-      name: "Ausentismo",
-      value: isAbsenceType ? base * multiplier * 2 : Math.max(0, base * multiplier - 2),
-      unit: "dias",
-      description: "Agrupa incapacidades comunes, laborales y novedades asociadas a ausentismo.",
-      chartData: chart(isAbsenceType ? base * 2 : base),
-    },
-  ]
+function indicatorChartData(indicator: Indicator) {
+  return (indicator.chartData ?? []).map((item, index) => ({
+    name: typeof item.name === "string"
+      ? item.name
+      : typeof item.label === "string"
+        ? item.label
+        : typeof item.period === "string"
+          ? item.period
+          : `Dato ${index + 1}`,
+    total: typeof item.total === "number"
+      ? item.total
+      : typeof item.value === "number"
+        ? item.value
+        : typeof item.count === "number"
+          ? item.count
+          : 0,
+  }))
 }
 
 function EmployeePicker({
@@ -408,70 +375,6 @@ function InfoBlock({ label, value }: { label: string; value: string }) {
   )
 }
 
-function downloadAnalysisPdf(record: AnalysisRecord) {
-  const doc = new jsPDF("p", "mm", "a4")
-  const pageWidth = doc.internal.pageSize.getWidth()
-  const margin = 14
-  const primaryColor: [number, number, number] = [31, 92, 77]
-
-  doc.setFillColor(...primaryColor)
-  doc.roundedRect(margin, 12, pageWidth - margin * 2, 24, 3, 3, "F")
-  doc.setTextColor(255, 255, 255)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(13)
-  doc.text("ESTADISTICAS Y ANALISIS", margin + 5, 23)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(8)
-  doc.text(`${periodicityLabel(record.periodicity)} · ${periodLabel(record)} · ${incidentTypeLabel(record.incidentType)}`, margin + 5, 30)
-
-  autoTable(doc, {
-    startY: 44,
-    theme: "grid",
-    margin: { left: margin, right: margin },
-    body: [
-      ["Fecha analisis", formatDate(record.analysisDate), "Responsable", record.responsibleName],
-      ["Tipo novedad", incidentTypeLabel(record.incidentType), "Periodo", periodLabel(record)],
-      ["Evidencia", record.evidence?.fileName ?? "Pendiente", "Accion mejora", record.improvementAction ? "Registrada" : "Pendiente"],
-    ],
-    styles: { font: "helvetica", fontSize: 9, cellPadding: 2.5, lineColor: [220, 226, 224], lineWidth: 0.1 },
-    columnStyles: {
-      0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 34 },
-      2: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 32 },
-    },
-  })
-
-  autoTable(doc, {
-    startY: ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 74) + 10,
-    theme: "striped",
-    margin: { left: margin, right: margin },
-    head: [["Indicador", "Valor", "Descripcion"]],
-    body: record.indicators.map((indicator) => [indicator.name, `${indicator.value} ${indicator.unit}`, indicator.description]),
-    styles: { font: "helvetica", fontSize: 8.5, cellPadding: 2.5, lineColor: [220, 226, 224], lineWidth: 0.1 },
-    headStyles: { fillColor: primaryColor, textColor: 255, fontStyle: "bold" },
-    columnStyles: {
-      0: { cellWidth: 42, fontStyle: "bold" },
-      1: { cellWidth: 28 },
-    },
-  })
-
-  const finalY = ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 170) + 10
-  doc.setTextColor(30, 41, 59)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(10)
-  doc.text("Accion de mejora", margin, finalY)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(9)
-  doc.text(doc.splitTextToSize(record.improvementAction?.description ?? "Pendiente por registrar.", pageWidth - margin * 2), margin, finalY + 7)
-
-  doc.setDrawColor(220, 226, 224)
-  doc.line(margin, 280, pageWidth - margin, 280)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(7)
-  doc.setTextColor(100, 116, 139)
-  doc.text("Documento generado desde SafeCloud - Sistema de Gestion Integral", margin, 286)
-  doc.save(`estadisticas-analisis-${record.year}-${record.incidentType}.pdf`)
-}
-
 function AnalysisDialog({
   open,
   record,
@@ -485,7 +388,7 @@ function AnalysisDialog({
   employees: EmployeeOption[]
   employeesLoading: boolean
   onClose: () => void
-  onSave: (form: AnalysisForm, responsibleName: string, recordId?: string) => void
+  onSave: (form: AnalysisForm, responsibleName: string, recordId?: string) => Promise<void>
 }) {
   const [form, setForm] = useState<AnalysisForm>(emptyAnalysisForm)
   const [saving, setSaving] = useState(false)
@@ -523,11 +426,13 @@ function AnalysisDialog({
     const responsibleName = findEmployeeName(employees, form.responsibleEmployeeId) || record?.responsibleName || "Responsable seleccionado"
 
     setSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, 250))
-    onSave(form, responsibleName, record?.id)
-    setSaving(false)
-    setForm(emptyAnalysisForm)
-    onClose()
+    try {
+      await onSave(form, responsibleName, record?.id)
+      setForm(emptyAnalysisForm)
+      onClose()
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -602,7 +507,7 @@ function ImprovementDialog({
 }: {
   record: AnalysisRecord | null
   onClose: () => void
-  onSave: (recordId: string, form: ImprovementForm) => void
+  onSave: (recordId: string, form: ImprovementForm) => Promise<void>
 }) {
   const [form, setForm] = useState<ImprovementForm>(emptyImprovementForm)
 
@@ -611,16 +516,23 @@ function ImprovementDialog({
     setForm(record.improvementAction ?? emptyImprovementForm)
   }, [record])
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [saving, setSaving] = useState(false)
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!record) return
     if (!form.description.trim()) return toast.error("Describe la accion de mejora")
     if (!form.responsible.trim()) return toast.error("Ingresa el responsable de la accion")
     if (!form.dueDate) return toast.error("Selecciona la fecha de cumplimiento")
 
-    onSave(record.id, form)
-    setForm(emptyImprovementForm)
-    onClose()
+    setSaving(true)
+    try {
+      await onSave(record.id, form)
+      setForm(emptyImprovementForm)
+      onClose()
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -647,7 +559,7 @@ function ImprovementDialog({
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit">Guardar accion</Button>
+            <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Guardar accion</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -662,19 +574,25 @@ function EvidenceDialog({
 }: {
   record: AnalysisRecord | null
   onClose: () => void
-  onUpload: (recordId: string, form: EvidenceForm) => void
+  onUpload: (recordId: string, form: EvidenceForm) => Promise<void>
 }) {
   const [form, setForm] = useState<EvidenceForm>(emptyEvidenceForm)
+  const [saving, setSaving] = useState(false)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!record) return
-    if (!form.fileName.trim()) return toast.error("Selecciona la evidencia")
+    if (!form.file) return toast.error("Selecciona la evidencia")
     if (!form.description.trim()) return toast.error("Describe brevemente la evidencia")
 
-    onUpload(record.id, form)
-    setForm(emptyEvidenceForm)
-    onClose()
+    setSaving(true)
+    try {
+      await onUpload(record.id, form)
+      setForm(emptyEvidenceForm)
+      onClose()
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -688,9 +606,9 @@ function EvidenceDialog({
           <div className="rounded-md border border-dashed border-border bg-secondary p-4">
             <Label className="grid gap-2">
               Archivo
-              <Input type="file" onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.files?.[0]?.name ?? "" }))} />
+              <Input type="file" onChange={(event) => setForm((current) => ({ ...current, file: event.target.files?.[0] ?? null }))} />
             </Label>
-            <Input className="mt-3" value={form.fileName} onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.value }))} placeholder="También puedes escribir el nombre del archivo mock" />
+            {form.file && <p className="mt-3 truncate text-sm text-muted-foreground">{form.file.name}</p>}
           </div>
 
           <Label className="grid gap-2">
@@ -705,7 +623,7 @@ function EvidenceDialog({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit" className="gap-2"><Upload className="h-4 w-4" />Guardar evidencia</Button>
+            <Button type="submit" className="gap-2" disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}Guardar evidencia</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -717,10 +635,18 @@ function DetailDialog({
   record,
   onClose,
   onDownload,
+  onPreviewDocument,
+  onDownloadDocument,
+  onDeleteDocument,
+  loadingDocumentId,
 }: {
   record: AnalysisRecord | null
   onClose: () => void
   onDownload: (record: AnalysisRecord) => void
+  onPreviewDocument: (document: EmployeeAnalyticsDocument) => void
+  onDownloadDocument: (document: EmployeeAnalyticsDocument) => void
+  onDeleteDocument: (document: EmployeeAnalyticsDocument) => void
+  loadingDocumentId: string | null
 }) {
   if (!record) return null
 
@@ -743,7 +669,7 @@ function DetailDialog({
           <div className="grid gap-4 lg:grid-cols-2">
             {record.indicators.map((indicator) => (
               <AnalyticsChartCard key={indicator.id} title={indicator.name} description={`${indicator.value} ${indicator.unit} · ${indicator.description}`}>
-                <AnalyticsBarChart data={indicator.chartData} color="var(--chart-2)" />
+                <AnalyticsBarChart data={indicatorChartData(indicator)} color="var(--chart-2)" />
               </AnalyticsChartCard>
             ))}
           </div>
@@ -768,13 +694,24 @@ function DetailDialog({
               <FileText className="h-4 w-4" />
               Evidencia
             </h3>
-            {record.evidence ? (
-              <div className="rounded-md bg-secondary p-3 text-sm">
-                <p className="font-medium text-foreground">{record.evidence.fileName}</p>
-                <p className="text-muted-foreground">{record.evidence.description}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {formatDateTime(record.evidence.uploadedAt)} · {record.evidence.isConfirmed ? "Confirmada" : "Sin confirmar"}
-                </p>
+            {(record.evidences?.length ?? 0) > 0 ? (
+              <div className="grid gap-2">
+                {record.evidences?.map((document) => (
+                  <div key={document.id} className="flex flex-col gap-3 rounded-md bg-secondary p-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium text-foreground">{document.originalName}</p>
+                      <p className="text-muted-foreground">{document.description || "Sin descripción"}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(document.createdAt)} · {document.isConfirmed ? "Confirmada" : "Sin confirmar"}</p>
+                    </div>
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                      <Button type="button" size="sm" variant="outline" className="gap-2" disabled={loadingDocumentId === document.id} onClick={() => onPreviewDocument(document)}>
+                        {loadingDocumentId === document.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}Ver
+                      </Button>
+                      <Button type="button" size="sm" variant="outline" className="gap-2" onClick={() => onDownloadDocument(document)}><Download className="h-4 w-4" />Descargar</Button>
+                      <Button type="button" size="sm" variant="destructive" className="gap-2" onClick={() => onDeleteDocument(document)}><Trash2 className="h-4 w-4" />Eliminar</Button>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">Aún no hay evidencia cargada.</p>
@@ -792,7 +729,8 @@ function DetailDialog({
 }
 
 export default function EmployeeAnalyticsPage() {
-  const [records, setRecords] = useState<AnalysisRecord[]>(initialRecords)
+  const [records, setRecords] = useState<AnalysisRecord[]>([])
+  const [loading, setLoading] = useState(true)
   const [employees, setEmployees] = useState<EmployeeOption[]>([])
   const [employeesLoading, setEmployeesLoading] = useState(true)
   const [search, setSearch] = useState("")
@@ -803,27 +741,49 @@ export default function EmployeeAnalyticsPage() {
   const [detailRecord, setDetailRecord] = useState<AnalysisRecord | null>(null)
   const [improvementRecord, setImprovementRecord] = useState<AnalysisRecord | null>(null)
   const [evidenceRecord, setEvidenceRecord] = useState<AnalysisRecord | null>(null)
+  const [preview, setPreview] = useState<DocumentPreview | null>(null)
+  const [loadingDocumentId, setLoadingDocumentId] = useState<string | null>(null)
+  const [recordToDelete, setRecordToDelete] = useState<AnalysisRecord | null>(null)
+  const [deletingRecord, setDeletingRecord] = useState(false)
 
   useEffect(() => {
     let mounted = true
 
-    async function loadEmployeeOptions() {
+    async function loadPageData() {
       try {
-        const employeeList = await listEmployees()
-        if (mounted) setEmployees(toEmployeeOptions(employeeList))
+        const [employeeList, analyticsList] = await Promise.all([
+          listEmployees(),
+          listEmployeeAnalytics({ page: 1, limit: 100 }),
+        ])
+        if (mounted) {
+          setEmployees(toEmployeeOptions(employeeList))
+          setRecords(analyticsList.items.map(toAnalysisRecord))
+        }
       } catch (error) {
-        if (mounted) toast.error(error instanceof Error ? error.message : "No se pudo cargar los funcionarios")
+        if (mounted) toast.error(error instanceof Error ? error.message : "No se pudo cargar Estadísticas y Análisis")
       } finally {
-        if (mounted) setEmployeesLoading(false)
+        if (mounted) {
+          setEmployeesLoading(false)
+          setLoading(false)
+        }
       }
     }
 
-    loadEmployeeOptions()
+    loadPageData()
 
     return () => {
       mounted = false
     }
   }, [])
+
+  useEffect(() => () => {
+    if (preview?.url) URL.revokeObjectURL(preview.url)
+  }, [preview])
+
+  async function refreshRecords() {
+    const analyticsList = await listEmployeeAnalytics({ page: 1, limit: 100 })
+    setRecords(analyticsList.items.map(toAnalysisRecord))
+  }
 
   const filteredRecords = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -842,7 +802,7 @@ export default function EmployeeAnalyticsPage() {
 
   const stats = useMemo(() => ({
     total: records.length,
-    withEvidence: records.filter((record) => Boolean(record.evidence)).length,
+    withEvidence: records.filter((record) => record.evidenceCount > 0).length,
     withAction: records.filter((record) => Boolean(record.improvementAction)).length,
     annual: records.filter((record) => record.periodicity === "ANNUAL").length,
   }), [records])
@@ -863,64 +823,183 @@ export default function EmployeeAnalyticsPage() {
       .filter((item) => item.total > 0)
   }, [records])
 
-  function handleSave(form: AnalysisForm, responsibleName: string, recordId?: string) {
+  async function handleSave(form: AnalysisForm, _responsibleName: string, recordId?: string) {
     const payload = {
       periodicity: form.periodicity,
-      year: form.year.trim(),
+      year: Number(form.year),
       period: form.period,
       responsibleEmployeeId: form.responsibleEmployeeId,
-      responsibleName,
       analysisDate: form.analysisDate,
       incidentType: form.incidentType,
-      indicators: generateIndicators(form.periodicity, form.incidentType),
     }
 
-    if (recordId) {
-      setRecords((current) => current.map((record) => record.id === recordId ? { ...record, ...payload } : record))
-      toast.success("Analisis actualizado")
-      return
+    try {
+      const saved = recordId
+        ? await updateEmployeeAnalytics(recordId, payload)
+        : await createEmployeeAnalytics(payload)
+      const normalized = toAnalysisRecord(saved)
+      setRecords((current) => recordId
+        ? current.map((record) => record.id === recordId ? normalized : record)
+        : [normalized, ...current])
+      toast.success(recordId ? "Análisis actualizado" : "Análisis generado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar el análisis")
+      throw error
     }
-
-    setRecords((current) => [{ id: createId("analysis"), ...payload, createdAt: new Date().toISOString() }, ...current])
-    toast.success("Analisis generado")
   }
 
-  function handleSaveImprovement(recordId: string, form: ImprovementForm) {
-    setRecords((current) =>
-      current.map((record) =>
-        record.id === recordId
-          ? {
-              ...record,
-              improvementAction: {
-                description: form.description.trim(),
-                responsible: form.responsible.trim(),
-                dueDate: form.dueDate,
-              },
-            }
-          : record,
-      ),
-    )
-    toast.success("Accion de mejora registrada")
+  async function handleSaveImprovement(recordId: string, form: ImprovementForm) {
+    try {
+      const action = await saveEmployeeAnalyticsImprovement(recordId, {
+        description: form.description.trim(),
+        responsible: form.responsible.trim(),
+        dueDate: form.dueDate,
+        status: "OPEN",
+      })
+      setRecords((current) => current.map((record) => record.id === recordId ? { ...record, improvementAction: action } : record))
+      if (detailRecord?.id === recordId) setDetailRecord((current) => current ? { ...current, improvementAction: action } : current)
+      toast.success("Acción de mejora registrada")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar la acción de mejora")
+      throw error
+    }
   }
 
-  function handleUpload(recordId: string, form: EvidenceForm) {
-    setRecords((current) =>
-      current.map((record) =>
-        record.id === recordId
-          ? {
-              ...record,
-              evidence: {
-                id: createId("evidence"),
-                fileName: form.fileName.trim(),
-                description: form.description.trim(),
-                uploadedAt: new Date().toISOString(),
-                isConfirmed: form.isConfirmed,
-              },
-            }
-          : record,
-      ),
-    )
-    toast.success("Evidencia cargada")
+  async function handleUpload(recordId: string, form: EvidenceForm) {
+    if (!form.file) return
+    try {
+      const document = await uploadEmployeeAnalyticsDocument(recordId, {
+        file: form.file,
+        description: form.description,
+        isConfirmed: form.isConfirmed,
+      })
+      setRecords((current) => current.map((record) => record.id === recordId
+        ? { ...record, evidence: document, evidenceCount: record.evidenceCount + 1 }
+        : record))
+      toast.success("Evidencia cargada")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar la evidencia")
+      throw error
+    }
+  }
+
+  async function openDetail(record: AnalysisRecord) {
+    try {
+      const [report, documents] = await Promise.all([
+        getEmployeeAnalytics(record.id),
+        listEmployeeAnalyticsDocuments(record.id),
+      ])
+      setDetailRecord({ ...toAnalysisRecord(report), evidences: documents })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el detalle")
+    }
+  }
+
+  async function downloadAnalysisPdf(record: AnalysisRecord) {
+    try {
+      const blob = await exportEmployeeAnalyticsPdf(record.id)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `estadisticas-analisis-${record.year}-${record.incidentType}.pdf`
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar el análisis")
+    }
+  }
+
+  async function getDocumentBlob(document: EmployeeAnalyticsDocument) {
+    if (!document.downloadUrl) throw new Error("La evidencia no tiene archivo disponible")
+    return downloadEmployeeAnalyticsDocument(document.downloadUrl)
+  }
+
+  async function previewDocument(document: EmployeeAnalyticsDocument) {
+    setLoadingDocumentId(document.id)
+    try {
+      const blob = await getDocumentBlob(document)
+      const url = URL.createObjectURL(blob)
+      setPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return { document, url, mimeType: blob.type || document.mimeType || "application/octet-stream" }
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo previsualizar la evidencia")
+    } finally {
+      setLoadingDocumentId(null)
+    }
+  }
+
+  async function downloadDocument(document: EmployeeAnalyticsDocument) {
+    try {
+      const blob = await getDocumentBlob(document)
+      const url = URL.createObjectURL(blob)
+      const link = window.document.createElement("a")
+      link.href = url
+      link.download = document.originalName || "evidencia-analisis"
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar la evidencia")
+    }
+  }
+
+  async function removeDocument(document: EmployeeAnalyticsDocument) {
+    if (!detailRecord) return
+    try {
+      await deleteEmployeeAnalyticsDocument(detailRecord.id, document.id)
+      setDetailRecord((current) => current ? {
+        ...current,
+        evidences: current.evidences?.filter((item) => item.id !== document.id),
+        evidenceCount: Math.max(0, current.evidenceCount - 1),
+        evidence: current.evidence?.id === document.id ? null : current.evidence,
+      } : current)
+      await refreshRecords()
+      toast.success("Evidencia eliminada")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar la evidencia")
+    }
+  }
+
+  async function removeAnalysis() {
+    if (!recordToDelete) return
+    const record = recordToDelete
+
+    try {
+      setDeletingRecord(true)
+      await deleteEmployeeAnalytics(record.id)
+      setRecords((current) => current.filter((item) => item.id !== record.id))
+      if (detailRecord?.id === record.id) setDetailRecord(null)
+      if (editingRecord?.id === record.id) {
+        setEditingRecord(null)
+        setDialogOpen(false)
+      }
+      if (improvementRecord?.id === record.id) setImprovementRecord(null)
+      if (evidenceRecord?.id === record.id) setEvidenceRecord(null)
+      setRecordToDelete(null)
+      toast.success("Análisis eliminado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar el análisis")
+    } finally {
+      setDeletingRecord(false)
+    }
+  }
+
+  async function downloadConsolidatedCsv() {
+    try {
+      const blob = await exportEmployeeAnalyticsCsv({
+        search: search.trim() || undefined,
+        incidentType: typeFilter === "all" ? undefined : typeFilter,
+      })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = "estadisticas-y-analisis.csv"
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo exportar el consolidado")
+    }
   }
 
   function openCreate() {
@@ -940,10 +1019,10 @@ export default function EmployeeAnalyticsPage() {
           <h1 className="text-2xl font-bold text-foreground">Estadísticas y Análisis</h1>
           <p className="text-muted-foreground">Genera indicadores estadísticos por periodo y tipo de novedad laboral.</p>
         </div>
-        <Button type="button" className="gap-2" onClick={openCreate}>
-          <Plus className="h-4 w-4" />
-          Nuevo analisis
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" className="gap-2" onClick={() => void downloadConsolidatedCsv()}><Download className="h-4 w-4" />Exportar CSV</Button>
+          <Button type="button" className="gap-2" onClick={openCreate}><Plus className="h-4 w-4" />Nuevo analisis</Button>
+        </div>
       </div>
 
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4"><Metric label="Analisis" value={stats.total} /><Metric label="Con evidencia" value={stats.withEvidence} tone="green" /><Metric label="Con mejora" value={stats.withAction} tone="blue" /><Metric label="Anuales" value={stats.annual} tone="amber" /></section>
@@ -993,7 +1072,14 @@ export default function EmployeeAnalyticsPage() {
           </div>
         </div>
 
-        {viewMode === "cards" ? (
+        {loading && (
+          <div className="flex items-center justify-center gap-2 rounded-md border border-border bg-card px-4 py-10 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Cargando análisis estadísticos...
+          </div>
+        )}
+
+        {!loading && (viewMode === "cards" ? (
           <div className="grid gap-4 xl:grid-cols-2">
             {filteredRecords.map((record) => (
               <Card key={record.id} className="border-border bg-card">
@@ -1006,7 +1092,7 @@ export default function EmployeeAnalyticsPage() {
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">{periodLabel(record)}</p>
                     </div>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => setDetailRecord(record)}>
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void openDetail(record)}>
                       <Eye className="h-4 w-4" />
                       Ver
                     </Button>
@@ -1015,7 +1101,7 @@ export default function EmployeeAnalyticsPage() {
                     <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />{formatDate(record.analysisDate)}</p>
                     <p className="flex items-center gap-2"><UserRound className="h-4 w-4" />{record.responsibleName}</p>
                     <p className="flex items-center gap-2"><Target className="h-4 w-4" />{record.improvementAction ? "Con accion" : "Sin accion"}</p>
-                    <p className="flex items-center gap-2"><FileText className="h-4 w-4" />{record.evidence ? "Con evidencia" : "Sin evidencia"}</p>
+                    <p className="flex items-center gap-2"><FileText className="h-4 w-4" />{record.evidenceCount > 0 ? `${record.evidenceCount} evidencia(s)` : "Sin evidencia"}</p>
                   </div>
                   <div className="grid gap-2 sm:grid-cols-3">
                     {record.indicators.slice(0, 3).map((indicator) => (
@@ -1060,19 +1146,23 @@ export default function EmployeeAnalyticsPage() {
                     <td className="px-4 py-3 text-muted-foreground">{formatDate(record.analysisDate)}</td>
                     <td className="px-4 py-3 text-muted-foreground">{record.responsibleName}</td>
                     <td className="px-4 py-3 text-muted-foreground">{record.indicators.length} indicadores</td>
-                    <td className="px-4 py-3 text-muted-foreground">{record.evidence?.fileName ?? "Sin evidencia"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{record.evidence?.originalName ?? (record.evidenceCount > 0 ? `${record.evidenceCount} evidencia(s)` : "Sin evidencia")}</td>
                     <td className="px-4 py-3 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones"><MoreHorizontal className="h-4 w-4" /></Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuItem onSelect={() => setDetailRecord(record)}><Eye className="h-4 w-4" />Ver detalle</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => void openDetail(record)}><Eye className="h-4 w-4" />Ver detalle</DropdownMenuItem>
                           <DropdownMenuItem onSelect={() => openEdit(record)}><Edit className="h-4 w-4" />Editar</DropdownMenuItem>
                           <DropdownMenuItem onSelect={() => setImprovementRecord(record)}><Target className="h-4 w-4" />Accion de mejora</DropdownMenuItem>
                           <DropdownMenuItem onSelect={() => downloadAnalysisPdf(record)}><Download className="h-4 w-4" />Descargar</DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onSelect={() => setEvidenceRecord(record)}><Upload className="h-4 w-4" />Subir evidencia</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => setRecordToDelete(record)}>
+                            <Trash2 className="h-4 w-4" />Eliminar análisis
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>
@@ -1086,7 +1176,7 @@ export default function EmployeeAnalyticsPage() {
               </tbody>
             </table>
           </div>
-        )}
+        ))}
       </section>
 
       <AnalysisDialog
@@ -1099,7 +1189,70 @@ export default function EmployeeAnalyticsPage() {
       />
       <ImprovementDialog record={improvementRecord} onClose={() => setImprovementRecord(null)} onSave={handleSaveImprovement} />
       <EvidenceDialog record={evidenceRecord} onClose={() => setEvidenceRecord(null)} onUpload={handleUpload} />
-      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={downloadAnalysisPdf} />
+      <AlertDialog open={Boolean(recordToDelete)} onOpenChange={(open) => { if (!open && !deletingRecord) setRecordToDelete(null) }}>
+        <AlertDialogContent className="overflow-hidden p-0 sm:max-w-md">
+          <AlertDialogHeader className="border-b bg-destructive/5 px-6 py-5 text-left">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+              <div className="space-y-1">
+                <AlertDialogTitle>Eliminar análisis estadístico</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta acción eliminará el análisis de <strong className="text-foreground">{recordToDelete ? incidentTypeLabel(recordToDelete.incidentType) : "la novedad seleccionada"}</strong> correspondiente a <strong className="text-foreground">{recordToDelete ? periodLabel(recordToDelete) : "este periodo"}</strong>.
+                </AlertDialogDescription>
+              </div>
+            </div>
+          </AlertDialogHeader>
+          <div className="px-6 py-4 text-sm text-muted-foreground">
+            ¿Estás seguro de continuar? El análisis y sus indicadores dejarán de aparecer en el listado.
+          </div>
+          <AlertDialogFooter className="border-t bg-muted/30 px-6 py-4">
+            <AlertDialogCancel disabled={deletingRecord}>Cancelar</AlertDialogCancel>
+            <Button type="button" variant="destructive" className="gap-2" disabled={deletingRecord} onClick={() => void removeAnalysis()}>
+              {deletingRecord ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+              {deletingRecord ? "Eliminando..." : "Sí, eliminar"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <DetailDialog
+        record={detailRecord}
+        loadingDocumentId={loadingDocumentId}
+        onClose={() => setDetailRecord(null)}
+        onDownload={(record) => void downloadAnalysisPdf(record)}
+        onPreviewDocument={(document) => void previewDocument(document)}
+        onDownloadDocument={(document) => void downloadDocument(document)}
+        onDeleteDocument={(document) => void removeDocument(document)}
+      />
+
+      <Dialog open={Boolean(preview)} onOpenChange={(nextOpen) => !nextOpen && setPreview(null)}>
+        <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+          <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
+            <DialogTitle className="truncate">{preview?.document.originalName || "Vista previa"}</DialogTitle>
+          </DialogHeader>
+          <div className="min-h-0 flex-1 overflow-auto bg-muted/30 p-4">
+            {preview?.mimeType.startsWith("image/") ? (
+              <div className="flex min-h-[24rem] items-center justify-center rounded-md border bg-card p-3">
+                <img src={preview.url} alt={preview.document.originalName} className="max-h-[70dvh] max-w-full object-contain" />
+              </div>
+            ) : preview?.mimeType.startsWith("application/pdf") ? (
+              <iframe src={preview.url} title={preview.document.originalName} className="h-[70dvh] min-h-[28rem] w-full rounded-md border bg-white" />
+            ) : preview ? (
+              <div className="flex min-h-[24rem] flex-col items-center justify-center rounded-md border border-dashed bg-card">
+                <FileText className="h-12 w-12 text-muted-foreground" />
+                <p className="mt-3 font-medium">Vista previa no disponible para este tipo de archivo</p>
+              </div>
+            ) : null}
+          </div>
+          <DialogFooter className="shrink-0 border-t border-border px-6 py-4">
+            {preview && <>
+              <Button type="button" variant="outline" className="gap-2" onClick={() => window.open(preview.url, "_blank", "noopener,noreferrer")}><ExternalLink className="h-4 w-4" />Abrir</Button>
+              <Button type="button" className="gap-2" onClick={() => void downloadDocument(preview.document)}><Download className="h-4 w-4" />Descargar</Button>
+            </>}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }
