@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
@@ -413,13 +414,14 @@ function TrainingDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] max-w-3xl overflow-hidden bg-card p-0">
+      <DialogContent className="max-h-[90vh] max-w-3xl overflow-hidden bg-white p-0">
         <form onSubmit={handleSubmit}>
-          <DialogHeader className="border-b border-border px-6 py-4">
-            <DialogTitle>{training ? "Editar capacitacion" : "Nueva capacitacion"}</DialogTitle>
+          <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4">
+            <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="training" tone="blue" /><div><DialogTitle>{training ? "Editar capacitación" : "Nueva capacitación"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Programa la actividad, define su modalidad y asigna participantes.</p></div></div>
           </DialogHeader>
 
-          <div className="grid max-h-[calc(90vh-140px)] gap-4 overflow-y-auto px-6 py-4">
+          <div className="grid max-h-[calc(90vh-140px)] gap-4 overflow-y-auto bg-slate-50/40 px-6 py-4">
+            <FormSectionTitle icon="details" title="Datos de la capacitación" description="Selecciona el tema, tipo, fecha y duración de la actividad." tone="cyan" />
             <div className="grid gap-2">
               <Label>Tema</Label>
               <Select value={form.topicId} onValueChange={(value) => setForm((current) => ({ ...current, topicId: value }))}>
@@ -491,7 +493,7 @@ function TrainingDialog({
             </div>
 
             {requiresInductionFields && (
-              <div className="grid gap-4 rounded-md border border-border bg-secondary/20 p-4">
+              <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="grid gap-2">
                     <Label htmlFor="training-entry-date">Fecha de ingreso</Label>
@@ -591,7 +593,7 @@ function TrainingDialog({
             </div>
           </div>
 
-          <DialogFooter className="border-t border-border px-6 py-4">
+          <DialogFooter className="border-t border-slate-200 bg-white px-6 py-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>

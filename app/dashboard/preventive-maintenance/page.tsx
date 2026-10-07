@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
 import {
@@ -198,12 +199,13 @@ function MaintenanceDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{maintenance ? "Editar mantenimiento preventivo" : "Nuevo mantenimiento preventivo"}</DialogTitle>
+      <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto border-slate-200 bg-white p-0">
+        <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="maintenance" tone="cyan" /><div><DialogTitle>{maintenance ? "Editar mantenimiento preventivo" : "Nuevo mantenimiento preventivo"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Programa la acción preventiva y asigna al funcionario responsable.</p></div></div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 bg-slate-50/40 px-6 py-5">
+          <FormSectionTitle icon="details" title="Datos del mantenimiento" description="Define la acción, fecha, responsable y alcance del mantenimiento." tone="cyan" />
           <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
               <Label>Acción</Label>
@@ -266,7 +268,7 @@ function MaintenanceDialog({
             />
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="border-t border-slate-200 bg-white pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
@@ -396,25 +398,23 @@ export default function PreventiveMaintenancePage() {
         </Button>
       </div>
 
+      <section className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+              <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
+                <span className="text-xs text-muted-foreground">Total</span>
+                <span className="text-xl font-bold leading-none">{maintenances.length}</span>
+              </div>
+              <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2">
+                <span className="text-xs text-muted-foreground">Activos</span>
+                <span className="text-xl font-bold leading-none text-emerald-700">{activeCount}</span>
+              </div>
+              <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2">
+                <span className="text-xs text-muted-foreground">Inactivos</span>
+                <span className="text-xl font-bold leading-none text-red-700">{maintenances.length - activeCount}</span>
+              </div>
+      </section>
+
       <Card>
         <CardContent className="space-y-5 p-5">
-          <div className="overflow-x-auto px-3 py-1">
-            <div className="flex min-w-max items-center justify-center gap-2">
-              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
-                <span className="text-xs text-muted-foreground">Total</span>
-                <span className="text-sm font-semibold">{maintenances.length}</span>
-              </div>
-              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
-                <span className="text-xs text-muted-foreground">Activos</span>
-                <span className="text-sm font-semibold text-green-600">{activeCount}</span>
-              </div>
-              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
-                <span className="text-xs text-muted-foreground">Inactivos</span>
-                <span className="text-sm font-semibold">{maintenances.length - activeCount}</span>
-              </div>
-            </div>
-          </div>
-
           <form onSubmit={handleFilter} className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_170px_170px_190px_150px_150px_auto]">
             <div className="grid gap-2">
               <Label>Buscar</Label>

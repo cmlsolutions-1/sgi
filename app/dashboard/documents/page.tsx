@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -554,12 +555,13 @@ export default function DocumentsPage() {
               Nuevo documento
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
-            <DialogHeader>
-              <DialogTitle>{form.id ? "Editar documento" : "Nuevo documento"}</DialogTitle>
+          <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto border-slate-200 bg-white">
+            <DialogHeader className="border-b border-slate-200 bg-slate-50/70 p-4">
+              <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="document" tone="blue" /><div><DialogTitle>{form.id ? "Editar documento" : "Nuevo documento"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Clasifica el documento, define su alcance y relaciónalo con la organización.</p></div></div>
             </DialogHeader>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-2">
+              <FormSectionTitle icon="details" title="Información del documento" description="Completa su identificación, responsables, objetivo y contenido." tone="cyan" className="md:col-span-2" />
               <div className="md:col-span-2 space-y-2">
                 <Label htmlFor="document-name">Nombre</Label>
                 <Input
@@ -733,7 +735,7 @@ export default function DocumentsPage() {
               </Alert>
             )}
 
-            <DialogFooter>
+            <DialogFooter className="border-t border-slate-200 pt-4">
               <Button variant="outline" onClick={resetForm} disabled={saving}>
                 Cancelar
               </Button>
@@ -911,21 +913,21 @@ export default function DocumentsPage() {
       </Dialog>
 
       <div className="overflow-x-auto px-3 py-1">
-        <div className="flex min-w-max items-center justify-center gap-2">
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
+          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
             <span className="text-xs text-muted-foreground">Total</span>
             <span className="text-sm font-semibold">{stats.total}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
             <span className="text-xs text-muted-foreground">Activos</span>
             <span className="text-sm font-semibold text-green-600">{stats.active}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-red-200 bg-red-50">
             <span className="text-xs text-muted-foreground">Inactivos</span>
             <span className="text-sm font-semibold">{stats.inactive}</span>
           </div>
           {DOCUMENT_TYPES.map((type) => (
-            <div key={type.value} className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+            <div key={type.value} className="flex items-center gap-2 border-blue-200 bg-blue-50">
               <span className="text-xs text-muted-foreground">{type.label}</span>
               <span className="text-sm font-semibold">{stats.byType[type.value] ?? 0}</span>
             </div>

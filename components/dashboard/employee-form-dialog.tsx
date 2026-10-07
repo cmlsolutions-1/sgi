@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { listJobs } from "@/services/jobService"
 import { listWorkAreaOptions } from "@/services/workAreaService"
@@ -230,13 +231,13 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-3xl flex-col gap-0 overflow-hidden border-border bg-card p-0 sm:max-w-3xl">
+      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-3xl flex-col gap-0 overflow-hidden border-slate-200 bg-white p-0 sm:max-w-3xl">
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-          <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-            <DialogTitle>{employee ? "Editar funcionario" : "Crear funcionario"}</DialogTitle>
+          <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+            <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="employee" tone="blue" /><div><DialogTitle>{employee ? "Editar funcionario" : "Crear funcionario"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra la información personal y su ubicación dentro de la organización.</p></div></div>
           </DialogHeader>
 
-          <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
+          <div className="min-h-0 flex-1 overflow-y-auto bg-slate-50/40 px-6 py-4">
             {loadingOptions ? (
               <div className="flex min-h-[260px] items-center justify-center">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -263,7 +264,8 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                   </Alert>
                 )}
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-2">
+                  <FormSectionTitle icon="employee" title="Información personal" description="Completa los datos de identificación y contacto del funcionario." tone="blue" className="md:col-span-2" />
                   <div className="space-y-2">
                     <Label htmlFor="employee-name">Nombre</Label>
                     <Input
@@ -390,7 +392,8 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-2">
+                  <FormSectionTitle icon="job" title="Información laboral" description="Relaciona el área y el cargo que desempeñará el funcionario." tone="cyan" className="md:col-span-2" />
                   <div className="space-y-2">
                     <Label>Area de trabajo</Label>
                     <Select value={formData.workAreaId} onValueChange={(value) => updateField("workAreaId", value)}>
@@ -430,7 +433,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
             )}
           </div>
 
-          <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+          <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>

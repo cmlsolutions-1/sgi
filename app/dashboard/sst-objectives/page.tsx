@@ -179,6 +179,9 @@ const emptyDiffusionForm: DiffusionForm = {
   evidenceDescription: "",
 }
 
+const objectiveFieldClassName =
+  "h-10 border-slate-300 bg-white shadow-sm transition-colors hover:border-slate-400 focus-visible:border-primary focus-visible:ring-primary/20"
+
 function normalizeNumber(value: string) {
   return value.replace(/\D/g, "")
 }
@@ -230,27 +233,27 @@ function latestFollowUp(objective: SstObjective) {
 
 function InfoBlock({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md bg-secondary p-3">
-      <p className="text-xs font-medium uppercase text-muted-foreground">{label}</p>
-      <p className="mt-1 text-sm font-medium text-foreground">{value}</p>
+    <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-3">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="mt-1 break-words text-sm font-medium text-foreground">{value}</p>
     </div>
   )
 }
 
 function Metric({ label, value, tone = "default" }: { label: string; value: number; tone?: "default" | "blue" | "green" | "amber" }) {
-  const toneClass =
+  const toneClasses =
     tone === "blue"
-      ? "text-blue-700"
+      ? "border-blue-200 bg-blue-50 text-blue-700"
       : tone === "green"
-        ? "text-emerald-700"
+        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
         : tone === "amber"
-          ? "text-amber-700"
-          : "text-foreground"
+          ? "border-amber-200 bg-amber-50 text-amber-700"
+          : "border-slate-200 bg-slate-50 text-slate-800"
 
   return (
-    <div className="rounded-md bg-secondary px-3 py-1.5">
-      <span className={`text-sm font-bold ${toneClass}`}>{value}</span>
-      <span className="ml-2 text-xs text-muted-foreground">{label}</span>
+    <div className={`flex min-h-14 items-center gap-3 rounded-lg border px-3.5 py-2 ${toneClasses}`}>
+      <span className="text-xl font-bold leading-none">{value}</span>
+      <span className="text-xs font-medium text-slate-600">{label}</span>
     </div>
   )
 }
@@ -286,7 +289,7 @@ function PolicyDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-w-2xl bg-card">
+      <DialogContent className="max-w-2xl border-slate-200 bg-white">
         <DialogHeader>
           <DialogTitle>Crear política SST</DialogTitle>
           <p className="text-sm text-muted-foreground">
@@ -300,6 +303,7 @@ function PolicyDialog({
               value={form.name}
               onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
               placeholder="Ej. Politica de Seguridad y Salud en el Trabajo"
+              className={objectiveFieldClassName}
             />
           </Label>
           <Label className="grid gap-2">
@@ -308,6 +312,7 @@ function PolicyDialog({
               value={form.description}
               onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
               rows={4}
+              className="border-slate-300 bg-white shadow-sm focus-visible:ring-primary/20"
             />
           </Label>
           <DialogFooter>
@@ -397,28 +402,44 @@ function ObjectiveDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-6xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-6xl">
-        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>{editing ? "Editar objetivo SST" : "Nuevo objetivo SST"}</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            Relaciona una politica SST, define la meta y registra el responsable del seguimiento.
-          </p>
+      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-6xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-6xl">
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-5 py-4 pr-12 sm:px-6">
+          <div className="flex items-start gap-3 text-left">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Target className="h-5 w-5" />
+            </div>
+            <div>
+              <DialogTitle>{editing ? "Editar objetivo SST" : "Nuevo objetivo SST"}</DialogTitle>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                Define el propósito, la forma de medirlo y quién realizará su seguimiento.
+              </p>
+            </div>
+          </div>
         </DialogHeader>
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Información general</h3>
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-slate-50/40 px-4 py-5 sm:px-6">
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+              <div className="mb-4 flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-700">
+                  <FileText className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground">Información general</h3>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Identifica el objetivo y explica claramente qué se desea alcanzar.</p>
+                </div>
+              </div>
               <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_140px_240px]">
                 <Label className="grid gap-2">
-                  Nombre del objetivo
+                  <span>Nombre del objetivo <span className="text-destructive">*</span></span>
                   <Input
                     value={form.name}
                     onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
                     placeholder="Ej. Reducir la accidentalidad laboral"
+                    className={objectiveFieldClassName}
                   />
                 </Label>
                 <Label className="grid gap-2">
-                  Año o vigencia
+                  <span>Año o vigencia <span className="text-destructive">*</span></span>
                   <Input
                     type="number"
                     min={currentYear}
@@ -426,10 +447,11 @@ function ObjectiveDialog({
                     onChange={(event) =>
                       setForm((current) => ({ ...current, year: normalizeNumber(event.target.value).slice(0, 4) }))
                     }
+                    className={objectiveFieldClassName}
                   />
                 </Label>
                 <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-foreground">Tipo</span>
+                  <span className="mb-2 block text-sm font-medium text-foreground">Tipo <span className="text-destructive">*</span></span>
                   <select
                     value={form.type}
                     onChange={(event) =>
@@ -439,7 +461,7 @@ function ObjectiveDialog({
                         customType: event.target.value === "OTHER" ? current.customType : "",
                       }))
                     }
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm transition-colors hover:border-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   >
                     {objectiveTypeOptions.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -456,21 +478,31 @@ function ObjectiveDialog({
                     value={form.customType}
                     onChange={(event) => setForm((current) => ({ ...current, customType: event.target.value }))}
                     placeholder="Escribe el tipo de objetivo"
+                    className={objectiveFieldClassName}
                   />
                 </Label>
               )}
               <Label className="mt-4 grid gap-2">
-                Descripción
+                <span>Descripción <span className="text-destructive">*</span></span>
                 <Textarea
                   value={form.description}
                   onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
                   rows={3}
+                  className="border-slate-300 bg-white shadow-sm focus-visible:ring-primary/20"
                 />
               </Label>
             </section>
 
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Meta e indicador</h3>
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+              <div className="mb-4 flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-50 text-cyan-700">
+                  <Target className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground">Meta e indicador</h3>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Establece cómo se medirá el avance y cuál es el resultado esperado.</p>
+                </div>
+              </div>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_140px_180px_180px]">
                 <Label className="grid gap-2">
                   Meta
@@ -478,6 +510,7 @@ function ObjectiveDialog({
                     value={form.goal}
                     onChange={(event) => setForm((current) => ({ ...current, goal: event.target.value }))}
                     placeholder="Ej. Alcanzar cumplimiento minimo del 90%"
+                    className={objectiveFieldClassName}
                   />
                 </Label>
                 <Label className="grid gap-2">
@@ -491,6 +524,7 @@ function ObjectiveDialog({
                       setForm((current) => ({ ...current, indicator: normalizeNumber(event.target.value).slice(0, 3) }))
                     }
                     placeholder="0"
+                    className={objectiveFieldClassName}
                   />
                 </Label>
                 <Label className="grid gap-2">
@@ -499,6 +533,7 @@ function ObjectiveDialog({
                     value={form.measurementUnit}
                     onChange={(event) => setForm((current) => ({ ...current, measurementUnit: event.target.value }))}
                     placeholder="%"
+                    className={objectiveFieldClassName}
                   />
                 </Label>
                 <Label className="grid gap-2">
@@ -507,20 +542,29 @@ function ObjectiveDialog({
                     value={form.expectedValue}
                     onChange={(event) => setForm((current) => ({ ...current, expectedValue: event.target.value }))}
                     placeholder="90%"
+                    className={objectiveFieldClassName}
                   />
                 </Label>
               </div>
             </section>
 
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Política y seguimiento</h3>
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+              <div className="mb-4 flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+                  <CalendarDays className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground">Política y seguimiento</h3>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Relaciona la política, asigna un responsable y define el periodo de ejecución.</p>
+                </div>
+              </div>
               <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px_170px_170px]">
                 <label className="block">
                   <span className="mb-2 block text-sm font-medium text-foreground">Política SST relacionada</span>
                   <select
                     value={form.policyId}
                     onChange={(event) => setForm((current) => ({ ...current, policyId: event.target.value }))}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm transition-colors hover:border-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="">Selecciona politica</option>
                     {policies.map((policy) => (
@@ -536,6 +580,7 @@ function ObjectiveDialog({
                     value={form.trackingResponsible}
                     onChange={(event) => setForm((current) => ({ ...current, trackingResponsible: event.target.value }))}
                     placeholder="Nombre o cargo responsable"
+                    className={objectiveFieldClassName}
                   />
                 </Label>
                 <Label className="grid gap-2">
@@ -544,6 +589,7 @@ function ObjectiveDialog({
                     type="date"
                     value={form.startDate}
                     onChange={(event) => setForm((current) => ({ ...current, startDate: event.target.value }))}
+                    className={objectiveFieldClassName}
                   />
                 </Label>
                 <Label className="grid gap-2">
@@ -553,6 +599,7 @@ function ObjectiveDialog({
                     min={form.startDate || undefined}
                     value={form.endDate}
                     onChange={(event) => setForm((current) => ({ ...current, endDate: event.target.value }))}
+                    className={objectiveFieldClassName}
                   />
                 </Label>
               </div>
@@ -562,16 +609,20 @@ function ObjectiveDialog({
                   value={form.observations}
                   onChange={(event) => setForm((current) => ({ ...current, observations: event.target.value }))}
                   rows={3}
+                  className="border-slate-300 bg-white shadow-sm focus-visible:ring-primary/20"
                 />
               </Label>
             </section>
           </div>
 
-          <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+          <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-4 py-4 sm:px-6">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit">{editing ? "Guardar cambios" : "Crear objetivo"}</Button>
+            <Button type="submit" className="gap-2">
+              <Target className="h-4 w-4" />
+              {editing ? "Guardar cambios" : "Crear objetivo"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -1233,18 +1284,20 @@ export default function SstObjectivesPage() {
         </div>
       </div>
 
-      <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        <div className="flex justify-center overflow-x-auto px-3 py-1">
-          <div className="flex w-fit min-w-max items-center gap-2">
-            <Metric label="Políticas" value={summary.policies} />
-            <Metric label="Objetivos" value={summary.total} />
-            <Metric label="Pendientes" value={summary.pending} tone="amber" />
-            <Metric label="En ejecución" value={summary.inProgress} tone="blue" />
-            <Metric label="Cumplidos" value={summary.fulfilled} tone="green" />
-          </div>
-        </div>
+      <section className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+        <Metric label="Políticas" value={summary.policies} />
+        <Metric label="Objetivos" value={summary.total} />
+        <Metric label="Pendientes" value={summary.pending} tone="amber" />
+        <Metric label="En ejecución" value={summary.inProgress} tone="blue" />
+        <Metric label="Cumplidos" value={summary.fulfilled} tone="green" />
+      </section>
 
-        <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(220px,1fr)_220px_190px]">
+      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+          <div className="mb-3">
+            <h2 className="text-sm font-semibold text-foreground">Buscar y filtrar</h2>
+            <p className="text-xs text-muted-foreground">Consulta objetivos por nombre, política, responsable, tipo o estado.</p>
+          </div>
+          <div className="grid gap-3 lg:grid-cols-[minmax(220px,1fr)_220px_190px]">
           <Label className="grid gap-2">
             Buscar
             <div className="relative">
@@ -1252,7 +1305,7 @@ export default function SstObjectivesPage() {
               <Input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                className="pl-9"
+                className={`${objectiveFieldClassName} pl-9`}
                 placeholder="Objetivo, política, responsable o tipo"
               />
             </div>
@@ -1262,7 +1315,7 @@ export default function SstObjectivesPage() {
             <select
               value={typeFilter}
               onChange={(event) => setTypeFilter(event.target.value as ObjectiveType | "all")}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm transition-colors hover:border-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             >
               <option value="all">Todos</option>
               {objectiveTypeOptions.map((option) => (
@@ -1277,7 +1330,7 @@ export default function SstObjectivesPage() {
             <select
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value as ObjectiveStatus | "all")}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm transition-colors hover:border-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             >
               <option value="all">Todos</option>
               <option value="PENDING">Pendiente</option>
@@ -1285,7 +1338,7 @@ export default function SstObjectivesPage() {
               <option value="FULFILLED">Cumplido</option>
             </select>
           </label>
-        </div>
+          </div>
       </section>
 
       <section className="space-y-4">

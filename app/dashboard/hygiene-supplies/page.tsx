@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Textarea } from "@/components/ui/textarea"
 import {
   changeHygieneSupplyStatus,
@@ -115,12 +116,13 @@ function SupplyDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto bg-white">
-        <DialogHeader className="border-b border-border pb-4">
-          <DialogTitle>{supply ? "Editar insumo de higiene" : "Nuevo insumo de higiene"}</DialogTitle>
+      <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto border-slate-200 bg-white p-0">
+        <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="supply" tone="cyan" /><div><DialogTitle>{supply ? "Editar insumo de higiene" : "Nuevo insumo de higiene"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra la información técnica y las condiciones de uso del insumo.</p></div></div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 bg-slate-50/40 px-6 py-5">
+          <FormSectionTitle icon="details" title="Datos del insumo" description="Identifica el producto y documenta su manejo seguro." tone="cyan" />
           <div className="grid gap-2">
             <Label>Nombre</Label>
             <Input value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} />
@@ -154,7 +156,7 @@ function SupplyDialog({
               onChange={(event) => setForm((current) => ({ ...current, contraindications: event.target.value }))}
             />
           </div>
-          <DialogFooter className="border-t border-border pt-4">
+          <DialogFooter className="border-t border-slate-200 bg-white pt-4">
             <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
               Cancelar
             </Button>
@@ -240,16 +242,16 @@ export default function HygieneSuppliesPage() {
       </div>
 
       <div className="overflow-x-auto px-3 py-1">
-        <div className="flex min-w-max items-center justify-center gap-2">
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
+          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
             <span className="text-xs text-muted-foreground">Total insumos</span>
             <span className="text-sm font-semibold">{supplies.length}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
             <span className="text-xs text-muted-foreground">Activos</span>
             <span className="text-sm font-semibold text-emerald-700">{activeCount}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-red-200 bg-red-50">
             <span className="text-xs text-muted-foreground">Vencidos</span>
             <span className="text-sm font-semibold text-destructive">{expiredCount}</span>
           </div>

@@ -865,7 +865,7 @@ export default function SpecialRiskPage() {
       </div>
 
       <div className="overflow-x-auto px-3 py-1">
-        <div className="flex min-w-max items-center justify-center gap-2">
+        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:border-slate-200 [&>div]:bg-slate-50 [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
           <Metric label="Registros" value={stats.total} />
           <Metric label="Activos" value={stats.active} tone="green" />
           <Metric label="Finalizados" value={stats.finished} tone="blue" />

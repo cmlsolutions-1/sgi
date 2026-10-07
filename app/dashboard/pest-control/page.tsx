@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import {
   changePestControlStatus,
   createPestControl,
@@ -122,12 +123,13 @@ function PestControlDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[90dvh] max-w-xl overflow-y-auto bg-white">
-        <DialogHeader className="border-b border-border pb-4">
-          <DialogTitle>{record ? "Editar control de plagas" : "Nuevo control de plagas"}</DialogTitle>
+      <DialogContent className="max-h-[90dvh] max-w-xl overflow-y-auto border-slate-200 bg-white p-0">
+        <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="pest" tone="amber" /><div><DialogTitle>{record ? "Editar control de plagas" : "Nuevo control de plagas"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra la visita, el proveedor y la fecha del próximo control.</p></div></div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 bg-slate-50/40 px-6 py-5">
+          <FormSectionTitle icon="details" title="Datos del control" description="Registra las fechas de atención y la empresa prestadora." tone="amber" />
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">
               <Label>Fecha del control</Label>
@@ -166,7 +168,7 @@ function PestControlDialog({
             </p>
           </div>
 
-          <DialogFooter className="border-t border-border pt-4">
+          <DialogFooter className="border-t border-slate-200 bg-white pt-4">
             <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
               Cancelar
             </Button>
@@ -271,16 +273,16 @@ export default function PestControlPage() {
       </div>
 
       <div className="overflow-x-auto px-3 py-1">
-        <div className="flex min-w-max items-center justify-center gap-2">
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
+          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
             <span className="text-xs text-muted-foreground">Controles</span>
             <span className="text-sm font-semibold">{records.length}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
             <span className="text-xs text-muted-foreground">Activos</span>
             <span className="text-sm font-semibold text-emerald-700">{activeCount}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-blue-200 bg-blue-50">
             <span className="text-xs text-muted-foreground">Próximas visitas</span>
             <span className="text-sm font-semibold text-blue-700">{scheduledCount}</span>
           </div>

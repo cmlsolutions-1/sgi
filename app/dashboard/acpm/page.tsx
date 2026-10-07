@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Textarea } from "@/components/ui/textarea"
 import {
   changeAcpmStatus,
@@ -280,20 +281,18 @@ function AcpmDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-6xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-6xl">
-        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>{editing ? "Editar ACPM" : "Nuevo ACPM"}</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            {editing
-              ? "Puedes actualizar los datos permitidos. Año, fecha limite y fecha de deteccion permanecen fijos."
-              : "Registra la accion y la no conformidad que le da origen."}
-          </p>
+      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-6xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-6xl">
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+          <div className="flex items-start gap-3 text-left">
+            <FormDialogIcon icon="acpm" tone="blue" />
+            <div><DialogTitle>{editing ? "Editar ACPM" : "Nuevo ACPM"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">{editing ? "Puedes actualizar los datos permitidos. Año, fecha limite y fecha de deteccion permanecen fijos." : "Registra la accion y la no conformidad que le da origen."}</p></div>
+          </div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Datos generales</h3>
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-slate-50/40 px-6 py-5">
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="details" title="Datos generales" description="Identifica el tipo, origen y vigencia de la acción." tone="blue" />
               <div className="grid gap-4 lg:grid-cols-[130px_170px_180px_minmax(0,1fr)]">
                 <Label className="grid gap-2">
                   Año
@@ -346,8 +345,8 @@ function AcpmDialog({
               </div>
             </section>
 
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Descripcion y responsable</h3>
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="employee" title="Descripción y responsable" description="Explica la acción y asigna a la persona encargada." tone="cyan" />
               <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
                 <Label className="grid gap-2">
                   Descripcion
@@ -388,8 +387,8 @@ function AcpmDialog({
               </div>
             </section>
 
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">No conformidad</h3>
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="labor" title="No conformidad" description="Registra la situación que dio origen a la acción." tone="amber" />
               <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px_260px]">
                 <Label className="grid gap-2">
                   Descripcion de la situacion
@@ -422,7 +421,7 @@ function AcpmDialog({
             </section>
           </div>
 
-          <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+          <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
@@ -1278,32 +1277,26 @@ export default function AcpmPage() {
         </Button>
       </div>
 
-      <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        <div className="flex justify-center overflow-x-auto px-3 py-1">
-          <div className="flex w-fit min-w-max items-center gap-2">
-            <Metric label="ACPM" value={stats.total} />
-            <Metric label="Activos" value={stats.active} tone="blue" />
-            <Metric label="En ejecucion" value={stats.inProgress} tone="amber" />
-            <Metric label="Pendiente cierre" value={stats.pendingClosure} tone="amber" />
-            <Metric label="Cerrados" value={stats.closed} tone="green" />
-            <Metric label="Inactivos" value={stats.inactive} tone="red" />
-          </div>
+      <section className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6"><Metric label="ACPM" value={stats.total} /><Metric label="Activos" value={stats.active} tone="green" /><Metric label="En ejecucion" value={stats.inProgress} tone="blue" /><Metric label="Pendiente cierre" value={stats.pendingClosure} tone="amber" /><Metric label="Cerrados" value={stats.closed} tone="green" /><Metric label="Inactivos" value={stats.inactive} tone="red" /></section>
+      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+        <div className="mb-4">
+          <h2 className="text-sm font-semibold text-foreground">Buscar y filtrar</h2>
+          <p className="text-xs text-muted-foreground">Consulta las acciones por sus datos principales, estado, responsable o fecha límite.</p>
         </div>
-
-        <form onSubmit={handleSearch} className="mt-4 grid gap-3 xl:grid-cols-[minmax(180px,1fr)_110px_150px_150px_140px_160px_145px_145px_auto]">
-          <Label className="grid gap-2">
+        <form onSubmit={handleSearch} className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12">
+          <Label className="grid min-w-0 gap-2 sm:col-span-2 lg:col-span-4">
             Buscar
-            <div className="relative">
+            <div className="relative min-w-0">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                className="pl-9"
+                className="min-w-0 pl-9"
                 placeholder="Nombre, descripcion o responsable"
               />
             </div>
           </Label>
-          <FilterSelect label="Año" value={yearFilter} onChange={setYearFilter}>
+          <FilterSelect className="lg:col-span-2" label="Año" value={yearFilter} onChange={setYearFilter}>
             <option value="all">Todos</option>
             {yearOptions.map((year) => (
               <option key={year} value={year}>
@@ -1311,7 +1304,7 @@ export default function AcpmPage() {
               </option>
             ))}
           </FilterSelect>
-          <FilterSelect label="Tipo" value={typeFilter} onChange={(value) => setTypeFilter(value as AcpmType | "all")}>
+          <FilterSelect className="lg:col-span-2" label="Tipo" value={typeFilter} onChange={(value) => setTypeFilter(value as AcpmType | "all")}>
             <option value="all">Todos</option>
             {acpmTypeOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -1319,7 +1312,7 @@ export default function AcpmPage() {
               </option>
             ))}
           </FilterSelect>
-          <FilterSelect label="Origen" value={originFilter} onChange={(value) => setOriginFilter(value as AcpmOrigin | "all")}>
+          <FilterSelect className="lg:col-span-2" label="Origen" value={originFilter} onChange={(value) => setOriginFilter(value as AcpmOrigin | "all")}>
             <option value="all">Todos</option>
             {acpmOriginOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -1327,12 +1320,12 @@ export default function AcpmPage() {
               </option>
             ))}
           </FilterSelect>
-          <FilterSelect label="Estado" value={statusFilter} onChange={(value) => setStatusFilter(value as AcpmStatus | "all")}>
+          <FilterSelect className="lg:col-span-2" label="Estado" value={statusFilter} onChange={(value) => setStatusFilter(value as AcpmStatus | "all")}>
             <option value="all">Todos</option>
             <option value="ACTIVE">Activos</option>
             <option value="INACTIVE">Inactivos</option>
           </FilterSelect>
-          <FilterSelect label="Responsable" value={responsibleFilter} onChange={setResponsibleFilter}>
+          <FilterSelect className="sm:col-span-2 lg:col-span-4" label="Responsable" value={responsibleFilter} onChange={setResponsibleFilter}>
             <option value="all">Todos</option>
             {employees.map((employee) => (
               <option key={employee.id} value={employee.id}>
@@ -1340,24 +1333,26 @@ export default function AcpmPage() {
               </option>
             ))}
           </FilterSelect>
-          <Label className="grid gap-2">
+          <Label className="grid min-w-0 gap-2 lg:col-span-3">
             Desde limite
             <Input
               type="date"
               value={startDueDateFilter}
               onChange={(event) => setStartDueDateFilter(event.target.value)}
+              className="min-w-0"
             />
           </Label>
-          <Label className="grid gap-2">
+          <Label className="grid min-w-0 gap-2 lg:col-span-3">
             Hasta limite
             <Input
               type="date"
               min={startDueDateFilter || undefined}
               value={endDueDateFilter}
               onChange={(event) => setEndDueDateFilter(event.target.value)}
+              className="min-w-0"
             />
           </Label>
-          <Button type="submit" variant="outline" className="mt-7 gap-2">
+          <Button type="submit" variant="outline" className="w-full gap-2 self-end sm:col-span-2 lg:col-span-2">
             <Search className="h-4 w-4" />
             Filtrar
           </Button>
@@ -1609,43 +1604,45 @@ export default function AcpmPage() {
 }
 
 function Metric({ label, value, tone = "default" }: { label: string; value: number; tone?: "default" | "blue" | "amber" | "green" | "red" }) {
-  const toneClass =
+  const toneClasses =
     tone === "blue"
-      ? "text-blue-700"
+      ? "border-blue-200 bg-blue-50 text-blue-700"
       : tone === "amber"
-        ? "text-amber-700"
+        ? "border-amber-200 bg-amber-50 text-amber-700"
         : tone === "green"
-          ? "text-emerald-700"
+          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
           : tone === "red"
-            ? "text-destructive"
-            : "text-foreground"
+            ? "border-red-200 bg-red-50 text-red-700"
+            : "border-slate-200 bg-slate-50 text-foreground"
 
   return (
-    <div className="rounded-md bg-secondary px-3 py-1.5">
-      <span className={`text-sm font-bold ${toneClass}`}>{value}</span>
-      <span className="ml-2 text-xs text-muted-foreground">{label}</span>
+    <div className={`flex min-h-14 items-center gap-3 rounded-lg border px-3.5 py-2 ${toneClasses}`}>
+      <span className="text-xl font-bold leading-none">{value}</span>
+      <span className="text-xs font-medium text-slate-600">{label}</span>
     </div>
   )
 }
 
 function FilterSelect({
+  className = "",
   label,
   value,
   onChange,
   children,
 }: {
+  className?: string
   label: string
   value: string
   onChange: (value: string) => void
   children: ReactNode
 }) {
   return (
-    <label className="block">
+    <label className={`block min-w-0 ${className}`}>
       <span className="mb-2 block text-sm font-medium text-foreground">{label}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+        className="w-full min-w-0 rounded-md border border-input bg-background px-3 py-2 text-sm"
       >
         {children}
       </select>

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Textarea } from "@/components/ui/textarea"
 import {
   activateWorkArea,
@@ -180,12 +181,13 @@ export function WorkAreasManager() {
               Nueva area
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-card">
+          <DialogContent className="overflow-hidden border-slate-200 bg-white p-0">
             <form onSubmit={handleSubmit}>
-              <DialogHeader>
-                <DialogTitle>{form.id ? "Editar area" : "Crear area"}</DialogTitle>
+              <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+                <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="area" tone="blue" /><div><DialogTitle>{form.id ? "Editar área" : "Crear área"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Define un área para organizar funcionarios y cargos de trabajo.</p></div></div>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
+              <div className="grid gap-4 bg-slate-50/40 px-6 py-5">
+                <FormSectionTitle icon="details" title="Datos del área" description="Asigna un nombre claro y una descripción breve." tone="cyan" />
                 <div className="grid gap-2">
                   <Label htmlFor="work-area-name">Nombre</Label>
                   <Input
@@ -218,7 +220,7 @@ export function WorkAreasManager() {
                   </p>
                 </div>
               </div>
-              <DialogFooter>
+              <DialogFooter className="border-t border-slate-200 bg-white px-6 py-4">
                 <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                   Cancelar
                 </Button>

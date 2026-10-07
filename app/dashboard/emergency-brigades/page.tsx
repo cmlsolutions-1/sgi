@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Textarea } from "@/components/ui/textarea"
 import {
   changeEmergencyBrigadeStatus,
@@ -163,12 +164,13 @@ function EmergencyBrigadeDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[90dvh] max-w-4xl overflow-y-auto bg-white">
-        <DialogHeader className="border-b border-border pb-4">
-          <DialogTitle>{brigade ? "Editar brigada de emergencia" : "Nueva brigada de emergencia"}</DialogTitle>
+      <DialogContent className="max-h-[90dvh] max-w-4xl overflow-y-auto border-slate-200 bg-white p-0">
+        <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="brigade" tone="rose" /><div><DialogTitle>{brigade ? "Editar brigada de emergencia" : "Nueva brigada de emergencia"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Define el propósito de la brigada y selecciona sus integrantes.</p></div></div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 bg-slate-50/40 px-6 py-5">
+          <FormSectionTitle icon="details" title="Datos de la brigada" description="Define el tipo, objetivo y funciones del equipo de respuesta." tone="rose" />
           <div className="grid gap-2">
             <Label>Tipo de brigada</Label>
             <select
@@ -212,11 +214,10 @@ function EmergencyBrigadeDialog({
             />
           </div>
 
-          <section className="rounded-md border border-slate-200 bg-white p-4">
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="mb-3 flex items-center justify-between gap-3">
               <div>
-                <h3 className="text-sm font-semibold">Integrantes</h3>
-                <p className="text-xs text-muted-foreground">Selecciona los funcionarios que harán parte de la brigada.</p>
+                <FormSectionTitle icon="committee" title="Integrantes" description="Selecciona los funcionarios que harán parte de la brigada." tone="rose" className="mb-0" />
               </div>
               <Button
                 type="button"
@@ -261,7 +262,7 @@ function EmergencyBrigadeDialog({
             </div>
           </section>
 
-          <DialogFooter className="border-t border-border pt-4">
+          <DialogFooter className="border-t border-slate-200 bg-white pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
@@ -386,16 +387,16 @@ export default function EmergencyBrigadesPage() {
       </div>
 
       <div className="overflow-x-auto px-3 py-1">
-        <div className="flex min-w-max items-center justify-center gap-2">
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
+          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
             <span className="text-xs text-muted-foreground">Total</span>
             <span className="text-sm font-semibold">{brigades.length}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
             <span className="text-xs text-muted-foreground">Activas</span>
             <span className="text-sm font-semibold text-green-600">{activeCount}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-blue-200 bg-blue-50">
             <span className="text-xs text-muted-foreground">Integrantes</span>
             <span className="text-sm font-semibold">{membersCount}</span>
           </div>

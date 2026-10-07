@@ -6,6 +6,7 @@ import { toast } from "sonner"
 
 import { CommitteeDocumentPanel } from "@/components/committee/CommitteeDocumentPanel"
 import { Button } from "@/components/ui/button"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import {
   Dialog,
   DialogContent,
@@ -157,19 +158,16 @@ function MeetingDialog({ open, committees, employees, meeting, onClose, onSave }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-lg bg-white shadow-xl">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-6 py-4">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900">{meeting ? "Editar reunión" : "Nueva reunión"}</h2>
-            <p className="text-sm text-slate-500">Registra actas, tema, horario y asistentes.</p>
-          </div>
+      <div className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-xl">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-slate-50/95 px-6 py-4 backdrop-blur">
+          <div className="flex items-start gap-3"><FormDialogIcon icon="meeting" tone="blue" /><div><h2 className="text-lg font-bold text-slate-900">{meeting ? "Editar reunión" : "Nueva reunión"}</h2><p className="mt-1 text-sm text-slate-500">Registra actas, tema, horario y asistentes.</p></div></div>
           <button type="button" onClick={onClose} className="rounded-md p-2 text-slate-500 hover:bg-slate-100">
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5 p-6">
-          <div className="grid gap-4 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className="space-y-5 bg-slate-50/40 p-6">
+          <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-2">
             <label className="block">
               <span className="mb-1 block text-sm font-semibold text-slate-700">Comité</span>
               <select
@@ -268,17 +266,7 @@ function MeetingDialog({ open, committees, employees, meeting, onClose, onSave }
 
           <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#2f8ed8]/10 text-[#2f8ed8]">
-                  <UsersRound className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900">Asistentes</h3>
-                  <p className="mt-1 text-xs leading-5 text-slate-500">
-                    Selecciona los funcionarios que asistieron o deben quedar registrados en el acta.
-                  </p>
-                </div>
-              </div>
+              <FormSectionTitle icon="committee" title="Asistentes" description="Selecciona los funcionarios que asistieron o deben quedar registrados en el acta." tone="cyan" className="mb-0" />
               <div className="flex shrink-0 items-center gap-2">
                 <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
                   {form.attendeeIds.length} seleccionados
@@ -449,16 +437,16 @@ export default function MeetingsPage() {
       </div>
 
       <div className="overflow-x-auto px-3 py-1">
-        <div className="flex min-w-max items-center justify-center gap-2">
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
+          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
             <span className="text-xs text-muted-foreground">Registradas</span>
             <span className="text-sm font-semibold">{meetings.length}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
             <span className="text-xs text-muted-foreground">Activas</span>
             <span className="text-sm font-semibold text-emerald-700">{activeCount}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-blue-200 bg-blue-50">
             <span className="text-xs text-muted-foreground">Comités</span>
             <span className="text-sm font-semibold">{committees.length}</span>
           </div>

@@ -2,7 +2,10 @@
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
 import {
+  Award,
+  Building2,
   CalendarDays,
+  CalendarRange,
   Download,
   Edit,
   Eye,
@@ -12,9 +15,11 @@ import {
   LayoutGrid,
   List,
   Loader2,
+  Mail,
   MoreHorizontal,
   Plus,
   Search,
+  ShieldCheck,
   Trash2,
   Upload,
   UserRound,
@@ -40,6 +45,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { getSgiResponsible } from "@/services/employeeService"
 import {
@@ -133,6 +139,9 @@ const emptyEvidenceForm: EvidenceForm = {
   description: "",
   observation: "",
 }
+
+const certificationFieldClassName =
+  "h-10 border-slate-300 bg-white shadow-sm transition-colors hover:border-slate-400 focus-visible:border-primary focus-visible:ring-primary/20"
 
 function competenceLabel(
   record: Pick<CertificationRecord, "competenceType" | "customCompetenceType">,
@@ -252,105 +261,163 @@ function CertificationDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-4xl">
-        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>{editing ? "Editar formación o certificación" : "Nueva formación o certificación"}</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            Registra la competencia del responsable SG-SST y sus datos de aprobación, vencimiento y soporte.
-          </p>
+      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-4xl">
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-5 py-4 pr-12 sm:px-6">
+          <div className="flex items-start gap-3 text-left">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <GraduationCap className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <DialogTitle className="text-lg">
+                {editing ? "Editar formación o certificación" : "Nueva formación o certificación"}
+              </DialogTitle>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                Registra la competencia del responsable SG-SST y controla claramente su periodo de vigencia.
+              </p>
+            </div>
+          </div>
         </DialogHeader>
 
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Responsable SG-SST</h3>
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-slate-50/40 px-4 py-5 sm:px-6">
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+              <div className="mb-4 flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-700">
+                  <UserRound className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground">Responsable SG-SST</h3>
+                  <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                    La certificación quedará asociada automáticamente al responsable asignado.
+                  </p>
+                </div>
+              </div>
               <div className="grid gap-4 md:grid-cols-3">
-                <InfoBlock label="Responsable" value={responsible.name} />
-                <InfoBlock label="Cargo" value={responsible.job} />
-                <InfoBlock label="Correo" value={responsible.email} />
+                <InfoBlock label="Responsable" value={responsible.name} icon={UserRound} />
+                <InfoBlock label="Cargo" value={responsible.job} icon={ShieldCheck} />
+                <InfoBlock label="Correo" value={responsible.email} icon={Mail} />
               </div>
             </section>
 
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Datos de la competencia</h3>
-              <div className="grid gap-4 md:grid-cols-2">
-                <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-foreground">Tipo de competencia</span>
-                  <select
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+              <div className="mb-5 flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-50 text-cyan-700">
+                  <Award className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground">Datos de la competencia</h3>
+                  <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                    Completa la información que permite identificar y controlar la vigencia del certificado.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-x-5 gap-y-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="certification-competence">
+                    Tipo de competencia <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
                     value={form.competenceType}
-                    onChange={(event) =>
+                    onValueChange={(value) =>
                       setForm((current) => ({
                         ...current,
-                        competenceType: event.target.value as CompetenceType,
-                        customCompetenceType: event.target.value === "OTHER" ? current.customCompetenceType : "",
+                        competenceType: value as CompetenceType,
+                        customCompetenceType: value === "OTHER" ? current.customCompetenceType : "",
                       }))
                     }
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
-                    {competenceOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                    <SelectTrigger id="certification-competence" className={certificationFieldClassName}>
+                      <SelectValue placeholder="Selecciona una competencia" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      {competenceOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
                 {form.competenceType === "OTHER" && (
                   <Label className="grid gap-2">
-                    Otro tipo de competencia
+                    <span>
+                      Otro tipo de competencia <span className="text-destructive">*</span>
+                    </span>
                     <Input
                       value={form.customCompetenceType}
                       onChange={(event) => setForm((current) => ({ ...current, customCompetenceType: event.target.value }))}
                       placeholder="Escribe la competencia"
+                      className={certificationFieldClassName}
                     />
                   </Label>
                 )}
 
                 <Label className="grid gap-2">
-                  Fecha de aprobacion
+                  <span className="flex items-center gap-2">
+                    <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                    Fecha de aprobación <span className="text-destructive">*</span>
+                  </span>
                   <Input
                     type="date"
                     value={form.approvalDate}
                     onChange={(event) => setForm((current) => ({ ...current, approvalDate: event.target.value }))}
+                    className={certificationFieldClassName}
                   />
                 </Label>
 
                 <Label className="grid gap-2">
-                  Fecha de vencimiento
+                  <span className="flex items-center gap-2">
+                    <CalendarRange className="h-4 w-4 text-muted-foreground" />
+                    Fecha de vencimiento <span className="text-destructive">*</span>
+                  </span>
                   <Input
                     type="date"
                     min={form.approvalDate || undefined}
                     value={form.expirationDate}
                     onChange={(event) => setForm((current) => ({ ...current, expirationDate: event.target.value }))}
+                    className={certificationFieldClassName}
                   />
                 </Label>
 
                 <Label className="grid gap-2">
-                  Entidad certificadora
+                  <span className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                    Entidad certificadora <span className="text-destructive">*</span>
+                  </span>
                   <Input
                     value={form.certifyingEntity}
                     onChange={(event) => setForm((current) => ({ ...current, certifyingEntity: event.target.value }))}
                     placeholder="Ej. ARL, universidad, entidad certificadora"
+                    className={certificationFieldClassName}
                   />
                 </Label>
 
                 <Label className="grid gap-2">
-                  Numero del certificado
+                  <span className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                    Número del certificado <span className="font-normal text-muted-foreground">(opcional)</span>
+                  </span>
                   <Input
                     value={form.certificateNumber}
                     onChange={(event) => setForm((current) => ({ ...current, certificateNumber: event.target.value }))}
-                    placeholder="Opcional"
+                    placeholder="Ej. CERT-2026-001"
+                    className={certificationFieldClassName}
                   />
                 </Label>
               </div>
             </section>
           </div>
 
-          <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+          <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-4 py-4 sm:px-6">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit">{editing ? "Guardar cambios" : "Crear registro"}</Button>
+            <Button type="submit" className="gap-2">
+              <ShieldCheck className="h-4 w-4" />
+              {editing ? "Guardar cambios" : "Crear registro"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -575,29 +642,44 @@ function DetailDialog({
   )
 }
 
-function InfoBlock({ label, value }: { label: string; value: string }) {
+function InfoBlock({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string
+  value: string
+  icon?: typeof UserRound
+}) {
   return (
-    <div className="rounded-md bg-secondary p-3">
-      <p className="text-xs font-medium uppercase text-muted-foreground">{label}</p>
-      <p className="mt-1 text-sm font-medium text-foreground">{value}</p>
+    <div className="flex min-w-0 items-start gap-3 rounded-lg border border-slate-200 bg-slate-50/70 p-3">
+      {Icon && (
+        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white text-primary shadow-sm">
+          <Icon className="h-4 w-4" />
+        </div>
+      )}
+      <div className="min-w-0">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+        <p className="mt-1 break-words text-sm font-medium text-foreground">{value}</p>
+      </div>
     </div>
   )
 }
 
 function Metric({ label, value, tone = "default" }: { label: string; value: number; tone?: "default" | "blue" | "green" | "red" }) {
-  const toneClass =
+  const toneClasses =
     tone === "blue"
-      ? "text-blue-700"
+      ? "border-blue-200 bg-blue-50 text-blue-700"
       : tone === "green"
-        ? "text-emerald-700"
+        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
         : tone === "red"
-          ? "text-destructive"
-          : "text-foreground"
+          ? "border-red-200 bg-red-50 text-red-700"
+          : "border-slate-200 bg-slate-50 text-slate-800"
 
   return (
-    <div className="rounded-md bg-secondary px-3 py-1.5">
-      <span className={`text-sm font-bold ${toneClass}`}>{value}</span>
-      <span className="ml-2 text-xs text-muted-foreground">{label}</span>
+    <div className={`flex min-h-14 items-center gap-3 rounded-lg border px-3.5 py-2 ${toneClasses}`}>
+      <span className="text-xl font-bold leading-none">{value}</span>
+      <span className="text-xs font-medium text-slate-600">{label}</span>
     </div>
   )
 }
@@ -857,7 +939,7 @@ export default function SstTrainingCertificationsPage() {
         </div>
         <Button
           type="button"
-          className="gap-2"
+          className="w-full gap-2 shadow-sm sm:w-auto"
           onClick={() => {
             setEditingRecord(null)
             setDialogOpen(true)
@@ -868,30 +950,33 @@ export default function SstTrainingCertificationsPage() {
         </Button>
       </div>
 
-      <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-          <div className="rounded-md bg-secondary p-3">
+      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Metric label="Registros" value={summary.total} />
+        <Metric label="Vigentes" value={summary.valid} tone="green" />
+        <Metric label="Vencidos" value={summary.expired} tone="red" />
+        <Metric label="Con evidencia" value={summary.withEvidence} tone="blue" />
+      </section>
+
+      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+        <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-3.5">
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-primary shadow-sm">
                 {loadingResponsible ? <Loader2 className="h-5 w-5 animate-spin" /> : <UserRound className="h-5 w-5" />}
               </div>
               <div>
-                <p className="text-sm font-semibold text-foreground">{responsible.name}</p>
-                <p className="text-xs text-muted-foreground">{responsible.job} · {responsible.email}</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Responsable SG-SST</p>
+                <p className="mt-0.5 text-sm font-semibold text-foreground">{responsible.name}</p>
+                <p className="mt-0.5 break-all text-xs text-muted-foreground">{responsible.job} · {responsible.email}</p>
               </div>
             </div>
-          </div>
-          <div className="flex justify-center overflow-x-auto px-1 py-1">
-            <div className="flex w-fit min-w-max items-center gap-2">
-              <Metric label="Registros" value={summary.total} />
-              <Metric label="Vigentes" value={summary.valid} tone="green" />
-              <Metric label="Vencidos" value={summary.expired} tone="red" />
-              <Metric label="Con evidencia" value={summary.withEvidence} tone="blue" />
-            </div>
-          </div>
         </div>
 
-        <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(220px,1fr)_270px_170px]">
+        <div className="mt-5 border-t border-slate-200 pt-4">
+          <div className="mb-3">
+            <h2 className="text-sm font-semibold text-foreground">Buscar y filtrar</h2>
+            <p className="text-xs text-muted-foreground">Encuentra rápidamente una certificación por sus datos principales.</p>
+          </div>
+          <div className="grid gap-3 lg:grid-cols-[minmax(220px,1fr)_270px_170px]">
           <Label className="grid gap-2">
             Buscar
             <div className="relative">
@@ -899,7 +984,7 @@ export default function SstTrainingCertificationsPage() {
               <Input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                className="pl-9"
+                className={`${certificationFieldClassName} pl-9`}
                 placeholder="Responsable, competencia, entidad o certificado"
               />
             </div>
@@ -909,7 +994,7 @@ export default function SstTrainingCertificationsPage() {
             <select
               value={competenceFilter}
               onChange={(event) => setCompetenceFilter(event.target.value as CompetenceType | "all")}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm transition-colors hover:border-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             >
               <option value="all">Todas</option>
               {competenceOptions.map((option) => (
@@ -924,13 +1009,14 @@ export default function SstTrainingCertificationsPage() {
             <select
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value as CertificationStatus | "all")}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm transition-colors hover:border-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             >
               <option value="all">Todos</option>
               <option value="VALID">Vigente</option>
               <option value="EXPIRED">Vencido</option>
             </select>
           </label>
+          </div>
         </div>
       </section>
 

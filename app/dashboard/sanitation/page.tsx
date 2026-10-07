@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { buildReportPdf, formatDisplayDate } from "@/lib/reporting"
 import { listEmployees } from "@/services/employeeService"
 import {
@@ -157,17 +158,14 @@ function SanitationDialog({
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
       <DialogContent className="max-h-[90dvh] w-[calc(100vw-2rem)] max-w-3xl overflow-y-auto bg-white p-0">
         <DialogHeader>
-          <div className="border-b border-slate-200 px-5 py-4">
-            <DialogTitle>{record ? "Editar saneamiento" : "Nueva actividad de saneamiento"}</DialogTitle>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Registra el tipo de actividad, responsable e insumos utilizados.
-            </p>
+          <div className="border-b border-slate-200 bg-slate-50/70 px-5 py-4">
+            <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="sanitation" tone="emerald" /><div><DialogTitle>{record ? "Editar saneamiento" : "Nueva actividad de saneamiento"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra el tipo de actividad, responsable e insumos utilizados.</p></div></div>
           </div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-5 px-5 pb-5">
-          <section className="rounded-lg border border-slate-200 bg-white p-4">
-            <h3 className="mb-3 text-sm font-semibold text-slate-900">Datos de la actividad</h3>
+        <form onSubmit={handleSubmit} className="space-y-5 bg-slate-50/40 px-5 pb-5 pt-5">
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <FormSectionTitle icon="details" title="Datos de la actividad" description="Define el tipo, fecha y hora de ejecución." tone="emerald" />
             <div className="grid gap-4 md:grid-cols-3">
               <div className="grid min-w-0 gap-2 md:col-span-1">
                 <Label htmlFor="sanitation-type">Tipo</Label>
@@ -205,8 +203,8 @@ function SanitationDialog({
             </div>
           </section>
 
-          <section className="rounded-lg border border-slate-200 bg-white p-4">
-            <h3 className="mb-3 text-sm font-semibold text-slate-900">Responsable</h3>
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <FormSectionTitle icon="employee" title="Responsable" description="Asigna un funcionario o identifica al tercero encargado." tone="blue" />
             <div className="grid gap-4 md:grid-cols-2">
               <div className="grid min-w-0 gap-2">
                 <Label htmlFor="sanitation-responsible-type">Tipo de responsable</Label>
@@ -269,10 +267,9 @@ function SanitationDialog({
           </section>
 
           {requiresSupplies(form.type) && (
-            <section className="rounded-lg border border-slate-200 bg-white p-4">
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="mb-3">
-                <h3 className="text-sm font-semibold text-slate-900">Insumos utilizados</h3>
-                <p className="text-xs text-muted-foreground">Selecciona los insumos aplicados durante la actividad.</p>
+                <FormSectionTitle icon="supply" title="Insumos utilizados" description="Selecciona los insumos aplicados durante la actividad." tone="cyan" className="mb-0" />
               </div>
               <div className="grid max-h-56 gap-2 overflow-y-auto rounded-md border border-slate-200 bg-white p-3 sm:grid-cols-2">
                 {supplies.length === 0 ? (
@@ -442,12 +439,12 @@ export default function SanitationPage() {
       </div>
 
       <div className="overflow-x-auto px-3 py-1">
-        <div className="flex min-w-max items-center justify-center gap-2">
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
+          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
             <span className="text-xs text-muted-foreground">Actividades</span>
             <span className="text-sm font-semibold">{records.length}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
             <span className="text-xs text-muted-foreground">Activas</span>
             <span className="text-sm font-semibold text-emerald-700">{activeCount}</span>
           </div>

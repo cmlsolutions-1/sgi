@@ -47,6 +47,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
@@ -593,15 +594,15 @@ function IncidentDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] max-w-4xl overflow-hidden bg-card p-0">
+      <DialogContent className="max-h-[90vh] max-w-4xl overflow-hidden bg-white p-0">
         <form className="flex max-h-[90vh] flex-col" onSubmit={handleSubmit}>
-          <DialogHeader className="border-b border-border px-6 py-4">
-            <DialogTitle>{incident ? "Editar novedad laboral" : "Nueva novedad laboral"}</DialogTitle>
+          <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4">
+            <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="labor" tone="amber" /><div><DialogTitle>{incident ? "Editar novedad laboral" : "Nueva novedad laboral"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra el caso, su clasificación y la información necesaria para su seguimiento.</p></div></div>
           </DialogHeader>
 
-          <div className="grid gap-5 overflow-y-auto px-6 py-4">
-            <section className="grid gap-4">
-              <h3 className="text-sm font-semibold text-foreground">Datos principales</h3>
+          <div className="grid gap-5 overflow-y-auto bg-slate-50/40 px-6 py-4">
+            <section className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="employee" title="Datos principales" description="Selecciona el funcionario y su contexto laboral." tone="blue" />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="grid gap-2">
                 <Label>Funcionario</Label>
@@ -665,8 +666,8 @@ function IncidentDialog({
             </div>
             </section>
 
-            <section className="grid gap-4">
-              <h3 className="text-sm font-semibold text-foreground">Clasificacion del caso</h3>
+            <section className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="labor" title="Clasificación del caso" description="Define el tipo, lugar y características de la novedad." tone="amber" />
             <div className="grid gap-2">
               <Label htmlFor="incident-place">Lugar</Label>
               <Input
@@ -737,8 +738,8 @@ function IncidentDialog({
             </div>
             </section>
 
-            <section className="grid gap-4">
-              <h3 className="text-sm font-semibold text-foreground">Detalle y seguimiento</h3>
+            <section className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="tracking" title="Detalle y seguimiento" description="Describe las consecuencias y acciones correctivas del caso." tone="cyan" />
             <div className="grid gap-2">
               <Label htmlFor="incident-description">Descripcion</Label>
               <Textarea
@@ -788,8 +789,8 @@ function IncidentDialog({
             </section>
 
             {hasPeriodDetails && (
-              <section className="grid gap-4">
-                <h3 className="text-sm font-semibold text-foreground">{periodLabels.title}</h3>
+              <section className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <FormSectionTitle icon="details" title={periodLabels.title} description="Registra el origen y periodo asociado a la novedad." tone="amber" />
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                   <div className="grid gap-2">
                     <Label>Origen incapacidad</Label>
@@ -867,7 +868,7 @@ function IncidentDialog({
             )}
           </div>
 
-          <DialogFooter className="border-t border-border bg-card px-6 py-4">
+          <DialogFooter className="border-t border-slate-200 bg-white px-6 py-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
@@ -1962,23 +1963,23 @@ export default function EmployeesPage() {
       </div>
 
       <div className="space-y-6">
-          <div className="overflow-x-auto px-3 py-1">
-            <div className="flex min-w-max items-center justify-center gap-2">
-              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="w-full">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
                 <span className="text-xs text-muted-foreground">Total</span>
-                <span className="text-sm font-semibold">{stats.total}</span>
+                <span className="text-xl font-bold leading-none">{stats.total}</span>
               </div>
-              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+              <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2">
                 <span className="text-xs text-muted-foreground">Activos</span>
-                <span className="text-sm font-semibold text-green-600">{stats.active}</span>
+                <span className="text-xl font-bold leading-none text-emerald-700">{stats.active}</span>
               </div>
-              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+              <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2">
                 <span className="text-xs text-muted-foreground">Inactivos</span>
-                <span className="text-sm font-semibold">{stats.inactive}</span>
+                <span className="text-xl font-bold leading-none text-red-700">{stats.inactive}</span>
               </div>
-              <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+              <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2">
                 <span className="text-xs text-muted-foreground">Áreas vinculadas</span>
-                <span className="text-sm font-semibold text-primary">{stats.workAreas}</span>
+                <span className="text-xl font-bold leading-none text-blue-700">{stats.workAreas}</span>
               </div>
             </div>
           </div>

@@ -6,6 +6,7 @@ import { toast } from "sonner"
 
 import { CommitteeDocumentPanel } from "@/components/committee/CommitteeDocumentPanel"
 import { Button } from "@/components/ui/button"
+import { FormDialogIcon } from "@/components/ui/form-dialog-visuals"
 import {
   Dialog,
   DialogContent,
@@ -144,19 +145,16 @@ function CommitteeDialog({ open, employees, committee, onClose, onSave }: Commit
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-lg bg-white shadow-xl">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-6 py-4">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900">{committee ? "Editar comité" : "Nuevo comité"}</h2>
-            <p className="text-sm text-slate-500">Define responsables y miembros del comité.</p>
-          </div>
+      <div className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-xl">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-slate-50/95 px-6 py-4 backdrop-blur">
+          <div className="flex items-start gap-3"><FormDialogIcon icon="committee" tone="blue" /><div><h2 className="text-lg font-bold text-slate-900">{committee ? "Editar comité" : "Nuevo comité"}</h2><p className="mt-1 text-sm text-slate-500">Define responsables y miembros del comité.</p></div></div>
           <button type="button" onClick={onClose} className="rounded-md p-2 text-slate-500 hover:bg-slate-100">
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5 p-6">
-          <div className="grid gap-4 md:grid-cols-3">
+        <form onSubmit={handleSubmit} className="space-y-5 bg-slate-50/40 p-6">
+          <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-3">
             <label className="block">
               <span className="mb-1 block text-sm font-semibold text-slate-700">Tipo</span>
               <select
@@ -193,7 +191,7 @@ function CommitteeDialog({ open, employees, committee, onClose, onSave }: Commit
             </label>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-2">
             <label className="block">
               <span className="mb-1 block text-sm font-semibold text-slate-700">Presidente</span>
               <select
@@ -433,16 +431,16 @@ export default function CommitteeManagementPage() {
       </div>
 
       <div className="overflow-x-auto px-3 py-1">
-        <div className="flex min-w-max items-center justify-center gap-2">
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
+          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
             <span className="text-xs text-muted-foreground">Registrados</span>
             <span className="text-sm font-semibold">{committees.length}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
             <span className="text-xs text-muted-foreground">Activos</span>
             <span className="text-sm font-semibold text-emerald-700">{activeCount}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-blue-200 bg-blue-50">
             <span className="text-xs text-muted-foreground">Funcionarios</span>
             <span className="text-sm font-semibold">{employees.length}</span>
           </div>

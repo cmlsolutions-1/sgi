@@ -392,9 +392,9 @@ function Metric({ label, value, tone = "default" }: { label: string; value: stri
           : "text-foreground"
 
   return (
-    <div className="rounded-md bg-secondary px-3 py-1.5">
-      <span className={`text-sm font-bold ${toneClass}`}>{value}</span>
-      <span className="ml-2 text-xs text-muted-foreground">{label}</span>
+    <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
+      <span className={`text-xl font-bold leading-none ${toneClass}`}>{value}</span>
+      <span className="text-xs font-medium text-slate-600">{label}</span>
     </div>
   )
 }
@@ -946,16 +946,8 @@ export default function EmployeeAnalyticsPage() {
         </Button>
       </div>
 
-      <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        <div className="flex justify-center overflow-x-auto px-3 py-1">
-          <div className="flex w-fit min-w-max items-center gap-2">
-            <Metric label="Analisis" value={stats.total} />
-            <Metric label="Con evidencia" value={stats.withEvidence} tone="green" />
-            <Metric label="Con mejora" value={stats.withAction} tone="blue" />
-            <Metric label="Anuales" value={stats.annual} tone="amber" />
-          </div>
-        </div>
-
+      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4"><Metric label="Analisis" value={stats.total} /><Metric label="Con evidencia" value={stats.withEvidence} tone="green" /><Metric label="Con mejora" value={stats.withAction} tone="blue" /><Metric label="Anuales" value={stats.annual} tone="amber" /></section>
+      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="mt-4 grid gap-3 md:grid-cols-[minmax(220px,1fr)_280px]">
           <Label className="grid gap-2">
             Buscar

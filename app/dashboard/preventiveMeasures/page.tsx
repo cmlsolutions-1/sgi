@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
@@ -673,12 +674,13 @@ export default function PreventiveMeasuresPage() {
             </Button>
           </DialogTrigger>
 
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white">
-            <DialogHeader>
-              <DialogTitle>{editingMeasure ? "Editar Medida de Prevención" : "Nueva Medida de Prevención"}</DialogTitle>
+          <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto border-slate-200 bg-white">
+            <DialogHeader className="border-b border-slate-200 bg-slate-50/70 p-4">
+              <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="prevention" tone="emerald" /><div><DialogTitle>{editingMeasure ? "Editar Medida de Prevención" : "Nueva Medida de Prevención"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Define el origen, la jerarquía de control y el plazo de cumplimiento.</p></div></div>
             </DialogHeader>
 
-            <div className="space-y-4">
+            <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="details" title="Datos de la medida" description="Completa el origen, la acción y los criterios de seguimiento." tone="emerald" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label className="text-sm font-medium">Origen de la medida *</label>
@@ -888,24 +890,24 @@ export default function PreventiveMeasuresPage() {
 
 
       <div className="overflow-x-auto px-3 py-1">
-        <div className="flex min-w-max items-center justify-center gap-2">
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
+          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
             <span className="text-xs text-muted-foreground">Total</span>
             <span className="text-sm font-semibold">{stats.total}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-amber-200 bg-amber-50">
             <span className="text-xs text-muted-foreground">Pendientes</span>
             <span className="text-sm font-semibold text-warning">{stats.pending}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-red-50 px-3 py-1.5">
+          <div className="flex items-center gap-2 border-red-200 bg-red-50">
             <span className="text-xs text-red-700">Vencidas</span>
             <span className="text-sm font-semibold text-red-700">{stats.overdue}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
             <span className="text-xs text-muted-foreground">Cumplidas</span>
             <span className="text-sm font-semibold text-green-600">{stats.done}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex items-center gap-2 border-blue-200 bg-blue-50">
             <span className="text-xs text-muted-foreground">Desde riesgos</span>
             <span className="text-sm font-semibold">{stats.riskBased}</span>
           </div>

@@ -799,28 +799,26 @@ export default function WorkPlanPage() {
         </Button>
       </div>
 
-      <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        <div className="flex justify-center overflow-x-auto px-3 py-1">
-          <div className="flex w-fit min-w-max items-center gap-2">
-            <div className="rounded-md bg-secondary px-3 py-1.5">
-              <span className="text-sm font-bold text-foreground">{stats.total}</span>
-              <span className="ml-2 text-xs text-muted-foreground">Actividades</span>
+      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
+              <span className="text-xl font-bold leading-none text-foreground">{stats.total}</span>
+              <span className="text-xs font-medium text-slate-600">Actividades</span>
             </div>
-            <div className="rounded-md bg-secondary px-3 py-1.5">
-              <span className="text-sm font-bold text-amber-700">{stats.pending}</span>
-              <span className="ml-2 text-xs text-muted-foreground">Pendientes</span>
+            <div className="flex min-h-14 items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2">
+              <span className="text-xl font-bold leading-none text-amber-700">{stats.pending}</span>
+              <span className="text-xs font-medium text-slate-600">Pendientes</span>
             </div>
-            <div className="rounded-md bg-secondary px-3 py-1.5">
-              <span className="text-sm font-bold text-emerald-700">{stats.approved}</span>
-              <span className="ml-2 text-xs text-muted-foreground">Aprobadas</span>
+            <div className="flex min-h-14 items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2">
+              <span className="text-xl font-bold leading-none text-emerald-700">{stats.approved}</span>
+              <span className="text-xs font-medium text-slate-600">Aprobadas</span>
             </div>
-            <div className="rounded-md bg-secondary px-3 py-1.5">
-              <span className="text-sm font-bold text-foreground">{formatCurrency(stats.budget)}</span>
-              <span className="ml-2 text-xs text-muted-foreground">Presupuesto</span>
+            <div className="flex min-h-14 items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2">
+              <span className="text-xl font-bold leading-none text-blue-700">{formatCurrency(stats.budget)}</span>
+              <span className="text-xs font-medium text-slate-600">Presupuesto</span>
             </div>
-          </div>
-        </div>
+      </section>
 
+      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_150px_220px]">
           <Label className="grid gap-2">
             Buscar

@@ -1275,23 +1275,23 @@ export default function InvestigationsPage() {
         </Button>
       </div>
 
-      <div className="overflow-x-auto px-3 py-1">
-        <div className="flex min-w-max items-center justify-center gap-2">
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+      <div className="w-full">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
             <span className="text-xs text-muted-foreground">Investigaciones</span>
-            <span className="text-sm font-semibold">{computedSummary.total}</span>
+            <span className="text-xl font-bold leading-none">{computedSummary.total}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2">
             <span className="text-xs text-muted-foreground">Reportadas</span>
-            <span className="text-sm font-semibold text-blue-700">{computedSummary.reported}</span>
+            <span className="text-xl font-bold leading-none text-blue-700">{computedSummary.reported}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2">
             <span className="text-xs text-muted-foreground">Por verificar</span>
-            <span className="text-sm font-semibold text-amber-700">{computedSummary.pendingVerification}</span>
+            <span className="text-xl font-bold leading-none text-amber-700">{computedSummary.pendingVerification}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2">
             <span className="text-xs text-muted-foreground">Cerradas eficaces</span>
-            <span className="text-sm font-semibold text-emerald-700">{computedSummary.closedEffective}</span>
+            <span className="text-xl font-bold leading-none text-emerald-700">{computedSummary.closedEffective}</span>
           </div>
         </div>
       </div>

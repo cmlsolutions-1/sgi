@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -421,17 +422,14 @@ export function JobsManager() {
               Nuevo cargo
             </Button>
           </DialogTrigger>
-          <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-4xl">
+          <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-4xl">
             <form onSubmit={handleSubmit}>
-              <DialogHeader className="border-b border-border px-6 py-4 pr-12">
-                <DialogTitle>{form.id ? "Editar cargo" : "Crear cargo"}</DialogTitle>
-                <p className="text-sm text-muted-foreground">
-                  Registra el perfil para que pueda ser informado y soportado ante el medico que realiza evaluaciones ocupacionales.
-                </p>
+              <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+                <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="job" tone="blue" /><div><DialogTitle>{form.id ? "Editar cargo" : "Crear cargo"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra el perfil para que pueda ser informado y soportado ante el médico que realiza evaluaciones ocupacionales.</p></div></div>
               </DialogHeader>
-              <div className="max-h-[calc(100dvh-13rem)] space-y-5 overflow-y-auto px-6 py-5">
-                <section className="rounded-md border border-border p-4">
-                  <h3 className="mb-3 text-sm font-semibold text-foreground">Datos del cargo</h3>
+              <div className="max-h-[calc(100dvh-13rem)] space-y-5 overflow-y-auto bg-slate-50/40 px-6 py-5">
+                <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                  <FormSectionTitle icon="job" title="Datos del cargo" description="Identifica el cargo y el área a la que pertenece." tone="blue" />
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="grid gap-2">
                       <Label htmlFor="job-name">Nombre del cargo</Label>
@@ -476,8 +474,8 @@ export function JobsManager() {
                   </div>
                 </section>
 
-                <section className="rounded-md border border-border p-4">
-                  <h3 className="mb-3 text-sm font-semibold text-foreground">Perfil ocupacional</h3>
+                <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                  <FormSectionTitle icon="prevention" title="Perfil ocupacional" description="Describe el entorno de trabajo y su nivel de riesgo." tone="cyan" />
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="grid gap-2">
                       <Label htmlFor="job-work-environment">Medio donde desarrolla la labor</Label>
@@ -537,7 +535,7 @@ export function JobsManager() {
                   Las evidencias documentales se cargan desde las acciones del cargo.
                 </div>
               </div>
-              <DialogFooter className="border-t border-border px-6 py-4">
+              <DialogFooter className="border-t border-slate-200 bg-white px-6 py-4">
                 <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                   Cancelar
                 </Button>
@@ -558,23 +556,23 @@ export function JobsManager() {
         </Card>
       )}
 
-      <div className="overflow-x-auto px-3 py-1">
-        <div className="flex min-w-max items-center justify-center gap-2">
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+      <div className="w-full">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
             <span className="text-xs text-muted-foreground">Cargos</span>
-            <span className="text-sm font-semibold">{stats.total}</span>
+            <span className="text-xl font-bold leading-none">{stats.total}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2">
             <span className="text-xs text-muted-foreground">Activos</span>
-            <span className="text-sm font-semibold text-emerald-700">{stats.active}</span>
+            <span className="text-xl font-bold leading-none text-emerald-700">{stats.active}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2">
             <span className="text-xs text-muted-foreground">Inactivos</span>
-            <span className="text-sm font-semibold text-destructive">{stats.inactive}</span>
+            <span className="text-xl font-bold leading-none text-destructive">{stats.inactive}</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
+          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2">
             <span className="text-xs text-muted-foreground">Con evidencia</span>
-            <span className="text-sm font-semibold text-blue-700">{stats.withEvidence}</span>
+            <span className="text-xl font-bold leading-none text-blue-700">{stats.withEvidence}</span>
           </div>
         </div>
       </div>
