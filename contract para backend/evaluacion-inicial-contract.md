@@ -6,7 +6,7 @@
 - Archivo principal: `app/dashboard/initial-evaluation/page.tsx`
 - Modulo padre actual en navegacion: `Gestion del SG-SST`
 - Codigo de modulo hijo usado en navegacion: `INITIAL_EVALUATION`
-- Estado actual: integrado con los endpoints del backend. El frontend conserva el catalogo legal completo como respaldo visual mientras el seed de backend se completa.
+- Estado actual: integrado con los endpoints del backend. El catálogo de estándares proviene exclusivamente del backend.
 
 La pantalla actual permite:
 
@@ -36,9 +36,9 @@ Permitir que la empresa diligencie la evaluacion inicial del SG-SST con base en 
 - modulo de SafeCloud donde aplica cada accion;
 - PDF descargable para firma y archivo.
 
-## 3. Catalogo de respaldo en frontend
+## 3. Catálogo administrado por backend
 
-El frontend conserva en `data/initialEvaluationStandardItems.ts` los 60 items originales de la tabla de valores y calificacion. Este arreglo no sustituye el catalogo de base de datos: solo permite mostrar la tabla completa cuando el backend todavia no ha ejecutado el seed.
+El frontend consume los estándares desde `GET /api/initial-evaluations/catalogs/standard-items?status=ACTIVE`. No conserva ni completa el catálogo con datos locales: cada fila mostrada, su orden y su UUID deben provenir del backend.
 
 Cada item tiene:
 
@@ -56,7 +56,7 @@ type StandardItem = {
 }
 ```
 
-Los items representan la tabla de valores y calificacion. Para crear o editar una evaluacion, el frontend exige que cada item ya exista en backend y tenga un UUID real. Nunca debe enviarse el codigo `1.1.1` como `standardItemId`.
+Los items representan la tabla de valores y calificacion. Para crear o editar una evaluación, cada item debe existir en backend y tener un UUID real. Nunca debe enviarse el código `1.1.1` como `standardItemId`.
 
 ## 3.1. Seed completo obligatorio del catalogo
 

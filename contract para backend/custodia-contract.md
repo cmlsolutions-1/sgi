@@ -1,6 +1,6 @@
 # Contrato frontend/backend - Custodia
 
-Este documento describe el contrato requerido para conectar el modulo hijo **Custodia** con backend. Actualmente el modulo esta implementado con datos mockeados en frontend, genera el compromiso de confidencialidad localmente y conserva los soportes solo en memoria.
+Este documento describe el contrato utilizado para conectar el modulo hijo **Custodia** con backend. El módulo ya consume la API y el backend es la fuente de los registros, el resumen, el compromiso de confidencialidad y los soportes documentales.
 
 ## Ubicacion en frontend
 
@@ -34,19 +34,16 @@ Tambien debe conservar soportes que demuestren dicha custodia y el compromiso de
 
 ## Estado actual de implementacion
 
-Todo el modulo esta mockeado en frontend:
+El módulo está integrado con backend:
 
-- registros iniciales;
-- creacion y edicion de registros;
-- eliminacion local;
-- busqueda por IPS, responsable o soporte;
-- descarga de compromiso de confidencialidad generado con `jsPDF` y `jspdf-autotable`;
-- carga simulada de soporte de custodia;
-- carga simulada de compromiso firmado;
-- vista previa local de PDF, imagen o texto;
-- descarga simulada de soporte.
-
-No existe servicio dedicado en `services/` ni tipos compartidos en `types/manager/` para este modulo.
+- consulta, creación, edición e inactivación de registros;
+- resumen obtenido desde `/api/custody/summary`;
+- búsqueda visual por IPS, responsable o soporte;
+- compromiso de confidencialidad generado por backend;
+- carga real del soporte de custodia y del compromiso firmado;
+- previsualización, descarga y eliminación de documentos reales;
+- servicio dedicado en `services/custodyService.ts`;
+- tipos compartidos en `types/manager/custody.ts`.
 
 ## Entidades sugeridas
 

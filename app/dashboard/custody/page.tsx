@@ -15,8 +15,6 @@ import {
   Trash2,
   Upload,
 } from "lucide-react"
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -39,27 +37,21 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import {
+  createCustodyRecord,
+  deleteCustodyDocument,
+  deleteCustodyRecord,
+  downloadCustodyCommitment,
+  downloadCustodyDocument,
+  getCustodyRecord,
+  getCustodySummary,
+  listCustodyRecords,
+  updateCustodyRecord,
+  uploadCustodyDocument,
+} from "@/services/custodyService"
+import type { CustodyDocument, CustodyRecord, CustodySummary } from "@/types/manager/custody"
 
 type EvidenceKind = "custody" | "confidentiality"
-
-type Evidence = {
-  id: string
-  fileName: string
-  description: string
-  uploadedAt: string
-  mimeType?: string
-  url?: string
-}
-
-type CustodyRecord = {
-  id: string
-  custodianInstitution: string
-  responsiblePerson: string
-  custodyStartDate: string
-  observations: string
-  custodyEvidence?: Evidence
-  confidentialityEvidence?: Evidence
-}
 
 type CustodyForm = {
   custodianInstitution: string
@@ -69,7 +61,6 @@ type CustodyForm = {
 }
 
 type EvidenceForm = {
-  fileName: string
   description: string
 }
 
@@ -77,7 +68,6 @@ type PreviewState = {
   title: string
   url: string
   mimeType: string
-  generated: boolean
 }
 
 const emptyForm: CustodyForm = {
@@ -88,44 +78,7 @@ const emptyForm: CustodyForm = {
 }
 
 const emptyEvidenceForm: EvidenceForm = {
-  fileName: "",
   description: "",
-}
-
-const initialRecords: CustodyRecord[] = [
-  {
-    id: "custody-1",
-    custodianInstitution: "IPS Salud Ocupacional Integral",
-    responsiblePerson: "Dra. Maria Perez",
-    custodyStartDate: "2026-01-12",
-    observations: "La IPS conserva la custodia de las historias clinicas ocupacionales derivadas de evaluaciones medicas.",
-    custodyEvidence: {
-      id: "custody-evidence-1",
-      fileName: "contrato-custodia-historias-clinicas.pdf",
-      description: "Contrato y certificacion de custodia con IPS.",
-      uploadedAt: "2026-01-13T09:30:00",
-      mimeType: "application/pdf",
-    },
-    confidentialityEvidence: {
-      id: "conf-evidence-1",
-      fileName: "compromiso-confidencialidad-firmado.pdf",
-      description: "Compromiso de confidencialidad firmado por responsable.",
-      uploadedAt: "2026-01-14T10:00:00",
-      mimeType: "application/pdf",
-    },
-  },
-  {
-    id: "custody-2",
-    custodianInstitution: "Medico especialista externo SST",
-    responsiblePerson: "Dr. Andres Molina",
-    custodyStartDate: "2026-04-01",
-    observations: "Custodia temporal de conceptos y soportes medicos ocupacionales.",
-  },
-]
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return `${prefix}-${crypto.randomUUID()}`
-  return `${prefix}-${Date.now()}`
 }
 
 function formatDate(value?: string | null) {
@@ -148,25 +101,12 @@ function canEmbed(mimeType?: string) {
   return Boolean(mimeType?.startsWith("image/") || mimeType === "application/pdf" || mimeType?.startsWith("text/"))
 }
 
-function evidenceFor(record: CustodyRecord, kind: EvidenceKind) {
+function evidenceFor(record: CustodyRecord, kind: EvidenceKind): CustodyDocument | null | undefined {
   return kind === "custody" ? record.custodyEvidence : record.confidentialityEvidence
 }
 
 function evidenceLabel(kind: EvidenceKind) {
   return kind === "custody" ? "soporte de custodia" : "compromiso de confidencialidad"
-}
-
-function buildEvidenceText(record: CustodyRecord, evidence: Evidence, kind: EvidenceKind) {
-  return `Custodia de historias clinicas ocupacionales
-Tipo soporte: ${evidenceLabel(kind)}
-Institucion custodio: ${record.custodianInstitution}
-Persona responsable: ${record.responsiblePerson}
-Fecha inicio custodia: ${formatDate(record.custodyStartDate)}
-
-Archivo: ${evidence.fileName}
-Descripcion: ${evidence.description || "Sin descripcion"}
-Cargado: ${formatDateTime(evidence.uploadedAt)}
-`
 }
 
 function CustodyDialog({
@@ -178,9 +118,10 @@ function CustodyDialog({
   open: boolean
   record: CustodyRecord | null
   onClose: () => void
-  onSave: (form: CustodyForm, recordId?: string) => void
+  onSave: (form: CustodyForm, recordId?: string) => Promise<void>
 }) {
   const [form, setForm] = useState<CustodyForm>(emptyForm)
+  const [saving, setSaving] = useState(false)
   const editing = Boolean(record)
 
   useEffect(() => {
@@ -191,20 +132,25 @@ function CustodyDialog({
             custodianInstitution: record.custodianInstitution,
             responsiblePerson: record.responsiblePerson,
             custodyStartDate: record.custodyStartDate,
-            observations: record.observations,
+            observations: record.observations ?? "",
           }
         : emptyForm,
     )
   }, [open, record])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!form.custodianInstitution.trim()) return toast.error("Ingresa la institucion custodio")
     if (!form.responsiblePerson.trim()) return toast.error("Ingresa la persona responsable")
     if (!form.custodyStartDate) return toast.error("Selecciona la fecha de inicio de custodia")
 
-    onSave(form, record?.id)
-    onClose()
+    try {
+      setSaving(true)
+      await onSave(form, record?.id)
+      onClose()
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -272,10 +218,10 @@ function CustodyDialog({
           </div>
 
           <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" disabled={saving} onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit">{editing ? "Guardar cambios" : "Crear custodia"}</Button>
+            <Button type="submit" disabled={saving}>{saving ? "Guardando..." : editing ? "Guardar cambios" : "Crear custodia"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -292,28 +238,33 @@ function EvidenceDialog({
   record: CustodyRecord | null
   kind: EvidenceKind
   onClose: () => void
-  onSave: (recordId: string, kind: EvidenceKind, form: EvidenceForm, file: File | null) => void
+  onSave: (recordId: string, kind: EvidenceKind, form: EvidenceForm, file: File | null) => Promise<void>
 }) {
   const [form, setForm] = useState<EvidenceForm>(emptyEvidenceForm)
   const [file, setFile] = useState<File | null>(null)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (!record) return
     const evidence = evidenceFor(record, kind)
     setForm({
-      fileName: evidence?.fileName ?? "",
       description: evidence?.description ?? "",
     })
     setFile(null)
   }, [kind, record])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!record) return
-    if (!file && !form.fileName.trim()) return toast.error(`Selecciona o registra el ${evidenceLabel(kind)}`)
+    if (!file) return toast.error(`Selecciona el ${evidenceLabel(kind)}`)
 
-    onSave(record.id, kind, form, file)
-    onClose()
+    try {
+      setSaving(true)
+      await onSave(record.id, kind, form, file)
+      onClose()
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -335,15 +286,14 @@ function EvidenceDialog({
                 onChange={(event) => {
                   const selected = event.target.files?.[0] ?? null
                   setFile(selected)
-                  setForm((current) => ({ ...current, fileName: selected?.name ?? current.fileName }))
                 }}
               />
             </Label>
             <Label className="grid gap-2">
-              Nombre del archivo
+              Archivo seleccionado
               <Input
-                value={form.fileName}
-                onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.value }))}
+                value={file?.name ?? (record ? evidenceFor(record, kind)?.originalName : "") ?? ""}
+                readOnly
                 placeholder={kind === "custody" ? "soporte-custodia.pdf" : "compromiso-confidencialidad-firmado.pdf"}
               />
             </Label>
@@ -358,10 +308,10 @@ function EvidenceDialog({
             </Label>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" disabled={saving} onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit">Guardar soporte</Button>
+            <Button type="submit" disabled={saving}>{saving ? "Subiendo..." : "Guardar soporte"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -416,7 +366,9 @@ function InfoBlock({ label, value }: { label: string; value: string }) {
 }
 
 export default function CustodyPage() {
-  const [records, setRecords] = useState<CustodyRecord[]>(initialRecords)
+  const [records, setRecords] = useState<CustodyRecord[]>([])
+  const [summary, setSummary] = useState<CustodySummary>({ total: 0, withCustodyEvidence: 0, withConfidentiality: 0, complete: 0, pending: 0 })
+  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingRecord, setEditingRecord] = useState<CustodyRecord | null>(null)
@@ -425,15 +377,27 @@ export default function CustodyPage() {
   const [detailRecord, setDetailRecord] = useState<CustodyRecord | null>(null)
   const [preview, setPreview] = useState<PreviewState | null>(null)
 
-  const stats = useMemo(
-    () => ({
-      total: records.length,
-      withCustodyEvidence: records.filter((record) => record.custodyEvidence).length,
-      withConfidentiality: records.filter((record) => record.confidentialityEvidence).length,
-      complete: records.filter((record) => record.custodyEvidence && record.confidentialityEvidence).length,
-    }),
-    [records],
-  )
+  async function loadData() {
+    setLoading(true)
+    try {
+      const [list, totals] = await Promise.all([
+        listCustodyRecords({ page: 1, limit: 100 }),
+        getCustodySummary(),
+      ])
+      setRecords(list.items)
+      setSummary(totals)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar los registros de custodia")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { void loadData() }, [])
+
+  useEffect(() => () => {
+    if (preview?.url) URL.revokeObjectURL(preview.url)
+  }, [preview])
 
   const filteredRecords = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -443,12 +407,12 @@ export default function CustodyPage() {
       (record) =>
         record.custodianInstitution.toLowerCase().includes(term) ||
         record.responsiblePerson.toLowerCase().includes(term) ||
-        record.custodyEvidence?.fileName.toLowerCase().includes(term) ||
-        record.confidentialityEvidence?.fileName.toLowerCase().includes(term),
+        record.custodyEvidence?.originalName.toLowerCase().includes(term) ||
+        record.confidentialityEvidence?.originalName.toLowerCase().includes(term),
     )
   }, [records, search])
 
-  function saveRecord(form: CustodyForm, recordId?: string) {
+  async function saveRecord(form: CustodyForm, recordId?: string) {
     const payload = {
       custodianInstitution: form.custodianInstitution.trim(),
       responsiblePerson: form.responsiblePerson.trim(),
@@ -456,162 +420,128 @@ export default function CustodyPage() {
       observations: form.observations.trim(),
     }
 
-    if (recordId) {
-      setRecords((current) => current.map((record) => (record.id === recordId ? { ...record, ...payload } : record)))
-      toast.success("Custodia actualizada")
-      return
+    try {
+      if (recordId) {
+        await updateCustodyRecord(recordId, payload)
+        toast.success("Custodia actualizada")
+      } else {
+        await createCustodyRecord(payload)
+        toast.success("Custodia creada")
+      }
+      await loadData()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar la custodia")
+      throw error
     }
-
-    setRecords((current) => [{ id: createId("custody"), ...payload }, ...current])
-    toast.success("Custodia creada")
   }
 
-  function saveEvidence(recordId: string, kind: EvidenceKind, form: EvidenceForm, file: File | null) {
-    const evidence: Evidence = {
-      id: createId(kind === "custody" ? "custody-evidence" : "confidentiality-evidence"),
-      fileName:
-        form.fileName.trim() ||
-        file?.name ||
-        (kind === "custody" ? "soporte-custodia.pdf" : "compromiso-confidencialidad-firmado.pdf"),
-      description: form.description.trim(),
-      uploadedAt: new Date().toISOString(),
-      mimeType: file?.type || "text/plain",
-      url: file ? URL.createObjectURL(file) : undefined,
+  async function saveEvidence(recordId: string, kind: EvidenceKind, form: EvidenceForm, file: File | null) {
+    if (!file) return
+    try {
+      await uploadCustodyDocument(recordId, {
+        file,
+        type: kind === "custody" ? "CUSTODY_SUPPORT" : "CONFIDENTIALITY_COMMITMENT_SIGNED",
+        description: form.description.trim() || undefined,
+        isConfirmed: true,
+      })
+      await loadData()
+      toast.success(kind === "custody" ? "Soporte de custodia cargado" : "Compromiso de confidencialidad cargado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el documento")
+      throw error
     }
-
-    setRecords((current) =>
-      current.map((record) =>
-        record.id === recordId
-          ? kind === "custody"
-            ? { ...record, custodyEvidence: evidence }
-            : { ...record, confidentialityEvidence: evidence }
-          : record,
-      ),
-    )
-    toast.success(kind === "custody" ? "Soporte de custodia cargado" : "Compromiso de confidencialidad cargado")
   }
 
-  function deleteRecord(record: CustodyRecord) {
+  async function deleteRecord(record: CustodyRecord) {
     if (!window.confirm(`Eliminar la custodia de "${record.custodianInstitution}"?`)) return
-    setRecords((current) => current.filter((item) => item.id !== record.id))
-    toast.success("Custodia eliminada")
+    try {
+      await deleteCustodyRecord(record.id)
+      await loadData()
+      toast.success("Custodia eliminada")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar la custodia")
+    }
   }
 
-  function downloadCommitment(record: CustodyRecord) {
-    const doc = new jsPDF("p", "mm", "a4")
-    const pageWidth = doc.internal.pageSize.getWidth()
-    const pageHeight = doc.internal.pageSize.getHeight()
-    const margin = 15
-    const primaryColor: [number, number, number] = [31, 92, 77]
-
-    doc.setFillColor(...primaryColor)
-    doc.roundedRect(margin, 12, pageWidth - margin * 2, 24, 3, 3, "F")
-    doc.setTextColor(255, 255, 255)
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(13)
-    doc.text("COMPROMISO DE CONFIDENCIALIDAD", margin + 5, 23)
-    doc.setFont("helvetica", "normal")
-    doc.setFontSize(8)
-    doc.text("Custodia de historias clínicas ocupacionales", margin + 5, 30)
-
-    autoTable(doc, {
-      startY: 46,
-      theme: "grid",
-      margin: { left: margin, right: margin },
-      body: [
-        ["Institución custodio", record.custodianInstitution],
-        ["Persona responsable", record.responsiblePerson],
-        ["Inicio de custodia", formatDate(record.custodyStartDate)],
-        ["Observaciones", record.observations || "Sin observaciones"],
-      ],
-      styles: { font: "helvetica", fontSize: 9, cellPadding: 3, lineColor: [220, 226, 224], lineWidth: 0.1 },
-      columnStyles: {
-        0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 55 },
-        1: { cellWidth: pageWidth - margin * 2 - 55 },
-      },
-    })
-
-    let y = ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 86) + 12
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(10)
-    doc.setTextColor(30, 41, 59)
-    doc.text("Declaración del responsable", margin, y)
-    y += 8
-    doc.setFont("helvetica", "normal")
-    doc.setFontSize(9)
-    const text = [
-      "Declaro que conozco el carácter reservado y sensible de la información contenida en las historias clínicas ocupacionales.",
-      "Me comprometo a mantener estricta confidencialidad, a custodiar la información únicamente para los fines permitidos y a impedir accesos, divulgaciones o usos no autorizados.",
-      "Este compromiso aplica durante la custodia y después de finalizada cualquier relación contractual o funcional relacionada con la empresa.",
-    ]
-    doc.text(text, margin, y, { maxWidth: pageWidth - margin * 2, lineHeightFactor: 1.45 })
-    y += 42
-
-    const signatureY = Math.min(y + 30, pageHeight - 38)
-    doc.setDrawColor(120, 130, 140)
-    doc.line(margin, signatureY, margin + 82, signatureY)
-    doc.line(pageWidth - margin - 82, signatureY, pageWidth - margin, signatureY)
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(8)
-    doc.text("Firma persona responsable", margin, signatureY + 6)
-    doc.text("Representante de la empresa", pageWidth - margin - 82, signatureY + 6)
-
-    doc.setDrawColor(220, 226, 224)
-    doc.line(margin, pageHeight - 12, pageWidth - margin, pageHeight - 12)
-    doc.setFont("helvetica", "normal")
-    doc.setFontSize(7)
-    doc.setTextColor(100, 116, 139)
-    doc.text("Documento generado desde SafeCloud SG-SST", margin, pageHeight - 7)
-    doc.text("Página 1 de 1", pageWidth - margin, pageHeight - 7, { align: "right" })
-
-    doc.save(`compromiso-confidencialidad-${record.responsiblePerson.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`)
+  async function downloadCommitment(record: CustodyRecord) {
+    try {
+      const blob = await downloadCustodyCommitment(record.id)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `compromiso-confidencialidad-${record.responsiblePerson.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar el compromiso")
+    }
   }
 
-  function viewEvidence(record: CustodyRecord, kind: EvidenceKind) {
+  async function openDetail(record: CustodyRecord) {
+    try {
+      setDetailRecord(await getCustodyRecord(record.id))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el detalle de custodia")
+    }
+  }
+
+  async function viewEvidence(record: CustodyRecord, kind: EvidenceKind) {
     const evidence = evidenceFor(record, kind)
     if (!evidence) {
       toast.error(`Este registro no tiene ${evidenceLabel(kind)}`)
       return
     }
 
-    if (evidence.url) {
+    try {
+      const blob = await downloadCustodyDocument(evidence.downloadUrl)
+      const url = URL.createObjectURL(blob)
       setPreview({
-        title: evidence.fileName,
-        url: evidence.url,
-        mimeType: evidence.mimeType || "application/octet-stream",
-        generated: false,
+        title: evidence.originalName,
+        url,
+        mimeType: blob.type || evidence.mimeType || "application/octet-stream",
       })
-      return
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo previsualizar el documento")
     }
-
-    const blob = new Blob([buildEvidenceText(record, evidence, kind)], { type: "text/plain;charset=utf-8" })
-    setPreview({
-      title: evidence.fileName,
-      url: URL.createObjectURL(blob),
-      mimeType: "text/plain",
-      generated: true,
-    })
   }
 
   function closePreview() {
-    if (preview?.generated) URL.revokeObjectURL(preview.url)
+    if (preview?.url) URL.revokeObjectURL(preview.url)
     setPreview(null)
   }
 
-  function downloadEvidence(record: CustodyRecord, kind: EvidenceKind) {
+  async function downloadEvidence(record: CustodyRecord, kind: EvidenceKind) {
     const evidence = evidenceFor(record, kind)
     if (!evidence) {
       toast.error(`Este registro no tiene ${evidenceLabel(kind)}`)
       return
     }
 
-    const url =
-      evidence.url ?? URL.createObjectURL(new Blob([buildEvidenceText(record, evidence, kind)], { type: "text/plain;charset=utf-8" }))
-    const link = document.createElement("a")
-    link.href = url
-    link.download = evidence.fileName
-    link.click()
-    if (!evidence.url) URL.revokeObjectURL(url)
+    try {
+      const blob = await downloadCustodyDocument(evidence.downloadUrl)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = evidence.originalName
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar el documento")
+    }
+  }
+
+  async function removeEvidence(record: CustodyRecord, kind: EvidenceKind) {
+    const evidence = evidenceFor(record, kind)
+    if (!evidence || !window.confirm(`¿Eliminar ${evidence.originalName}?`)) return
+
+    try {
+      await deleteCustodyDocument(record.id, evidence.id)
+      await loadData()
+      if (detailRecord?.id === record.id) setDetailRecord(await getCustodyRecord(record.id))
+      toast.success(kind === "custody" ? "Soporte de custodia eliminado" : "Compromiso firmado eliminado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar el documento")
+    }
   }
 
   return (
@@ -640,19 +570,19 @@ export default function CustodyPage() {
         <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:border-slate-200 [&>div]:bg-slate-50 [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
           <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
             <span className="text-xs text-muted-foreground">Total</span>
-            <span className="text-sm font-semibold">{stats.total}</span>
+            <span className="text-sm font-semibold">{summary.total}</span>
           </div>
           <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
             <span className="text-xs text-muted-foreground">Soporte custodia</span>
-            <span className="text-sm font-semibold text-primary">{stats.withCustodyEvidence}</span>
+            <span className="text-sm font-semibold text-primary">{summary.withCustodyEvidence}</span>
           </div>
           <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
             <span className="text-xs text-muted-foreground">Compromiso firmado</span>
-            <span className="text-sm font-semibold text-green-700">{stats.withConfidentiality}</span>
+            <span className="text-sm font-semibold text-green-700">{summary.withConfidentiality}</span>
           </div>
           <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
             <span className="text-xs text-muted-foreground">Completos</span>
-            <span className="text-sm font-semibold">{stats.complete}</span>
+            <span className="text-sm font-semibold">{summary.complete}</span>
           </div>
         </div>
       </section>
@@ -707,7 +637,7 @@ export default function CustodyPage() {
                   {record.custodyEvidence ? (
                     <span className="flex items-center gap-2 text-muted-foreground">
                       <FileCheck2 className="h-4 w-4 text-primary" />
-                      {record.custodyEvidence.fileName}
+                      {record.custodyEvidence.originalName}
                     </span>
                   ) : (
                     <span className="text-muted-foreground">Sin soporte</span>
@@ -733,11 +663,11 @@ export default function CustodyPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-72">
-                      <DropdownMenuItem onSelect={() => setDetailRecord(record)}>
+                      <DropdownMenuItem onSelect={() => void openDetail(record)}>
                         <Eye className="h-4 w-4" />
                         Ver detalle
                       </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => downloadCommitment(record)}>
+                      <DropdownMenuItem onSelect={() => void downloadCommitment(record)}>
                         <Download className="h-4 w-4" />
                         Descargar compromiso para firma
                       </DropdownMenuItem>
@@ -759,17 +689,29 @@ export default function CustodyPage() {
                         <Upload className="h-4 w-4" />
                         Cargar compromiso firmado
                       </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => viewEvidence(record, "custody")} disabled={!record.custodyEvidence}>
+                      <DropdownMenuItem onSelect={() => void viewEvidence(record, "custody")} disabled={!record.custodyEvidence}>
                         <FileText className="h-4 w-4" />
                         Ver soporte de custodia
                       </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => viewEvidence(record, "confidentiality")} disabled={!record.confidentialityEvidence}>
+                      <DropdownMenuItem onSelect={() => void downloadEvidence(record, "custody")} disabled={!record.custodyEvidence}>
+                        <Download className="h-4 w-4" />
+                        Descargar soporte de custodia
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => void viewEvidence(record, "confidentiality")} disabled={!record.confidentialityEvidence}>
                         <FileText className="h-4 w-4" />
                         Ver compromiso firmado
                       </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => downloadEvidence(record, "confidentiality")} disabled={!record.confidentialityEvidence}>
+                      <DropdownMenuItem onSelect={() => void downloadEvidence(record, "confidentiality")} disabled={!record.confidentialityEvidence}>
                         <Download className="h-4 w-4" />
                         Descargar compromiso firmado
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => void removeEvidence(record, "custody")} disabled={!record.custodyEvidence} className="text-destructive focus:text-destructive">
+                        <Trash2 className="h-4 w-4" />
+                        Eliminar soporte de custodia
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => void removeEvidence(record, "confidentiality")} disabled={!record.confidentialityEvidence} className="text-destructive focus:text-destructive">
+                        <Trash2 className="h-4 w-4" />
+                        Eliminar compromiso firmado
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onSelect={() => {
@@ -781,7 +723,7 @@ export default function CustodyPage() {
                         Editar
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onSelect={() => deleteRecord(record)} className="text-destructive">
+                      <DropdownMenuItem onSelect={() => void deleteRecord(record)} className="text-destructive">
                         <Trash2 className="h-4 w-4" />
                         Eliminar
                       </DropdownMenuItem>
@@ -790,13 +732,14 @@ export default function CustodyPage() {
                 </td>
               </tr>
             ))}
-            {filteredRecords.length === 0 && (
+            {!loading && filteredRecords.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
                   No hay registros de custodia para mostrar.
                 </td>
               </tr>
             )}
+            {loading && <tr><td colSpan={6} className="px-4 py-10"><div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" /></td></tr>}
           </tbody>
         </table>
       </section>
@@ -833,7 +776,7 @@ export default function CustodyPage() {
                 label="Soporte custodia"
                 value={
                   detailRecord.custodyEvidence
-                    ? `${detailRecord.custodyEvidence.fileName} · ${formatDateTime(detailRecord.custodyEvidence.uploadedAt)}`
+                    ? `${detailRecord.custodyEvidence.originalName} · ${formatDateTime(detailRecord.custodyEvidence.createdAt)}`
                     : "Sin soporte"
                 }
               />
@@ -841,7 +784,7 @@ export default function CustodyPage() {
                 label="Compromiso confidencialidad"
                 value={
                   detailRecord.confidentialityEvidence
-                    ? `${detailRecord.confidentialityEvidence.fileName} · ${formatDateTime(detailRecord.confidentialityEvidence.uploadedAt)}`
+                    ? `${detailRecord.confidentialityEvidence.originalName} · ${formatDateTime(detailRecord.confidentialityEvidence.createdAt)}`
                     : "Pendiente de firma"
                 }
               />

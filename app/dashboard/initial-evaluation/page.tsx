@@ -11,7 +11,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { INITIAL_EVALUATION_STANDARD_ITEMS } from "@/data/initialEvaluationStandardItems"
 import {
   createInitialEvaluation, deleteInitialEvaluationDocument, downloadInitialEvaluationDocument,
   downloadInitialEvaluationPdf, getInitialEvaluation, getInitialEvaluationSummary,
@@ -30,7 +29,6 @@ type Preview = { document: InitialEvaluationDocument; url: string; mimeType: str
 const currentYear = new Date().getFullYear()
 const emptyForm: EvaluationForm = { name: "", year: String(currentYear), date: new Date().toISOString().slice(0, 10), company: "", responsible: "", observations: "" }
 const emptySummary: InitialEvaluationSummary = { evaluations: 0, latestEvaluationId: null, latestScore: 0, latestTotalPossible: 0, latestCompliancePercentage: 0, latestFindings: 0, byCycle: [] }
-const missingCatalogPrefix = "missing-standard-item:"
 const evaluationFieldClassName = "h-10 border-slate-300 bg-white shadow-sm transition-colors hover:border-slate-400 focus-visible:border-primary focus-visible:ring-primary/20"
 
 const formatNumber = (value: number) => new Intl.NumberFormat("es-CO", { maximumFractionDigits: 2 }).format(value)
@@ -38,18 +36,18 @@ const formatDate = (value?: string | null) => value?.slice(0, 10) || "No registr
 function fileSize(size: number) { return size < 1024 ? `${size} B` : size < 1048576 ? `${(size / 1024).toFixed(1)} KB` : `${(size / 1048576).toFixed(1)} MB` }
 function statusLabel(status: InitialEvaluation["status"]) { return status === "COMPLETED" ? "Completada" : status === "SIGNED" ? "Firmada" : status === "INACTIVE" ? "Inactiva" : "Borrador" }
 function defaultAnswers(items: StandardItem[]): Record<string, Answer> { return Object.fromEntries(items.map((item) => [item.id, { compliance: "DOES_NOT_COMPLY", observation: "" }])) }
-function mergeStandardItems(catalog: StandardItem[]): StandardItem[] {
-  const backendByCode = new Map(catalog.map((item) => [item.code, item]))
-  const knownCodes = new Set(INITIAL_EVALUATION_STANDARD_ITEMS.map((item) => item.code))
-  const recovered = INITIAL_EVALUATION_STANDARD_ITEMS.map((definition) => backendByCode.get(definition.code) ?? {
-    ...definition,
-    id: `${missingCatalogPrefix}${definition.code}`,
-    status: "ACTIVE" as const,
-    createdAt: "",
-    updatedAt: "",
-  })
+function normalizeStandardItems(catalog: StandardItem[]): StandardItem[] {
+  const seenIds = new Set<string>()
+  const seenCodes = new Set<string>()
 
-  return [...recovered, ...catalog.filter((item) => !knownCodes.has(item.code))].sort((a, b) => a.order - b.order)
+  return catalog
+    .filter((item) => {
+      if (!item.id || !item.code || seenIds.has(item.id) || seenCodes.has(item.code)) return false
+      seenIds.add(item.id)
+      seenCodes.add(item.code)
+      return true
+    })
+    .sort((a, b) => a.order - b.order)
 }
 function answersFromDetail(detail: InitialEvaluationDetail, items: StandardItem[]) {
   const answers = defaultAnswers(items)
@@ -102,10 +100,9 @@ function EvaluationDialog({ open, evaluation, items, companyName, onClose, onSav
         <Label className="grid gap-2">Empresa<Input className="h-10 border-slate-200 bg-slate-100 text-slate-600 shadow-none" value={form.company || "Empresa de la sesión"} disabled /></Label>
       </div><div className="mt-4 grid gap-4 md:grid-cols-[300px_minmax(0,1fr)]"><Label className="grid gap-2"><span>Responsable <span className="text-destructive">*</span></span><Input className={evaluationFieldClassName} maxLength={250} value={form.responsible} onChange={(e) => setForm((x) => ({ ...x, responsible: e.target.value }))} /></Label><Label className="grid gap-2">Observaciones <span className="font-normal text-muted-foreground">(opcional)</span><Textarea className="border-slate-300 bg-white shadow-sm focus-visible:ring-primary/20" maxLength={4000} rows={2} value={form.observations} onChange={(e) => setForm((x) => ({ ...x, observations: e.target.value }))} /></Label></div></section>
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"><div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"><div className="flex items-start gap-3"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-50 text-cyan-700"><CheckCircle2 className="h-4 w-4" /></div><div><h3 className="text-sm font-semibold">Tabla de valores y calificación</h3><p className="mt-0.5 text-sm text-muted-foreground">Cumple totalmente o No aplica otorgan el puntaje posible; No cumple genera hallazgo.</p></div></div><div className="relative w-full lg:w-[360px]"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input className={`${evaluationFieldClassName} pl-9`} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar ítem, ciclo o módulo" /></div></div>
-        {items.some((item) => item.id.startsWith(missingCatalogPrefix)) && <div className="mb-4 flex gap-3 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /><p>Se muestran los 60 estándares para consulta, pero el backend aún no ha creado todos sus registros. Ejecuta el seed del contrato antes de guardar la evaluación.</p></div>}
         <div className="overflow-x-auto rounded-md border"><table className="w-full min-w-[1280px] text-sm"><thead className="border-b bg-secondary text-left text-xs uppercase text-muted-foreground"><tr>{["Ciclo", "Estándar", "Ítem del estándar", "Valor", "Peso porcentual", "Puntaje posible", "Calificación", "Observación"].map((label) => <th key={label} className="px-3 py-3 font-medium">{label}</th>)}</tr></thead><tbody className="divide-y">{filtered.map((item) => { const answer = answers[item.id] ?? { compliance: "DOES_NOT_COMPLY", observation: "" }; return <tr key={item.id} className="align-top"><td className="px-3 py-3 text-muted-foreground">{item.cycle}</td><td className="px-3 py-3 text-muted-foreground">{item.standard}</td><td className="px-3 py-3"><p className="font-medium">{item.code}</p><p className="mt-1 max-w-[360px] text-muted-foreground">{item.standardItem}</p></td><td className="px-3 py-3">{formatNumber(item.value)}</td><td className="px-3 py-3">{formatNumber(item.percentageWeight)}%</td><td className="px-3 py-3">{formatNumber(item.possibleScore)}</td><td className="px-3 py-3"><select className="w-full rounded-md border bg-background px-3 py-2" value={answer.compliance} onChange={(e) => patchAnswer(item.id, { compliance: e.target.value as Compliance })}><option value="COMPLIES">Cumple totalmente</option><option value="DOES_NOT_COMPLY">No cumple</option><option value="NOT_APPLICABLE">No aplica</option></select></td><td className="px-3 py-3"><Input maxLength={4000} value={answer.observation} onChange={(e) => patchAnswer(item.id, { observation: e.target.value })} placeholder="Opcional" /></td></tr> })}</tbody></table></div>
       </section>
-    </div><DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-4 py-4 sm:px-6"><Button type="button" variant="outline" disabled={saving} onClick={onClose}>Cancelar</Button><Button type="submit" className="gap-2" disabled={saving || items.some((item) => item.id.startsWith(missingCatalogPrefix))}><ClipboardList className="h-4 w-4" />{saving ? "Guardando..." : items.some((item) => item.id.startsWith(missingCatalogPrefix)) ? "Catálogo pendiente" : evaluation ? "Guardar cambios" : "Crear evaluación"}</Button></DialogFooter></form>
+    </div><DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-4 py-4 sm:px-6"><Button type="button" variant="outline" disabled={saving} onClick={onClose}>Cancelar</Button><Button type="submit" className="gap-2" disabled={saving}><ClipboardList className="h-4 w-4" />{saving ? "Guardando..." : evaluation ? "Guardar cambios" : "Crear evaluación"}</Button></DialogFooter></form>
   </DialogContent></Dialog>
 }
 
@@ -125,10 +122,10 @@ function DetailDialog({ evaluation, findings, documents, loadingId, onClose, onU
 
 export default function InitialEvaluationPage() {
   const [items, setItems] = useState<StandardItem[]>([]); const [evaluations, setEvaluations] = useState<InitialEvaluation[]>([]); const [summary, setSummary] = useState(emptySummary); const [search, setSearch] = useState(""); const [open, setOpen] = useState(false); const [editing, setEditing] = useState<InitialEvaluationDetail | null>(null); const [detail, setDetail] = useState<InitialEvaluationDetail | null>(null); const [findings, setFindings] = useState<InitialEvaluationFinding[]>([]); const [documents, setDocuments] = useState<InitialEvaluationDocument[]>([]); const [preview, setPreview] = useState<Preview | null>(null); const [previewLoadingId, setPreviewLoadingId] = useState<string | null>(null); const [loading, setLoading] = useState(true)
-  async function loadData() { setLoading(true); try { const [catalog, list, totals] = await Promise.all([listInitialEvaluationStandardItems(), listInitialEvaluations({ limit: 100 }), getInitialEvaluationSummary()]); setItems(mergeStandardItems(catalog)); setEvaluations(list.items); setSummary(totals) } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo cargar la evaluación inicial") } finally { setLoading(false) } }
+  async function loadData() { setLoading(true); try { const [catalog, list, totals] = await Promise.all([listInitialEvaluationStandardItems(), listInitialEvaluations({ limit: 100 }), getInitialEvaluationSummary()]); setItems(normalizeStandardItems(catalog)); setEvaluations(list.items); setSummary(totals) } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo cargar la evaluación inicial") } finally { setLoading(false) } }
   useEffect(() => { void loadData() }, []); useEffect(() => () => { if (preview?.url) URL.revokeObjectURL(preview.url) }, [preview?.url])
   const filtered = useMemo(() => { const q = search.trim().toLowerCase(); return evaluations.filter((evaluation) => !q || [evaluation.name, evaluation.company.name, evaluation.responsible, String(evaluation.year)].some((value) => value.toLowerCase().includes(q))) }, [evaluations, search])
-  async function save(form: EvaluationForm, answers: Record<string, Answer>, id?: string) { const missingItems = items.filter((item) => item.id.startsWith(missingCatalogPrefix)); if (missingItems.length) { const message = `El backend aún debe crear ${missingItems.length} estándares del catálogo antes de guardar.`; toast.error(message); throw new Error(message) } const payload: UpsertInitialEvaluationDto = { name: form.name.trim(), year: Number(form.year), date: form.date, responsible: form.responsible.trim(), observations: form.observations.trim() || undefined, answers: items.map((item) => ({ standardItemId: item.id, compliance: answers[item.id]?.compliance ?? "DOES_NOT_COMPLY", observation: answers[item.id]?.observation.trim() || undefined })) }; try { if (id) { await updateInitialEvaluation(id, payload); toast.success("Evaluación inicial actualizada") } else { await createInitialEvaluation(payload); toast.success("Evaluación inicial creada") } await loadData() } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo guardar la evaluación"); throw error } }
+  async function save(form: EvaluationForm, answers: Record<string, Answer>, id?: string) { const payload: UpsertInitialEvaluationDto = { name: form.name.trim(), year: Number(form.year), date: form.date, responsible: form.responsible.trim(), observations: form.observations.trim() || undefined, answers: items.map((item) => ({ standardItemId: item.id, compliance: answers[item.id]?.compliance ?? "DOES_NOT_COMPLY", observation: answers[item.id]?.observation.trim() || undefined })) }; try { if (id) { await updateInitialEvaluation(id, payload); toast.success("Evaluación inicial actualizada") } else { await createInitialEvaluation(payload); toast.success("Evaluación inicial creada") } await loadData() } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo guardar la evaluación"); throw error } }
   async function openEdit(evaluation: InitialEvaluation) { try { setEditing(await getInitialEvaluation(evaluation.id)); setOpen(true) } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo cargar la evaluación") } }
   async function openDetail(evaluation: InitialEvaluation) { try { const [full, found, docs] = await Promise.all([getInitialEvaluation(evaluation.id), listInitialEvaluationFindings(evaluation.id), listInitialEvaluationDocuments(evaluation.id)]); setDetail(full); setFindings(found); setDocuments(docs) } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo cargar el detalle") } }
   async function downloadPdf(evaluation: InitialEvaluation) { try { const blob = await downloadInitialEvaluationPdf(evaluation.id); const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href = url; link.download = `evaluacion-inicial-${evaluation.year}.pdf`; link.click(); URL.revokeObjectURL(url) } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo descargar la evaluación") } }
