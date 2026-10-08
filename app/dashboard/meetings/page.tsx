@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { CommitteeDocumentPanel } from "@/components/committee/CommitteeDocumentPanel"
 import { Button } from "@/components/ui/button"
 import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Dialog,
   DialogContent,
@@ -168,21 +169,17 @@ function MeetingDialog({ open, committees, employees, meeting, onClose, onSave }
 
         <form onSubmit={handleSubmit} className="space-y-5 bg-slate-50/40 p-6">
           <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-2">
-            <label className="block">
+            <div className="block">
               <span className="mb-1 block text-sm font-semibold text-slate-700">Comité</span>
-              <select
-                value={form.committeeId}
-                onChange={(event) => setForm((current) => ({ ...current, committeeId: event.target.value }))}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-              >
-                <option value="">Selecciona comité</option>
+              <Select value={form.committeeId} onValueChange={(value) => setForm((current) => ({ ...current, committeeId: value }))}>
+                <SelectTrigger className="h-10 w-full"><SelectValue placeholder="Selecciona comité" /></SelectTrigger>
+                <SelectContent>
                 {committees.map((committee) => (
-                  <option key={committee.id} value={committee.id}>
-                    {getCommitteeTypeLabel(committee.type)} · {formatDate(committee.startDate)}
-                  </option>
+                  <SelectItem key={committee.id} value={committee.id}>{getCommitteeTypeLabel(committee.type)} · {formatDate(committee.startDate)}</SelectItem>
                 ))}
-              </select>
-            </label>
+                </SelectContent>
+              </Select>
+            </div>
 
             <label className="block">
               <span className="mb-1 block text-sm font-semibold text-slate-700">Número de acta</span>

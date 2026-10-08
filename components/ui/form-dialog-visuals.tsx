@@ -4,10 +4,12 @@ import {
   Bug,
   Building2,
   CalendarCheck2,
+  ChartNoAxesCombined,
   ClipboardCheck,
   FileText,
   GraduationCap,
   PackageCheck,
+  Presentation,
   ShieldCheck,
   Siren,
   Sparkles,
@@ -39,6 +41,8 @@ export type FormVisualIcon =
   | "pest"
   | "details"
   | "tracking"
+  | "accountability"
+  | "analytics"
 
 type Tone = "blue" | "cyan" | "emerald" | "amber" | "violet" | "rose"
 
@@ -61,6 +65,8 @@ const icons = {
   pest: Bug,
   details: FileText,
   tracking: Target,
+  accountability: Presentation,
+  analytics: ChartNoAxesCombined,
 } satisfies Record<FormVisualIcon, typeof Target>
 
 const tones: Record<Tone, string> = {

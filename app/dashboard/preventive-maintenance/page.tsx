@@ -37,6 +37,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
 import {
@@ -209,19 +210,14 @@ function MaintenanceDialog({
           <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
               <Label>Acción</Label>
-              <select
-                value={form.action}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, action: event.target.value as PreventiveMaintenanceAction }))
-                }
-                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-              >
+              <Select value={form.action} onValueChange={(value) => setForm((current) => ({ ...current, action: value as PreventiveMaintenanceAction }))}>
+                <SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger>
+                <SelectContent>
                 {actionOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
+                  <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
                 ))}
-              </select>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid gap-2">
@@ -236,18 +232,14 @@ function MaintenanceDialog({
 
           <div className="grid gap-2">
             <Label>Responsable</Label>
-            <select
-              value={form.responsibleEmployeeId}
-              onChange={(event) => setForm((current) => ({ ...current, responsibleEmployeeId: event.target.value }))}
-              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-            >
-              <option value="">{loadingEmployees ? "Cargando funcionarios..." : "Selecciona funcionario"}</option>
+            <Select value={form.responsibleEmployeeId} onValueChange={(value) => setForm((current) => ({ ...current, responsibleEmployeeId: value }))} disabled={loadingEmployees}>
+              <SelectTrigger className="h-10 w-full"><SelectValue placeholder={loadingEmployees ? "Cargando funcionarios..." : "Selecciona funcionario"} /></SelectTrigger>
+              <SelectContent>
               {employees.map((employee) => (
-                <option key={employee.id} value={employee.id}>
-                  {employeeName(employee)}
-                </option>
+                <SelectItem key={employee.id} value={employee.id}>{employeeName(employee)}</SelectItem>
               ))}
-            </select>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid gap-2">

@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { CommitteeDocumentPanel } from "@/components/committee/CommitteeDocumentPanel"
 import { Button } from "@/components/ui/button"
 import { FormDialogIcon } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Dialog,
   DialogContent,
@@ -155,20 +156,17 @@ function CommitteeDialog({ open, employees, committee, onClose, onSave }: Commit
 
         <form onSubmit={handleSubmit} className="space-y-5 bg-slate-50/40 p-6">
           <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-3">
-            <label className="block">
+            <div className="block">
               <span className="mb-1 block text-sm font-semibold text-slate-700">Tipo</span>
-              <select
-                value={form.type}
-                onChange={(event) => setForm((current) => ({ ...current, type: event.target.value as CommitteeType }))}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-              >
+              <Select value={form.type} onValueChange={(value) => setForm((current) => ({ ...current, type: value as CommitteeType }))}>
+                <SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger>
+                <SelectContent>
                 {COMMITTEE_TYPES.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
+                  <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
                 ))}
-              </select>
-            </label>
+                </SelectContent>
+              </Select>
+            </div>
 
             <label className="block">
               <span className="mb-1 block text-sm font-semibold text-slate-700">Fecha inicio</span>
@@ -192,39 +190,29 @@ function CommitteeDialog({ open, employees, committee, onClose, onSave }: Commit
           </div>
 
           <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-2">
-            <label className="block">
+            <div className="block">
               <span className="mb-1 block text-sm font-semibold text-slate-700">Presidente</span>
-              <select
-                value={form.presidentEmployeeId}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, presidentEmployeeId: event.target.value }))
-                }
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-              >
-                <option value="">Selecciona funcionario</option>
+              <Select value={form.presidentEmployeeId} onValueChange={(value) => setForm((current) => ({ ...current, presidentEmployeeId: value }))}>
+                <SelectTrigger className="h-10 w-full"><SelectValue placeholder="Selecciona funcionario" /></SelectTrigger>
+                <SelectContent>
                 {employees.map((employee) => (
-                  <option key={employee.id} value={employee.id}>
-                    {getEmployeeName(employee)}
-                  </option>
+                  <SelectItem key={employee.id} value={employee.id}>{getEmployeeName(employee)}</SelectItem>
                 ))}
-              </select>
-            </label>
+                </SelectContent>
+              </Select>
+            </div>
 
-            <label className="block">
+            <div className="block">
               <span className="mb-1 block text-sm font-semibold text-slate-700">Secretario</span>
-              <select
-                value={form.secretaryEmployeeId}
-                onChange={(event) => setForm((current) => ({ ...current, secretaryEmployeeId: event.target.value }))}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-              >
-                <option value="">Selecciona funcionario</option>
+              <Select value={form.secretaryEmployeeId} onValueChange={(value) => setForm((current) => ({ ...current, secretaryEmployeeId: value }))}>
+                <SelectTrigger className="h-10 w-full"><SelectValue placeholder="Selecciona funcionario" /></SelectTrigger>
+                <SelectContent>
                 {employees.map((employee) => (
-                  <option key={employee.id} value={employee.id}>
-                    {getEmployeeName(employee)}
-                  </option>
+                  <SelectItem key={employee.id} value={employee.id}>{getEmployeeName(employee)}</SelectItem>
                 ))}
-              </select>
-            </label>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">

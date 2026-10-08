@@ -37,6 +37,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import {
   changeEmergencyBrigadeStatus,
@@ -173,17 +174,14 @@ function EmergencyBrigadeDialog({
           <FormSectionTitle icon="details" title="Datos de la brigada" description="Define el tipo, objetivo y funciones del equipo de respuesta." tone="rose" />
           <div className="grid gap-2">
             <Label>Tipo de brigada</Label>
-            <select
-              value={form.brigadeType}
-              onChange={(event) => setForm((current) => ({ ...current, brigadeType: event.target.value as BrigadeType }))}
-              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-            >
+            <Select value={form.brigadeType} onValueChange={(value) => setForm((current) => ({ ...current, brigadeType: value as BrigadeType }))}>
+              <SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger>
+              <SelectContent>
               {BRIGADE_TYPES.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
+                <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
               ))}
-            </select>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">

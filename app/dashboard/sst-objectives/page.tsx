@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { createSstPolicy, listSstPolicies } from "@/services/sstPolicyService"
 import {
@@ -450,26 +451,26 @@ function ObjectiveDialog({
                     className={objectiveFieldClassName}
                   />
                 </Label>
-                <label className="block">
+                <div className="block">
                   <span className="mb-2 block text-sm font-medium text-foreground">Tipo <span className="text-destructive">*</span></span>
-                  <select
+                  <Select
                     value={form.type}
-                    onChange={(event) =>
+                    onValueChange={(value) =>
                       setForm((current) => ({
                         ...current,
-                        type: event.target.value as ObjectiveType,
-                        customType: event.target.value === "OTHER" ? current.customType : "",
+                        type: value as ObjectiveType,
+                        customType: value === "OTHER" ? current.customType : "",
                       }))
                     }
-                    className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm transition-colors hover:border-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   >
+                    <SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger>
+                    <SelectContent>
                     {objectiveTypeOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
+                      <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
                     ))}
-                  </select>
-                </label>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               {form.type === "OTHER" && (
                 <Label className="mt-4 grid gap-2">
@@ -559,21 +560,17 @@ function ObjectiveDialog({
                 </div>
               </div>
               <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px_170px_170px]">
-                <label className="block">
+                <div className="block">
                   <span className="mb-2 block text-sm font-medium text-foreground">Política SST relacionada</span>
-                  <select
-                    value={form.policyId}
-                    onChange={(event) => setForm((current) => ({ ...current, policyId: event.target.value }))}
-                    className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm transition-colors hover:border-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option value="">Selecciona politica</option>
+                  <Select value={form.policyId} onValueChange={(value) => setForm((current) => ({ ...current, policyId: value }))}>
+                    <SelectTrigger className="h-10 w-full"><SelectValue placeholder="Selecciona política" /></SelectTrigger>
+                    <SelectContent>
                     {policies.map((policy) => (
-                      <option key={policy.id} value={policy.id}>
-                        {policy.name}
-                      </option>
+                      <SelectItem key={policy.id} value={policy.id}>{policy.name}</SelectItem>
                     ))}
-                  </select>
-                </label>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <Label className="grid gap-2">
                   Responsable del seguimiento
                   <Input

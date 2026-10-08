@@ -44,6 +44,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import {
   changeAcpmStatus,
@@ -306,34 +307,28 @@ function AcpmDialog({
                     }
                   />
                 </Label>
-                <label className="block">
+                <div className="block">
                   <span className="mb-2 block text-sm font-medium text-foreground">Tipo</span>
-                  <select
-                    value={form.type}
-                    onChange={(event) => setForm((current) => ({ ...current, type: event.target.value as AcpmType }))}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
+                  <Select value={form.type} onValueChange={(value) => setForm((current) => ({ ...current, type: value as AcpmType }))}>
+                    <SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger>
+                    <SelectContent>
                     {acpmTypeOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
+                      <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
                     ))}
-                  </select>
-                </label>
-                <label className="block">
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="block">
                   <span className="mb-2 block text-sm font-medium text-foreground">Origen</span>
-                  <select
-                    value={form.origin}
-                    onChange={(event) => setForm((current) => ({ ...current, origin: event.target.value as AcpmOrigin }))}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
+                  <Select value={form.origin} onValueChange={(value) => setForm((current) => ({ ...current, origin: value as AcpmOrigin }))}>
+                    <SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger>
+                    <SelectContent>
                     {acpmOriginOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
+                      <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
                     ))}
-                  </select>
-                </label>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <Label className="grid gap-2">
                   Nombre del ACPM
                   <Input
@@ -357,23 +352,17 @@ function AcpmDialog({
                   />
                 </Label>
                 <div className="grid gap-4">
-                  <label className="block">
+                  <div className="block">
                     <span className="mb-2 block text-sm font-medium text-foreground">Responsable</span>
-                    <select
-                      value={form.responsibleEmployeeId}
-                      onChange={(event) =>
-                        setForm((current) => ({ ...current, responsibleEmployeeId: event.target.value }))
-                      }
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    >
-                      <option value="">Selecciona responsable</option>
+                    <Select value={form.responsibleEmployeeId} onValueChange={(value) => setForm((current) => ({ ...current, responsibleEmployeeId: value }))}>
+                      <SelectTrigger className="h-10 w-full"><SelectValue placeholder="Selecciona responsable" /></SelectTrigger>
+                      <SelectContent>
                       {employees.map((employee) => (
-                        <option key={employee.id} value={employee.id}>
-                          {employeeName(employee)} - {employeeJob(employee)}
-                        </option>
+                        <SelectItem key={employee.id} value={employee.id}>{employeeName(employee)} - {employeeJob(employee)}</SelectItem>
                       ))}
-                    </select>
-                  </label>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <Label className="grid gap-2">
                     Fecha limite
                     <Input

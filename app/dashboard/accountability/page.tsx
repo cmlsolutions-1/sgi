@@ -49,6 +49,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import {
   createAccountabilityReport,
@@ -184,18 +186,18 @@ function InfoBlock({ label, value }: { label: string; value: string }) {
 }
 
 function Metric({ label, value, tone = "default" }: { label: string; value: string | number; tone?: "default" | "blue" | "green" | "amber" }) {
-  const toneClass =
+  const toneClasses =
     tone === "blue"
-      ? "text-blue-700"
+      ? "border-blue-200 bg-blue-50 text-blue-700"
       : tone === "green"
-        ? "text-emerald-700"
+        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
         : tone === "amber"
-          ? "text-amber-700"
-          : "text-foreground"
+          ? "border-amber-200 bg-amber-50 text-amber-700"
+          : "border-slate-200 bg-slate-50 text-foreground"
 
   return (
-    <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
-      <span className={`text-xl font-bold leading-none ${toneClass}`}>{value}</span>
+    <div className={`flex min-h-14 items-center gap-3 rounded-lg border px-3.5 py-2 ${toneClasses}`}>
+      <span className="text-xl font-bold leading-none">{value}</span>
       <span className="text-xs font-medium text-slate-600">{label}</span>
     </div>
   )
@@ -238,18 +240,21 @@ function AccountabilityDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-3xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-3xl">
-        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>Nueva rendición de cuentas</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            Selecciona la vigencia y el tipo de ejecución para consolidar el informe anual del SG-SST.
-          </p>
+      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-3xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-3xl">
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+          <div className="flex items-start gap-3 text-left">
+            <FormDialogIcon icon="accountability" tone="blue" />
+            <div>
+              <DialogTitle>Nueva rendición de cuentas</DialogTitle>
+              <p className="mt-1 text-sm text-muted-foreground">Selecciona la vigencia y el tipo de ejecución para consolidar el informe anual del SG-SST.</p>
+            </div>
+          </div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Información general</h3>
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-slate-50/40 px-6 py-5">
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="details" title="Información general" description="Define la vigencia, fecha y responsables de la rendición." tone="cyan" />
               <div className="grid gap-4 md:grid-cols-2">
                 <Label className="grid gap-2">
                   Año / Vigencia
@@ -271,47 +276,46 @@ function AccountabilityDialog({
                   Responsable SG-SST
                   <Input value={responsible ? `${responsible.employee.name} ${responsible.employee.lastName}`.trim() : "Sin responsable asignado"} disabled />
                 </Label>
-                <label className="grid gap-2">
+                <div className="grid gap-2">
                   <span className="text-sm font-medium text-foreground">Representante legal</span>
-                  <select
+                  <Select
                     value={form.legalRepresentativeEmployeeId}
-                    onChange={(event) => {
-                      const employee = employees.find((item) => item.id === event.target.value)
+                    onValueChange={(value) => {
+                      const employee = employees.find((item) => item.id === value)
                       setForm((current) => ({
                         ...current,
-                        legalRepresentativeEmployeeId: event.target.value,
+                        legalRepresentativeEmployeeId: value,
                         legalRepresentativeName: employee ? `${employee.name} ${employee.lastName}`.trim() : "",
                       }))
                     }}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
-                    <option value="">Selecciona representante</option>
+                    <SelectTrigger className="h-10 w-full"><SelectValue placeholder="Selecciona representante" /></SelectTrigger>
+                    <SelectContent>
                     {employees.map((employee) => (
-                      <option key={employee.id} value={employee.id}>
-                        {employee.name} {employee.lastName}
-                      </option>
+                      <SelectItem key={employee.id} value={employee.id}>{employee.name} {employee.lastName}</SelectItem>
                     ))}
-                  </select>
-                </label>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </section>
 
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Tipo de ejecución</h3>
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="tracking" title="Tipo de ejecución" description="Elige si SafeCloud consolida los indicadores o si cargarás el informe manualmente." tone="violet" />
               <div className="grid gap-3 sm:grid-cols-2">
                 {(["AUTOMATIC", "MANUAL"] as ExecutionType[]).map((type) => (
                   <button
                     key={type}
                     type="button"
                     onClick={() => setForm((current) => ({ ...current, executionType: type }))}
-                    className={`rounded-md border p-4 text-left transition ${
+                    className={`rounded-lg border p-4 text-left transition ${
                       form.executionType === type
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-secondary text-foreground hover:border-primary/50"
+                        ? "border-blue-300 bg-blue-50 text-blue-950 ring-1 ring-blue-100"
+                        : "border-slate-200 bg-white text-foreground hover:border-blue-200 hover:bg-blue-50/50"
                     }`}
                   >
                     <p className="text-sm font-semibold">{executionTypeLabel(type)}</p>
-                    <p className={`mt-1 text-xs ${form.executionType === type ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                    <p className="mt-1 text-xs text-muted-foreground">
                       {type === "AUTOMATIC"
                         ? "El sistema consolida indicadores de la vigencia seleccionada."
                         : "Solo crea el registro para cargar el documento firmado."}
@@ -321,18 +325,13 @@ function AccountabilityDialog({
               </div>
             </section>
 
-            <Label className="grid gap-2">
-              Observaciones
-              <Textarea
-                value={form.observations}
-                onChange={(event) => setForm((current) => ({ ...current, observations: event.target.value }))}
-                rows={3}
-                placeholder="Agrega notas sobre la rendición, compromisos o información relevante."
-              />
-            </Label>
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="document" title="Observaciones" description="Añade compromisos, notas o información relevante para el informe." tone="amber" />
+              <Textarea value={form.observations} onChange={(event) => setForm((current) => ({ ...current, observations: event.target.value }))} rows={3} placeholder="Agrega notas sobre la rendición, compromisos o información relevante." />
+            </section>
           </div>
 
-          <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+          <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
@@ -719,15 +718,19 @@ export default function AccountabilityPage() {
 
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4"><Metric label="Rendiciones" value={stats.total} /><Metric label="Automáticas" value={stats.automatic} tone="blue" /><Metric label="Con soporte" value={stats.withDocument} tone="green" /><Metric label="Plan ejecutado promedio" value={`${stats.averageExecution}%`} tone="amber" /></section>
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-        <div className="mt-4 grid gap-3 md:grid-cols-[minmax(220px,1fr)_auto] md:items-end">
-          <Label className="grid gap-2">
+        <div className="mb-4">
+          <h2 className="text-sm font-semibold text-foreground">Buscar y consultar</h2>
+          <p className="text-xs text-muted-foreground">Encuentra rendiciones por vigencia, responsables o estado del soporte.</p>
+        </div>
+        <div className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+          <Label className="grid min-w-0 gap-2">
             Buscar
-            <div className="relative">
+            <div className="relative min-w-0">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                className="pl-9"
+                className="min-w-0 pl-9"
                 placeholder="Vigencia, responsable, representante o estado"
               />
             </div>

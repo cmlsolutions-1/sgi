@@ -53,6 +53,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
 import {
@@ -162,6 +164,16 @@ const emptyEvidenceForm: EvidenceForm = {
   description: "",
   isConfirmed: true,
 }
+
+const analysisSelectTriggerClassName =
+  "h-11 w-full min-w-0 rounded-lg border-slate-300 bg-white shadow-sm hover:border-blue-300 hover:bg-blue-50/40 focus:border-blue-400 focus:ring-blue-100"
+
+const analysisSelectContentClassName = "rounded-xl border-slate-200 bg-white shadow-xl"
+const analysisSelectItemClassName = "rounded-lg py-2.5 focus:bg-blue-50 focus:text-blue-900"
+const analysisLongSelectContentClassName =
+  `${analysisSelectContentClassName} max-h-72 [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-slot=select-scroll-down-button]]:hidden`
+const analysisScrollableViewportClassName =
+  "!h-auto max-h-64 overflow-y-scroll [scrollbar-color:#94a3b8_#f1f5f9] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-400 [&::-webkit-scrollbar-track]:bg-slate-100"
 
 const incidentTypeOptions: Array<{ value: IncidentType; label: string }> = [
   { value: "INCIDENTE", label: "Incidente" },
@@ -349,18 +361,18 @@ function EmployeePicker({
 }
 
 function Metric({ label, value, tone = "default" }: { label: string; value: string | number; tone?: "default" | "blue" | "green" | "amber" }) {
-  const toneClass =
+  const toneClasses =
     tone === "blue"
-      ? "text-blue-700"
+      ? "border-blue-200 bg-blue-50 text-blue-700"
       : tone === "green"
-        ? "text-emerald-700"
+        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
         : tone === "amber"
-          ? "text-amber-700"
-          : "text-foreground"
+          ? "border-amber-200 bg-amber-50 text-amber-700"
+          : "border-slate-200 bg-slate-50 text-foreground"
 
   return (
-    <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
-      <span className={`text-xl font-bold leading-none ${toneClass}`}>{value}</span>
+    <div className={`flex min-h-14 items-center gap-3 rounded-lg border px-3.5 py-2 ${toneClasses}`}>
+      <span className="text-xl font-bold leading-none">{value}</span>
       <span className="text-xs font-medium text-slate-600">{label}</span>
     </div>
   )
@@ -437,57 +449,88 @@ function AnalysisDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-4xl">
-        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>{record ? "Editar analisis" : "Nuevo analisis"}</DialogTitle>
-          <p className="text-sm text-muted-foreground">Configura el periodo, responsable y tipo de novedad laboral para generar los indicadores.</p>
+      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-4xl">
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+          <div className="flex items-start gap-3 text-left">
+            <FormDialogIcon icon="analytics" tone="violet" />
+            <div>
+              <DialogTitle>{record ? "Editar análisis" : "Nuevo análisis"}</DialogTitle>
+              <p className="mt-1 text-sm text-muted-foreground">Configura el periodo, responsable y tipo de novedad laboral para generar los indicadores.</p>
+            </div>
+          </div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Datos del analisis</h3>
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-slate-50/40 px-6 py-5">
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="details" title="Periodo del análisis" description="Define el corte temporal y la novedad laboral que se analizará." tone="blue" />
               <div className="grid gap-4 md:grid-cols-2">
-                <label className="grid gap-2">
+                <div className="grid gap-2">
                   <span className="text-sm font-medium text-foreground">Periodicidad</span>
-                  <select value={form.periodicity} onChange={(event) => update("periodicity", event.target.value as Periodicity)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                    <option value="ANNUAL">Anual</option>
-                    <option value="SEMESTER">Semestral</option>
-                    <option value="QUARTER">Trimestral</option>
-                    <option value="BIMONTHLY">Bimestral</option>
-                    <option value="MONTHLY">Mensual</option>
-                  </select>
-                </label>
+                  <Select value={form.periodicity} onValueChange={(value) => update("periodicity", value as Periodicity)}>
+                    <SelectTrigger className={analysisSelectTriggerClassName}>
+                      <SelectValue placeholder="Selecciona la periodicidad" />
+                    </SelectTrigger>
+                    <SelectContent className={analysisSelectContentClassName}>
+                      <SelectItem className={analysisSelectItemClassName} value="ANNUAL">Anual</SelectItem>
+                      <SelectItem className={analysisSelectItemClassName} value="SEMESTER">Semestral</SelectItem>
+                      <SelectItem className={analysisSelectItemClassName} value="QUARTER">Trimestral</SelectItem>
+                      <SelectItem className={analysisSelectItemClassName} value="BIMONTHLY">Bimestral</SelectItem>
+                      <SelectItem className={analysisSelectItemClassName} value="MONTHLY">Mensual</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <Label className="grid gap-2">
                   Año
                   <Input value={form.year} onChange={(event) => update("year", event.target.value.replace(/\D/g, "").slice(0, 4))} placeholder="2026" />
                 </Label>
                 {form.periodicity !== "ANNUAL" && (
-                  <label className="grid gap-2">
+                  <div className="grid gap-2">
                     <span className="text-sm font-medium text-foreground">Periodo</span>
-                    <select value={form.period} onChange={(event) => update("period", event.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                      {periodOptions.map((period) => <option key={period} value={period}>{period}</option>)}
-                    </select>
-                  </label>
+                    <Select value={form.period} onValueChange={(value) => update("period", value)}>
+                      <SelectTrigger className={analysisSelectTriggerClassName}>
+                        <SelectValue placeholder="Selecciona el periodo" />
+                      </SelectTrigger>
+                      <SelectContent
+                        className={analysisLongSelectContentClassName}
+                        viewportClassName={analysisScrollableViewportClassName}
+                      >
+                        {periodOptions.map((period) => (
+                          <SelectItem className={analysisSelectItemClassName} key={period} value={period}>{period}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 )}
                 <Label className="grid gap-2">
                   Fecha de analisis
                   <Input type="date" value={form.analysisDate} onChange={(event) => update("analysisDate", event.target.value)} />
                 </Label>
-                <label className="grid gap-2 md:col-span-2">
+                <div className="grid gap-2 md:col-span-2">
                   <span className="text-sm font-medium text-foreground">Tipo de novedad laboral</span>
-                  <select value={form.incidentType} onChange={(event) => update("incidentType", event.target.value as IncidentType)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                    {incidentTypeOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                  </select>
-                </label>
-                <div className="md:col-span-2">
-                  <EmployeePicker employees={employees} loading={employeesLoading} value={form.responsibleEmployeeId} onChange={(employeeId) => update("responsibleEmployeeId", employeeId)} />
+                  <Select value={form.incidentType} onValueChange={(value) => update("incidentType", value as IncidentType)}>
+                    <SelectTrigger className={analysisSelectTriggerClassName}>
+                      <SelectValue placeholder="Selecciona el tipo de novedad" />
+                    </SelectTrigger>
+                    <SelectContent
+                      className={analysisLongSelectContentClassName}
+                      viewportClassName={analysisScrollableViewportClassName}
+                    >
+                      {incidentTypeOptions.map((option) => (
+                        <SelectItem className={analysisSelectItemClassName} key={option.value} value={option.value}>{option.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </section>
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="employee" title="Responsable" description="Selecciona el funcionario encargado de revisar y presentar los resultados." tone="cyan" />
+              <EmployeePicker employees={employees} loading={employeesLoading} value={form.responsibleEmployeeId} onChange={(employeeId) => update("responsibleEmployeeId", employeeId)} />
+            </section>
           </div>
 
-          <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+          <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
             <Button type="submit" className="gap-2" disabled={saving}>
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -1027,17 +1070,21 @@ export default function EmployeeAnalyticsPage() {
 
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4"><Metric label="Analisis" value={stats.total} /><Metric label="Con evidencia" value={stats.withEvidence} tone="green" /><Metric label="Con mejora" value={stats.withAction} tone="blue" /><Metric label="Anuales" value={stats.annual} tone="amber" /></section>
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-        <div className="mt-4 grid gap-3 md:grid-cols-[minmax(220px,1fr)_280px]">
-          <Label className="grid gap-2">
+        <div className="mb-4">
+          <h2 className="text-sm font-semibold text-foreground">Buscar y filtrar</h2>
+          <p className="text-xs text-muted-foreground">Consulta los análisis por novedad, responsable, periodo o tipo.</p>
+        </div>
+        <div className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_minmax(220px,280px)]">
+          <Label className="grid min-w-0 gap-2">
             Buscar
-            <div className="relative">
+            <div className="relative min-w-0">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input value={search} onChange={(event) => setSearch(event.target.value)} className="pl-9" placeholder="Novedad, responsable o periodo" />
+              <Input value={search} onChange={(event) => setSearch(event.target.value)} className="min-w-0 pl-9" placeholder="Novedad, responsable o periodo" />
             </div>
           </Label>
-          <label className="block">
+          <label className="block min-w-0">
             <span className="mb-2 block text-sm font-medium text-foreground">Tipo de novedad</span>
-            <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as IncidentType | "all")} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+            <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as IncidentType | "all")} className="w-full min-w-0 rounded-md border border-input bg-background px-3 py-2 text-sm">
               <option value="all">Todos</option>
               {incidentTypeOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
             </select>

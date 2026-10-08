@@ -200,6 +200,19 @@ export const navigation: NavigationItem[] = [
         href: "/dashboard/pesv-diagnosis",
         icon: ClipboardList,
       },
+      {
+        code: "PESV_RISKS",
+        name: "Riesgos Viales",
+        href: "/dashboard/pesv-risks",
+        icon: TriangleAlert,
+      },
+      { code: "PESV_OBJECTIVES", name: "Objetivos y metas", href: "/dashboard/pesv-objectives", icon: Target },
+      { code: "PESV_PROGRAMS", name: "Programas de riesgos críticos", href: "/dashboard/pesv-programs", icon: ShieldPlus },
+      { code: "PESV_WORK_PLAN", name: "Plan anual de trabajo", href: "/dashboard/pesv-work-plan", icon: ClipboardCheck },
+      { code: "PESV_TRAINING", name: "Competencia y formación", href: "/dashboard/pesv-training", icon: GraduationCap },
+      { code: "PESV_BEHAVIOR", name: "Comportamiento seguro", href: "/dashboard/pesv-behavior", icon: UserCheck },
+      { code: "PESV_EMERGENCIES", name: "Emergencias Viales", href: "/dashboard/pesv-emergencies", icon: FlameKindling },
+      { code: "PESV_INVESTIGATIONS", name: "Investigación de Siniestros", href: "/dashboard/pesv-investigations", icon: FileSearch },
     ],
   },
   {
@@ -374,6 +387,14 @@ const alwaysVisibleCodes = new Set<string>([
   "PESV_POLICY",
   "PESV_LEADERSHIP",
   "PESV_DIAGNOSIS",
+  "PESV_RISKS",
+  "PESV_OBJECTIVES",
+  "PESV_PROGRAMS",
+  "PESV_WORK_PLAN",
+  "PESV_TRAINING",
+  "PESV_BEHAVIOR",
+  "PESV_EMERGENCIES",
+  "PESV_INVESTIGATIONS",
 ])
 
 const moduleCodeAliases: Record<string, string[]> = {
@@ -456,6 +477,14 @@ function isSubItemAllowed(
   if (subItem.code === "PESV_POLICY" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "PESV_LEADERSHIP" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "PESV_DIAGNOSIS" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "PESV_RISKS" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "PESV_OBJECTIVES" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "PESV_PROGRAMS" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "PESV_WORK_PLAN" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "PESV_TRAINING" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "PESV_BEHAVIOR" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "PESV_EMERGENCIES" && isCodeAllowed(parentCode, allowedCodes)) return true
+  if (subItem.code === "PESV_INVESTIGATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
 
   const parentChildCodes = getDirectChildCodesByParentCode(modules, parentCode)
 

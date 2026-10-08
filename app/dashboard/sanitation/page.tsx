@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { buildReportPdf, formatDisplayDate } from "@/lib/reporting"
 import { listEmployees } from "@/services/employeeService"
 import {
@@ -169,18 +170,14 @@ function SanitationDialog({
             <div className="grid gap-4 md:grid-cols-3">
               <div className="grid min-w-0 gap-2 md:col-span-1">
                 <Label htmlFor="sanitation-type">Tipo</Label>
-                <select
-                  id="sanitation-type"
-                  value={form.type}
-                  onChange={(event) => setForm((current) => ({ ...current, type: event.target.value as SanitationType }))}
-                  className="h-10 w-full min-w-0 truncate rounded-md border border-slate-300 bg-white px-3 text-sm shadow-sm outline-none transition hover:border-slate-400 focus:border-primary focus:ring-3 focus:ring-primary/25"
-                >
+                <Select value={form.type} onValueChange={(value) => setForm((current) => ({ ...current, type: value as SanitationType }))}>
+                  <SelectTrigger id="sanitation-type" className="h-10 w-full min-w-0"><SelectValue /></SelectTrigger>
+                  <SelectContent>
                   {sanitationTypes.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
+                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
                   ))}
-                </select>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid min-w-0 gap-2">
                 <Label htmlFor="sanitation-date">Fecha</Label>
@@ -208,49 +205,41 @@ function SanitationDialog({
             <div className="grid gap-4 md:grid-cols-2">
               <div className="grid min-w-0 gap-2">
                 <Label htmlFor="sanitation-responsible-type">Tipo de responsable</Label>
-                <select
-                  id="sanitation-responsible-type"
+                <Select
                   value={form.responsibleType}
-                  onChange={(event) =>
+                  onValueChange={(value) =>
                     setForm((current) => ({
                       ...current,
-                      responsibleType: event.target.value as SanitationResponsibleType,
+                      responsibleType: value as SanitationResponsibleType,
                       responsibleEmployeeId: "",
                       thirdPartyName: "",
                     }))
                   }
-                  className="h-10 w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 text-sm shadow-sm outline-none transition hover:border-slate-400 focus:border-primary focus:ring-3 focus:ring-primary/25"
                 >
-                  <option value="EMPLOYEE">Funcionario</option>
-                  <option value="THIRD_PARTY">Tercero</option>
-                </select>
+                  <SelectTrigger id="sanitation-responsible-type" className="h-10 w-full min-w-0"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="EMPLOYEE">Funcionario</SelectItem>
+                    <SelectItem value="THIRD_PARTY">Tercero</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               {form.responsibleType === "EMPLOYEE" ? (
                 <div className="grid min-w-0 gap-2">
                   <Label htmlFor="sanitation-responsible-employee">Funcionario responsable</Label>
-                  <select
-                    id="sanitation-responsible-employee"
+                  <Select
                     value={form.responsibleEmployeeId ?? ""}
-                    onChange={(event) => setForm((current) => ({ ...current, responsibleEmployeeId: event.target.value }))}
-                    className="h-10 w-full min-w-0 truncate rounded-md border border-slate-300 bg-white px-3 text-sm shadow-sm outline-none transition hover:border-slate-400 focus:border-primary focus:ring-3 focus:ring-primary/25"
+                    onValueChange={(value) => setForm((current) => ({ ...current, responsibleEmployeeId: value }))}
+                    disabled={loadingEmployees || employees.length === 0}
                   >
-                    <option value="">Selecciona un funcionario</option>
-                    {loadingEmployees ? (
-                      <option value="" disabled>
-                        Cargando funcionarios...
-                      </option>
-                    ) : employees.length === 0 ? (
-                      <option value="" disabled>
-                        No hay funcionarios disponibles
-                      </option>
-                    ) : (
-                      employees.map((employee) => (
-                        <option key={employee.id} value={employee.id}>
-                          {employeeName(employee)}
-                        </option>
-                      ))
-                    )}
-                  </select>
+                    <SelectTrigger id="sanitation-responsible-employee" className="h-10 w-full min-w-0">
+                      <SelectValue placeholder={loadingEmployees ? "Cargando funcionarios..." : employees.length === 0 ? "No hay funcionarios disponibles" : "Selecciona un funcionario"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {employees.map((employee) => (
+                        <SelectItem key={employee.id} value={employee.id}>{employeeName(employee)}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               ) : (
                 <div className="grid min-w-0 gap-2">

@@ -296,7 +296,9 @@ function readDiagnoses() {
 
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as PesvDiagnosis[]) : initialDiagnoses
+    if (raw) return JSON.parse(raw) as PesvDiagnosis[]
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(initialDiagnoses))
+    return initialDiagnoses
   } catch {
     return initialDiagnoses
   }

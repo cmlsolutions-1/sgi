@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listAcpms } from "@/services/acpmService"
 import { listManagedDocuments } from "@/services/documentManagementService"
@@ -441,39 +442,29 @@ function InvestigationDialog({
               </div>
 
               <div className="grid gap-3 md:grid-cols-2">
-                <label className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
+                <div className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
                   <span className="text-xs font-semibold text-muted-foreground">Novedad laboral</span>
-                  <select
-                    value={form.incidentId}
-                    onChange={(event) => setForm((current) => ({ ...current, incidentId: event.target.value }))}
-                    className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs outline-none transition-colors hover:border-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option value="">Selecciona una novedad</option>
+                  <Select value={form.incidentId} onValueChange={(value) => setForm((current) => ({ ...current, incidentId: value }))}>
+                    <SelectTrigger className="h-10 w-full"><SelectValue placeholder="Selecciona una novedad" /></SelectTrigger>
+                    <SelectContent>
                     {incidents.map((incident) => (
-                      <option key={incident.id} value={incident.id}>
-                        {incidentOptionLabel(incident)}
-                      </option>
+                      <SelectItem key={incident.id} value={incident.id}>{incidentOptionLabel(incident)}</SelectItem>
                     ))}
-                  </select>
-                </label>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                <label className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
+                <div className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
                   <span className="text-xs font-semibold text-muted-foreground">Funcionario responsable</span>
-                  <select
-                    value={form.responsibleEmployeeId}
-                    onChange={(event) =>
-                      setForm((current) => ({ ...current, responsibleEmployeeId: event.target.value }))
-                    }
-                    className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs outline-none transition-colors hover:border-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option value="">Selecciona responsable</option>
+                  <Select value={form.responsibleEmployeeId} onValueChange={(value) => setForm((current) => ({ ...current, responsibleEmployeeId: value }))}>
+                    <SelectTrigger className="h-10 w-full"><SelectValue placeholder="Selecciona responsable" /></SelectTrigger>
+                    <SelectContent>
                     {employees.map((employee) => (
-                      <option key={employee.id} value={employee.id}>
-                        {employeeLabel(employee)}
-                      </option>
+                      <SelectItem key={employee.id} value={employee.id}>{employeeLabel(employee)}</SelectItem>
                     ))}
-                  </select>
-                </label>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </section>
 
@@ -502,38 +493,29 @@ function InvestigationDialog({
                     key={reviewer.id}
                     className="grid gap-3 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs lg:grid-cols-[190px_minmax(0,1fr)_44px] lg:items-end"
                   >
-                    <label className="grid gap-1.5">
+                    <div className="grid gap-1.5">
                       <span className="text-xs font-semibold text-muted-foreground">Tipo</span>
-                      <select
-                        value={reviewer.type}
-                        onChange={(event) =>
-                          updateReviewer(reviewer.id, { type: event.target.value as InvestigationReviewerType })
-                        }
-                        className="h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs outline-none transition-colors hover:border-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                        aria-label={`Tipo de investigador ${index + 1}`}
-                      >
-                        <option value="EMPLOYEE">Funcionario</option>
-                        <option value="EXTERNAL">Externo</option>
-                      </select>
-                    </label>
+                      <Select value={reviewer.type} onValueChange={(value) => updateReviewer(reviewer.id, { type: value as InvestigationReviewerType })}>
+                        <SelectTrigger className="h-10 w-full" aria-label={`Tipo de investigador ${index + 1}`}><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="EMPLOYEE">Funcionario</SelectItem>
+                          <SelectItem value="EXTERNAL">Externo</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
                     {reviewer.type === "EMPLOYEE" ? (
-                      <label className="grid gap-1.5">
+                      <div className="grid gap-1.5">
                         <span className="text-xs font-semibold text-muted-foreground">Investigador</span>
-                        <select
-                          value={reviewer.employeeId}
-                          onChange={(event) => updateReviewer(reviewer.id, { employeeId: event.target.value })}
-                          className="h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs outline-none transition-colors hover:border-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                          aria-label={`Funcionario investigador ${index + 1}`}
-                        >
-                          <option value="">Selecciona funcionario</option>
+                        <Select value={reviewer.employeeId} onValueChange={(value) => updateReviewer(reviewer.id, { employeeId: value })}>
+                          <SelectTrigger className="h-10 w-full" aria-label={`Funcionario investigador ${index + 1}`}><SelectValue placeholder="Selecciona funcionario" /></SelectTrigger>
+                          <SelectContent>
                           {employees.map((employee) => (
-                            <option key={employee.id} value={employee.id}>
-                              {employeeLabel(employee)}
-                            </option>
+                            <SelectItem key={employee.id} value={employee.id}>{employeeLabel(employee)}</SelectItem>
                           ))}
-                        </select>
-                      </label>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     ) : (
                       <label className="grid gap-1.5">
                         <span className="text-xs font-semibold text-muted-foreground">Persona externa</span>
@@ -625,59 +607,53 @@ function InvestigationDialog({
               </div>
 
               <div className="grid gap-3 lg:grid-cols-[240px_minmax(0,1fr)_240px]">
-                <label className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
+                <div className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
                   <span className="text-xs font-semibold text-muted-foreground">Origen ACPM</span>
-                  <select
+                  <Select
                     value={form.acpmSource}
-                    onChange={(event) =>
+                    onValueChange={(value) =>
                       setForm((current) => ({
                         ...current,
-                        acpmSource: event.target.value as InvestigationAcpmSource,
+                        acpmSource: value as InvestigationAcpmSource,
                         acpmId: "",
                         documentManagementId: "",
                         acpmReference: "",
                       }))
                     }
-                    className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs outline-none transition-colors hover:border-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                   >
-                    <option value="ACPM">ACPM</option>
-                    <option value="DOCUMENT_MANAGEMENT">Gestión documental</option>
-                    <option value="OTHER">Otro</option>
-                  </select>
-                </label>
+                    <SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ACPM">ACPM</SelectItem>
+                      <SelectItem value="DOCUMENT_MANAGEMENT">Gestión documental</SelectItem>
+                      <SelectItem value="OTHER">Otro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
                 {form.acpmSource === "ACPM" ? (
-                  <label className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
+                  <div className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
                     <span className="text-xs font-semibold text-muted-foreground">ACPM relacionada</span>
-                    <select
-                      value={form.acpmId}
-                      onChange={(event) => handleAcpmChange(event.target.value)}
-                      className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs outline-none transition-colors hover:border-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    >
-                      <option value="">Selecciona ACPM relacionada</option>
+                    <Select value={form.acpmId} onValueChange={handleAcpmChange}>
+                      <SelectTrigger className="h-10 w-full"><SelectValue placeholder="Selecciona ACPM relacionada" /></SelectTrigger>
+                      <SelectContent>
                       {acpms.map((acpm) => (
-                        <option key={acpm.id} value={acpm.id}>
-                          {acpm.year} - {acpm.name}
-                        </option>
+                        <SelectItem key={acpm.id} value={acpm.id}>{acpm.year} - {acpm.name}</SelectItem>
                       ))}
-                    </select>
-                  </label>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 ) : form.acpmSource === "DOCUMENT_MANAGEMENT" ? (
-                  <label className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
+                  <div className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
                     <span className="text-xs font-semibold text-muted-foreground">Documento relacionado</span>
-                    <select
-                      value={form.documentManagementId}
-                      onChange={(event) => handleDocumentChange(event.target.value)}
-                      className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-xs outline-none transition-colors hover:border-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    >
-                      <option value="">Selecciona documento</option>
+                    <Select value={form.documentManagementId} onValueChange={handleDocumentChange}>
+                      <SelectTrigger className="h-10 w-full"><SelectValue placeholder="Selecciona documento" /></SelectTrigger>
+                      <SelectContent>
                       {documents.map((document) => (
-                        <option key={document.id} value={document.id}>
-                          {document.code} - {document.name}
-                        </option>
+                        <SelectItem key={document.id} value={document.id}>{document.code} - {document.name}</SelectItem>
                       ))}
-                    </select>
-                  </label>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 ) : (
                   <Label className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 text-xs font-semibold text-muted-foreground shadow-xs">
                     Referencia
