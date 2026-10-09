@@ -167,7 +167,7 @@ export const navigation: NavigationItem[] = [
       //{ code: "HEALTHY_LIFESTYLES", name: "Estilos de Vida Saludable", href: "/dashboard/healthy-lifestyles", icon: HeartPulse },
     ],
   },
-  {
+  /* {
     code: "PESV",
     name: "PESV",
     icon: ShieldCheck,
@@ -226,7 +226,7 @@ export const navigation: NavigationItem[] = [
       { code: "PESV_IMPROVEMENT", name: "Mejora continua · ACPM", href: "/dashboard/pesv-improvement", icon: FileCheck2 },
       { code: "PESV_COMMUNICATIONS", name: "Comunicación y participación", href: "/dashboard/pesv-communications", icon: Users },
     ],
-  },
+  }, */
   {
     code: "RISKS",
     name: "Riesgos",
