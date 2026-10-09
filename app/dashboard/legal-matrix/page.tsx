@@ -6,6 +6,7 @@ import {
   Edit,
   Eye,
   FileText,
+  Loader2,
   MoreHorizontal,
   Plus,
   Search,
@@ -35,28 +36,15 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-
-type LegalDocumentType = "LEY" | "DECRETO" | "RESOLUCION" | "CIRCULAR" | "NORMA_TECNICA" | "OTRO"
-
-type LegalEvidence = {
-  id: string
-  fileName: string
-  description: string
-  uploadedAt: string
-  mimeType?: string
-  url?: string
-}
-
-type LegalMatrixItem = {
-  id: string
-  documentType: LegalDocumentType
-  customDocumentType?: string
-  normNumber: string
-  emissionDate: string
-  expirationDate: string
-  issuedBy: string
-  evidence?: LegalEvidence
-}
+import {
+  createLegalMatrixItem,
+  deleteLegalMatrixItem,
+  downloadLegalMatrixEvidence,
+  listLegalMatrixItems,
+  updateLegalMatrixItem,
+  uploadLegalMatrixEvidence,
+} from "@/services/legalMatrixService"
+import type { LegalDocumentType, LegalMatrixItem, UpsertLegalMatrixDto } from "@/types/manager/legal-matrix"
 
 type LegalMatrixForm = {
   documentType: LegalDocumentType
@@ -102,55 +90,6 @@ const documentTypeOptions: Array<{ value: LegalDocumentType; label: string }> = 
   { value: "OTRO", label: "Otro" },
 ]
 
-const initialItems: LegalMatrixItem[] = [
-  {
-    id: "legal-1",
-    documentType: "LEY",
-    normNumber: "1562",
-    emissionDate: "2012-07-11",
-    expirationDate: "2027-07-11",
-    issuedBy: "Congreso de Colombia",
-    evidence: {
-      id: "ev-1",
-      fileName: "ley-1562-2012.pdf",
-      description: "Soporte legal cargado en el normograma.",
-      uploadedAt: "2026-09-01T09:00:00",
-      mimeType: "application/pdf",
-    },
-  },
-  {
-    id: "legal-2",
-    documentType: "DECRETO",
-    normNumber: "1072",
-    emissionDate: "2015-05-26",
-    expirationDate: "2028-05-26",
-    issuedBy: "Presidente de la Republica de Colombia",
-    evidence: {
-      id: "ev-2",
-      fileName: "decreto-1072-2015.pdf",
-      description: "Decreto unico reglamentario del sector trabajo.",
-      uploadedAt: "2026-09-01T09:15:00",
-      mimeType: "application/pdf",
-    },
-  },
-  {
-    id: "legal-3",
-    documentType: "DECRETO",
-    normNumber: "1447",
-    emissionDate: "2014-08-05",
-    expirationDate: "2026-08-05",
-    issuedBy: "Presidente de la Republica de Colombia",
-  },
-]
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
-}
-
 function documentTypeLabel(item: Pick<LegalMatrixItem, "documentType" | "customDocumentType">) {
   if (item.documentType === "OTRO") return item.customDocumentType?.trim() || "Otro"
   return documentTypeOptions.find((option) => option.value === item.documentType)?.label ?? item.documentType
@@ -159,17 +98,6 @@ function documentTypeLabel(item: Pick<LegalMatrixItem, "documentType" | "customD
 function formatDate(value?: string | null) {
   if (!value) return "No registrada"
   return value.slice(0, 10)
-}
-
-function formatDateTime(value?: string | null) {
-  if (!value) return "No registrada"
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
-
-  return new Intl.DateTimeFormat("es-CO", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date)
 }
 
 function getDatePart(value: string, part: "day" | "month" | "year") {
@@ -183,21 +111,12 @@ function getDatePart(value: string, part: "day" | "month" | "year") {
   return new Intl.DateTimeFormat("es-CO", { month: "long" }).format(date).toUpperCase()
 }
 
-function isExpired(expirationDate: string) {
-  if (!expirationDate) return false
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
-  const expiration = new Date(`${expirationDate}T00:00:00`)
-  return !Number.isNaN(expiration.getTime()) && expiration < today
-}
-
 function statusLabel(item: LegalMatrixItem) {
-  return isExpired(item.expirationDate) ? "Vencido" : "Vigente"
+  return item.status === "EXPIRED" ? "Vencido" : "Vigente"
 }
 
 function statusClassName(item: LegalMatrixItem) {
-  return isExpired(item.expirationDate)
+  return item.status === "EXPIRED"
     ? "border-destructive bg-destructive/10 text-destructive"
     : "border-emerald-200 bg-emerald-50 text-emerald-700"
 }
@@ -206,31 +125,29 @@ function canEmbed(mimeType?: string) {
   return Boolean(mimeType?.startsWith("image/") || mimeType === "application/pdf" || mimeType?.startsWith("text/"))
 }
 
-function buildEvidenceText(item: LegalMatrixItem, evidence: LegalEvidence) {
-  return `Matriz legal - Normograma
-Tipo de documento: ${documentTypeLabel(item)}
-Numero de norma: ${item.normNumber}
-Fecha de emision: ${formatDate(item.emissionDate)}
-Fecha de vencimiento: ${formatDate(item.expirationDate)}
-Emitido por: ${item.issuedBy}
-Estado: ${statusLabel(item)}
-
-Documento: ${evidence.fileName}
-Descripcion: ${evidence.description || "Sin descripcion"}
-Cargado: ${formatDateTime(evidence.uploadedAt)}
-`
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
 }
 
 function LegalMatrixDialog({
   open,
   item,
+  saving,
   onClose,
   onSave,
 }: {
   open: boolean
   item: LegalMatrixItem | null
+  saving: boolean
   onClose: () => void
-  onSave: (form: LegalMatrixForm, itemId?: string) => void
+  onSave: (form: LegalMatrixForm, itemId?: string) => Promise<void>
 }) {
   const [form, setForm] = useState<LegalMatrixForm>(emptyForm)
   const editing = Boolean(item)
@@ -251,7 +168,7 @@ function LegalMatrixDialog({
     )
   }, [item, open])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     if (!form.normNumber.trim()) return toast.error("Ingresa el numero de la norma")
@@ -262,8 +179,7 @@ function LegalMatrixDialog({
       return toast.error("Ingresa el tipo de documento")
     }
 
-    onSave(form, item?.id)
-    onClose()
+    await onSave(form, item?.id)
   }
 
   return (
@@ -356,10 +272,13 @@ function LegalMatrixDialog({
           </div>
 
           <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
               Cancelar
             </Button>
-            <Button type="submit">{editing ? "Guardar cambios" : "Agregar item"}</Button>
+            <Button type="submit" disabled={saving}>
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+              {editing ? "Guardar cambios" : "Agregar item"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -369,12 +288,14 @@ function LegalMatrixDialog({
 
 function EvidenceDialog({
   item,
+  uploading,
   onClose,
   onSave,
 }: {
   item: LegalMatrixItem | null
+  uploading: boolean
   onClose: () => void
-  onSave: (itemId: string, form: EvidenceForm, file: File | null) => void
+  onSave: (itemId: string, form: EvidenceForm, file: File) => Promise<void>
 }) {
   const [form, setForm] = useState<EvidenceForm>(emptyEvidenceForm)
   const [file, setFile] = useState<File | null>(null)
@@ -382,19 +303,18 @@ function EvidenceDialog({
   useEffect(() => {
     if (!item) return
     setForm({
-      fileName: item.evidence?.fileName ?? "",
+      fileName: item.evidence?.originalName ?? "",
       description: item.evidence?.description ?? "",
     })
     setFile(null)
   }, [item])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!item) return
-    if (!form.fileName.trim() && !file) return toast.error("Selecciona o registra el nombre del documento")
+    if (!file) return toast.error("Selecciona el documento legal")
 
-    onSave(item.id, form, file)
-    onClose()
+    await onSave(item.id, form, file)
   }
 
   return (
@@ -425,7 +345,7 @@ function EvidenceDialog({
               Nombre del archivo
               <Input
                 value={form.fileName}
-                onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.value }))}
+                readOnly
                 placeholder="documento-legal.pdf"
               />
             </Label>
@@ -441,10 +361,13 @@ function EvidenceDialog({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} disabled={uploading}>
               Cancelar
             </Button>
-            <Button type="submit">Guardar evidencia</Button>
+            <Button type="submit" disabled={uploading}>
+              {uploading && <Loader2 className="h-4 w-4 animate-spin" />}
+              Guardar evidencia
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -496,15 +419,47 @@ function EvidencePreviewDialog({
 }
 
 export default function LegalMatrixPage() {
-  const [items, setItems] = useState<LegalMatrixItem[]>(initialItems)
+  const [items, setItems] = useState<LegalMatrixItem[]>([])
   const [search, setSearch] = useState("")
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<LegalMatrixItem | null>(null)
   const [evidenceItem, setEvidenceItem] = useState<LegalMatrixItem | null>(null)
   const [preview, setPreview] = useState<EvidencePreview | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [busyItemId, setBusyItemId] = useState<string | null>(null)
+
+  async function loadItems(showError = true) {
+    try {
+      const response = await listLegalMatrixItems({ limit: 100 })
+      setItems(response.items)
+    } catch (error) {
+      if (showError) toast.error(error instanceof Error ? error.message : "No se pudo cargar la matriz legal")
+    }
+  }
+
+  useEffect(() => {
+    let active = true
+    async function load() {
+      setLoading(true)
+      try {
+        const response = await listLegalMatrixItems({ limit: 100 })
+        if (active) setItems(response.items)
+      } catch (error) {
+        if (active) toast.error(error instanceof Error ? error.message : "No se pudo cargar la matriz legal")
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+    void load()
+    return () => {
+      active = false
+    }
+  }, [])
 
   const stats = useMemo(() => {
-    const expired = items.filter((item) => isExpired(item.expirationDate)).length
+    const expired = items.filter((item) => item.status === "EXPIRED").length
     return {
       total: items.length,
       active: items.length - expired,
@@ -522,91 +477,87 @@ export default function LegalMatrixPage() {
         documentTypeLabel(item).toLowerCase().includes(term) ||
         item.normNumber.toLowerCase().includes(term) ||
         item.issuedBy.toLowerCase().includes(term) ||
-        item.evidence?.fileName.toLowerCase().includes(term)
+        item.evidence?.originalName.toLowerCase().includes(term)
       )
     })
   }, [items, search])
 
-  function saveItem(form: LegalMatrixForm, itemId?: string) {
-    if (itemId) {
-      setItems((current) =>
-        current.map((item) =>
-          item.id === itemId
-            ? {
-                ...item,
-                documentType: form.documentType,
-                customDocumentType: form.customDocumentType.trim(),
-                normNumber: form.normNumber.trim(),
-                emissionDate: form.emissionDate,
-                expirationDate: form.expirationDate,
-                issuedBy: form.issuedBy.trim(),
-              }
-            : item,
-        ),
-      )
-      toast.success("Item del normograma actualizado")
-      return
+  async function saveItem(form: LegalMatrixForm, itemId?: string) {
+    const payload: UpsertLegalMatrixDto = {
+      documentType: form.documentType,
+      customDocumentType: form.documentType === "OTRO" ? form.customDocumentType.trim() : null,
+      normNumber: form.normNumber.trim(),
+      emissionDate: form.emissionDate,
+      expirationDate: form.expirationDate,
+      issuedBy: form.issuedBy.trim(),
     }
-
-    setItems((current) => [
-      {
-        id: createId("legal"),
-        documentType: form.documentType,
-        customDocumentType: form.customDocumentType.trim(),
-        normNumber: form.normNumber.trim(),
-        emissionDate: form.emissionDate,
-        expirationDate: form.expirationDate,
-        issuedBy: form.issuedBy.trim(),
-      },
-      ...current,
-    ])
-    toast.success("Item agregado al normograma")
+    setSaving(true)
+    try {
+      if (itemId) {
+        await updateLegalMatrixItem(itemId, payload)
+        toast.success("Item del normograma actualizado")
+      } else {
+        await createLegalMatrixItem(payload)
+        toast.success("Item agregado al normograma")
+      }
+      await loadItems(false)
+      setDialogOpen(false)
+      setEditingItem(null)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar el item del normograma")
+    } finally {
+      setSaving(false)
+    }
   }
 
-  function saveEvidence(itemId: string, form: EvidenceForm, file: File | null) {
-    const evidence: LegalEvidence = {
-      id: createId("legal-evidence"),
-      fileName: form.fileName.trim() || file?.name || "documento-legal.pdf",
-      description: form.description.trim(),
-      uploadedAt: new Date().toISOString(),
-      mimeType: file?.type || "text/plain",
-      url: file ? URL.createObjectURL(file) : undefined,
+  async function saveEvidence(itemId: string, form: EvidenceForm, file: File) {
+    setUploading(true)
+    try {
+      await uploadLegalMatrixEvidence(itemId, { file, description: form.description.trim(), isConfirmed: true })
+      await loadItems(false)
+      setEvidenceItem(null)
+      toast.success("Evidencia cargada")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar la evidencia")
+    } finally {
+      setUploading(false)
     }
-
-    setItems((current) => current.map((item) => (item.id === itemId ? { ...item, evidence } : item)))
-    setEvidenceItem((current) => (current?.id === itemId ? { ...current, evidence } : current))
-    toast.success("Evidencia cargada")
   }
 
-  function deleteItem(item: LegalMatrixItem) {
+  async function deleteItem(item: LegalMatrixItem) {
     if (!window.confirm(`Eliminar la norma ${documentTypeLabel(item)} ${item.normNumber}?`)) return
-    setItems((current) => current.filter((currentItem) => currentItem.id !== item.id))
-    toast.success("Item eliminado")
+    setBusyItemId(item.id)
+    try {
+      await deleteLegalMatrixItem(item.id)
+      setItems((current) => current.filter((currentItem) => currentItem.id !== item.id))
+      toast.success("Item eliminado")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar el item")
+    } finally {
+      setBusyItemId(null)
+    }
   }
 
-  function viewEvidence(item: LegalMatrixItem) {
+  async function viewEvidence(item: LegalMatrixItem) {
     if (!item.evidence) {
       toast.error("Este item no tiene documento legal cargado")
       return
     }
 
-    if (item.evidence.url) {
+    setBusyItemId(item.id)
+    try {
+      const blob = await downloadLegalMatrixEvidence(item.evidence.downloadUrl)
       setPreview({
-        title: item.evidence.fileName,
-        url: item.evidence.url,
-        mimeType: item.evidence.mimeType || "application/octet-stream",
-        generated: false,
+        title: item.evidence.originalName,
+        url: URL.createObjectURL(blob),
+        mimeType: item.evidence.mimeType || blob.type || "application/octet-stream",
+        generated: true,
       })
-      return
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo abrir el documento legal")
+    } finally {
+      setBusyItemId(null)
     }
-
-    const blob = new Blob([buildEvidenceText(item, item.evidence)], { type: "text/plain;charset=utf-8" })
-    setPreview({
-      title: item.evidence.fileName,
-      url: URL.createObjectURL(blob),
-      mimeType: "text/plain",
-      generated: true,
-    })
   }
 
   function closePreview() {
@@ -614,21 +565,21 @@ export default function LegalMatrixPage() {
     setPreview(null)
   }
 
-  function downloadEvidence(item: LegalMatrixItem) {
+  async function downloadEvidence(item: LegalMatrixItem) {
     if (!item.evidence) {
       toast.error("Este item no tiene documento legal cargado")
       return
     }
 
-    const url =
-      item.evidence.url ??
-      URL.createObjectURL(new Blob([buildEvidenceText(item, item.evidence)], { type: "text/plain;charset=utf-8" }))
-    const link = document.createElement("a")
-    link.href = url
-    link.download = item.evidence.fileName
-    link.click()
-
-    if (!item.evidence.url) URL.revokeObjectURL(url)
+    setBusyItemId(item.id)
+    try {
+      const blob = await downloadLegalMatrixEvidence(item.evidence.downloadUrl)
+      downloadBlob(blob, item.evidence.originalName)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar el documento legal")
+    } finally {
+      setBusyItemId(null)
+    }
   }
 
   function exportNormograma() {
@@ -641,7 +592,7 @@ export default function LegalMatrixPage() {
       formatDate(item.expirationDate),
       item.issuedBy,
       statusLabel(item),
-      item.evidence?.fileName ?? "Sin evidencia",
+      item.evidence?.originalName ?? "Sin evidencia",
     ])
 
     const csv = [headers, ...rows].map((row) => row.map((cell) => `"${cell.replaceAll('"', '""')}"`).join(";")).join("\n")
@@ -775,11 +726,11 @@ export default function LegalMatrixPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
-                      <DropdownMenuItem onSelect={() => viewEvidence(item)} disabled={!item.evidence}>
+                      <DropdownMenuItem onSelect={() => void viewEvidence(item)} disabled={!item.evidence || busyItemId === item.id}>
                         <Eye className="h-4 w-4" />
                         Ver documento
                       </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => downloadEvidence(item)} disabled={!item.evidence}>
+                      <DropdownMenuItem onSelect={() => void downloadEvidence(item)} disabled={!item.evidence || busyItemId === item.id}>
                         <Download className="h-4 w-4" />
                         Descargar documento
                       </DropdownMenuItem>
@@ -797,7 +748,7 @@ export default function LegalMatrixPage() {
                         Editar
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onSelect={() => deleteItem(item)} className="text-destructive">
+                      <DropdownMenuItem onSelect={() => void deleteItem(item)} className="text-destructive" disabled={busyItemId === item.id}>
                         <Trash2 className="h-4 w-4" />
                         Eliminar
                       </DropdownMenuItem>
@@ -806,7 +757,14 @@ export default function LegalMatrixPage() {
                 </td>
               </tr>
             ))}
-            {filteredItems.length === 0 && (
+            {loading && (
+              <tr>
+                <td colSpan={9} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                  <span className="inline-flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Cargando matriz legal...</span>
+                </td>
+              </tr>
+            )}
+            {!loading && filteredItems.length === 0 && (
               <tr>
                 <td colSpan={9} className="px-4 py-10 text-center text-sm text-muted-foreground">
                   No hay normas para mostrar.
@@ -833,13 +791,14 @@ export default function LegalMatrixPage() {
       <LegalMatrixDialog
         open={dialogOpen}
         item={editingItem}
+        saving={saving}
         onClose={() => {
           setDialogOpen(false)
           setEditingItem(null)
         }}
         onSave={saveItem}
       />
-      <EvidenceDialog item={evidenceItem} onClose={() => setEvidenceItem(null)} onSave={saveEvidence} />
+      <EvidenceDialog item={evidenceItem} uploading={uploading} onClose={() => setEvidenceItem(null)} onSave={saveEvidence} />
       <EvidencePreviewDialog preview={preview} onClose={closePreview} />
     </main>
   )

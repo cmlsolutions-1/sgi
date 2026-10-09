@@ -1,6 +1,6 @@
 # Contrato frontend/backend - Comunicaciones SST
 
-Este documento describe el contrato requerido para conectar el modulo hijo **Comunicaciones SST** con backend. Actualmente el modulo esta implementado con datos mockeados en frontend, maneja archivos con URLs locales temporales y conserva los registros solo en memoria.
+Este documento describe el contrato utilizado para conectar el modulo hijo **Comunicaciones SST** con backend. El frontend ya consume estos endpoints y no conserva registros mockeados ni archivos temporales como fuente de datos.
 
 ## Ubicacion en frontend
 
@@ -45,19 +45,16 @@ Mientras no exista evidencia inicial, no se debe permitir descargar el PDF para 
 
 ## Estado actual de implementacion
 
-Todo el modulo esta mockeado en frontend:
+El modulo se encuentra integrado con backend:
 
-- registros iniciales;
-- empleados mockeados;
-- creacion, edicion y eliminacion local;
-- carga local de evidencia inicial;
-- carga local de documento firmado;
-- vista previa local para PDF, imagen o texto;
-- descarga simulada de evidencias;
-- PDF generado en frontend con `jsPDF` y `jspdf-autotable`;
-- inclusion de imagen de evidencia inicial en el PDF cuando aplica.
-
-No existe servicio dedicado en `services/` ni tipos compartidos en `types/manager/` para este modulo.
+- CRUD persistido mediante `/api/sst-communications`;
+- funcionarios obtenidos desde `/api/employee`;
+- evidencia inicial y documento firmado enviados como `multipart/form-data`;
+- visualizacion y descarga de archivos reales;
+- PDF para firma obtenido desde backend;
+- servicio dedicado en `services/sstCommunicationService.ts`;
+- contratos compartidos en `types/manager/sst-communication.ts`;
+- navegacion habilitada mediante el codigo `SST_COMMUNICATIONS`.
 
 ## Entidades sugeridas
 

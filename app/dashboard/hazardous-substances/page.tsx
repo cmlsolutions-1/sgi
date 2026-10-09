@@ -2,6 +2,7 @@
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
 import {
+  ArrowRight,
   CalendarDays,
   Download,
   Edit,
@@ -18,8 +19,7 @@ import {
   Upload,
   UserRound,
 } from "lucide-react"
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -46,24 +46,35 @@ import { listManagedDocuments } from "@/services/documentManagementService"
 import { listEmployees } from "@/services/employeeService"
 import { listPreventiveMeasures } from "@/services/preventiveMeasureService"
 import { listRisks } from "@/services/riskService"
+import {
+  createHazardousProgram,
+  createHazardousSubstance,
+  downloadHazardousSubstanceEvidence,
+  exportHazardousSubstance,
+  getHazardousSubstance,
+  listHazardousSubstances,
+  updateHazardousProgram,
+  updateHazardousSubstance,
+  uploadHazardousSubstanceEvidence,
+} from "@/services/hazardousSubstancesService"
 import type { ManagedDocument } from "@/types/manager/document-management"
 import type { Employee } from "@/types/manager/employee"
 import type { PreventiveMeasure } from "@/types/manager/preventiveMeasure"
 import type { Risk } from "@/types/manager/risk"
+import type {
+  HazardousProgramProcedureType,
+  HazardousSubstanceClassification,
+  HazardousSubstanceDocument,
+  HazardousSubstanceRecord as ApiHazardousSubstanceRecord,
+  HazardousSubstanceType,
+} from "@/types/manager/hazardousSubstances"
 
 type ViewMode = "cards" | "list"
 type RecordKind = "SUBSTANCE" | "PROGRAM"
-type SubstanceType = "CARCINOGENIC" | "ACUTE_TOXICITY" | "BOTH"
-type ClassificationType = "IARC_GROUP" | "GHS_CATEGORY"
-type ProgramProcedureType = "STORAGE" | "HANDLING" | "EMERGENCY" | "DISPOSAL" | "PPE"
-
-type Evidence = {
-  id: string
-  fileName: string
-  description: string
-  uploadedAt: string
-  isConfirmed: boolean
-}
+type SubstanceType = HazardousSubstanceType
+type ClassificationType = HazardousSubstanceClassification
+type ProgramProcedureType = HazardousProgramProcedureType
+type Evidence = HazardousSubstanceDocument
 
 type EmployeeOption = {
   id: string
@@ -132,7 +143,7 @@ type ProgramForm = {
 }
 
 type EvidenceForm = {
-  fileName: string
+  file: File | null
   description: string
   isConfirmed: boolean
 }
@@ -158,52 +169,9 @@ const emptyProgramForm: ProgramForm = {
 }
 
 const emptyEvidenceForm: EvidenceForm = {
-  fileName: "",
+  file: null,
   description: "",
   isConfirmed: true,
-}
-
-const initialRecords: HazardousSubstanceRecord[] = [
-  {
-    id: "hazardous-1",
-    kind: "SUBSTANCE",
-    substanceName: "Hipoclorito de sodio",
-    type: "ACUTE_TOXICITY",
-    classification: "GHS_CATEGORY",
-    storageArea: "Bodega de insumos químicos",
-    technicalSheet: "Ficha técnica hipoclorito.pdf",
-    recommendation: "Usar guantes, gafas de seguridad y ventilación adecuada durante la manipulación.",
-    responsibleEmployeeId: "mock-employee-1",
-    responsibleName: "Responsable SG-SST",
-    riskId: "mock-risk-1",
-    riskName: "Exposición a sustancias químicas",
-    preventiveMeasureId: "mock-measure-1",
-    preventiveMeasureName: "Uso obligatorio de EPP",
-    procedureDocumentId: "mock-document-1",
-    procedureDocumentName: "Procedimiento de manejo de sustancias peligrosas",
-    observations: "Mantener alejado de ácidos y materiales incompatibles.",
-    evidence: {
-      id: "evidence-1",
-      fileName: "soporte-almacenamiento-hipoclorito.pdf",
-      description: "Registro fotográfico del almacenamiento y rotulación.",
-      uploadedAt: "2026-09-10T14:00:00.000Z",
-      isConfirmed: true,
-    },
-    createdAt: "2026-09-10T14:00:00.000Z",
-  },
-  {
-    id: "hazardous-program-1",
-    kind: "PROGRAM",
-    name: "Programa de manejo seguro de sustancias peligrosas",
-    procedureType: "HANDLING",
-    date: "2026-09-01",
-    createdAt: "2026-09-01T09:00:00.000Z",
-  },
-]
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return `${prefix}-${crypto.randomUUID()}`
-  return `${prefix}-${Date.now()}`
 }
 
 function formatDate(value?: string | null) {
@@ -298,6 +266,32 @@ function kindClassName(kind: RecordKind) {
   return kind === "PROGRAM" ? "bg-accentActivd text-accentActivd-foreground border-transparent" : "bg-blue-600 text-white border-transparent"
 }
 
+function normalizeRecord(record: ApiHazardousSubstanceRecord): HazardousSubstanceRecord {
+  if (record.kind === "PROGRAM") {
+    return { ...record, evidence: record.evidence ?? undefined }
+  }
+  const employee = record.responsibleEmployee
+  const responsibleName = record.responsibleName
+    || `${employee?.name ?? ""} ${employee?.lastName ?? ""}`.trim()
+    || employee?.email
+    || "Responsable no disponible"
+  return {
+    ...record,
+    responsibleName,
+    observations: record.observations ?? "",
+    evidence: record.evidence ?? undefined,
+  }
+}
+
+function saveBlob(blob: Blob, fileName: string) {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
 function EmployeePicker({
   employees,
   value,
@@ -366,6 +360,8 @@ function SearchableOptionPicker({
   loading,
   placeholder,
   emptyMessage,
+  emptyActionLabel,
+  onEmptyAction,
   onChange,
 }: {
   label: string
@@ -374,6 +370,8 @@ function SearchableOptionPicker({
   loading: boolean
   placeholder: string
   emptyMessage: string
+  emptyActionLabel?: string
+  onEmptyAction?: () => void
   onChange: (id: string) => void
 }) {
   const [query, setQuery] = useState("")
@@ -418,7 +416,15 @@ function SearchableOptionPicker({
           ) : options.length > 0 ? (
             <p className="px-2 py-3 text-sm text-muted-foreground">No hay coincidencias para esa búsqueda.</p>
           ) : (
-            <p className="px-2 py-3 text-sm text-muted-foreground">{emptyMessage}</p>
+            <div className="grid gap-3 px-2 py-3">
+              <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+              {emptyActionLabel && onEmptyAction && (
+                <Button type="button" variant="outline" size="sm" className="w-fit gap-2 border-primary/30 text-primary hover:bg-primary/10 hover:text-primary" onClick={onEmptyAction}>
+                  {emptyActionLabel}
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -445,70 +451,6 @@ function Metric({ label, value, tone = "default" }: { label: string; value: stri
   )
 }
 
-function downloadRecordPdf(record: HazardousSubstanceRecord) {
-  const doc = new jsPDF("p", "mm", "a4")
-  const pageWidth = doc.internal.pageSize.getWidth()
-  const margin = 14
-  const primaryColor: [number, number, number] = [31, 92, 77]
-
-  doc.setFillColor(...primaryColor)
-  doc.roundedRect(margin, 12, pageWidth - margin * 2, 24, 3, 3, "F")
-  doc.setTextColor(255, 255, 255)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(13)
-  doc.text("SUSTANCIAS PELIGROSAS", margin + 5, 23)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(8)
-  doc.text(`${kindLabel(record.kind)} · ${recordCategory(record)}`, margin + 5, 30)
-
-  const body =
-    record.kind === "PROGRAM"
-      ? [
-          ["Nombre", record.name, "Tipo procedimiento", procedureTypeLabel(record.procedureType)],
-          ["Fecha", formatDate(record.date), "Evidencia", record.evidence?.fileName ?? "Pendiente"],
-        ]
-      : [
-          ["Sustancia", record.substanceName, "Tipo", typeLabel(record.type)],
-          ["Clasificacion", classificationLabel(record.classification), "Almacenamiento", record.storageArea],
-          ["Responsable", record.responsibleName, "Riesgo asociado", record.riskName],
-          ["Medida preventiva", record.preventiveMeasureName, "Procedimiento", record.procedureDocumentName],
-          ["Ficha técnica", record.technicalSheet, "Evidencia", record.evidence?.fileName ?? "Pendiente"],
-        ]
-
-  autoTable(doc, {
-    startY: 44,
-    theme: "grid",
-    margin: { left: margin, right: margin },
-    body,
-    styles: { font: "helvetica", fontSize: 8.5, cellPadding: 2.5, lineColor: [220, 226, 224], lineWidth: 0.1 },
-    columnStyles: {
-      0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 34 },
-      2: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 34 },
-    },
-  })
-
-  const y = ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 84) + 12
-  doc.setTextColor(30, 41, 59)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(10)
-  doc.text(record.kind === "PROGRAM" ? "Descripción del programa" : "Recomendaciones y observaciones", margin, y)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(9)
-  const paragraph =
-    record.kind === "PROGRAM"
-      ? "Programa orientado a identificación, almacenamiento, manipulación y control de sustancias peligrosas."
-      : `${record.recommendation || "Sin recomendaciones."}\n${record.observations || "Sin observaciones."}`
-  doc.text(doc.splitTextToSize(paragraph, pageWidth - margin * 2), margin, y + 7)
-
-  doc.setDrawColor(220, 226, 224)
-  doc.line(margin, 280, pageWidth - margin, 280)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(7)
-  doc.setTextColor(100, 116, 139)
-  doc.text("Documento generado desde SafeCloud - Sistema de Gestión Integral", margin, 286)
-  doc.save(`sustancias-peligrosas-${recordTitle(record).replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
-}
-
 function SubstanceDialog({
   open,
   record,
@@ -518,6 +460,9 @@ function SubstanceDialog({
   documents,
   loadingCatalogs,
   employeesLoading,
+  onCreateRisk,
+  onCreateMeasure,
+  onCreateProcedure,
   onClose,
   onSave,
 }: {
@@ -529,8 +474,11 @@ function SubstanceDialog({
   documents: Option[]
   loadingCatalogs: boolean
   employeesLoading: boolean
+  onCreateRisk: () => void
+  onCreateMeasure: () => void
+  onCreateProcedure: () => void
   onClose: () => void
-  onSave: (form: SubstanceForm, resolved: Pick<SubstanceRecord, "responsibleName" | "riskName" | "preventiveMeasureName" | "procedureDocumentName">, recordId?: string) => void
+  onSave: (form: SubstanceForm, resolved: Pick<SubstanceRecord, "responsibleName" | "riskName" | "preventiveMeasureName" | "procedureDocumentName">, recordId?: string) => Promise<boolean>
 }) {
   const [form, setForm] = useState<SubstanceForm>(emptySubstanceForm)
   const [saving, setSaving] = useState(false)
@@ -575,9 +523,9 @@ function SubstanceDialog({
     }
 
     setSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, 250))
-    onSave(form, resolved, record?.id)
+    const saved = await onSave(form, resolved, record?.id)
     setSaving(false)
+    if (!saved) return
     setForm(emptySubstanceForm)
     onClose()
   }
@@ -631,9 +579,39 @@ function SubstanceDialog({
 
             <section className="grid gap-4 lg:grid-cols-2">
               <EmployeePicker employees={employees} loading={employeesLoading} value={form.responsibleEmployeeId} onChange={(employeeId) => update("responsibleEmployeeId", employeeId)} />
-              <SearchableOptionPicker label="Riesgo asociado" value={form.riskId} options={risks} loading={loadingCatalogs} placeholder="Buscar riesgo químico..." emptyMessage="No hay riesgos disponibles." onChange={(id) => update("riskId", id)} />
-              <SearchableOptionPicker label="Medida de prevención" value={form.preventiveMeasureId} options={measures} loading={loadingCatalogs} placeholder="Buscar medida preventiva..." emptyMessage="No hay medidas de prevención disponibles." onChange={(id) => update("preventiveMeasureId", id)} />
-              <SearchableOptionPicker label="Procedimiento de gestión documental" value={form.procedureDocumentId} options={documents} loading={loadingCatalogs} placeholder="Buscar procedimiento..." emptyMessage="No hay procedimientos disponibles." onChange={(id) => update("procedureDocumentId", id)} />
+              <SearchableOptionPicker
+                label="Riesgo asociado"
+                value={form.riskId}
+                options={risks}
+                loading={loadingCatalogs}
+                placeholder="Buscar riesgo químico..."
+                emptyMessage="No hay riesgos químicos disponibles. Primero crea un riesgo laboral de tipo químico para poder enlazarlo."
+                emptyActionLabel="Crear riesgo químico"
+                onEmptyAction={onCreateRisk}
+                onChange={(id) => update("riskId", id)}
+              />
+              <SearchableOptionPicker
+                label="Medida de prevención"
+                value={form.preventiveMeasureId}
+                options={measures}
+                loading={loadingCatalogs}
+                placeholder="Buscar medida preventiva..."
+                emptyMessage="No hay medidas de prevención disponibles. Primero crea una medida para poder enlazarla."
+                emptyActionLabel="Crear medida de prevención"
+                onEmptyAction={onCreateMeasure}
+                onChange={(id) => update("preventiveMeasureId", id)}
+              />
+              <SearchableOptionPicker
+                label="Procedimiento de gestión documental"
+                value={form.procedureDocumentId}
+                options={documents}
+                loading={loadingCatalogs}
+                placeholder="Buscar procedimiento..."
+                emptyMessage="No hay documentos de tipo procedimiento disponibles. Primero crea un procedimiento en Gestión Documental."
+                emptyActionLabel="Crear procedimiento"
+                onEmptyAction={onCreateProcedure}
+                onChange={(id) => update("procedureDocumentId", id)}
+              />
             </section>
 
             <Label className="grid gap-2 rounded-md border border-border p-4">
@@ -664,7 +642,7 @@ function ProgramDialog({
   open: boolean
   record: ProgramRecord | null
   onClose: () => void
-  onSave: (form: ProgramForm, recordId?: string) => void
+  onSave: (form: ProgramForm, recordId?: string) => Promise<boolean>
 }) {
   const [form, setForm] = useState<ProgramForm>(emptyProgramForm)
   const [saving, setSaving] = useState(false)
@@ -680,9 +658,9 @@ function ProgramDialog({
     if (!form.date) return toast.error("Selecciona la fecha")
 
     setSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, 250))
-    onSave(form, record?.id)
+    const saved = await onSave(form, record?.id)
     setSaving(false)
+    if (!saved) return
     setForm(emptyProgramForm)
     onClose()
   }
@@ -735,16 +713,20 @@ function EvidenceDialog({
 }: {
   record: HazardousSubstanceRecord | null
   onClose: () => void
-  onUpload: (recordId: string, form: EvidenceForm) => void
+  onUpload: (recordId: string, form: EvidenceForm) => Promise<boolean>
 }) {
   const [form, setForm] = useState<EvidenceForm>(emptyEvidenceForm)
+  const [uploading, setUploading] = useState(false)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!record) return
-    if (!form.fileName.trim()) return toast.error("Selecciona la evidencia")
+    if (!form.file) return toast.error("Selecciona la evidencia")
     if (!form.description.trim()) return toast.error("Describe brevemente la evidencia")
-    onUpload(record.id, form)
+    setUploading(true)
+    const uploaded = await onUpload(record.id, form)
+    setUploading(false)
+    if (!uploaded) return
     setForm(emptyEvidenceForm)
     onClose()
   }
@@ -760,9 +742,9 @@ function EvidenceDialog({
           <div className="rounded-md border border-dashed border-border bg-secondary p-4">
             <Label className="grid gap-2">
               Archivo
-              <Input type="file" onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.files?.[0]?.name ?? "" }))} />
+              <Input type="file" onChange={(event) => setForm((current) => ({ ...current, file: event.target.files?.[0] ?? null }))} />
             </Label>
-            <Input className="mt-3" value={form.fileName} onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.value }))} placeholder="También puedes escribir el nombre del archivo mock" />
+            {form.file && <p className="mt-3 truncate text-sm text-muted-foreground">{form.file.name}</p>}
           </div>
           <Label className="grid gap-2">
             Descripción de la evidencia
@@ -774,7 +756,7 @@ function EvidenceDialog({
           </label>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit" className="gap-2"><Upload className="h-4 w-4" />Guardar evidencia</Button>
+            <Button type="submit" className="gap-2" disabled={uploading}>{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}Guardar evidencia</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -786,10 +768,12 @@ function DetailDialog({
   record,
   onClose,
   onDownload,
+  onPreviewEvidence,
 }: {
   record: HazardousSubstanceRecord | null
   onClose: () => void
   onDownload: (record: HazardousSubstanceRecord) => void
+  onPreviewEvidence: (record: HazardousSubstanceRecord) => void
 }) {
   if (!record) return null
 
@@ -826,9 +810,14 @@ function DetailDialog({
             <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground"><FileText className="h-4 w-4" />Evidencia</h3>
             {record.evidence ? (
               <div className="rounded-md bg-secondary p-3 text-sm">
-                <p className="font-medium text-foreground">{record.evidence.fileName}</p>
-                <p className="text-muted-foreground">{record.evidence.description}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(record.evidence.uploadedAt)} · {record.evidence.isConfirmed ? "Confirmada" : "Sin confirmar"}</p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-foreground">{record.evidence.originalName}</p>
+                    <p className="text-muted-foreground">{record.evidence.description || "Sin descripción"}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(record.evidence.createdAt)} · {record.evidence.isConfirmed ? "Confirmada" : "Sin confirmar"}</p>
+                  </div>
+                  <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onPreviewEvidence(record)}><Eye className="h-4 w-4" />Previsualizar</Button>
+                </div>
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">Aún no hay evidencia cargada.</p>
@@ -844,8 +833,46 @@ function DetailDialog({
   )
 }
 
+type EvidencePreview = { url: string; mimeType: string; name: string }
+
+function EvidencePreviewDialog({ preview, onClose }: { preview: EvidencePreview | null; onClose: () => void }) {
+  if (!preview) return null
+  const isImage = preview.mimeType.startsWith("image/")
+  const isPdf = preview.mimeType === "application/pdf" || preview.name.toLowerCase().endsWith(".pdf")
+  return (
+    <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="!flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
+          <DialogTitle className="truncate">{preview.name}</DialogTitle>
+        </DialogHeader>
+        <div className="min-h-0 flex-1 bg-slate-100 p-3">
+          {isImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={preview.url} alt={preview.name} className="h-full w-full object-contain" />
+          ) : isPdf ? (
+            <iframe src={preview.url} title={preview.name} className="h-full w-full rounded-md border border-border bg-white" />
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm text-muted-foreground">
+              <FileText className="h-10 w-10" />
+              Este tipo de archivo no admite previsualización en el navegador.
+            </div>
+          )}
+        </div>
+        <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+          <Button type="button" variant="outline" onClick={onClose}>Cerrar</Button>
+          <Button type="button" className="gap-2" asChild>
+            <a href={preview.url} download={preview.name}><Download className="h-4 w-4" />Descargar</a>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export default function HazardousSubstancesPage() {
-  const [records, setRecords] = useState<HazardousSubstanceRecord[]>(initialRecords)
+  const router = useRouter()
+  const [records, setRecords] = useState<HazardousSubstanceRecord[]>([])
+  const [recordsLoading, setRecordsLoading] = useState(true)
   const [employees, setEmployees] = useState<EmployeeOption[]>([])
   const [risks, setRisks] = useState<Option[]>([])
   const [measures, setMeasures] = useState<Option[]>([])
@@ -861,6 +888,23 @@ export default function HazardousSubstancesPage() {
   const [editingProgram, setEditingProgram] = useState<ProgramRecord | null>(null)
   const [detailRecord, setDetailRecord] = useState<HazardousSubstanceRecord | null>(null)
   const [evidenceRecord, setEvidenceRecord] = useState<HazardousSubstanceRecord | null>(null)
+  const [preview, setPreview] = useState<EvidencePreview | null>(null)
+
+  async function loadRecords() {
+    setRecordsLoading(true)
+    try {
+      const result = await listHazardousSubstances({ limit: 100 })
+      setRecords((result.items ?? []).map(normalizeRecord))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar las sustancias peligrosas")
+    } finally {
+      setRecordsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void loadRecords()
+  }, [])
 
   useEffect(() => {
     let mounted = true
@@ -893,15 +937,14 @@ export default function HazardousSubstancesPage() {
         if (riskResult.status === "fulfilled") {
           const riskItems = riskResult.value.items ?? []
           const chemicalRisks = riskItems.filter(riskIsChemical)
-          const source = chemicalRisks.length > 0 ? chemicalRisks : riskItems
-          setRisks(source.map((risk) => ({ id: risk.id, name: riskLabel(risk), description: risk.hazardType?.name ?? risk.hazardDescription?.name })))
+          setRisks(chemicalRisks.map((risk) => ({ id: risk.id, name: riskLabel(risk), description: risk.hazardType?.name ?? risk.hazardDescription?.name })))
         }
         if (measureResult.status === "fulfilled") {
           setMeasures((measureResult.value.items ?? []).map((measure) => ({ id: measure.id, name: measureLabel(measure), description: measure.risk?.process })))
         }
         if (documentResult.status === "fulfilled") {
           const procedureDocuments = documentResult.value.filter((document) => document.type === "PROCEDURE")
-          setDocuments((procedureDocuments.length > 0 ? procedureDocuments : documentResult.value).map((document) => ({ id: document.id, name: documentLabel(document), description: document.workArea?.name })))
+          setDocuments(procedureDocuments.map((document) => ({ id: document.id, name: documentLabel(document), description: document.workArea?.name })))
         }
       } catch (error) {
         if (mounted) toast.error(error instanceof Error ? error.message : "No se pudo cargar la información relacionada")
@@ -931,11 +974,11 @@ export default function HazardousSubstancesPage() {
     withEvidence: records.filter((record) => Boolean(record.evidence)).length,
   }), [records])
 
-  function handleSaveSubstance(
+  async function handleSaveSubstance(
     form: SubstanceForm,
     resolved: Pick<SubstanceRecord, "responsibleName" | "riskName" | "preventiveMeasureName" | "procedureDocumentName">,
     recordId?: string,
-  ) {
+  ): Promise<boolean> {
     const payload = {
       substanceName: form.substanceName.trim(),
       type: form.type,
@@ -948,37 +991,84 @@ export default function HazardousSubstancesPage() {
       preventiveMeasureId: form.preventiveMeasureId,
       procedureDocumentId: form.procedureDocumentId,
       observations: form.observations.trim(),
-      ...resolved,
     }
-    if (recordId) {
-      setRecords((current) => current.map((record) => record.id === recordId ? { ...record, ...payload } as HazardousSubstanceRecord : record))
-      toast.success("Sustancia peligrosa actualizada")
-      return
+    try {
+      const saved = recordId
+        ? await updateHazardousSubstance(recordId, payload)
+        : await createHazardousSubstance(payload)
+      const normalized = normalizeRecord({ ...saved, ...resolved })
+      setRecords((current) => recordId
+        ? current.map((record) => record.id === recordId ? normalized : record)
+        : [normalized, ...current])
+      toast.success(recordId ? "Sustancia peligrosa actualizada" : "Sustancia peligrosa creada")
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar la sustancia peligrosa")
+      return false
     }
-    setRecords((current) => [{ id: createId("hazardous"), kind: "SUBSTANCE", ...payload, createdAt: new Date().toISOString() }, ...current])
-    toast.success("Sustancia peligrosa creada")
   }
 
-  function handleSaveProgram(form: ProgramForm, recordId?: string) {
+  async function handleSaveProgram(form: ProgramForm, recordId?: string): Promise<boolean> {
     const payload = { name: form.name.trim(), procedureType: form.procedureType, date: form.date }
-    if (recordId) {
-      setRecords((current) => current.map((record) => record.id === recordId ? { ...record, ...payload } as HazardousSubstanceRecord : record))
-      toast.success("Programa actualizado")
-      return
+    try {
+      const saved = recordId
+        ? await updateHazardousProgram(recordId, payload)
+        : await createHazardousProgram(payload)
+      const normalized = normalizeRecord(saved)
+      setRecords((current) => recordId
+        ? current.map((record) => record.id === recordId ? normalized : record)
+        : [normalized, ...current])
+      toast.success(recordId ? "Programa actualizado" : "Programa creado")
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar el programa")
+      return false
     }
-    setRecords((current) => [{ id: createId("program"), kind: "PROGRAM", ...payload, createdAt: new Date().toISOString() }, ...current])
-    toast.success("Programa creado")
   }
 
-  function handleUpload(recordId: string, form: EvidenceForm) {
-    setRecords((current) =>
-      current.map((record) =>
-        record.id === recordId
-          ? { ...record, evidence: { id: createId("evidence"), fileName: form.fileName.trim(), description: form.description.trim(), uploadedAt: new Date().toISOString(), isConfirmed: form.isConfirmed } }
-          : record,
-      ),
-    )
-    toast.success("Evidencia cargada")
+  async function handleUpload(recordId: string, form: EvidenceForm): Promise<boolean> {
+    if (!form.file) return false
+    try {
+      const evidence = await uploadHazardousSubstanceEvidence(recordId, { file: form.file, description: form.description, isConfirmed: form.isConfirmed })
+      setRecords((current) => current.map((record) => record.id === recordId ? { ...record, evidence } : record))
+      setDetailRecord((current) => current?.id === recordId ? { ...current, evidence } : current)
+      toast.success("Evidencia cargada")
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar la evidencia")
+      return false
+    }
+  }
+
+  async function openDetail(record: HazardousSubstanceRecord) {
+    try {
+      const detail = normalizeRecord(await getHazardousSubstance(record.id))
+      setDetailRecord(detail)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el detalle")
+    }
+  }
+
+  async function downloadRecordPdf(record: HazardousSubstanceRecord) {
+    try {
+      const blob = await exportHazardousSubstance(record.id)
+      saveBlob(blob, `sustancias-peligrosas-${recordTitle(record).replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo exportar el registro")
+    }
+  }
+
+  async function previewEvidence(record: HazardousSubstanceRecord) {
+    if (!record.evidence) return
+    try {
+      const blob = await downloadHazardousSubstanceEvidence(record.id, record.evidence.id)
+      setPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return { url: URL.createObjectURL(blob), mimeType: blob.type || record.evidence?.mimeType || "application/octet-stream", name: record.evidence?.originalName || "evidencia" }
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo previsualizar la evidencia")
+    }
   }
 
   function openEdit(record: HazardousSubstanceRecord) {
@@ -1056,7 +1146,7 @@ export default function HazardousSubstancesPage() {
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">{recordCategory(record)}</p>
                     </div>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => setDetailRecord(record)}><Eye className="h-4 w-4" />Ver</Button>
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void openDetail(record)}><Eye className="h-4 w-4" />Ver</Button>
                   </div>
                   <div className="grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
                     <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />{formatDate(recordDate(record))}</p>
@@ -1066,7 +1156,7 @@ export default function HazardousSubstancesPage() {
                   </div>
                   <div className="flex flex-wrap justify-end gap-2 border-t border-border pt-3">
                     <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => openEdit(record)}><Edit className="h-4 w-4" />Editar</Button>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => downloadRecordPdf(record)}><Download className="h-4 w-4" />PDF</Button>
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void downloadRecordPdf(record)}><Download className="h-4 w-4" />PDF</Button>
                     <Button type="button" size="sm" className="gap-2" onClick={() => setEvidenceRecord(record)}><Upload className="h-4 w-4" />Evidencia</Button>
                   </div>
                 </CardContent>
@@ -1088,7 +1178,10 @@ export default function HazardousSubstancesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {filteredRecords.map((record) => (
+                {recordsLoading && (
+                  <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground"><Loader2 className="mx-auto mb-2 h-5 w-5 animate-spin" />Cargando registros...</td></tr>
+                )}
+                {!recordsLoading && filteredRecords.map((record) => (
                   <tr key={record.id} className="align-middle">
                     <td className="px-4 py-3">
                       <p className="font-medium text-foreground">{recordTitle(record)}</p>
@@ -1098,14 +1191,14 @@ export default function HazardousSubstancesPage() {
                     <td className="px-4 py-3 text-muted-foreground">{recordCategory(record)}</td>
                     <td className="px-4 py-3 text-muted-foreground">{recordResponsible(record)}</td>
                     <td className="px-4 py-3 text-muted-foreground">{record.kind === "SUBSTANCE" ? record.riskName : procedureTypeLabel(record.procedureType)}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{record.evidence?.fileName ?? "Sin evidencia"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{record.evidence?.originalName ?? "Sin evidencia"}</td>
                     <td className="px-4 py-3 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild><Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuItem onSelect={() => setDetailRecord(record)}><Eye className="h-4 w-4" />Ver detalle</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => void openDetail(record)}><Eye className="h-4 w-4" />Ver detalle</DropdownMenuItem>
                           <DropdownMenuItem onSelect={() => openEdit(record)}><Edit className="h-4 w-4" />Editar</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => downloadRecordPdf(record)}><Download className="h-4 w-4" />Descargar</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => void downloadRecordPdf(record)}><Download className="h-4 w-4" />Descargar</DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onSelect={() => setEvidenceRecord(record)}><Upload className="h-4 w-4" />Subir evidencia</DropdownMenuItem>
                         </DropdownMenuContent>
@@ -1113,7 +1206,7 @@ export default function HazardousSubstancesPage() {
                     </td>
                   </tr>
                 ))}
-                {filteredRecords.length === 0 && (
+                {!recordsLoading && filteredRecords.length === 0 && (
                   <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground">No hay registros de sustancias peligrosas para mostrar.</td></tr>
                 )}
               </tbody>
@@ -1131,12 +1224,16 @@ export default function HazardousSubstancesPage() {
         documents={documents}
         loadingCatalogs={catalogsLoading}
         employeesLoading={employeesLoading}
+        onCreateRisk={() => router.push("/dashboard/occupational")}
+        onCreateMeasure={() => router.push("/dashboard/preventiveMeasures")}
+        onCreateProcedure={() => router.push("/dashboard/documents")}
         onClose={() => { setSubstanceDialogOpen(false); setEditingSubstance(null) }}
         onSave={handleSaveSubstance}
       />
       <ProgramDialog open={programDialogOpen} record={editingProgram} onClose={() => { setProgramDialogOpen(false); setEditingProgram(null) }} onSave={handleSaveProgram} />
       <EvidenceDialog record={evidenceRecord} onClose={() => setEvidenceRecord(null)} onUpload={handleUpload} />
-      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={downloadRecordPdf} />
+      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={(record) => void downloadRecordPdf(record)} onPreviewEvidence={(record) => void previewEvidence(record)} />
+      <EvidencePreviewDialog preview={preview} onClose={() => { if (preview?.url) URL.revokeObjectURL(preview.url); setPreview(null) }} />
     </main>
   )
 }

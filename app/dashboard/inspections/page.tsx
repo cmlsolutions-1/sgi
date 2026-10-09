@@ -17,8 +17,6 @@ import {
   Upload,
   UserRound,
 } from "lucide-react"
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -40,21 +38,30 @@ import { buildInspectionInsights } from "@/lib/intelligence-engine"
 import { askSafeCloud } from "@/lib/safecloud-assistant"
 import { listEmployees } from "@/services/employeeService"
 import { listWorkAreaOptions } from "@/services/workAreaService"
+import {
+  createInspection,
+  downloadInspectionEvidence,
+  exportInspection,
+  getInspection,
+  listInspections,
+  updateInspection,
+  uploadInspectionEvidence,
+} from "@/services/inspectionsService"
 import type { Employee } from "@/types/manager/employee"
 import type { WorkAreaOption } from "@/types/manager/work-area"
+import type {
+  InspectionAction as ApiInspectionAction,
+  InspectionDocument,
+  InspectionElementType,
+  InspectionRecord as ApiInspectionRecord,
+  InspectionResult as ApiInspectionResult,
+} from "@/types/manager/inspections"
 
 type ViewMode = "cards" | "list"
-type ElementType = "INSTALLATION" | "MACHINERY" | "EQUIPMENT" | "EMERGENCY" | "OTHER"
-type InspectionAction = "INSPECTION" | "MAINTENANCE"
-type InspectionResult = "COMPLIES" | "DOES_NOT_COMPLY" | "PARTIAL"
-
-type Evidence = {
-  id: string
-  fileName: string
-  description: string
-  uploadedAt: string
-  isConfirmed: boolean
-}
+type ElementType = InspectionElementType
+type InspectionAction = ApiInspectionAction
+type InspectionResult = ApiInspectionResult
+type Evidence = InspectionDocument
 
 type EmployeeOption = {
   id: string
@@ -94,7 +101,7 @@ type InspectionForm = {
 }
 
 type EvidenceForm = {
-  fileName: string
+  file: File | null
   description: string
   isConfirmed: boolean
 }
@@ -113,40 +120,9 @@ const emptyInspectionForm: InspectionForm = {
 }
 
 const emptyEvidenceForm: EvidenceForm = {
-  fileName: "",
+  file: null,
   description: "",
   isConfirmed: true,
-}
-
-const initialRecords: InspectionRecord[] = [
-  {
-    id: "inspection-1",
-    elementName: "Extintor zona de bodega",
-    elementType: "EMERGENCY",
-    action: "INSPECTION",
-    description: "Verificación visual de presión, sello, señalización y acceso libre.",
-    workAreaId: "mock-area-1",
-    workAreaName: "Bodega",
-    date: "2026-09-10",
-    responsibleEmployeeId: "mock-employee-1",
-    responsibleName: "Responsable SG-SST",
-    copasstParticipated: true,
-    result: "COMPLIES",
-    observations: "El elemento se encuentra operativo y señalizado.",
-    evidence: {
-      id: "inspection-evidence-1",
-      fileName: "inspeccion-extintor-bodega.pdf",
-      description: "Registro fotográfico y lista de chequeo.",
-      uploadedAt: "2026-09-10T14:00:00.000Z",
-      isConfirmed: true,
-    },
-    createdAt: "2026-09-10T14:00:00.000Z",
-  },
-]
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return `${prefix}-${crypto.randomUUID()}`
-  return `${prefix}-${Date.now()}`
 }
 
 function formatDate(value?: string | null) {
@@ -206,6 +182,30 @@ function findEmployeeName(employees: EmployeeOption[], employeeId: string) {
 
 function findAreaName(areas: WorkAreaOption[], areaId: string) {
   return areas.find((area) => area.id === areaId)?.name ?? ""
+}
+
+function normalizeInspection(record: ApiInspectionRecord): InspectionRecord {
+  const employee = record.responsibleEmployee
+  const responsibleName = record.responsibleName
+    || `${employee?.name ?? ""} ${employee?.lastName ?? ""}`.trim()
+    || employee?.email
+    || "Responsable no disponible"
+  return {
+    ...record,
+    workAreaName: record.workAreaName || record.workArea?.name || "Área no disponible",
+    responsibleName,
+    observations: record.observations ?? "",
+    evidence: record.evidence ?? undefined,
+  }
+}
+
+function saveBlob(blob: Blob, fileName: string) {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
 }
 
 function EmployeePicker({
@@ -325,37 +325,6 @@ function WorkAreaPicker({
   )
 }
 
-function downloadInspectionPdf(record: InspectionRecord) {
-  const doc = new jsPDF()
-  doc.setFontSize(16)
-  doc.text("Inspección y mantenimiento", 14, 18)
-  doc.setFontSize(10)
-  doc.text("SafeCloud - Sistema de Gestión Integral", 14, 26)
-
-  autoTable(doc, {
-    startY: 34,
-    head: [["Campo", "Información"]],
-    body: [
-      ["Elemento", record.elementName],
-      ["Tipo de elemento", elementTypeLabel(record.elementType)],
-      ["Acción", actionLabel(record.action)],
-      ["Descripción", record.description],
-      ["Área", record.workAreaName],
-      ["Fecha", formatDate(record.date)],
-      ["Responsable", record.responsibleName],
-      ["Participó el COPASST", record.copasstParticipated ? "Sí" : "No"],
-      ["Resultado", resultLabel(record.result)],
-      ["Observaciones", record.observations || "Sin observaciones"],
-      ["Evidencia", record.evidence?.fileName ?? "Sin evidencia"],
-    ],
-    styles: { fontSize: 9, cellPadding: 3 },
-    headStyles: { fillColor: [43, 135, 213] },
-    columnStyles: { 0: { cellWidth: 55, fontStyle: "bold" } },
-  })
-
-  doc.save(`${record.elementName.toLowerCase().replace(/\s+/g, "-")}.pdf`)
-}
-
 function InspectionDialog({
   open,
   record,
@@ -371,9 +340,10 @@ function InspectionDialog({
   areas: WorkAreaOption[]
   loading: boolean
   onClose: () => void
-  onSave: (form: InspectionForm, recordId?: string) => void
+  onSave: (form: InspectionForm, recordId?: string) => Promise<boolean>
 }) {
   const [form, setForm] = useState<InspectionForm>(emptyInspectionForm)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (!open) return
@@ -397,13 +367,16 @@ function InspectionDialog({
 
   const update = <K extends keyof InspectionForm>(key: K, value: InspectionForm[K]) => setForm((current) => ({ ...current, [key]: value }))
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!form.elementName.trim() || !form.description.trim() || !form.workAreaId || !form.date || !form.responsibleEmployeeId) {
       toast.error("Diligencia el elemento, descripción, área, fecha y responsable.")
       return
     }
-    onSave(form, record?.id)
+    setSaving(true)
+    const saved = await onSave(form, record?.id)
+    setSaving(false)
+    if (saved) onClose()
   }
 
   return (
@@ -464,7 +437,7 @@ function InspectionDialog({
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit">{record ? "Guardar cambios" : "Crear inspección"}</Button>
+            <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{record ? "Guardar cambios" : "Crear inspección"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -479,22 +452,26 @@ function EvidenceDialog({
 }: {
   record: InspectionRecord | null
   onClose: () => void
-  onUpload: (record: InspectionRecord, evidence: EvidenceForm) => void
+  onUpload: (record: InspectionRecord, evidence: EvidenceForm) => Promise<boolean>
 }) {
   const [form, setForm] = useState<EvidenceForm>(emptyEvidenceForm)
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     if (record) setForm(emptyEvidenceForm)
   }, [record])
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!record) return
-    if (!form.fileName.trim()) {
-      toast.error("Selecciona o registra el nombre del archivo de evidencia.")
+    if (!form.file) {
+      toast.error("Selecciona el archivo de evidencia.")
       return
     }
-    onUpload(record, form)
+    setUploading(true)
+    const uploaded = await onUpload(record, form)
+    setUploading(false)
+    if (uploaded) onClose()
   }
 
   return (
@@ -506,7 +483,8 @@ function EvidenceDialog({
         <form onSubmit={handleSubmit} className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="evidence-file">Archivo</Label>
-            <Input id="evidence-file" value={form.fileName} onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.value }))} placeholder="Nombre del archivo o soporte" />
+            <Input id="evidence-file" type="file" onChange={(event) => setForm((current) => ({ ...current, file: event.target.files?.[0] ?? null }))} />
+            {form.file && <p className="truncate text-sm text-muted-foreground">{form.file.name}</p>}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="evidence-description">Descripción</Label>
@@ -518,7 +496,7 @@ function EvidenceDialog({
           </label>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit" className="gap-2"><Upload className="h-4 w-4" />Subir</Button>
+            <Button type="submit" className="gap-2" disabled={uploading}>{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}Subir</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -530,10 +508,12 @@ function DetailDialog({
   record,
   onClose,
   onDownload,
+  onPreviewEvidence,
 }: {
   record: InspectionRecord | null
   onClose: () => void
   onDownload: (record: InspectionRecord) => void
+  onPreviewEvidence: (record: InspectionRecord) => void
 }) {
   if (!record) return null
 
@@ -560,7 +540,16 @@ function DetailDialog({
           </div>
           <div className="rounded-md border border-border p-4">
             <h3 className="font-semibold text-foreground">Evidencia</h3>
-            <p className="mt-2 text-sm text-muted-foreground">{record.evidence ? `${record.evidence.fileName} · ${formatDateTime(record.evidence.uploadedAt)}` : "Sin evidencia cargada."}</p>
+            {record.evidence ? (
+              <div className="mt-2 flex flex-col gap-3 rounded-md bg-secondary p-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0 text-sm">
+                  <p className="truncate font-medium text-foreground">{record.evidence.originalName}</p>
+                  <p className="text-muted-foreground">{record.evidence.description || "Sin descripción"}</p>
+                  <p className="text-xs text-muted-foreground">{formatDateTime(record.evidence.createdAt)}</p>
+                </div>
+                <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onPreviewEvidence(record)}><Eye className="h-4 w-4" />Previsualizar</Button>
+              </div>
+            ) : <p className="mt-2 text-sm text-muted-foreground">Sin evidencia cargada.</p>}
           </div>
         </div>
         <DialogFooter className="gap-2 sm:gap-0">
@@ -572,8 +561,38 @@ function DetailDialog({
   )
 }
 
+type EvidencePreview = { url: string; mimeType: string; name: string }
+
+function EvidencePreviewDialog({ preview, onClose }: { preview: EvidencePreview | null; onClose: () => void }) {
+  if (!preview) return null
+  const isImage = preview.mimeType.startsWith("image/")
+  const isPdf = preview.mimeType === "application/pdf" || preview.name.toLowerCase().endsWith(".pdf")
+  return (
+    <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="!flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12"><DialogTitle className="truncate">{preview.name}</DialogTitle></DialogHeader>
+        <div className="min-h-0 flex-1 bg-slate-100 p-3">
+          {isImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={preview.url} alt={preview.name} className="h-full w-full object-contain" />
+          ) : isPdf ? (
+            <iframe src={preview.url} title={preview.name} className="h-full w-full rounded-md border border-border bg-white" />
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm text-muted-foreground"><FileText className="h-10 w-10" />Este tipo de archivo no admite previsualización en el navegador.</div>
+          )}
+        </div>
+        <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+          <Button type="button" variant="outline" onClick={onClose}>Cerrar</Button>
+          <Button type="button" className="gap-2" asChild><a href={preview.url} download={preview.name}><Download className="h-4 w-4" />Descargar</a></Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export default function InspectionsPage() {
-  const [records, setRecords] = useState<InspectionRecord[]>(initialRecords)
+  const [records, setRecords] = useState<InspectionRecord[]>([])
+  const [recordsLoading, setRecordsLoading] = useState(true)
   const [employees, setEmployees] = useState<EmployeeOption[]>([])
   const [areas, setAreas] = useState<WorkAreaOption[]>([])
   const [loadingCatalogs, setLoadingCatalogs] = useState(false)
@@ -585,6 +604,23 @@ export default function InspectionsPage() {
   const [editingRecord, setEditingRecord] = useState<InspectionRecord | null>(null)
   const [evidenceRecord, setEvidenceRecord] = useState<InspectionRecord | null>(null)
   const [detailRecord, setDetailRecord] = useState<InspectionRecord | null>(null)
+  const [preview, setPreview] = useState<EvidencePreview | null>(null)
+
+  async function loadRecords() {
+    setRecordsLoading(true)
+    try {
+      const result = await listInspections({ limit: 100 })
+      setRecords((result.items ?? []).map(normalizeInspection))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar las inspecciones")
+    } finally {
+      setRecordsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void loadRecords()
+  }, [])
 
   useEffect(() => {
     let mounted = true
@@ -633,44 +669,66 @@ export default function InspectionsPage() {
   const pendingCount = records.filter((record) => record.result !== "COMPLIES").length
   const intelligenceInsights = useMemo(() => buildInspectionInsights(records), [records])
 
-  function handleSave(form: InspectionForm, recordId?: string) {
+  async function handleSave(form: InspectionForm, recordId?: string): Promise<boolean> {
     const responsibleName = findEmployeeName(employees, form.responsibleEmployeeId)
     const workAreaName = findAreaName(areas, form.workAreaId)
-
-    setRecords((current) => {
-      if (recordId) {
-        return current.map((record) => (record.id === recordId ? { ...record, ...form, responsibleName, workAreaName } : record))
-      }
-
-      return [
-        {
-          id: createId("inspection"),
-          ...form,
-          responsibleName,
-          workAreaName,
-          createdAt: new Date().toISOString(),
-        },
-        ...current,
-      ]
-    })
-
-    setDialogOpen(false)
-    setEditingRecord(null)
-    toast.success(recordId ? "Inspección actualizada." : "Inspección creada.")
+    try {
+      const saved = recordId ? await updateInspection(recordId, form) : await createInspection(form)
+      const normalized = normalizeInspection({ ...saved, responsibleName, workAreaName })
+      setRecords((current) => recordId ? current.map((record) => record.id === recordId ? normalized : record) : [normalized, ...current])
+      setDialogOpen(false)
+      setEditingRecord(null)
+      toast.success(recordId ? "Inspección actualizada." : "Inspección creada.")
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar la inspección")
+      return false
+    }
   }
 
-  function handleUpload(record: InspectionRecord, form: EvidenceForm) {
-    const evidence: Evidence = {
-      id: createId("inspection-evidence"),
-      fileName: form.fileName,
-      description: form.description,
-      uploadedAt: new Date().toISOString(),
-      isConfirmed: form.isConfirmed,
+  async function handleUpload(record: InspectionRecord, form: EvidenceForm): Promise<boolean> {
+    if (!form.file) return false
+    try {
+      const evidence = await uploadInspectionEvidence(record.id, { file: form.file, description: form.description, isConfirmed: form.isConfirmed })
+      setRecords((current) => current.map((item) => item.id === record.id ? { ...item, evidence } : item))
+      setDetailRecord((current) => current?.id === record.id ? { ...current, evidence } : current)
+      setEvidenceRecord(null)
+      toast.success("Evidencia cargada correctamente.")
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar la evidencia")
+      return false
     }
+  }
 
-    setRecords((current) => current.map((item) => (item.id === record.id ? { ...item, evidence } : item)))
-    setEvidenceRecord(null)
-    toast.success("Evidencia cargada correctamente.")
+  async function openDetail(record: InspectionRecord) {
+    try {
+      setDetailRecord(normalizeInspection(await getInspection(record.id)))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el detalle")
+    }
+  }
+
+  async function downloadInspectionPdf(record: InspectionRecord) {
+    try {
+      const blob = await exportInspection(record.id)
+      saveBlob(blob, `${record.elementName.toLowerCase().replace(/\s+/g, "-")}.pdf`)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo exportar la inspección")
+    }
+  }
+
+  async function previewEvidence(record: InspectionRecord) {
+    if (!record.evidence) return
+    try {
+      const blob = await downloadInspectionEvidence(record.id, record.evidence.id)
+      setPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return { url: URL.createObjectURL(blob), mimeType: blob.type || record.evidence?.mimeType || "application/octet-stream", name: record.evidence?.originalName || "evidencia" }
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo previsualizar la evidencia")
+    }
   }
 
   function openEdit(record: InspectionRecord) {
@@ -799,7 +857,7 @@ export default function InspectionsPage() {
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">{elementTypeLabel(record.elementType)} · {record.workAreaName}</p>
                     </div>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => setDetailRecord(record)}><Eye className="h-4 w-4" />Ver</Button>
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void openDetail(record)}><Eye className="h-4 w-4" />Ver</Button>
                   </div>
                   <div className="grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
                     <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />{formatDate(record.date)}</p>
@@ -809,13 +867,14 @@ export default function InspectionsPage() {
                   </div>
                   <div className="flex flex-wrap justify-end gap-2 border-t border-border pt-3">
                     <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => openEdit(record)}><Edit className="h-4 w-4" />Editar</Button>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => downloadInspectionPdf(record)}><Download className="h-4 w-4" />PDF</Button>
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void downloadInspectionPdf(record)}><Download className="h-4 w-4" />PDF</Button>
                     <Button type="button" size="sm" className="gap-2" onClick={() => setEvidenceRecord(record)}><Upload className="h-4 w-4" />Evidencia</Button>
                   </div>
                 </CardContent>
               </Card>
             ))}
-            {filteredRecords.length === 0 && <Card><CardContent className="p-8 text-center text-sm text-muted-foreground">No hay inspecciones para mostrar.</CardContent></Card>}
+            {recordsLoading && <Card><CardContent className="p-8 text-center text-sm text-muted-foreground"><Loader2 className="mx-auto mb-2 h-5 w-5 animate-spin" />Cargando inspecciones...</CardContent></Card>}
+            {!recordsLoading && filteredRecords.length === 0 && <Card><CardContent className="p-8 text-center text-sm text-muted-foreground">No hay inspecciones para mostrar.</CardContent></Card>}
           </div>
         ) : (
           <div className="overflow-x-auto rounded-md border border-border bg-card">
@@ -833,7 +892,8 @@ export default function InspectionsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {filteredRecords.map((record) => (
+                {recordsLoading && <tr><td colSpan={8} className="px-4 py-10 text-center text-sm text-muted-foreground"><Loader2 className="mx-auto mb-2 h-5 w-5 animate-spin" />Cargando inspecciones...</td></tr>}
+                {!recordsLoading && filteredRecords.map((record) => (
                   <tr key={record.id} className="align-middle">
                     <td className="px-4 py-3">
                       <p className="font-medium text-foreground">{record.elementName}</p>
@@ -844,14 +904,14 @@ export default function InspectionsPage() {
                     <td className="px-4 py-3 text-muted-foreground">{record.workAreaName}</td>
                     <td className="px-4 py-3 text-muted-foreground">{record.responsibleName}</td>
                     <td className="px-4 py-3"><Badge variant="outline" className={resultClassName(record.result)}>{resultLabel(record.result)}</Badge></td>
-                    <td className="px-4 py-3 text-muted-foreground">{record.evidence?.fileName ?? "Sin evidencia"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{record.evidence?.originalName ?? "Sin evidencia"}</td>
                     <td className="px-4 py-3 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild><Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuItem onSelect={() => setDetailRecord(record)}><Eye className="h-4 w-4" />Ver detalle</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => void openDetail(record)}><Eye className="h-4 w-4" />Ver detalle</DropdownMenuItem>
                           <DropdownMenuItem onSelect={() => openEdit(record)}><Edit className="h-4 w-4" />Editar</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => downloadInspectionPdf(record)}><Download className="h-4 w-4" />Descargar</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => void downloadInspectionPdf(record)}><Download className="h-4 w-4" />Descargar</DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onSelect={() => setEvidenceRecord(record)}><Upload className="h-4 w-4" />Subir evidencia</DropdownMenuItem>
                         </DropdownMenuContent>
@@ -859,7 +919,7 @@ export default function InspectionsPage() {
                     </td>
                   </tr>
                 ))}
-                {filteredRecords.length === 0 && <tr><td colSpan={8} className="px-4 py-10 text-center text-sm text-muted-foreground">No hay inspecciones para mostrar.</td></tr>}
+                {!recordsLoading && filteredRecords.length === 0 && <tr><td colSpan={8} className="px-4 py-10 text-center text-sm text-muted-foreground">No hay inspecciones para mostrar.</td></tr>}
               </tbody>
             </table>
           </div>
@@ -876,7 +936,8 @@ export default function InspectionsPage() {
         onSave={handleSave}
       />
       <EvidenceDialog record={evidenceRecord} onClose={() => setEvidenceRecord(null)} onUpload={handleUpload} />
-      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={downloadInspectionPdf} />
+      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={(record) => void downloadInspectionPdf(record)} onPreviewEvidence={(record) => void previewEvidence(record)} />
+      <EvidencePreviewDialog preview={preview} onClose={() => { if (preview?.url) URL.revokeObjectURL(preview.url); setPreview(null) }} />
     </main>
   )
 }

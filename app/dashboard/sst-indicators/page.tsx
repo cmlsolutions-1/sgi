@@ -1,9 +1,7 @@
 "use client"
 
-import { type FormEvent, useMemo, useState } from "react"
-import { BarChart3, CalendarDays, CheckCircle2, Download, FileText, Filter, Plus, Search } from "lucide-react"
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
+import { type FormEvent, useEffect, useMemo, useState } from "react"
+import { BarChart3, CalendarDays, CheckCircle2, Download, FileText, Filter, Loader2, Plus, Search } from "lucide-react"
 import { toast } from "sonner"
 
 import { AnalyticsBarChart, AnalyticsChartCard, AnalyticsDonutChart } from "@/components/dashboard/analytics-charts"
@@ -12,29 +10,20 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  exportSstIndicatorReport,
+  generateSstIndicatorReport,
+  getSstIndicatorReport,
+  listSstIndicatorReports,
+} from "@/services/sstIndicatorsService"
+import type {
+  SstIndicatorPeriod,
+  SstIndicatorReport,
+  SstIndicatorState,
+} from "@/types/manager/sst-indicators"
 
-type PeriodFilter = "ANNUAL" | "SEMESTER" | "QUARTER" | "BIMONTHLY" | "MONTHLY" | "CUSTOM"
-type IndicatorState = "OK" | "WATCH" | "CRITICAL"
-
-type IndicatorRow = {
-  id: string
-  name: string
-  result: string
-  numericValue: number
-  state: IndicatorState
-  description: string
-}
-
-type IndicatorReport = {
-  id: string
-  year: string
-  period: PeriodFilter
-  periodLabel: string
-  startDate: string
-  endDate: string
-  generatedAt: string
-  indicators: IndicatorRow[]
-}
+type PeriodFilter = SstIndicatorPeriod
+type IndicatorState = SstIndicatorState
 
 type FilterForm = {
   year: string
@@ -90,11 +79,6 @@ const periodOptions: Record<Exclude<PeriodFilter, "CUSTOM">, Array<{ value: stri
     { value: "11", label: "Noviembre" },
     { value: "12", label: "Diciembre" },
   ],
-}
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return `${prefix}-${crypto.randomUUID()}`
-  return `${prefix}-${Date.now()}`
 }
 
 function formatDate(value?: string | null) {
@@ -154,81 +138,6 @@ function periodDates(year: string, period: PeriodFilter, periodValue: string, st
   return { startDate: `${year}-${periodValue}-01`, endDate: `${year}-${periodValue}-${String(lastDay).padStart(2, "0")}` }
 }
 
-function indicatorState(value: number, kind: "positive" | "negative" = "negative"): IndicatorState {
-  if (kind === "positive") {
-    if (value >= 90) return "OK"
-    if (value >= 70) return "WATCH"
-    return "CRITICAL"
-  }
-  if (value === 0) return "OK"
-  if (value <= 2) return "OK"
-  if (value <= 4) return "WATCH"
-  return "CRITICAL"
-}
-
-function generateIndicators(filters: FilterForm): IndicatorRow[] {
-  const yearSeed = Number(filters.year.slice(-2)) || 26
-  const periodSeed = filters.periodValue === "YEAR" ? 1 : filters.periodValue.charCodeAt(filters.periodValue.length - 1) % 7
-  const base = yearSeed + periodSeed
-  const frequency = Number(((base % 5) + 1.5).toFixed(1))
-  const severity = Number((((base + 2) % 4) + 0.8).toFixed(1))
-  const mortality = base % 6 === 0 ? 1 : 0
-  const prevalence = Number((((base % 4) + 1) / 10).toFixed(1))
-  const incidence = Number((((base % 3) + 1) / 10).toFixed(1))
-  const absenteeism = Number((((base % 5) + 5) / 4).toFixed(1))
-
-  return [
-    {
-      id: "frequency",
-      name: "Frecuencia de accidentalidad",
-      result: String(frequency),
-      numericValue: frequency,
-      state: indicatorState(frequency),
-      description: "Relación de accidentes frente al periodo seleccionado.",
-    },
-    {
-      id: "severity",
-      name: "Severidad",
-      result: String(severity),
-      numericValue: severity,
-      state: indicatorState(severity),
-      description: "Impacto de los eventos según días perdidos o afectación.",
-    },
-    {
-      id: "mortality",
-      name: "Mortalidad",
-      result: String(mortality),
-      numericValue: mortality,
-      state: mortality === 0 ? "OK" : "CRITICAL",
-      description: "Eventos mortales reportados en la vigencia filtrada.",
-    },
-    {
-      id: "prevalence",
-      name: "Prevalencia",
-      result: String(prevalence),
-      numericValue: prevalence,
-      state: indicatorState(prevalence),
-      description: "Casos existentes de enfermedad laboral frente a población expuesta.",
-    },
-    {
-      id: "incidence",
-      name: "Incidencia",
-      result: String(incidence),
-      numericValue: incidence,
-      state: indicatorState(incidence),
-      description: "Nuevos casos registrados durante el periodo.",
-    },
-    {
-      id: "absenteeism",
-      name: "Ausentismo",
-      result: `${absenteeism}%`,
-      numericValue: absenteeism,
-      state: indicatorState(absenteeism),
-      description: "Porcentaje estimado de ausentismo por novedades laborales.",
-    },
-  ]
-}
-
 function stateLabel(state: IndicatorState) {
   if (state === "CRITICAL") return "Crítico"
   if (state === "WATCH") return "Seguimiento"
@@ -241,68 +150,60 @@ function stateClassName(state: IndicatorState) {
   return "bg-accentActivd text-accentActivd-foreground border-transparent"
 }
 
-function buildReport(filters: FilterForm): IndicatorReport {
-  const dates = periodDates(filters.year, filters.period, filters.periodValue, filters.startDate, filters.endDate)
-  return {
-    id: createId("sst-indicators"),
-    year: filters.year,
-    period: filters.period,
-    periodLabel: periodLabel(filters.period, filters.periodValue),
-    startDate: dates.startDate,
-    endDate: dates.endDate,
-    generatedAt: new Date().toISOString(),
-    indicators: generateIndicators(filters),
-  }
-}
-
-function downloadReportPdf(report: IndicatorReport) {
-  const doc = new jsPDF()
-  doc.setFontSize(16)
-  doc.text("Informe de Indicadores SST", 14, 18)
-  doc.setFontSize(10)
-  doc.text("SafeCloud - Sistema de Gestión Integral", 14, 26)
-  doc.text(`Vigencia: ${report.year} · ${report.periodLabel}`, 14, 34)
-  doc.text(`Periodo: ${formatDate(report.startDate)} a ${formatDate(report.endDate)}`, 14, 40)
-  doc.text(`Generado: ${formatDateTime(report.generatedAt)}`, 14, 46)
-
-  autoTable(doc, {
-    startY: 56,
-    head: [["Indicador", "Resultado", "Estado", "Descripción"]],
-    body: report.indicators.map((indicator) => [
-      indicator.name,
-      indicator.result,
-      stateLabel(indicator.state),
-      indicator.description,
-    ]),
-    styles: { fontSize: 8.5, cellPadding: 3 },
-    headStyles: { fillColor: [43, 135, 213] },
-    columnStyles: {
-      0: { cellWidth: 48, fontStyle: "bold" },
-      1: { cellWidth: 24 },
-      2: { cellWidth: 28 },
-    },
-  })
-
-  doc.save(`indicadores-sst-${report.year}-${report.periodLabel.toLowerCase().replace(/\s+/g, "-")}.pdf`)
-}
-
 export default function SstIndicatorsPage() {
   const [filters, setFilters] = useState<FilterForm>(initialFilters)
-  const [reports, setReports] = useState<IndicatorReport[]>([buildReport(initialFilters)])
+  const [reports, setReports] = useState<SstIndicatorReport[]>([])
+  const [currentReport, setCurrentReport] = useState<SstIndicatorReport | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [generating, setGenerating] = useState(false)
+  const [exportingId, setExportingId] = useState<string | null>(null)
 
-  const currentReport = reports[0]
+  async function loadReports() {
+    setLoading(true)
+    try {
+      const response = await listSstIndicatorReports({ page: 1, limit: 100 })
+      setReports(response.items)
+      if (response.items.length) {
+        const detail = await getSstIndicatorReport(response.items[0].id)
+        setCurrentReport(detail)
+      } else {
+        setCurrentReport(null)
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar los indicadores SST.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void loadReports()
+  }, [])
+
+  const displayedReport = currentReport ?? {
+    id: "",
+    companyId: "",
+    year: Number(filters.year) || currentYear,
+    period: filters.period,
+    periodValue: filters.periodValue,
+    periodLabel: periodLabel(filters.period, filters.periodValue),
+    ...periodDates(filters.year, filters.period, filters.periodValue, filters.startDate, filters.endDate),
+    generatedAt: "",
+    indicators: [],
+    summary: { totalIndicators: 0, okCount: 0, watchCount: 0, criticalCount: 0 },
+  }
 
   const filteredIndicators = useMemo(() => {
     const query = filters.search.trim().toLowerCase()
-    if (!query) return currentReport.indicators
-    return currentReport.indicators.filter((indicator) => `${indicator.name} ${indicator.description} ${stateLabel(indicator.state)}`.toLowerCase().includes(query))
-  }, [currentReport.indicators, filters.search])
+    if (!query) return displayedReport.indicators
+    return displayedReport.indicators.filter((indicator) => `${indicator.name} ${indicator.description} ${stateLabel(indicator.state)}`.toLowerCase().includes(query))
+  }, [displayedReport.indicators, filters.search])
 
-  const chartData = currentReport.indicators.map((indicator) => ({ name: indicator.name, total: indicator.numericValue }))
+  const chartData = displayedReport.indicators.map((indicator) => ({ name: indicator.name, total: indicator.numericValue }))
   const stateChartData = [
-    { name: "Cumple", total: currentReport.indicators.filter((indicator) => indicator.state === "OK").length },
-    { name: "Seguimiento", total: currentReport.indicators.filter((indicator) => indicator.state === "WATCH").length },
-    { name: "Crítico", total: currentReport.indicators.filter((indicator) => indicator.state === "CRITICAL").length },
+    { name: "Cumple", total: displayedReport.summary?.okCount ?? displayedReport.indicators.filter((indicator) => indicator.state === "OK").length },
+    { name: "Seguimiento", total: displayedReport.summary?.watchCount ?? displayedReport.indicators.filter((indicator) => indicator.state === "WATCH").length },
+    { name: "Crítico", total: displayedReport.summary?.criticalCount ?? displayedReport.indicators.filter((indicator) => indicator.state === "CRITICAL").length },
   ]
 
   const complianceCount = stateChartData[0].total
@@ -319,7 +220,7 @@ export default function SstIndicatorsPage() {
     })
   }
 
-  function handleGenerate(event: FormEvent<HTMLFormElement>) {
+  async function handleGenerate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!filters.year.trim()) {
       toast.error("Selecciona el año o vigencia para generar los indicadores.")
@@ -329,10 +230,45 @@ export default function SstIndicatorsPage() {
       toast.error("Selecciona el rango de fechas para generar el informe.")
       return
     }
+    if (filters.period === "CUSTOM" && filters.startDate > filters.endDate) {
+      toast.error("La fecha de inicio no puede ser posterior a la fecha final.")
+      return
+    }
 
-    const report = buildReport(filters)
-    setReports((current) => [report, ...current])
-    toast.success("Indicadores SST generados correctamente.")
+    setGenerating(true)
+    try {
+      const report = await generateSstIndicatorReport({
+        year: Number(filters.year),
+        period: filters.period,
+        periodValue: filters.period === "CUSTOM" ? "CUSTOM" : filters.periodValue,
+        startDate: filters.period === "CUSTOM" ? filters.startDate : null,
+        endDate: filters.period === "CUSTOM" ? filters.endDate : null,
+      })
+      setCurrentReport(report)
+      setReports((current) => [report, ...current.filter((item) => item.id !== report.id)])
+      toast.success("Indicadores SST generados correctamente.")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron generar los indicadores SST.")
+    } finally {
+      setGenerating(false)
+    }
+  }
+
+  async function downloadReportPdf(report: SstIndicatorReport) {
+    setExportingId(report.id)
+    try {
+      const blob = await exportSstIndicatorReport(report.id)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `indicadores-sst-${report.year}-${report.periodLabel.toLowerCase().replace(/\s+/g, "-")}.pdf`
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo exportar el informe.")
+    } finally {
+      setExportingId(null)
+    }
   }
 
   return (
@@ -342,8 +278,8 @@ export default function SstIndicatorsPage() {
           <h1 className="text-2xl font-bold text-foreground">Indicadores SST</h1>
           <p className="text-sm text-muted-foreground">Consulta y genera indicadores de accidentalidad, severidad, mortalidad, prevalencia, incidencia y ausentismo.</p>
         </div>
-        <Button type="button" className="gap-2" onClick={() => downloadReportPdf(currentReport)}>
-          <Download className="h-4 w-4" />Exportar informe
+        <Button type="button" className="gap-2" disabled={!currentReport || exportingId === currentReport.id} onClick={() => currentReport && void downloadReportPdf(currentReport)}>
+          {currentReport && exportingId === currentReport.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}Exportar informe
         </Button>
       </div>
 
@@ -397,22 +333,22 @@ export default function SstIndicatorsPage() {
                 <Input id="indicator-search" value={filters.search} onChange={(event) => updateFilter("search", event.target.value)} className="pl-9" placeholder="Buscar por nombre o estado" />
               </div>
             </div>
-            <Button type="submit" className="gap-2">
-              <Plus className="h-4 w-4" />Generar
+            <Button type="submit" className="gap-2" disabled={generating}>
+              {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}Generar
             </Button>
           </div>
         </form>
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Indicadores</p><p className="mt-2 text-2xl font-bold text-foreground">{currentReport.indicators.length}</p></CardContent></Card>
+        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Indicadores</p><p className="mt-2 text-2xl font-bold text-foreground">{displayedReport.summary?.totalIndicators ?? displayedReport.indicators.length}</p></CardContent></Card>
         <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Cumplen</p><p className="mt-2 text-2xl font-bold text-foreground">{complianceCount}</p></CardContent></Card>
         <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">En seguimiento</p><p className="mt-2 text-2xl font-bold text-foreground">{watchCount}</p></CardContent></Card>
         <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Críticos</p><p className="mt-2 text-2xl font-bold text-foreground">{criticalCount}</p></CardContent></Card>
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
-        <AnalyticsChartCard title="Resultado por indicador" description={`Periodo generado: ${currentReport.periodLabel} · ${formatDate(currentReport.startDate)} a ${formatDate(currentReport.endDate)}`}>
+        <AnalyticsChartCard title="Resultado por indicador" description={`Periodo generado: ${displayedReport.periodLabel} · ${formatDate(displayedReport.startDate)} a ${formatDate(displayedReport.endDate)}`}>
           <AnalyticsBarChart data={chartData} layout="vertical" color="var(--chart-2)" />
         </AnalyticsChartCard>
         <AnalyticsChartCard title="Estado de indicadores" description="Distribución del cumplimiento calculado.">
@@ -424,9 +360,9 @@ export default function SstIndicatorsPage() {
         <div className="flex flex-col gap-2 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="font-semibold text-foreground">Tabla automática de indicadores</h2>
-            <p className="text-sm text-muted-foreground">Generado: {formatDateTime(currentReport.generatedAt)}</p>
+            <p className="text-sm text-muted-foreground">Generado: {formatDateTime(displayedReport.generatedAt)}</p>
           </div>
-          <Badge variant="outline" className="w-fit bg-blue-600 text-white border-transparent">{currentReport.year} · {currentReport.periodLabel}</Badge>
+          <Badge variant="outline" className="w-fit bg-blue-600 text-white border-transparent">{displayedReport.year} · {displayedReport.periodLabel}</Badge>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] text-sm">
@@ -468,17 +404,19 @@ export default function SstIndicatorsPage() {
           <h2 className="font-semibold text-foreground">Historial de informes generados</h2>
         </div>
         <div className="mt-4 grid gap-2">
-          {reports.slice(0, 5).map((report) => (
+          {loading && <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" />Cargando informes...</div>}
+          {!loading && reports.slice(0, 5).map((report) => (
             <div key={report.id} className="flex flex-col gap-2 rounded-md border border-border p-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="font-medium text-foreground">{report.year} · {report.periodLabel}</p>
                 <p className="text-sm text-muted-foreground">{formatDate(report.startDate)} a {formatDate(report.endDate)} · {formatDateTime(report.generatedAt)}</p>
               </div>
-              <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => downloadReportPdf(report)}>
-                <Download className="h-4 w-4" />PDF
+              <Button type="button" variant="outline" size="sm" className="gap-2" disabled={exportingId === report.id} onClick={() => void downloadReportPdf(report)}>
+                {exportingId === report.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}PDF
               </Button>
             </div>
           ))}
+          {!loading && reports.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">Aún no hay informes de indicadores SST generados.</p>}
         </div>
       </section>
     </main>

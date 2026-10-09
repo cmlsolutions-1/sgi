@@ -1,6 +1,6 @@
 # Contrato frontend/backend - Matriz Legal
 
-Este documento describe el contrato requerido para conectar el modulo hijo **Matriz Legal** con backend. Actualmente el modulo esta implementado con datos mockeados en frontend y conserva el normograma/evidencias solo en memoria.
+Este documento describe el contrato utilizado para conectar el modulo hijo **Matriz Legal** con backend. El frontend ya consume los endpoints y no conserva el normograma ni sus evidencias en memoria como fuente de datos.
 
 ## Ubicacion en frontend
 
@@ -31,17 +31,16 @@ El modulo contempla:
 
 ## Estado actual de implementacion
 
-Todo el modulo esta mockeado en frontend:
+El modulo se encuentra integrado con backend:
 
-- registros iniciales;
-- creacion y edicion en memoria;
-- carga local de evidencia;
-- vista previa local de PDF, imagen o texto;
-- descarga simulada de evidencia;
-- estado `Vigente` o `Vencido` calculado por `expirationDate`;
-- eliminacion local.
-
-No existe servicio dedicado en `services/` ni tipos compartidos en `types/manager/` para este modulo.
+- CRUD persistido mediante `/api/legal-matrix`;
+- estado `Vigente` o `Vencido` recibido desde backend;
+- documentos enviados como `multipart/form-data`;
+- previsualizacion y descarga de evidencias reales;
+- exportacion CSV construida con los registros persistidos;
+- servicio dedicado en `services/legalMatrixService.ts`;
+- contratos compartidos en `types/manager/legal-matrix.ts`;
+- navegacion habilitada mediante el codigo `LEGAL_MATRIX`.
 
 ## Entidades sugeridas
 

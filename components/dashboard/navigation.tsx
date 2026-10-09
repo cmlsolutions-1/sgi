@@ -37,6 +37,8 @@ import {
   Handshake,
   Route,
   Car,
+  MessageSquare,
+  ScrollText,
 } from "lucide-react"
 import type { ModuleNode } from "@/store/auth.store"
 
@@ -113,24 +115,24 @@ export const navigation: NavigationItem[] = [
         href: "/dashboard/acpm",
         icon: FileCheck2,
       },
-      /* {
+      {
         code: "SST_INDICATORS",
         name: "Indicadores SST",
         href: "/dashboard/sst-indicators",
         icon: BarChart3,
-      }, */
-      /* {
+      },
+      {
         code: "SST_AUDITS",
         name: "Auditorías SST",
         href: "/dashboard/audits",
         icon: FileSearch,
-      }, */
-      /* {
+      },
+      {
         code: "SST_COMMUNICATIONS",
         name: "Comunicaciones SST",
         href: "/dashboard/sst-communications",
         icon: MessageSquare,
-      }, */
+      },
       {
         code: "SST_TRAINING_CERTIFICATIONS",
         name: "Formación y Certificaciones",
@@ -163,8 +165,8 @@ export const navigation: NavigationItem[] = [
     icon: CalendarDays,
     subItems: [
       { code: "TRAINING", name: "Capacitaciones", href: "/dashboard/trainingPlan", icon: Brain },
-      //{ code: "WORK_PLAN", name: "Plan de Trabajo", href: "/dashboard/work-plan", icon: ClipboardCheck },
-      //{ code: "HEALTHY_LIFESTYLES", name: "Estilos de Vida Saludable", href: "/dashboard/healthy-lifestyles", icon: HeartPulse },
+      { code: "WORK_PLAN", name: "Plan de Trabajo", href: "/dashboard/work-plan", icon: ClipboardCheck },
+      { code: "HEALTHY_LIFESTYLES", name: "Estilos de Vida Saludable", href: "/dashboard/healthy-lifestyles", icon: HeartPulse },
     ],
   },
   /* {
@@ -245,30 +247,30 @@ export const navigation: NavigationItem[] = [
         href: "/dashboard/preventive-maintenance",
         icon: ClipboardCheck,
       },
-      /* {
+      {
         code: "HAZARDOUS_SUBSTANCES",
         name: "Sustancias Peligrosas",
         href: "/dashboard/hazardous-substances",
         icon: FlaskConical,
-      }, */
-      /* {
+      },
+      {
         code: "ENVIRONMENTAL_MEASUREMENTS",
         name: "Mediciones Ambientales",
         href: "/dashboard/environmental-measurements",
         icon: BarChart3,
-      }, */
-      /* {
+      },
+      {
         code: "INSPECTIONS",
         name: "Inspecciones",
         href: "/dashboard/inspections",
         icon: ClipboardCheck,
-      }, */
-      /* {
+      },
+      {
         code: "LEGAL_MATRIX",
         name: "Matriz Legal",
         href: "/dashboard/legal-matrix",
         icon: ScrollText,
-      }, */
+      },
     ],
   },
   {
@@ -333,18 +335,18 @@ export const navigation: NavigationItem[] = [
         href: "/dashboard/hygiene-supplies",
         icon: PackageCheck,
       },
-      /* {
+      {
         code: "HYGIENE_SERVICES",
         name: "Servicios de Higiene",
         href: "/dashboard/hygiene-services",
         icon: Droplets,
-      }, */
-      /* {
+      },
+      {
         code: "WASTE_MANAGEMENT",
         name: "Manejo de Residuos",
         href: "/dashboard/waste-management",
         icon: Recycle,
-      }, */
+      },
       {
         code: "SANITATION",
         name: "Saneamiento",

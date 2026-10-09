@@ -1,6 +1,6 @@
 # Contrato frontend/backend - Estilos de Vida Saludable
 
-Este documento describe el contrato requerido para conectar el modulo hijo **Estilos de Vida Saludable** con backend. Actualmente el modulo esta implementado con datos mockeados en frontend y conserva actividades/evidencias solo en memoria.
+Este documento describe el contrato utilizado para conectar el modulo hijo **Estilos de Vida Saludable** con backend. El frontend ya consume los endpoints y no conserva actividades ni evidencias mockeadas.
 
 ## Ubicacion en frontend
 
@@ -32,19 +32,17 @@ El modulo contempla:
 
 ## Estado actual de implementacion
 
-Todo el modulo esta mockeado en frontend:
+El modulo se encuentra integrado con backend:
 
-- registros iniciales;
-- creacion y edicion en memoria;
-- consulta real de funcionarios desde `GET /api/employees`;
-- calculo local de estado segun fechas;
-- carga simulada de evidencia por nombre de archivo;
-- filtros locales;
-- vista en tarjetas/lista;
-- detalle en modal;
-- PDF generado en frontend con `jsPDF` y `jspdf-autotable`.
-
-No existe servicio dedicado en `services/` ni tipos compartidos en `types/manager/` para este modulo.
+- CRUD persistido mediante `/api/healthy-lifestyles`;
+- funcionarios reales obtenidos desde `/api/employee`;
+- estado recibido y calculado por backend;
+- evidencia binaria enviada como `multipart/form-data`;
+- exportacion PDF obtenida desde backend;
+- filtros, vistas de tarjetas/lista y detalle conservados;
+- servicio dedicado en `services/healthyLifestyleService.ts`;
+- contratos compartidos en `types/manager/healthy-lifestyle.ts`;
+- navegacion habilitada mediante el codigo `HEALTHY_LIFESTYLES`.
 
 ## Entidades sugeridas
 

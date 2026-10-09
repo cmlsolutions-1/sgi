@@ -17,8 +17,6 @@ import {
   Upload,
   UserRound,
 } from "lucide-react"
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -38,23 +36,34 @@ import { Textarea } from "@/components/ui/textarea"
 import { listManagedDocuments } from "@/services/documentManagementService"
 import { listEmployees } from "@/services/employeeService"
 import { listRisks } from "@/services/riskService"
+import {
+  createEnvironmentalMeasurement,
+  createEnvironmentalProcedure,
+  downloadEnvironmentalEvidence,
+  exportEnvironmentalMeasurement,
+  getEnvironmentalMeasurement,
+  listEnvironmentalMeasurements,
+  updateEnvironmentalMeasurement,
+  updateEnvironmentalProcedure,
+  uploadEnvironmentalEvidence,
+} from "@/services/environmentalMeasurementsService"
 import type { ManagedDocument } from "@/types/manager/document-management"
 import type { Employee } from "@/types/manager/employee"
 import type { Risk } from "@/types/manager/risk"
+import type {
+  EnvironmentalMeasurementDocument,
+  EnvironmentalMeasurementResult,
+  EnvironmentalMeasurementType,
+  EnvironmentalProcedureType,
+  EnvironmentalRecord as ApiEnvironmentalRecord,
+} from "@/types/manager/environmentalMeasurements"
 
 type ViewMode = "cards" | "list"
 type RecordKind = "MEASUREMENT" | "PROCEDURE"
-type MeasurementType = "NOISE" | "LIGHTING" | "VIBRATION" | "CHEMICAL" | "BIOLOGICAL" | "TEMPERATURE" | "OTHER"
-type MeasurementResult = "COMPLIES" | "DOES_NOT_COMPLY" | "IN_EVALUATION"
-type ProcedureType = "FORMATO" | "PROCEDIMIENTO" | "OTRO"
-
-type Evidence = {
-  id: string
-  fileName: string
-  description: string
-  uploadedAt: string
-  isConfirmed: boolean
-}
+type MeasurementType = EnvironmentalMeasurementType
+type MeasurementResult = EnvironmentalMeasurementResult
+type ProcedureType = EnvironmentalProcedureType
+type Evidence = EnvironmentalMeasurementDocument
 
 type EmployeeOption = {
   id: string
@@ -121,7 +130,7 @@ type ProcedureForm = {
 }
 
 type EvidenceForm = {
-  fileName: string
+  file: File | null
   description: string
   isConfirmed: boolean
 }
@@ -146,51 +155,9 @@ const emptyProcedureForm: ProcedureForm = {
 }
 
 const emptyEvidenceForm: EvidenceForm = {
-  fileName: "",
+  file: null,
   description: "",
   isConfirmed: true,
-}
-
-const initialRecords: EnvironmentalRecord[] = [
-  {
-    id: "environmental-measurement-1",
-    kind: "MEASUREMENT",
-    name: "Medición de iluminación en bodega",
-    procedureDocumentId: "mock-document-1",
-    procedureDocumentName: "Procedimiento de mediciones ambientales",
-    measurementType: "LIGHTING",
-    riskId: "mock-risk-1",
-    riskName: "Exposición a condiciones físicas",
-    measurementDate: "2026-09-10",
-    laboratory: "Laboratorio Ambiental SGSST",
-    responsibleEmployeeId: "mock-employee-1",
-    responsibleName: "Responsable SG-SST",
-    result: "COMPLIES",
-    observations: "Los niveles medidos cumplen con el rango definido para el área.",
-    evidence: {
-      id: "environmental-evidence-1",
-      fileName: "informe-iluminacion-bodega.pdf",
-      description: "Informe técnico de medición ambiental.",
-      uploadedAt: "2026-09-10T14:00:00.000Z",
-      isConfirmed: true,
-    },
-    createdAt: "2026-09-10T14:00:00.000Z",
-  },
-  {
-    id: "environmental-procedure-1",
-    kind: "PROCEDURE",
-    name: "Procedimiento de seguimiento a mediciones ambientales",
-    procedureType: "PROCEDIMIENTO",
-    relatedProcedureId: "mock-document-2",
-    relatedProcedureName: "Procedimiento de control operacional",
-    date: "2026-09-01",
-    createdAt: "2026-09-01T09:00:00.000Z",
-  },
-]
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return `${prefix}-${crypto.randomUUID()}`
-  return `${prefix}-${Date.now()}`
 }
 
 function formatDate(value?: string | null) {
@@ -292,6 +259,30 @@ function recordCategory(record: EnvironmentalRecord) {
 
 function recordResponsible(record: EnvironmentalRecord) {
   return record.kind === "PROCEDURE" ? "Procedimiento institucional" : record.responsibleName
+}
+
+function normalizeRecord(record: ApiEnvironmentalRecord): EnvironmentalRecord {
+  if (record.kind === "PROCEDURE") return { ...record, evidence: record.evidence ?? undefined }
+  const employee = record.responsibleEmployee
+  const responsibleName = record.responsibleName
+    || `${employee?.name ?? ""} ${employee?.lastName ?? ""}`.trim()
+    || employee?.email
+    || "Responsable no disponible"
+  return {
+    ...record,
+    responsibleName,
+    observations: record.observations ?? "",
+    evidence: record.evidence ?? undefined,
+  }
+}
+
+function saveBlob(blob: Blob, fileName: string) {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
 }
 
 function EmployeePicker({
@@ -416,47 +407,6 @@ function SearchableOptionPicker({
   )
 }
 
-function downloadRecordPdf(record: EnvironmentalRecord) {
-  const doc = new jsPDF()
-  const title = record.kind === "PROCEDURE" ? "Procedimiento de mediciones ambientales" : "Medición ambiental"
-  doc.setFontSize(16)
-  doc.text(title, 14, 18)
-  doc.setFontSize(10)
-  doc.text("SafeCloud - Sistema de Gestión Integral", 14, 26)
-
-  const rows =
-    record.kind === "PROCEDURE"
-      ? [
-          ["Nombre", record.name],
-          ["Tipo", procedureTypeLabel(record.procedureType)],
-          ["Procedimiento relacionado", record.relatedProcedureName || "No relacionado"],
-          ["Fecha", formatDate(record.date)],
-          ["Evidencia", record.evidence?.fileName ?? "Sin evidencia"],
-        ]
-      : [
-          ["Nombre", record.name],
-          ["Procedimiento", record.procedureDocumentName || "No relacionado"],
-          ["Tipo de medición", measurementTypeLabel(record.measurementType)],
-          ["Riesgo asociado", record.riskName || "No relacionado"],
-          ["Fecha de medición", formatDate(record.measurementDate)],
-          ["Empresa o laboratorio", record.laboratory],
-          ["Responsable", record.responsibleName],
-          ["Resultado", resultLabel(record.result)],
-          ["Observaciones", record.observations || "Sin observaciones"],
-          ["Evidencia", record.evidence?.fileName ?? "Sin evidencia"],
-        ]
-
-  autoTable(doc, {
-    startY: 34,
-    head: [["Campo", "Información"]],
-    body: rows,
-    styles: { fontSize: 9, cellPadding: 3 },
-    headStyles: { fillColor: [43, 135, 213] },
-    columnStyles: { 0: { cellWidth: 55, fontStyle: "bold" } },
-  })
-  doc.save(`${recordTitle(record).toLowerCase().replace(/\s+/g, "-")}.pdf`)
-}
-
 function MeasurementDialog({
   open,
   record,
@@ -476,9 +426,10 @@ function MeasurementDialog({
   employeesLoading: boolean
   catalogsLoading: boolean
   onClose: () => void
-  onSave: (form: MeasurementForm, recordId?: string) => void
+  onSave: (form: MeasurementForm, recordId?: string) => Promise<boolean>
 }) {
   const [form, setForm] = useState<MeasurementForm>(emptyMeasurementForm)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (!open) return
@@ -501,13 +452,16 @@ function MeasurementDialog({
 
   const update = <K extends keyof MeasurementForm>(key: K, value: MeasurementForm[K]) => setForm((current) => ({ ...current, [key]: value }))
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!form.name.trim() || !form.procedureDocumentId || !form.riskId || !form.measurementDate || !form.laboratory.trim() || !form.responsibleEmployeeId) {
       toast.error("Diligencia todos los campos obligatorios de la medición ambiental.")
       return
     }
-    onSave(form, record?.id)
+    setSaving(true)
+    const saved = await onSave(form, record?.id)
+    setSaving(false)
+    if (saved) onClose()
   }
 
   return (
@@ -560,7 +514,7 @@ function MeasurementDialog({
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit">{record ? "Guardar cambios" : "Crear medición"}</Button>
+            <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{record ? "Guardar cambios" : "Crear medición"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -581,9 +535,10 @@ function ProcedureDialog({
   documents: Option[]
   catalogsLoading: boolean
   onClose: () => void
-  onSave: (form: ProcedureForm, recordId?: string) => void
+  onSave: (form: ProcedureForm, recordId?: string) => Promise<boolean>
 }) {
   const [form, setForm] = useState<ProcedureForm>(emptyProcedureForm)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (!open) return
@@ -601,13 +556,16 @@ function ProcedureDialog({
 
   const update = <K extends keyof ProcedureForm>(key: K, value: ProcedureForm[K]) => setForm((current) => ({ ...current, [key]: value }))
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!form.name.trim() || !form.relatedProcedureId || !form.date) {
       toast.error("Diligencia el nombre, procedimiento relacionado y fecha.")
       return
     }
-    onSave(form, record?.id)
+    setSaving(true)
+    const saved = await onSave(form, record?.id)
+    setSaving(false)
+    if (saved) onClose()
   }
 
   return (
@@ -638,7 +596,7 @@ function ProcedureDialog({
           <SearchableOptionPicker label="Relacionar procedimiento de gestión documental" value={form.relatedProcedureId} options={documents} loading={catalogsLoading} placeholder="Buscar documento..." emptyMessage="No hay documentos disponibles." onChange={(id) => update("relatedProcedureId", id)} />
           <DialogFooter className="gap-2 sm:gap-0">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit">{record ? "Guardar cambios" : "Crear procedimiento"}</Button>
+            <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{record ? "Guardar cambios" : "Crear procedimiento"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -653,22 +611,26 @@ function EvidenceDialog({
 }: {
   record: EnvironmentalRecord | null
   onClose: () => void
-  onUpload: (record: EnvironmentalRecord, evidence: EvidenceForm) => void
+  onUpload: (record: EnvironmentalRecord, evidence: EvidenceForm) => Promise<boolean>
 }) {
   const [form, setForm] = useState<EvidenceForm>(emptyEvidenceForm)
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     if (record) setForm(emptyEvidenceForm)
   }, [record])
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!record) return
-    if (!form.fileName.trim()) {
-      toast.error("Selecciona o registra el nombre del archivo de evidencia.")
+    if (!form.file) {
+      toast.error("Selecciona el archivo de evidencia.")
       return
     }
-    onUpload(record, form)
+    setUploading(true)
+    const uploaded = await onUpload(record, form)
+    setUploading(false)
+    if (uploaded) onClose()
   }
 
   return (
@@ -680,7 +642,8 @@ function EvidenceDialog({
         <form onSubmit={handleSubmit} className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="evidence-file">Archivo</Label>
-            <Input id="evidence-file" value={form.fileName} onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.value }))} placeholder="Nombre del archivo o soporte" />
+            <Input id="evidence-file" type="file" onChange={(event) => setForm((current) => ({ ...current, file: event.target.files?.[0] ?? null }))} />
+            {form.file && <p className="truncate text-sm text-muted-foreground">{form.file.name}</p>}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="evidence-description">Descripción</Label>
@@ -692,7 +655,7 @@ function EvidenceDialog({
           </label>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit" className="gap-2"><Upload className="h-4 w-4" />Subir</Button>
+            <Button type="submit" className="gap-2" disabled={uploading}>{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}Subir</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -704,10 +667,12 @@ function DetailDialog({
   record,
   onClose,
   onDownload,
+  onPreviewEvidence,
 }: {
   record: EnvironmentalRecord | null
   onClose: () => void
   onDownload: (record: EnvironmentalRecord) => void
+  onPreviewEvidence: (record: EnvironmentalRecord) => void
 }) {
   if (!record) return null
 
@@ -745,7 +710,16 @@ function DetailDialog({
           </div>
           <div className="rounded-md border border-border p-4">
             <h3 className="font-semibold text-foreground">Evidencia</h3>
-            <p className="mt-2 text-sm text-muted-foreground">{record.evidence ? `${record.evidence.fileName} · ${formatDateTime(record.evidence.uploadedAt)}` : "Sin evidencia cargada."}</p>
+            {record.evidence ? (
+              <div className="mt-2 flex flex-col gap-3 rounded-md bg-secondary p-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0 text-sm">
+                  <p className="truncate font-medium text-foreground">{record.evidence.originalName}</p>
+                  <p className="text-muted-foreground">{record.evidence.description || "Sin descripción"}</p>
+                  <p className="text-xs text-muted-foreground">{formatDateTime(record.evidence.createdAt)}</p>
+                </div>
+                <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onPreviewEvidence(record)}><Eye className="h-4 w-4" />Previsualizar</Button>
+              </div>
+            ) : <p className="mt-2 text-sm text-muted-foreground">Sin evidencia cargada.</p>}
           </div>
         </div>
         <DialogFooter className="gap-2 sm:gap-0">
@@ -757,8 +731,38 @@ function DetailDialog({
   )
 }
 
+type EvidencePreview = { url: string; mimeType: string; name: string }
+
+function EvidencePreviewDialog({ preview, onClose }: { preview: EvidencePreview | null; onClose: () => void }) {
+  if (!preview) return null
+  const isImage = preview.mimeType.startsWith("image/")
+  const isPdf = preview.mimeType === "application/pdf" || preview.name.toLowerCase().endsWith(".pdf")
+  return (
+    <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="!flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12"><DialogTitle className="truncate">{preview.name}</DialogTitle></DialogHeader>
+        <div className="min-h-0 flex-1 bg-slate-100 p-3">
+          {isImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={preview.url} alt={preview.name} className="h-full w-full object-contain" />
+          ) : isPdf ? (
+            <iframe src={preview.url} title={preview.name} className="h-full w-full rounded-md border border-border bg-white" />
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm text-muted-foreground"><FileText className="h-10 w-10" />Este tipo de archivo no admite previsualización en el navegador.</div>
+          )}
+        </div>
+        <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+          <Button type="button" variant="outline" onClick={onClose}>Cerrar</Button>
+          <Button type="button" className="gap-2" asChild><a href={preview.url} download={preview.name}><Download className="h-4 w-4" />Descargar</a></Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export default function EnvironmentalMeasurementsPage() {
-  const [records, setRecords] = useState<EnvironmentalRecord[]>(initialRecords)
+  const [records, setRecords] = useState<EnvironmentalRecord[]>([])
+  const [recordsLoading, setRecordsLoading] = useState(true)
   const [employees, setEmployees] = useState<EmployeeOption[]>([])
   const [risks, setRisks] = useState<Option[]>([])
   const [documents, setDocuments] = useState<Option[]>([])
@@ -774,6 +778,23 @@ export default function EnvironmentalMeasurementsPage() {
   const [editingProcedure, setEditingProcedure] = useState<ProcedureRecord | null>(null)
   const [evidenceRecord, setEvidenceRecord] = useState<EnvironmentalRecord | null>(null)
   const [detailRecord, setDetailRecord] = useState<EnvironmentalRecord | null>(null)
+  const [preview, setPreview] = useState<EvidencePreview | null>(null)
+
+  async function loadRecords() {
+    setRecordsLoading(true)
+    try {
+      const result = await listEnvironmentalMeasurements({ limit: 100 })
+      setRecords((result.items ?? []).map(normalizeRecord))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar las mediciones ambientales")
+    } finally {
+      setRecordsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void loadRecords()
+  }, [])
 
   useEffect(() => {
     let mounted = true
@@ -835,80 +856,87 @@ export default function EnvironmentalMeasurementsPage() {
   const withEvidenceCount = records.filter((record) => record.evidence).length
   const notComplyCount = records.filter((record) => record.kind === "MEASUREMENT" && record.result === "DOES_NOT_COMPLY").length
 
-  function handleSaveMeasurement(form: MeasurementForm, recordId?: string) {
+  async function handleSaveMeasurement(form: MeasurementForm, recordId?: string): Promise<boolean> {
     const responsibleName = findEmployeeName(employees, form.responsibleEmployeeId)
     const riskName = findOptionName(risks, form.riskId)
     const procedureDocumentName = findOptionName(documents, form.procedureDocumentId)
-
-    setRecords((current) => {
-      if (recordId) {
-        return current.map((record) =>
-          record.id === recordId && record.kind === "MEASUREMENT"
-            ? { ...record, ...form, responsibleName, riskName, procedureDocumentName }
-            : record,
-        )
-      }
-
-      return [
-        {
-          id: createId("environmental-measurement"),
-          kind: "MEASUREMENT",
-          ...form,
-          responsibleName,
-          riskName,
-          procedureDocumentName,
-          createdAt: new Date().toISOString(),
-        },
-        ...current,
-      ]
-    })
-
-    setMeasurementDialogOpen(false)
-    setEditingMeasurement(null)
-    toast.success(recordId ? "Medición ambiental actualizada." : "Medición ambiental creada.")
-  }
-
-  function handleSaveProcedure(form: ProcedureForm, recordId?: string) {
-    const relatedProcedureName = findOptionName(documents, form.relatedProcedureId)
-
-    setRecords((current) => {
-      if (recordId) {
-        return current.map((record) =>
-          record.id === recordId && record.kind === "PROCEDURE"
-            ? { ...record, ...form, relatedProcedureName }
-            : record,
-        )
-      }
-
-      return [
-        {
-          id: createId("environmental-procedure"),
-          kind: "PROCEDURE",
-          ...form,
-          relatedProcedureName,
-          createdAt: new Date().toISOString(),
-        },
-        ...current,
-      ]
-    })
-
-    setProcedureDialogOpen(false)
-    setEditingProcedure(null)
-    toast.success(recordId ? "Procedimiento actualizado." : "Procedimiento creado.")
-  }
-
-  function handleUpload(record: EnvironmentalRecord, form: EvidenceForm) {
-    const evidence: Evidence = {
-      id: createId("environmental-evidence"),
-      fileName: form.fileName,
-      description: form.description,
-      uploadedAt: new Date().toISOString(),
-      isConfirmed: form.isConfirmed,
+    try {
+      const saved = recordId
+        ? await updateEnvironmentalMeasurement(recordId, form)
+        : await createEnvironmentalMeasurement(form)
+      const normalized = normalizeRecord({ ...saved, responsibleName, riskName, procedureDocumentName })
+      setRecords((current) => recordId ? current.map((record) => record.id === recordId ? normalized : record) : [normalized, ...current])
+      setMeasurementDialogOpen(false)
+      setEditingMeasurement(null)
+      toast.success(recordId ? "Medición ambiental actualizada." : "Medición ambiental creada.")
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar la medición ambiental")
+      return false
     }
+  }
 
-    setRecords((current) => current.map((item) => (item.id === record.id ? { ...item, evidence } : item)))
-    setEvidenceRecord(null)
-    toast.success("Evidencia cargada correctamente.")
+  async function handleSaveProcedure(form: ProcedureForm, recordId?: string): Promise<boolean> {
+    const relatedProcedureName = findOptionName(documents, form.relatedProcedureId)
+    try {
+      const saved = recordId
+        ? await updateEnvironmentalProcedure(recordId, form)
+        : await createEnvironmentalProcedure(form)
+      const normalized = normalizeRecord({ ...saved, relatedProcedureName })
+      setRecords((current) => recordId ? current.map((record) => record.id === recordId ? normalized : record) : [normalized, ...current])
+      setProcedureDialogOpen(false)
+      setEditingProcedure(null)
+      toast.success(recordId ? "Procedimiento actualizado." : "Procedimiento creado.")
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar el procedimiento")
+      return false
+    }
+  }
+
+  async function handleUpload(record: EnvironmentalRecord, form: EvidenceForm): Promise<boolean> {
+    if (!form.file) return false
+    try {
+      const evidence = await uploadEnvironmentalEvidence(record.id, { file: form.file, description: form.description, isConfirmed: form.isConfirmed })
+      setRecords((current) => current.map((item) => item.id === record.id ? { ...item, evidence } : item))
+      setDetailRecord((current) => current?.id === record.id ? { ...current, evidence } : current)
+      setEvidenceRecord(null)
+      toast.success("Evidencia cargada correctamente.")
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar la evidencia")
+      return false
+    }
+  }
+
+  async function openDetail(record: EnvironmentalRecord) {
+    try {
+      setDetailRecord(normalizeRecord(await getEnvironmentalMeasurement(record.id)))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el detalle")
+    }
+  }
+
+  async function downloadRecordPdf(record: EnvironmentalRecord) {
+    try {
+      const blob = await exportEnvironmentalMeasurement(record.id)
+      saveBlob(blob, `${recordTitle(record).toLowerCase().replace(/\s+/g, "-")}.pdf`)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo exportar el registro")
+    }
+  }
+
+  async function previewEvidence(record: EnvironmentalRecord) {
+    if (!record.evidence) return
+    try {
+      const blob = await downloadEnvironmentalEvidence(record.id, record.evidence.id)
+      setPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return { url: URL.createObjectURL(blob), mimeType: blob.type || record.evidence?.mimeType || "application/octet-stream", name: record.evidence?.originalName || "evidencia" }
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo previsualizar la evidencia")
+    }
   }
 
   function openEdit(record: EnvironmentalRecord) {
@@ -993,7 +1021,7 @@ export default function EnvironmentalMeasurementsPage() {
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">{recordCategory(record)}</p>
                     </div>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => setDetailRecord(record)}><Eye className="h-4 w-4" />Ver</Button>
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void openDetail(record)}><Eye className="h-4 w-4" />Ver</Button>
                   </div>
                   <div className="grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
                     <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />{formatDate(recordDate(record))}</p>
@@ -1003,13 +1031,14 @@ export default function EnvironmentalMeasurementsPage() {
                   </div>
                   <div className="flex flex-wrap justify-end gap-2 border-t border-border pt-3">
                     <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => openEdit(record)}><Edit className="h-4 w-4" />Editar</Button>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => downloadRecordPdf(record)}><Download className="h-4 w-4" />PDF</Button>
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void downloadRecordPdf(record)}><Download className="h-4 w-4" />PDF</Button>
                     <Button type="button" size="sm" className="gap-2" onClick={() => setEvidenceRecord(record)}><Upload className="h-4 w-4" />Evidencia</Button>
                   </div>
                 </CardContent>
               </Card>
             ))}
-            {filteredRecords.length === 0 && <Card><CardContent className="p-8 text-center text-sm text-muted-foreground">No hay registros para mostrar.</CardContent></Card>}
+            {recordsLoading && <Card><CardContent className="p-8 text-center text-sm text-muted-foreground"><Loader2 className="mx-auto mb-2 h-5 w-5 animate-spin" />Cargando registros...</CardContent></Card>}
+            {!recordsLoading && filteredRecords.length === 0 && <Card><CardContent className="p-8 text-center text-sm text-muted-foreground">No hay registros para mostrar.</CardContent></Card>}
           </div>
         ) : (
           <div className="overflow-x-auto rounded-md border border-border bg-card">
@@ -1026,7 +1055,8 @@ export default function EnvironmentalMeasurementsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {filteredRecords.map((record) => (
+                {recordsLoading && <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground"><Loader2 className="mx-auto mb-2 h-5 w-5 animate-spin" />Cargando registros...</td></tr>}
+                {!recordsLoading && filteredRecords.map((record) => (
                   <tr key={record.id} className="align-middle">
                     <td className="px-4 py-3">
                       <p className="font-medium text-foreground">{recordTitle(record)}</p>
@@ -1036,14 +1066,14 @@ export default function EnvironmentalMeasurementsPage() {
                     <td className="px-4 py-3 text-muted-foreground">{formatDate(recordDate(record))}</td>
                     <td className="px-4 py-3 text-muted-foreground">{recordResponsible(record)}</td>
                     <td className="px-4 py-3">{record.kind === "MEASUREMENT" ? <Badge variant="outline" className={resultClassName(record.result)}>{resultLabel(record.result)}</Badge> : <span className="text-muted-foreground">No aplica</span>}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{record.evidence?.fileName ?? "Sin evidencia"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{record.evidence?.originalName ?? "Sin evidencia"}</td>
                     <td className="px-4 py-3 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild><Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuItem onSelect={() => setDetailRecord(record)}><Eye className="h-4 w-4" />Ver detalle</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => void openDetail(record)}><Eye className="h-4 w-4" />Ver detalle</DropdownMenuItem>
                           <DropdownMenuItem onSelect={() => openEdit(record)}><Edit className="h-4 w-4" />Editar</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => downloadRecordPdf(record)}><Download className="h-4 w-4" />Descargar</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => void downloadRecordPdf(record)}><Download className="h-4 w-4" />Descargar</DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onSelect={() => setEvidenceRecord(record)}><Upload className="h-4 w-4" />Subir evidencia</DropdownMenuItem>
                         </DropdownMenuContent>
@@ -1051,7 +1081,7 @@ export default function EnvironmentalMeasurementsPage() {
                     </td>
                   </tr>
                 ))}
-                {filteredRecords.length === 0 && <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground">No hay registros para mostrar.</td></tr>}
+                {!recordsLoading && filteredRecords.length === 0 && <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground">No hay registros para mostrar.</td></tr>}
               </tbody>
             </table>
           </div>
@@ -1078,7 +1108,8 @@ export default function EnvironmentalMeasurementsPage() {
         onSave={handleSaveProcedure}
       />
       <EvidenceDialog record={evidenceRecord} onClose={() => setEvidenceRecord(null)} onUpload={handleUpload} />
-      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={downloadRecordPdf} />
+      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={(record) => void downloadRecordPdf(record)} onPreviewEvidence={(record) => void previewEvidence(record)} />
+      <EvidencePreviewDialog preview={preview} onClose={() => { if (preview?.url) URL.revokeObjectURL(preview.url); setPreview(null) }} />
     </main>
   )
 }

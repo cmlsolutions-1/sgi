@@ -8,6 +8,7 @@ import {
   Eye,
   FileCheck2,
   FileText,
+  Loader2,
   MessageSquare,
   MoreHorizontal,
   Plus,
@@ -15,8 +16,6 @@ import {
   Trash2,
   Upload,
 } from "lucide-react"
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -39,41 +38,31 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { listEmployees } from "@/services/employeeService"
+import {
+  createSstCommunication,
+  deleteSstCommunication,
+  downloadSstCommunicationDocument,
+  downloadSstCommunicationSignaturePdf,
+  getSstCommunication,
+  listSstCommunications,
+  updateSstCommunication,
+  uploadSstCommunicationInitialEvidence,
+  uploadSstCommunicationSignedEvidence,
+} from "@/services/sstCommunicationService"
+import type {
+  SstCommunication,
+  SstCommunicationMedium as CommunicationMedium,
+  SstCommunicationResponsibleType as ResponsibleType,
+  SstCommunicationType as CommunicationType,
+  UpsertSstCommunicationDto,
+} from "@/types/manager/sst-communication"
 
-type CommunicationType = "INTERNAL" | "EXTERNAL"
-type CommunicationMedium = "WHATSAPP" | "EMAIL" | "MAILBOX" | "FORM" | "VERBAL" | "MEETING" | "OTHER"
-type ResponsibleType = "EMPLOYEE" | "MANAGER"
-
-type MockEmployee = {
+type EmployeeOption = {
   id: string
   name: string
   lastName: string
   job: string
-}
-
-type SignedEvidence = {
-  id: string
-  fileName: string
-  description: string
-  uploadedAt: string
-  mimeType?: string
-  url?: string
-}
-
-type SstCommunication = {
-  id: string
-  mechanismName: string
-  type: CommunicationType
-  medium: CommunicationMedium
-  customMedium?: string
-  responsibleType: ResponsibleType
-  responsibleEmployeeId?: string
-  managerName?: string
-  implementationDate: string
-  observations: string
-  informedCopasst: boolean
-  initialEvidence?: SignedEvidence
-  signedEvidence?: SignedEvidence
 }
 
 type CommunicationForm = {
@@ -100,12 +89,6 @@ type EvidencePreview = {
   mimeType: string
   generated: boolean
 }
-
-const employees: MockEmployee[] = [
-  { id: "emp-1", name: "Diana", lastName: "Mendoza", job: "Responsable SG-SST" },
-  { id: "emp-2", name: "Carlos", lastName: "Ramirez", job: "Coordinador operativo" },
-  { id: "emp-3", name: "Valentina", lastName: "Suarez", job: "Auxiliar administrativa" },
-]
 
 const mediumOptions: Array<{ value: CommunicationMedium; label: string }> = [
   { value: "WHATSAPP", label: "WhatsApp" },
@@ -135,57 +118,6 @@ const emptyEvidenceForm: EvidenceForm = {
   description: "",
 }
 
-const initialCommunications: SstCommunication[] = [
-  {
-    id: "comm-1",
-    mechanismName: "Comunicacion interna de novedades SST",
-    type: "INTERNAL",
-    medium: "WHATSAPP",
-    responsibleType: "EMPLOYEE",
-    responsibleEmployeeId: "emp-1",
-    implementationDate: "2026-09-01",
-    observations: "Canal usado para reportes rapidos y divulgacion de alertas SST.",
-    informedCopasst: true,
-    initialEvidence: {
-      id: "initial-evidence-1",
-      fileName: "soporte-canal-whatsapp-sst.pdf",
-      description: "Evidencia de implementación del canal de WhatsApp SST.",
-      uploadedAt: "2026-09-01T08:30:00",
-      mimeType: "application/pdf",
-    },
-    signedEvidence: {
-      id: "evidence-1",
-      fileName: "acta-comunicaciones-sst-firmada.pdf",
-      description: "Acta firmada por gerencia.",
-      uploadedAt: "2026-09-02T10:00:00",
-      mimeType: "application/pdf",
-    },
-  },
-  {
-    id: "comm-2",
-    mechanismName: "Buzon de sugerencias SST",
-    type: "INTERNAL",
-    medium: "MAILBOX",
-    responsibleType: "MANAGER",
-    managerName: "Gerencia General",
-    implementationDate: "2026-08-15",
-    observations: "Recepcion mensual de inquietudes, quejas o reportes de condiciones inseguras.",
-    informedCopasst: false,
-    initialEvidence: {
-      id: "initial-evidence-2",
-      fileName: "registro-buzon-sugerencias-sst.pdf",
-      description: "Registro fotografico del buzon y acta de apertura.",
-      uploadedAt: "2026-08-15T14:20:00",
-      mimeType: "application/pdf",
-    },
-  },
-]
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return `${prefix}-${crypto.randomUUID()}`
-  return `${prefix}-${Date.now()}`
-}
-
 function formatDate(value?: string | null) {
   if (!value) return "No registrada"
   return value.slice(0, 10)
@@ -211,63 +143,44 @@ function mediumLabel(record: Pick<SstCommunication, "medium" | "customMedium">) 
   return mediumOptions.find((option) => option.value === record.medium)?.label ?? record.medium
 }
 
-function employeeName(employeeId?: string) {
-  const employee = employees.find((item) => item.id === employeeId)
-  if (!employee) return "Empleado no asignado"
-  return `${employee.name} ${employee.lastName}`
-}
-
-function responsibleLabel(record: SstCommunication) {
+function responsibleLabel(record: SstCommunication, employees: EmployeeOption[] = []) {
   if (record.responsibleType === "MANAGER") return record.managerName?.trim() || "Gerente"
-  return employeeName(record.responsibleEmployeeId)
+  if (record.responsibleEmployee) {
+    return `${record.responsibleEmployee.name} ${record.responsibleEmployee.lastName}`.trim()
+  }
+  const employee = employees.find((item) => item.id === record.responsibleEmployeeId)
+  return employee ? `${employee.name} ${employee.lastName}` : "Empleado no asignado"
 }
 
 function canEmbed(mimeType?: string) {
   return Boolean(mimeType?.startsWith("image/") || mimeType === "application/pdf" || mimeType?.startsWith("text/"))
 }
 
-function getImageFormat(mimeType?: string) {
-  if (mimeType === "image/jpeg" || mimeType === "image/jpg") return "JPEG"
-  if (mimeType === "image/webp") return "WEBP"
-  return "PNG"
-}
-
-function loadPdfImage(evidence?: SignedEvidence | null) {
-  if (!evidence?.url || !evidence.mimeType?.startsWith("image/")) return Promise.resolve(null)
-
-  return new Promise<{ image: HTMLImageElement; format: string } | null>((resolve) => {
-    const image = new Image()
-    image.onload = () => resolve({ image, format: getImageFormat(evidence.mimeType) })
-    image.onerror = () => resolve(null)
-    image.src = evidence.url as string
-  })
-}
-
-function buildEvidenceText(record: SstCommunication, evidence: SignedEvidence) {
-  return `Comunicaciones SST - Evidencia
-Mecanismo: ${record.mechanismName}
-Tipo: ${typeLabel(record.type)}
-Medio: ${mediumLabel(record)}
-Responsable: ${responsibleLabel(record)}
-Fecha implementacion: ${formatDate(record.implementationDate)}
-Informo a miembros del COPASST: ${record.informedCopasst ? "Si" : "No"}
-
-Archivo: ${evidence.fileName}
-Descripcion: ${evidence.description || "Sin descripcion"}
-Cargado: ${formatDateTime(evidence.uploadedAt)}
-`
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
 }
 
 function CommunicationDialog({
   open,
   record,
+  employees,
+  saving,
   onClose,
   onSave,
 }: {
   open: boolean
   record: SstCommunication | null
+  employees: EmployeeOption[]
+  saving: boolean
   onClose: () => void
-  onSave: (form: CommunicationForm, recordId?: string) => void
+  onSave: (form: CommunicationForm, recordId?: string) => Promise<void>
 }) {
   const [form, setForm] = useState<CommunicationForm>(emptyForm)
   const editing = Boolean(record)
@@ -285,14 +198,14 @@ function CommunicationDialog({
             responsibleEmployeeId: record.responsibleEmployeeId ?? "",
             managerName: record.managerName ?? "",
             implementationDate: record.implementationDate,
-            observations: record.observations,
+            observations: record.observations ?? "",
             informedCopasst: record.informedCopasst ? "YES" : "NO",
           }
         : emptyForm,
     )
   }, [open, record])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!form.mechanismName.trim()) return toast.error("Ingresa el nombre del mecanismo")
     if (!form.implementationDate) return toast.error("Selecciona la fecha de implementacion")
@@ -300,8 +213,7 @@ function CommunicationDialog({
     if (form.responsibleType === "EMPLOYEE" && !form.responsibleEmployeeId) return toast.error("Selecciona el empleado responsable")
     if (form.responsibleType === "MANAGER" && !form.managerName.trim()) return toast.error("Ingresa el responsable gerente")
 
-    onSave(form, record?.id)
-    onClose()
+    await onSave(form, record?.id)
   }
 
   return (
@@ -446,10 +358,13 @@ function CommunicationDialog({
           </div>
 
           <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
               Cancelar
             </Button>
-            <Button type="submit">{editing ? "Guardar cambios" : "Crear comunicacion"}</Button>
+            <Button type="submit" disabled={saving}>
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+              {editing ? "Guardar cambios" : "Crear comunicacion"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -460,13 +375,15 @@ function CommunicationDialog({
 function EvidenceDialog({
   record,
   kind,
+  uploading,
   onClose,
   onSave,
 }: {
   record: SstCommunication | null
   kind: "initial" | "signed"
+  uploading: boolean
   onClose: () => void
-  onSave: (recordId: string, form: EvidenceForm, file: File | null, kind: "initial" | "signed") => void
+  onSave: (recordId: string, form: EvidenceForm, file: File, kind: "initial" | "signed") => Promise<void>
 }) {
   const [form, setForm] = useState<EvidenceForm>(emptyEvidenceForm)
   const [file, setFile] = useState<File | null>(null)
@@ -475,21 +392,20 @@ function EvidenceDialog({
     if (!record) return
     const evidence = kind === "initial" ? record.initialEvidence : record.signedEvidence
     setForm({
-      fileName: evidence?.fileName ?? "",
+      fileName: evidence?.originalName ?? "",
       description: evidence?.description ?? "",
     })
     setFile(null)
   }, [kind, record])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!record) return
-    if (!file && !form.fileName.trim()) {
-      return toast.error(kind === "initial" ? "Selecciona o registra la evidencia inicial" : "Selecciona o registra el documento firmado")
+    if (!file) {
+      return toast.error(kind === "initial" ? "Selecciona la evidencia inicial" : "Selecciona el documento firmado")
     }
 
-    onSave(record.id, form, file, kind)
-    onClose()
+    await onSave(record.id, form, file, kind)
   }
 
   return (
@@ -521,7 +437,7 @@ function EvidenceDialog({
               Nombre del archivo
               <Input
                 value={form.fileName}
-                onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.value }))}
+                readOnly
                 placeholder={kind === "initial" ? "evidencia-comunicacion-sst.pdf" : "comunicaciones-sst-firmado.pdf"}
               />
             </Label>
@@ -536,10 +452,13 @@ function EvidenceDialog({
             </Label>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} disabled={uploading}>
               Cancelar
             </Button>
-            <Button type="submit">{kind === "initial" ? "Guardar evidencia inicial" : "Guardar documento firmado"}</Button>
+            <Button type="submit" disabled={uploading}>
+              {uploading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {kind === "initial" ? "Guardar evidencia inicial" : "Guardar documento firmado"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -600,7 +519,8 @@ function InfoBlock({ label, value }: { label: string; value: string }) {
 }
 
 export default function SstCommunicationsPage() {
-  const [records, setRecords] = useState<SstCommunication[]>(initialCommunications)
+  const [records, setRecords] = useState<SstCommunication[]>([])
+  const [employees, setEmployees] = useState<EmployeeOption[]>([])
   const [search, setSearch] = useState("")
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingRecord, setEditingRecord] = useState<SstCommunication | null>(null)
@@ -608,6 +528,50 @@ export default function SstCommunicationsPage() {
   const [evidenceKind, setEvidenceKind] = useState<"initial" | "signed">("initial")
   const [detailRecord, setDetailRecord] = useState<SstCommunication | null>(null)
   const [preview, setPreview] = useState<EvidencePreview | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [busyRecordId, setBusyRecordId] = useState<string | null>(null)
+
+  async function loadRecords(showError = true) {
+    try {
+      const response = await listSstCommunications({ limit: 100 })
+      setRecords(response.items)
+    } catch (error) {
+      if (showError) toast.error(error instanceof Error ? error.message : "No se pudieron cargar las comunicaciones SST")
+    }
+  }
+
+  useEffect(() => {
+    let active = true
+    async function loadPage() {
+      setLoading(true)
+      try {
+        const [communications, employeeList] = await Promise.all([
+          listSstCommunications({ limit: 100 }),
+          listEmployees(),
+        ])
+        if (!active) return
+        setRecords(communications.items)
+        setEmployees(
+          employeeList.map((employee) => ({
+            id: employee.id,
+            name: employee.name,
+            lastName: employee.lastName,
+            job: employee.job?.name ?? "Sin cargo asignado",
+          })),
+        )
+      } catch (error) {
+        if (active) toast.error(error instanceof Error ? error.message : "No se pudo cargar el módulo de comunicaciones SST")
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+    void loadPage()
+    return () => {
+      active = false
+    }
+  }, [])
 
   const stats = useMemo(() => {
     return {
@@ -627,72 +591,73 @@ export default function SstCommunicationsPage() {
       (record) =>
         record.mechanismName.toLowerCase().includes(term) ||
         mediumLabel(record).toLowerCase().includes(term) ||
-        responsibleLabel(record).toLowerCase().includes(term) ||
-        record.initialEvidence?.fileName.toLowerCase().includes(term) ||
-        record.signedEvidence?.fileName.toLowerCase().includes(term),
+        responsibleLabel(record, employees).toLowerCase().includes(term) ||
+        record.initialEvidence?.originalName.toLowerCase().includes(term) ||
+        record.signedEvidence?.originalName.toLowerCase().includes(term),
     )
-  }, [records, search])
+  }, [employees, records, search])
 
-  function saveRecord(form: CommunicationForm, recordId?: string) {
-    const payload = {
+  async function saveRecord(form: CommunicationForm, recordId?: string) {
+    const payload: UpsertSstCommunicationDto = {
       mechanismName: form.mechanismName.trim(),
       type: form.type,
       medium: form.medium,
-      customMedium: form.customMedium.trim(),
+      customMedium: form.medium === "OTHER" ? form.customMedium.trim() : null,
       responsibleType: form.responsibleType,
-      responsibleEmployeeId: form.responsibleType === "EMPLOYEE" ? form.responsibleEmployeeId : undefined,
-      managerName: form.responsibleType === "MANAGER" ? form.managerName.trim() : undefined,
+      responsibleEmployeeId: form.responsibleType === "EMPLOYEE" ? form.responsibleEmployeeId : null,
+      managerName: form.responsibleType === "MANAGER" ? form.managerName.trim() : null,
       implementationDate: form.implementationDate,
       observations: form.observations.trim(),
       informedCopasst: form.informedCopasst === "YES",
     }
 
-    if (recordId) {
-      setRecords((current) => current.map((record) => (record.id === recordId ? { ...record, ...payload } : record)))
-      toast.success("Comunicacion SST actualizada")
-      return
+    setSaving(true)
+    try {
+      if (recordId) {
+        await updateSstCommunication(recordId, payload)
+        toast.success("Comunicación SST actualizada")
+      } else {
+        await createSstCommunication(payload)
+        toast.success("Comunicación SST creada")
+      }
+      await loadRecords(false)
+      setDialogOpen(false)
+      setEditingRecord(null)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar la comunicación SST")
+    } finally {
+      setSaving(false)
     }
-
-    setRecords((current) => [{ id: createId("communication"), ...payload }, ...current])
-    toast.success("Comunicacion SST creada")
   }
 
-  function saveEvidence(recordId: string, form: EvidenceForm, file: File | null, kind: "initial" | "signed") {
-    const evidence: SignedEvidence = {
-      id: createId(kind === "initial" ? "communication-initial-evidence" : "communication-signed-evidence"),
-      fileName:
-        form.fileName.trim() ||
-        file?.name ||
-        (kind === "initial" ? "evidencia-comunicacion-sst.pdf" : "comunicacion-sst-firmada.pdf"),
-      description: form.description.trim(),
-      uploadedAt: new Date().toISOString(),
-      mimeType: file?.type || "text/plain",
-      url: file ? URL.createObjectURL(file) : undefined,
+  async function saveEvidence(recordId: string, form: EvidenceForm, file: File, kind: "initial" | "signed") {
+    setUploading(true)
+    try {
+      const payload = { file, description: form.description.trim(), isConfirmed: true }
+      if (kind === "initial") await uploadSstCommunicationInitialEvidence(recordId, payload)
+      else await uploadSstCommunicationSignedEvidence(recordId, payload)
+      toast.success(kind === "initial" ? "Evidencia inicial cargada" : "Documento firmado cargado")
+      await loadRecords(false)
+      setEvidenceRecord(null)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el documento")
+    } finally {
+      setUploading(false)
     }
-
-    setRecords((current) =>
-      current.map((record) =>
-        record.id === recordId
-          ? kind === "initial"
-            ? { ...record, initialEvidence: evidence }
-            : { ...record, signedEvidence: evidence }
-          : record,
-      ),
-    )
-    setEvidenceRecord((current) =>
-      current?.id === recordId
-        ? kind === "initial"
-          ? { ...current, initialEvidence: evidence }
-          : { ...current, signedEvidence: evidence }
-        : current,
-    )
-    toast.success(kind === "initial" ? "Evidencia inicial cargada" : "Documento firmado cargado")
   }
 
-  function deleteRecord(record: SstCommunication) {
+  async function deleteRecord(record: SstCommunication) {
     if (!window.confirm(`Eliminar la comunicacion "${record.mechanismName}"?`)) return
-    setRecords((current) => current.filter((item) => item.id !== record.id))
-    toast.success("Comunicacion eliminada")
+    setBusyRecordId(record.id)
+    try {
+      await deleteSstCommunication(record.id)
+      setRecords((current) => current.filter((item) => item.id !== record.id))
+      toast.success("Comunicación eliminada")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar la comunicación")
+    } finally {
+      setBusyRecordId(null)
+    }
   }
 
   async function downloadPdf(record: SstCommunication) {
@@ -701,135 +666,38 @@ export default function SstCommunicationsPage() {
       return
     }
 
-    const doc = new jsPDF("p", "mm", "a4")
-    const pageWidth = doc.internal.pageSize.getWidth()
-    const pageHeight = doc.internal.pageSize.getHeight()
-    const margin = 15
-    const primaryColor: [number, number, number] = [31, 92, 77]
-
-    doc.setFillColor(...primaryColor)
-    doc.roundedRect(margin, 12, pageWidth - margin * 2, 22, 3, 3, "F")
-    doc.setTextColor(255, 255, 255)
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(13)
-    doc.text("ACTA DE COMUNICACIONES SST", margin + 5, 22)
-    doc.setFont("helvetica", "normal")
-    doc.setFontSize(8)
-    doc.text(`Documento para firma de gerencia · Generado: ${formatDate(new Date().toISOString())}`, margin + 5, 29)
-
-    autoTable(doc, {
-      startY: 42,
-      theme: "grid",
-      margin: { left: margin, right: margin },
-      body: [
-        ["Nombre del mecanismo", record.mechanismName],
-        ["Tipo", typeLabel(record.type)],
-        ["Medio", mediumLabel(record)],
-        ["Responsable", responsibleLabel(record)],
-        ["Fecha de implementación", formatDate(record.implementationDate)],
-        ["Informó a miembros del COPASST", record.informedCopasst ? "Sí" : "No"],
-        ["Evidencia inicial", record.initialEvidence.fileName],
-        ["Descripción evidencia", record.initialEvidence.description || "Sin descripción"],
-        ["Observaciones", record.observations || "Sin observaciones"],
-      ],
-      styles: { font: "helvetica", fontSize: 9, cellPadding: 3, lineColor: [220, 226, 224], lineWidth: 0.1 },
-      columnStyles: {
-        0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 55 },
-        1: { cellWidth: pageWidth - margin * 2 - 55 },
-      },
-    })
-
-    let finalY = ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 110) + 14
-    const evidenceImage = await loadPdfImage(record.initialEvidence)
-
-    if (evidenceImage) {
-      if (finalY + 92 > pageHeight - 18) {
-        doc.addPage()
-        finalY = 18
-      }
-
-      doc.setFont("helvetica", "bold")
-      doc.setTextColor(30, 41, 59)
-      doc.setFontSize(10)
-      doc.text("Evidencia inicial cargada", margin, finalY)
-
-      const maxImageWidth = pageWidth - margin * 2
-      const maxImageHeight = 78
-      const imageRatio = evidenceImage.image.width / Math.max(1, evidenceImage.image.height)
-      let imageWidth = maxImageWidth
-      let imageHeight = imageWidth / imageRatio
-
-      if (imageHeight > maxImageHeight) {
-        imageHeight = maxImageHeight
-        imageWidth = imageHeight * imageRatio
-      }
-
-      const imageX = margin + (maxImageWidth - imageWidth) / 2
-      doc.addImage(evidenceImage.image, evidenceImage.format, imageX, finalY + 6, imageWidth, imageHeight)
-      finalY += imageHeight + 20
+    setBusyRecordId(record.id)
+    try {
+      const blob = await downloadSstCommunicationSignaturePdf(record.id)
+      downloadBlob(blob, `comunicacion-sst-${record.mechanismName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar el PDF para firma")
+    } finally {
+      setBusyRecordId(null)
     }
-
-    if (finalY + 52 > pageHeight - 18) {
-      doc.addPage()
-      finalY = 18
-    }
-
-    doc.setFont("helvetica", "bold")
-    doc.setTextColor(30, 41, 59)
-    doc.setFontSize(10)
-    doc.text("Aprobación de gerencia", margin, finalY)
-    doc.setFont("helvetica", "normal")
-    doc.setFontSize(9)
-    doc.text("Con mi firma dejo constancia de la revisión y aprobación del mecanismo de comunicación SST.", margin, finalY + 8)
-
-    const signatureY = Math.min(finalY + 40, pageHeight - 36)
-    doc.setDrawColor(120, 130, 140)
-    doc.line(margin, signatureY, margin + 80, signatureY)
-    doc.line(pageWidth - margin - 80, signatureY, pageWidth - margin, signatureY)
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(8)
-    doc.text("Firma del gerente", margin, signatureY + 6)
-    doc.text("Responsable SG-SST", pageWidth - margin - 80, signatureY + 6)
-
-    const pageCount = Math.max(1, ((doc.internal as unknown as { pages?: unknown[] }).pages?.length ?? 2) - 1)
-    for (let pageNumber = 1; pageNumber <= pageCount; pageNumber += 1) {
-      doc.setPage(pageNumber)
-      doc.setDrawColor(220, 226, 224)
-      doc.line(margin, pageHeight - 12, pageWidth - margin, pageHeight - 12)
-      doc.setFont("helvetica", "normal")
-      doc.setFontSize(7)
-      doc.setTextColor(100, 116, 139)
-      doc.text("Documento generado desde SafeCloud SG-SST", margin, pageHeight - 7)
-      doc.text(`Página ${pageNumber} de ${pageCount}`, pageWidth - margin, pageHeight - 7, { align: "right" })
-    }
-
-    doc.save(`comunicacion-sst-${record.mechanismName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`)
   }
 
-  function viewEvidence(record: SstCommunication, kind: "initial" | "signed") {
+  async function viewEvidence(record: SstCommunication, kind: "initial" | "signed") {
     const evidence = kind === "initial" ? record.initialEvidence : record.signedEvidence
     if (!evidence) {
       toast.error(kind === "initial" ? "Esta comunicacion no tiene evidencia inicial" : "Esta comunicacion no tiene evidencia firmada")
       return
     }
 
-    if (evidence.url) {
+    setBusyRecordId(record.id)
+    try {
+      const blob = await downloadSstCommunicationDocument(evidence.downloadUrl)
       setPreview({
-        title: evidence.fileName,
-        url: evidence.url,
-        mimeType: evidence.mimeType || "application/octet-stream",
-        generated: false,
+        title: evidence.originalName,
+        url: URL.createObjectURL(blob),
+        mimeType: evidence.mimeType || blob.type || "application/octet-stream",
+        generated: true,
       })
-      return
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo abrir el documento")
+    } finally {
+      setBusyRecordId(null)
     }
-
-    const blob = new Blob([buildEvidenceText(record, evidence)], { type: "text/plain;charset=utf-8" })
-    setPreview({
-      title: evidence.fileName,
-      url: URL.createObjectURL(blob),
-      mimeType: "text/plain",
-      generated: true,
-    })
   }
 
   function closePreview() {
@@ -837,21 +705,33 @@ export default function SstCommunicationsPage() {
     setPreview(null)
   }
 
-  function downloadEvidence(record: SstCommunication, kind: "initial" | "signed") {
+  async function downloadEvidence(record: SstCommunication, kind: "initial" | "signed") {
     const evidence = kind === "initial" ? record.initialEvidence : record.signedEvidence
     if (!evidence) {
       toast.error(kind === "initial" ? "Esta comunicacion no tiene evidencia inicial" : "Esta comunicacion no tiene evidencia firmada")
       return
     }
 
-    const url =
-      evidence.url ??
-      URL.createObjectURL(new Blob([buildEvidenceText(record, evidence)], { type: "text/plain;charset=utf-8" }))
-    const link = document.createElement("a")
-    link.href = url
-    link.download = evidence.fileName
-    link.click()
-    if (!evidence.url) URL.revokeObjectURL(url)
+    setBusyRecordId(record.id)
+    try {
+      const blob = await downloadSstCommunicationDocument(evidence.downloadUrl)
+      downloadBlob(blob, evidence.originalName)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar el documento")
+    } finally {
+      setBusyRecordId(null)
+    }
+  }
+
+  async function openDetail(record: SstCommunication) {
+    setBusyRecordId(record.id)
+    try {
+      setDetailRecord(await getSstCommunication(record.id))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el detalle")
+    } finally {
+      setBusyRecordId(null)
+    }
   }
 
   return (
@@ -954,7 +834,7 @@ export default function SstCommunicationsPage() {
                   </Badge>
                 </td>
                 <td className="px-4 py-3 text-muted-foreground">{mediumLabel(record)}</td>
-                <td className="px-4 py-3 text-muted-foreground">{responsibleLabel(record)}</td>
+                <td className="px-4 py-3 text-muted-foreground">{responsibleLabel(record, employees)}</td>
                 <td className="px-4 py-3 text-muted-foreground">{formatDate(record.implementationDate)}</td>
                 <td className="px-4 py-3">
                   <Badge
@@ -972,7 +852,7 @@ export default function SstCommunicationsPage() {
                   {record.initialEvidence ? (
                     <span className="flex items-center gap-2 text-muted-foreground">
                       <FileCheck2 className="h-4 w-4 text-primary" />
-                      {record.initialEvidence.fileName}
+                      {record.initialEvidence.originalName}
                     </span>
                   ) : (
                     <span className="text-muted-foreground">Sin evidencia inicial</span>
@@ -982,7 +862,7 @@ export default function SstCommunicationsPage() {
                   {record.signedEvidence ? (
                     <span className="flex items-center gap-2 text-muted-foreground">
                       <CheckCircle2 className="h-4 w-4 text-green-700" />
-                      {record.signedEvidence.fileName}
+                      {record.signedEvidence.originalName}
                     </span>
                   ) : (
                     <span className="text-muted-foreground">Sin evidencia</span>
@@ -996,7 +876,7 @@ export default function SstCommunicationsPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-60">
-                      <DropdownMenuItem onSelect={() => setDetailRecord(record)}>
+                      <DropdownMenuItem onSelect={() => void openDetail(record)} disabled={busyRecordId === record.id}>
                         <Eye className="h-4 w-4" />
                         Ver detalle
                       </DropdownMenuItem>
@@ -1009,7 +889,7 @@ export default function SstCommunicationsPage() {
                         <Upload className="h-4 w-4" />
                         Cargar evidencia inicial
                       </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => downloadPdf(record)} disabled={!record.initialEvidence}>
+                      <DropdownMenuItem onSelect={() => void downloadPdf(record)} disabled={!record.initialEvidence || busyRecordId === record.id}>
                         <Download className="h-4 w-4" />
                         Descargar PDF para firma
                       </DropdownMenuItem>
@@ -1023,15 +903,15 @@ export default function SstCommunicationsPage() {
                         <Upload className="h-4 w-4" />
                         Cargar evidencia firmada
                       </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => viewEvidence(record, "initial")} disabled={!record.initialEvidence}>
+                      <DropdownMenuItem onSelect={() => void viewEvidence(record, "initial")} disabled={!record.initialEvidence || busyRecordId === record.id}>
                         <FileText className="h-4 w-4" />
                         Ver evidencia inicial
                       </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => viewEvidence(record, "signed")} disabled={!record.signedEvidence}>
+                      <DropdownMenuItem onSelect={() => void viewEvidence(record, "signed")} disabled={!record.signedEvidence || busyRecordId === record.id}>
                         <FileText className="h-4 w-4" />
                         Ver documento firmado
                       </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => downloadEvidence(record, "signed")} disabled={!record.signedEvidence}>
+                      <DropdownMenuItem onSelect={() => void downloadEvidence(record, "signed")} disabled={!record.signedEvidence || busyRecordId === record.id}>
                         <Download className="h-4 w-4" />
                         Descargar firmado
                       </DropdownMenuItem>
@@ -1045,7 +925,7 @@ export default function SstCommunicationsPage() {
                         Editar
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onSelect={() => deleteRecord(record)} className="text-destructive">
+                      <DropdownMenuItem onSelect={() => void deleteRecord(record)} className="text-destructive" disabled={busyRecordId === record.id}>
                         <Trash2 className="h-4 w-4" />
                         Eliminar
                       </DropdownMenuItem>
@@ -1054,7 +934,14 @@ export default function SstCommunicationsPage() {
                 </td>
               </tr>
             ))}
-            {filteredRecords.length === 0 && (
+            {loading && (
+              <tr>
+                <td colSpan={9} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                  <span className="inline-flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Cargando comunicaciones SST...</span>
+                </td>
+              </tr>
+            )}
+            {!loading && filteredRecords.length === 0 && (
               <tr>
                 <td colSpan={9} className="px-4 py-10 text-center text-sm text-muted-foreground">
                   No hay comunicaciones SST para mostrar.
@@ -1075,14 +962,14 @@ export default function SstCommunicationsPage() {
               <InfoBlock label="Mecanismo" value={detailRecord.mechanismName} />
               <InfoBlock label="Tipo" value={typeLabel(detailRecord.type)} />
               <InfoBlock label="Medio" value={mediumLabel(detailRecord)} />
-              <InfoBlock label="Responsable" value={responsibleLabel(detailRecord)} />
+              <InfoBlock label="Responsable" value={responsibleLabel(detailRecord, employees)} />
               <InfoBlock label="Fecha implementación" value={formatDate(detailRecord.implementationDate)} />
               <InfoBlock label="COPASST" value={detailRecord.informedCopasst ? "Informado" : "Pendiente"} />
               <div className="rounded-md bg-secondary p-3 md:col-span-2">
                 <p className="text-xs font-medium uppercase text-muted-foreground">Evidencia inicial</p>
                 <p className="mt-1 text-sm text-foreground">
                   {detailRecord.initialEvidence
-                    ? `${detailRecord.initialEvidence.fileName} · ${formatDateTime(detailRecord.initialEvidence.uploadedAt)}`
+                    ? `${detailRecord.initialEvidence.originalName} · ${formatDateTime(detailRecord.initialEvidence.createdAt)}`
                     : "Sin evidencia inicial"}
                 </p>
               </div>
@@ -1094,7 +981,7 @@ export default function SstCommunicationsPage() {
                 <p className="text-xs font-medium uppercase text-muted-foreground">Evidencia firmada</p>
                 <p className="mt-1 text-sm text-foreground">
                   {detailRecord.signedEvidence
-                    ? `${detailRecord.signedEvidence.fileName} · ${formatDateTime(detailRecord.signedEvidence.uploadedAt)}`
+                    ? `${detailRecord.signedEvidence.originalName} · ${formatDateTime(detailRecord.signedEvidence.createdAt)}`
                     : "Sin evidencia firmada"}
                 </p>
               </div>
@@ -1111,6 +998,8 @@ export default function SstCommunicationsPage() {
       <CommunicationDialog
         open={dialogOpen}
         record={editingRecord}
+        employees={employees}
+        saving={saving}
         onClose={() => {
           setDialogOpen(false)
           setEditingRecord(null)
@@ -1120,6 +1009,7 @@ export default function SstCommunicationsPage() {
       <EvidenceDialog
         record={evidenceRecord}
         kind={evidenceKind}
+        uploading={uploading}
         onClose={() => setEvidenceRecord(null)}
         onSave={saveEvidence}
       />

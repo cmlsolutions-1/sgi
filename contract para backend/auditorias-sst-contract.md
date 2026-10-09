@@ -1,6 +1,6 @@
 # Contrato frontend/backend - Auditorías SST
 
-Este documento describe el contrato requerido para conectar el modulo hijo **Auditorías SST** con backend. Actualmente el modulo esta implementado con datos mockeados en frontend y conserva auditorias, documentos y acciones ACPM solo en memoria.
+Este documento describe el contrato utilizado para conectar el modulo hijo **Auditorías SST** con backend. El frontend ya consume las auditorias, documentos, acciones ACPM y exportaciones entregadas por la API.
 
 ## Ubicacion en frontend
 
@@ -35,23 +35,21 @@ El modulo contempla:
 
 ## Estado actual de implementacion
 
-Todo el modulo esta mockeado en frontend:
+El modulo se encuentra integrado con backend:
 
-- registro inicial de auditoria;
-- creacion y edicion en memoria;
-- carga simulada de documentos por nombre de archivo;
-- acciones ACPM en memoria;
-- filtros locales;
-- estadisticas locales;
-- detalle en modal;
-- PDF generado en frontend con `jsPDF` y `jspdf-autotable`.
+- listado, creacion, edicion y detalle de auditorias;
+- carga real de actas, informes y otras evidencias;
+- consulta y creacion de acciones ACPM derivadas;
+- exportacion PDF desde backend;
+- tipos compartidos en `types/manager/sst-audit.ts`;
+- servicio dedicado en `services/sstAuditService.ts`.
 
-El frontend ya consume catalogos reales para:
+El frontend tambien consume catalogos reales para:
 
 - funcionarios desde `GET /api/employees`;
 - documentos/procedimientos desde el servicio de gestion documental.
 
-No existe servicio dedicado en `services/` ni tipos compartidos en `types/manager/` para este modulo.
+No se conservan auditorias, documentos ni acciones ACPM mockeadas en memoria.
 
 ## Entidades sugeridas
 
@@ -690,9 +688,9 @@ Mantener el formato estandar de SafeCloud:
 }
 ```
 
-## Notas para integracion frontend
+## Integracion frontend
 
-Cuando backend este listo, se deben reemplazar los mocks por:
+La integracion utiliza:
 
 - `services/sstAuditsService.ts`;
 - `types/manager/sstAudits.ts`;

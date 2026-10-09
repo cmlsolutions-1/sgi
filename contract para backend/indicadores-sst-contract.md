@@ -1,6 +1,6 @@
 # Contrato frontend/backend - Indicadores SST
 
-Este documento describe el contrato requerido para conectar el modulo hijo **Indicadores SST** con backend. Actualmente el modulo esta implementado con datos mockeados/calculados en frontend y conserva el historial de informes solo en memoria.
+Este documento describe el contrato utilizado para conectar el modulo hijo **Indicadores SST** con backend. El frontend ya consume los informes, calculos y exportaciones entregados por la API.
 
 ## Ubicacion en frontend
 
@@ -29,16 +29,16 @@ El modulo contempla:
 
 ## Estado actual de implementacion
 
-Todo el modulo esta mockeado en frontend:
+El modulo se encuentra integrado con backend:
 
-- generacion local de indicadores;
-- calculo local de estado `OK`, `WATCH` y `CRITICAL`;
-- filtros por periodo;
-- historial local de ultimos informes;
-- PDF generado en frontend con `jsPDF` y `jspdf-autotable`;
-- graficas con componentes locales de analytics.
-
-No existe servicio dedicado en `services/` ni tipos compartidos en `types/manager/` para este modulo.
+- generacion mediante `POST /api/sst-indicators/generate`;
+- calculos y estados `OK`, `WATCH` y `CRITICAL` recibidos desde backend;
+- historial mediante `GET /api/sst-indicators`;
+- detalle mediante `GET /api/sst-indicators/{id}`;
+- PDF mediante `GET /api/sst-indicators/{id}/export`;
+- servicio dedicado en `services/sstIndicatorsService.ts`;
+- tipos compartidos en `types/manager/sst-indicators.ts`;
+- graficas alimentadas exclusivamente con resultados reales de la API.
 
 ## Entidades sugeridas
 
@@ -517,9 +517,9 @@ Mantener el formato estandar de SafeCloud:
 }
 ```
 
-## Notas para integracion frontend
+## Integracion frontend
 
-Cuando backend este listo, se deben reemplazar los mocks por:
+La integracion utiliza:
 
 - `services/sstIndicatorsService.ts`;
 - `types/manager/sstIndicators.ts`;
@@ -528,7 +528,7 @@ Cuando backend este listo, se deben reemplazar los mocks por:
 - detalle desde `GET /api/sst-indicators/{id}`;
 - descarga desde `GET /api/sst-indicators/{id}/export` o PDF frontend con datos reales.
 
-La interfaz actual ya tiene:
+La interfaz conserva:
 
 - filtros de generacion;
 - tarjetas de resumen;
@@ -537,4 +537,4 @@ La interfaz actual ya tiene:
 - historial de informes;
 - boton de exportacion PDF.
 
-Por eso, la integracion puede hacerse conservando el diseno actual y cambiando solamente la fuente de datos.
+No se calculan indicadores ni se conservan informes mockeados en el frontend.

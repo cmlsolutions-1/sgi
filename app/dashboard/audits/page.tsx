@@ -14,8 +14,6 @@ import {
   Search,
   Upload,
 } from "lucide-react"
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -34,13 +32,34 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { listManagedDocuments } from "@/services/documentManagementService"
 import { listEmployees } from "@/services/employeeService"
+import {
+  createSstAudit,
+  createSstAuditAction,
+  exportSstAudit,
+  getSstAudit,
+  listSstAuditActions,
+  listSstAuditDocuments,
+  listSstAudits,
+  updateSstAudit,
+  uploadSstAuditDocument,
+} from "@/services/sstAuditService"
 import type { ManagedDocument } from "@/types/manager/document-management"
 import type { Employee } from "@/types/manager/employee"
+import type {
+  SstAudit,
+  SstAuditAcpmType,
+  SstAuditActionStatus,
+  SstAuditDocument,
+  SstAuditDocumentType,
+  SstAuditMethodology,
+  SstAuditStatus,
+  SstAuditType,
+} from "@/types/manager/sst-audit"
 
-type AuditType = "INTERNAL" | "EXTERNAL"
-type AuditMethodology = "PRESENTIAL" | "VIRTUAL"
-type AuditStatus = "ACTIVE" | "EXPIRED" | "FINISHED"
-type AcpmType = "PREVENTIVE" | "CORRECTIVE" | "IMPROVEMENT"
+type AuditType = SstAuditType
+type AuditMethodology = SstAuditMethodology
+type AuditStatus = SstAuditStatus
+type AcpmType = SstAuditAcpmType
 
 type Option = {
   id: string
@@ -56,11 +75,15 @@ type EmployeeOption = {
 
 type Evidence = {
   id: string
+  type: SstAuditDocumentType
   label: string
   fileName: string
   description: string
   uploadedAt: string
   isConfirmed: boolean
+  mimeType: string
+  size: number
+  downloadUrl: string
 }
 
 type AuditAction = {
@@ -69,7 +92,7 @@ type AuditAction = {
   name: string
   responsible: string
   dueDate: string
-  status: "PENDING" | "IN_PROGRESS" | "DONE"
+  status: SstAuditActionStatus
 }
 
 type AuditRecord = {
@@ -86,6 +109,8 @@ type AuditRecord = {
   status: AuditStatus
   procedureId: string
   procedureName: string
+  evidencesCount: number
+  actionsCount: number
   evidences: Evidence[]
   actions: AuditAction[]
   createdAt: string
@@ -105,8 +130,8 @@ type AuditForm = {
 }
 
 type EvidenceForm = {
-  label: string
-  fileName: string
+  type: SstAuditDocumentType
+  file: File | null
   description: string
   isConfirmed: boolean
 }
@@ -135,8 +160,8 @@ const emptyAuditForm: AuditForm = {
 }
 
 const emptyEvidenceForm: EvidenceForm = {
-  label: "Acta de inicio",
-  fileName: "",
+  type: "OPENING_MINUTES",
+  file: null,
   description: "",
   isConfirmed: true,
 }
@@ -149,64 +174,9 @@ const emptyActionForm: ActionForm = {
   status: "PENDING",
 }
 
-const initialAudits: AuditRecord[] = [
-  {
-    id: "audit-1",
-    year: "2026",
-    name: "Auditoría interna del SG-SST",
-    scheduledDate: "2026-10-20",
-    auditType: "INTERNAL",
-    internalAuditorId: "mock-employee-1",
-    internalAuditorName: "Responsable SG-SST",
-    externalAuditTeam: "",
-    scope: "Verificar el cumplimiento documental y operativo del SG-SST.",
-    methodology: "PRESENTIAL",
-    status: "ACTIVE",
-    procedureId: "mock-document-1",
-    procedureName: "Procedimiento de auditoría interna",
-    evidences: [
-      {
-        id: "evidence-1",
-        label: "Acta de inicio",
-        fileName: "acta-inicio-auditoria-2026.pdf",
-        description: "Apertura formal de auditoría.",
-        uploadedAt: "2026-09-10T14:00:00.000Z",
-        isConfirmed: true,
-      },
-    ],
-    actions: [
-      {
-        id: "action-1",
-        type: "CORRECTIVE",
-        name: "Actualizar matriz de seguimiento documental",
-        responsible: "Responsable SG-SST",
-        dueDate: "2026-11-15",
-        status: "IN_PROGRESS",
-      },
-    ],
-    createdAt: "2026-09-10T14:00:00.000Z",
-  },
-]
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return `${prefix}-${crypto.randomUUID()}`
-  return `${prefix}-${Date.now()}`
-}
-
 function formatDate(value?: string | null) {
   if (!value) return "No registrada"
   return value.slice(0, 10)
-}
-
-function formatDateTime(value?: string | null) {
-  if (!value) return "No registrada"
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
-
-  return new Intl.DateTimeFormat("es-CO", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date)
 }
 
 function employeeFullName(employee: Employee) {
@@ -244,18 +214,65 @@ function acpmTypeLabel(value: AcpmType) {
   return "Correctiva"
 }
 
-function actionStatusLabel(value: AuditAction["status"]) {
-  if (value === "DONE") return "Finalizada"
-  if (value === "IN_PROGRESS") return "En proceso"
-  return "Pendiente"
+function evidenceTypeLabel(value: SstAuditDocumentType) {
+  if (value === "CLOSING_MINUTES") return "Acta de fin de auditoría"
+  if (value === "AUDIT_REPORT") return "Informe de auditoría"
+  if (value === "OTHER_EVIDENCE") return "Otra evidencia"
+  return "Acta de inicio de auditoría"
 }
 
-function findEmployeeName(employees: EmployeeOption[], employeeId: string) {
-  return employees.find((employee) => employee.id === employeeId)?.name ?? ""
+function mapEvidence(document: SstAuditDocument): Evidence {
+  return {
+    id: document.id,
+    type: document.type,
+    label: document.label || evidenceTypeLabel(document.type),
+    fileName: document.originalName,
+    description: document.description ?? "",
+    uploadedAt: document.createdAt,
+    isConfirmed: document.isConfirmed,
+    mimeType: document.mimeType,
+    size: document.size,
+    downloadUrl: document.downloadUrl,
+  }
 }
 
-function findOptionName(options: Option[], id: string) {
-  return options.find((option) => option.id === id)?.name ?? ""
+function mapAudit(audit: SstAudit): AuditRecord {
+  const internalAuditorName = audit.internalAuditor
+    ? `${audit.internalAuditor.name ?? ""} ${audit.internalAuditor.lastName ?? ""}`.trim()
+    : ""
+  const procedureName = audit.procedure
+    ? `${audit.procedure.code ? `${audit.procedure.code} · ` : ""}${audit.procedure.name}`
+    : ""
+  const evidences = (audit.evidences ?? []).map(mapEvidence)
+  const actions = (audit.actions ?? []).map((action) => ({
+    id: action.id,
+    type: action.type,
+    name: action.name,
+    responsible: action.responsible,
+    dueDate: action.dueDate,
+    status: action.status,
+  }))
+
+  return {
+    id: audit.id,
+    year: String(audit.year),
+    name: audit.name,
+    scheduledDate: audit.scheduledDate,
+    auditType: audit.auditType,
+    internalAuditorId: audit.internalAuditorId ?? "",
+    internalAuditorName,
+    externalAuditTeam: audit.externalAuditTeam ?? "",
+    scope: audit.scope,
+    methodology: audit.methodology,
+    status: audit.status,
+    procedureId: audit.procedureId,
+    procedureName,
+    evidencesCount: audit.evidencesCount ?? evidences.length,
+    actionsCount: audit.actionsCount ?? actions.length,
+    evidences,
+    actions,
+    createdAt: audit.createdAt,
+  }
 }
 
 function EmployeePicker({
@@ -378,61 +395,13 @@ function SearchableOptionPicker({
   )
 }
 
-function downloadAuditPdf(audit: AuditRecord) {
-  const doc = new jsPDF()
-  doc.setFontSize(16)
-  doc.text("Plan anual de auditorías SST", 14, 18)
-  doc.setFontSize(10)
-  doc.text("SafeCloud - Sistema de Gestión Integral", 14, 26)
-
-  autoTable(doc, {
-    startY: 34,
-    head: [["Campo", "Información"]],
-    body: [
-      ["Vigencia", audit.year],
-      ["Auditoría", audit.name],
-      ["Fecha programada", formatDate(audit.scheduledDate)],
-      ["Tipo", auditTypeLabel(audit.auditType)],
-      ["Auditor / equipo", audit.auditType === "INTERNAL" ? audit.internalAuditorName : audit.externalAuditTeam],
-      ["Procedimiento", audit.procedureName || "No relacionado"],
-      ["Metodología", methodologyLabel(audit.methodology)],
-      ["Estado", statusLabel(audit.status)],
-      ["Alcance", audit.scope],
-    ],
-    styles: { fontSize: 9, cellPadding: 3 },
-    headStyles: { fillColor: [43, 135, 213] },
-    columnStyles: { 0: { cellWidth: 50, fontStyle: "bold" } },
-  })
-
-  autoTable(doc, {
-    startY: (doc as any).lastAutoTable.finalY + 10,
-    head: [["Documento", "Archivo", "Descripción"]],
-    body: audit.evidences.length
-      ? audit.evidences.map((evidence) => [evidence.label, evidence.fileName, evidence.description || "Sin descripción"])
-      : [["Sin evidencias", "No registrada", ""]],
-    styles: { fontSize: 8.5, cellPadding: 3 },
-    headStyles: { fillColor: [43, 135, 213] },
-  })
-
-  autoTable(doc, {
-    startY: (doc as any).lastAutoTable.finalY + 10,
-    head: [["ACPM", "Tipo", "Responsable", "Fecha límite", "Estado"]],
-    body: audit.actions.length
-      ? audit.actions.map((action) => [action.name, acpmTypeLabel(action.type), action.responsible, formatDate(action.dueDate), actionStatusLabel(action.status)])
-      : [["Sin acciones", "No aplica", "", "", ""]],
-    styles: { fontSize: 8.5, cellPadding: 3 },
-    headStyles: { fillColor: [43, 135, 213] },
-  })
-
-  doc.save(`auditoria-sst-${audit.year}-${audit.name.toLowerCase().replace(/\s+/g, "-")}.pdf`)
-}
-
 function AuditDialog({
   open,
   audit,
   employees,
   documents,
   loading,
+  saving,
   onClose,
   onSave,
 }: {
@@ -441,6 +410,7 @@ function AuditDialog({
   employees: EmployeeOption[]
   documents: Option[]
   loading: boolean
+  saving: boolean
   onClose: () => void
   onSave: (form: AuditForm, auditId?: string) => void
 }) {
@@ -543,7 +513,7 @@ function AuditDialog({
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit">{audit ? "Guardar cambios" : "Crear auditoría"}</Button>
+            <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{audit ? "Guardar cambios" : "Crear auditoría"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -553,10 +523,12 @@ function AuditDialog({
 
 function EvidenceDialog({
   audit,
+  uploading,
   onClose,
   onUpload,
 }: {
   audit: AuditRecord | null
+  uploading: boolean
   onClose: () => void
   onUpload: (audit: AuditRecord, form: EvidenceForm) => void
 }) {
@@ -569,8 +541,8 @@ function EvidenceDialog({
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!audit) return
-    if (!form.fileName.trim()) {
-      toast.error("Registra el archivo o soporte de la auditoría.")
+    if (!form.file) {
+      toast.error("Selecciona el archivo o soporte de la auditoría.")
       return
     }
     onUpload(audit, form)
@@ -585,16 +557,16 @@ function EvidenceDialog({
         <form onSubmit={handleSubmit} className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="evidence-label">Tipo de documento</Label>
-            <select id="evidence-label" value={form.label} onChange={(event) => setForm((current) => ({ ...current, label: event.target.value }))} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
-              <option value="Acta de inicio">Acta de inicio de auditoría</option>
-              <option value="Acta de fin">Acta de fin de auditoría</option>
-              <option value="Informe de auditoría">Informe de auditoría</option>
-              <option value="Otra evidencia">Otra evidencia</option>
+            <select id="evidence-label" value={form.type} onChange={(event) => setForm((current) => ({ ...current, type: event.target.value as SstAuditDocumentType }))} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
+              <option value="OPENING_MINUTES">Acta de inicio de auditoría</option>
+              <option value="CLOSING_MINUTES">Acta de fin de auditoría</option>
+              <option value="AUDIT_REPORT">Informe de auditoría</option>
+              <option value="OTHER_EVIDENCE">Otra evidencia</option>
             </select>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="evidence-file">Archivo</Label>
-            <Input id="evidence-file" value={form.fileName} onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.value }))} placeholder="Nombre del archivo o soporte" />
+            <Input id="evidence-file" type="file" onChange={(event) => setForm((current) => ({ ...current, file: event.target.files?.[0] ?? null }))} />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="evidence-description">Descripción</Label>
@@ -605,8 +577,8 @@ function EvidenceDialog({
             Documento confirmado
           </label>
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit" className="gap-2"><Upload className="h-4 w-4" />Cargar</Button>
+            <Button type="button" variant="outline" disabled={uploading} onClick={onClose}>Cancelar</Button>
+            <Button type="submit" className="gap-2" disabled={uploading}>{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}Cargar</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -616,10 +588,12 @@ function EvidenceDialog({
 
 function ActionDialog({
   audit,
+  saving,
   onClose,
   onSave,
 }: {
   audit: AuditRecord | null
+  saving: boolean
   onClose: () => void
   onSave: (audit: AuditRecord, form: ActionForm) => void
 }) {
@@ -669,8 +643,8 @@ function ActionDialog({
             <Input id="action-responsible" value={form.responsible} onChange={(event) => setForm((current) => ({ ...current, responsible: event.target.value }))} placeholder="Responsable de ejecutar la acción" />
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit">Agregar acción</Button>
+            <Button type="button" variant="outline" disabled={saving} onClick={onClose}>Cancelar</Button>
+            <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Agregar acción</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -743,10 +717,15 @@ function DetailDialog({
 }
 
 export default function AuditsPage() {
-  const [audits, setAudits] = useState<AuditRecord[]>(initialAudits)
+  const [audits, setAudits] = useState<AuditRecord[]>([])
   const [employees, setEmployees] = useState<EmployeeOption[]>([])
   const [documents, setDocuments] = useState<Option[]>([])
+  const [loadingAudits, setLoadingAudits] = useState(true)
   const [loadingCatalogs, setLoadingCatalogs] = useState(false)
+  const [savingAudit, setSavingAudit] = useState(false)
+  const [uploadingEvidence, setUploadingEvidence] = useState(false)
+  const [savingAction, setSavingAction] = useState(false)
+  const [exportingId, setExportingId] = useState<string | null>(null)
   const [search, setSearch] = useState("")
   const [yearFilter, setYearFilter] = useState(currentYear)
   const [statusFilter, setStatusFilter] = useState<"ALL" | AuditStatus>("ALL")
@@ -755,6 +734,22 @@ export default function AuditsPage() {
   const [evidenceAudit, setEvidenceAudit] = useState<AuditRecord | null>(null)
   const [actionAudit, setActionAudit] = useState<AuditRecord | null>(null)
   const [detailAudit, setDetailAudit] = useState<AuditRecord | null>(null)
+
+  async function loadAudits() {
+    setLoadingAudits(true)
+    try {
+      const response = await listSstAudits({ page: 1, limit: 100 })
+      setAudits(response.items.map(mapAudit))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar las auditorías SST.")
+    } finally {
+      setLoadingAudits(false)
+    }
+  }
+
+  useEffect(() => {
+    void loadAudits()
+  }, [])
 
   useEffect(() => {
     let mounted = true
@@ -805,67 +800,96 @@ export default function AuditsPage() {
     finished: audits.filter((audit) => audit.status === "FINISHED").length,
   }
 
-  function handleSaveAudit(form: AuditForm, auditId?: string) {
-    const internalAuditorName = findEmployeeName(employees, form.internalAuditorId)
-    const procedureName = findOptionName(documents, form.procedureId)
-
-    setAudits((current) => {
-      if (auditId) {
-        return current.map((audit) =>
-          audit.id === auditId
-            ? {
-                ...audit,
-                ...form,
-                internalAuditorName,
-                procedureName,
-              }
-            : audit,
-        )
+  async function handleSaveAudit(form: AuditForm, auditId?: string) {
+    setSavingAudit(true)
+    try {
+      const dto = {
+        year: Number(form.year),
+        name: form.name.trim(),
+        scheduledDate: form.scheduledDate,
+        auditType: form.auditType,
+        internalAuditorId: form.auditType === "INTERNAL" ? form.internalAuditorId : null,
+        externalAuditTeam: form.auditType === "EXTERNAL" ? form.externalAuditTeam.trim() : null,
+        scope: form.scope.trim(),
+        methodology: form.methodology,
+        status: form.status,
+        procedureId: form.procedureId,
       }
-
-      return [
-        {
-          id: createId("audit"),
-          ...form,
-          internalAuditorName,
-          procedureName,
-          evidences: [],
-          actions: [],
-          createdAt: new Date().toISOString(),
-        },
-        ...current,
-      ]
-    })
-
-    setAuditDialogOpen(false)
-    setEditingAudit(null)
-    toast.success(auditId ? "Auditoría actualizada." : "Auditoría creada en el plan anual.")
+      if (auditId) await updateSstAudit(auditId, dto)
+      else await createSstAudit(dto)
+      await loadAudits()
+      setAuditDialogOpen(false)
+      setEditingAudit(null)
+      toast.success(auditId ? "Auditoría actualizada." : "Auditoría creada en el plan anual.")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar la auditoría SST.")
+    } finally {
+      setSavingAudit(false)
+    }
   }
 
-  function handleUploadEvidence(audit: AuditRecord, form: EvidenceForm) {
-    const evidence: Evidence = {
-      id: createId("audit-evidence"),
-      label: form.label,
-      fileName: form.fileName,
-      description: form.description,
-      uploadedAt: new Date().toISOString(),
-      isConfirmed: form.isConfirmed,
+  async function handleUploadEvidence(audit: AuditRecord, form: EvidenceForm) {
+    if (!form.file) return
+    setUploadingEvidence(true)
+    try {
+      await uploadSstAuditDocument(audit.id, {
+        file: form.file,
+        type: form.type,
+        description: form.description,
+        isConfirmed: form.isConfirmed,
+      })
+      await loadAudits()
+      setEvidenceAudit(null)
+      toast.success("Documento de auditoría cargado.")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el documento de auditoría.")
+    } finally {
+      setUploadingEvidence(false)
     }
-
-    setAudits((current) => current.map((item) => (item.id === audit.id ? { ...item, evidences: [evidence, ...item.evidences] } : item)))
-    setEvidenceAudit(null)
-    toast.success("Documento de auditoría cargado.")
   }
 
-  function handleSaveAction(audit: AuditRecord, form: ActionForm) {
-    const action: AuditAction = {
-      id: createId("audit-action"),
-      ...form,
+  async function handleSaveAction(audit: AuditRecord, form: ActionForm) {
+    setSavingAction(true)
+    try {
+      await createSstAuditAction(audit.id, form)
+      await loadAudits()
+      setActionAudit(null)
+      toast.success("Acción ACPM agregada a la auditoría.")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo agregar la acción ACPM.")
+    } finally {
+      setSavingAction(false)
     }
+  }
 
-    setAudits((current) => current.map((item) => (item.id === audit.id ? { ...item, actions: [action, ...item.actions] } : item)))
-    setActionAudit(null)
-    toast.success("Acción ACPM agregada a la auditoría.")
+  async function openAuditDetail(audit: AuditRecord) {
+    try {
+      const [detail, evidences, actions] = await Promise.all([
+        getSstAudit(audit.id),
+        listSstAuditDocuments(audit.id),
+        listSstAuditActions(audit.id),
+      ])
+      setDetailAudit(mapAudit({ ...detail, evidences, actions }))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el detalle de la auditoría.")
+    }
+  }
+
+  async function downloadAuditPdf(audit: AuditRecord) {
+    setExportingId(audit.id)
+    try {
+      const blob = await exportSstAudit(audit.id)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `auditoria-sst-${audit.year}-${audit.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar el plan de auditoría.")
+    } finally {
+      setExportingId(null)
+    }
   }
 
   return (
@@ -931,7 +955,8 @@ export default function AuditsPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {filteredAudits.map((audit) => (
+            {loadingAudits && <tr><td colSpan={8} className="px-4 py-10 text-center"><Loader2 className="mx-auto h-5 w-5 animate-spin text-muted-foreground" /></td></tr>}
+            {!loadingAudits && filteredAudits.map((audit) => (
               <tr key={audit.id} className="align-middle">
                 <td className="px-4 py-3">
                   <p className="max-w-[260px] truncate font-medium text-foreground">{audit.name}</p>
@@ -948,15 +973,15 @@ export default function AuditsPage() {
                 <td className="px-4 py-3 text-muted-foreground"><p className="max-w-[220px] truncate">{audit.procedureName || "No relacionado"}</p></td>
                 <td className="px-4 py-3"><Badge variant="outline" className={statusClassName(audit.status)}>{statusLabel(audit.status)}</Badge></td>
                 <td className="px-4 py-3 text-muted-foreground">
-                  <p>{audit.evidences.length} documentos</p>
-                  <p>{audit.actions.length} ACPM</p>
+                  <p>{audit.evidencesCount} documentos</p>
+                  <p>{audit.actionsCount} ACPM</p>
                 </td>
                 <td className="px-4 py-3 text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild><Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-60">
-                      <DropdownMenuItem onSelect={() => setDetailAudit(audit)}><Eye className="h-4 w-4" />Ver detalle</DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => downloadAuditPdf(audit)}><Download className="h-4 w-4" />Descargar plan</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => void openAuditDetail(audit)}><Eye className="h-4 w-4" />Ver detalle</DropdownMenuItem>
+                      <DropdownMenuItem disabled={exportingId === audit.id} onSelect={() => void downloadAuditPdf(audit)}><Download className="h-4 w-4" />Descargar plan</DropdownMenuItem>
                       <DropdownMenuItem onSelect={() => { setEditingAudit(audit); setAuditDialogOpen(true) }}><Edit className="h-4 w-4" />Editar</DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onSelect={() => setEvidenceAudit(audit)}><Upload className="h-4 w-4" />Cargar acta o informe</DropdownMenuItem>
@@ -966,7 +991,7 @@ export default function AuditsPage() {
                 </td>
               </tr>
             ))}
-            {filteredAudits.length === 0 && (
+            {!loadingAudits && filteredAudits.length === 0 && (
               <tr>
                 <td colSpan={8} className="px-4 py-10 text-center text-sm text-muted-foreground">No hay auditorías para mostrar.</td>
               </tr>
@@ -981,11 +1006,12 @@ export default function AuditsPage() {
         employees={employees}
         documents={documents}
         loading={loadingCatalogs}
+        saving={savingAudit}
         onClose={() => { setAuditDialogOpen(false); setEditingAudit(null) }}
         onSave={handleSaveAudit}
       />
-      <EvidenceDialog audit={evidenceAudit} onClose={() => setEvidenceAudit(null)} onUpload={handleUploadEvidence} />
-      <ActionDialog audit={actionAudit} onClose={() => setActionAudit(null)} onSave={handleSaveAction} />
+      <EvidenceDialog audit={evidenceAudit} uploading={uploadingEvidence} onClose={() => setEvidenceAudit(null)} onUpload={handleUploadEvidence} />
+      <ActionDialog audit={actionAudit} saving={savingAction} onClose={() => setActionAudit(null)} onSave={handleSaveAction} />
       <DetailDialog audit={detailAudit} onClose={() => setDetailAudit(null)} onDownload={downloadAuditPdf} />
     </main>
   )

@@ -1,6 +1,6 @@
 "use client"
 
-import { type FormEvent, useMemo, useState } from "react"
+import { type FormEvent, useEffect, useMemo, useState } from "react"
 import {
   CalendarDays,
   CheckCircle2,
@@ -42,21 +42,28 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { listEmployees } from "@/services/employeeService"
+import {
+  approveWorkPlan,
+  createWorkPlanItem,
+  downloadWorkPlanFile,
+  generateWorkPlanDocument,
+  getWorkPlanItem,
+  listWorkPlanItems,
+} from "@/services/workPlanService"
+import type { Employee } from "@/types/manager/employee"
+import type {
+  WorkPlanDocument,
+  WorkPlanItem as ApiWorkPlanItem,
+  WorkPlanStatus,
+} from "@/types/manager/work-plan"
 
 type ViewMode = "cards" | "list"
-type WorkPlanStatus = "PENDING_APPROVAL" | "APPROVED"
 
-type MockEmployee = {
+type EmployeeOption = {
   id: string
   name: string
-  lastName: string
   job: string
-}
-
-type WorkPlanEvidence = {
-  fileName: string
-  uploadedAt: string
-  uploadedBy: string
 }
 
 type WorkPlanItem = {
@@ -67,11 +74,13 @@ type WorkPlanItem = {
   objective: string
   budget: number
   responsibleId: string
+  responsibleName: string
+  responsibleJob: string
   evidence: string
   status: WorkPlanStatus
   approvedBy?: string
   approvedAt?: string
-  signedEvidence?: WorkPlanEvidence
+  signedEvidence?: WorkPlanDocument
   createdAt: string
 }
 
@@ -84,13 +93,6 @@ type WorkPlanForm = {
   evidence: string
 }
 
-const employees: MockEmployee[] = [
-  { id: "emp-1", name: "Laura", lastName: "Martinez", job: "Coordinadora SST" },
-  { id: "emp-2", name: "Andres", lastName: "Rojas", job: "Supervisor operativo" },
-  { id: "emp-3", name: "Camila", lastName: "Gomez", job: "Analista de talento humano" },
-  { id: "emp-4", name: "Julian", lastName: "Perez", job: "Jefe de mantenimiento" },
-]
-
 const currentYear = new Date().getFullYear()
 
 const emptyForm: WorkPlanForm = {
@@ -102,72 +104,33 @@ const emptyForm: WorkPlanForm = {
   evidence: "",
 }
 
-const initialWorkPlanItems: WorkPlanItem[] = [
-  {
-    id: "wp-1",
-    consecutive: "PT-2026-001",
-    year: 2026,
-    activity: "Actualizar matriz legal SG-SST",
-    objective: "Mantener alineados los requisitos legales aplicables al sistema de gestion.",
-    budget: 450000,
-    responsibleId: "emp-1",
-    evidence: "Matriz legal actualizada y acta de revision.",
-    status: "APPROVED",
-    approvedBy: "Ricardo Salazar",
-    approvedAt: "2026-01-18T10:30:00",
-    signedEvidence: {
-      fileName: "plan-trabajo-aprobado-enero.pdf",
-      uploadedAt: "2026-01-18T11:05:00",
-      uploadedBy: "Laura Martinez",
-    },
-    createdAt: "2026-01-10T08:00:00",
-  },
-  {
-    id: "wp-2",
-    consecutive: "PT-2026-002",
-    year: 2026,
-    activity: "Inspeccion locativa trimestral",
-    objective: "Identificar condiciones inseguras y establecer acciones de mejora.",
-    budget: 850000,
-    responsibleId: "emp-2",
-    evidence: "Informe de inspeccion con registro fotografico.",
-    status: "PENDING_APPROVAL",
-    createdAt: "2026-07-12T09:10:00",
-  },
-  {
-    id: "wp-3",
-    consecutive: "PT-2026-003",
-    year: 2026,
-    activity: "Campana de orden y aseo",
-    objective: "Fortalecer habitos preventivos en areas operativas.",
-    budget: 620000,
-    responsibleId: "emp-3",
-    evidence: "Listado de asistencia, piezas divulgativas y registro fotografico.",
-    status: "PENDING_APPROVAL",
-    createdAt: "2026-07-20T14:35:00",
-  },
-]
+function toEmployeeOptions(employees: Employee[]): EmployeeOption[] {
+  return employees.map((employee) => ({
+    id: employee.id,
+    name: `${employee.name ?? ""} ${employee.lastName ?? ""}`.trim() || employee.email || "Funcionario sin nombre",
+    job: employee.job?.name ?? "Cargo no registrado",
+  }))
+}
 
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
+function normalizeWorkPlanItem(item: ApiWorkPlanItem): WorkPlanItem {
+  const employee = item.responsibleEmployee
+  return {
+    id: item.id,
+    consecutive: item.consecutive,
+    year: item.year,
+    activity: item.activity,
+    objective: item.objective,
+    budget: Number(item.budget) || 0,
+    responsibleId: item.responsibleEmployeeId,
+    responsibleName: `${employee?.name ?? ""} ${employee?.lastName ?? ""}`.trim() || employee?.email || "No asignado",
+    responsibleJob: employee?.job?.name ?? "Cargo no registrado",
+    evidence: item.expectedEvidence,
+    status: item.status,
+    approvedBy: item.approvedBy ?? undefined,
+    approvedAt: item.approvedAt ?? undefined,
+    signedEvidence: item.signedEvidence ?? undefined,
+    createdAt: item.createdAt,
   }
-
-  return `${prefix}-${Date.now()}`
-}
-
-function nowIso() {
-  return new Date().toISOString()
-}
-
-function employeeName(employeeId?: string) {
-  const employee = employees.find((item) => item.id === employeeId)
-  if (!employee) return "No asignado"
-  return `${employee.name} ${employee.lastName}`
-}
-
-function employeeJob(employeeId?: string) {
-  return employees.find((item) => item.id === employeeId)?.job ?? "Cargo no registrado"
 }
 
 function formatDate(value?: string | null) {
@@ -211,6 +174,15 @@ function parseBudget(value: string) {
   return digits ? Number(digits) : 0
 }
 
+function saveBlob(blob: Blob, fileName: string) {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
 function statusLabel(status: WorkPlanStatus) {
   return status === "APPROVED" ? "Aprobado" : "Pendiente de aprobacion"
 }
@@ -230,12 +202,14 @@ function getPdfPageCount(doc: jsPDF) {
 
 function WorkPlanDialog({
   open,
+  employees,
   onClose,
   onSave,
 }: {
   open: boolean
+  employees: EmployeeOption[]
   onClose: () => void
-  onSave: (form: WorkPlanForm) => void
+  onSave: (form: WorkPlanForm) => Promise<boolean>
 }) {
   const [form, setForm] = useState<WorkPlanForm>(emptyForm)
   const [saving, setSaving] = useState(false)
@@ -255,10 +229,10 @@ function WorkPlanDialog({
     if (!form.budget || budget < 0) return toast.error("Ingresa un presupuesto valido")
 
     setSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, 250))
-    onSave(form)
-    setForm(emptyForm)
+    const saved = await onSave(form)
     setSaving(false)
+    if (!saved) return
+    setForm(emptyForm)
     onClose()
   }
 
@@ -344,7 +318,7 @@ function WorkPlanDialog({
                     <option value="">Selecciona responsable</option>
                     {employees.map((employee) => (
                       <option key={employee.id} value={employee.id}>
-                        {employeeName(employee.id)} - {employee.job}
+                         {employee.name} - {employee.job}
                       </option>
                     ))}
                   </select>
@@ -395,21 +369,25 @@ function ApprovalDialog({
   open: boolean
   selectedItems: WorkPlanItem[]
   onClose: () => void
-  onApprove: (bossName: string, evidenceFileName: string) => void
+  onApprove: (bossName: string, file: File) => Promise<boolean>
 }) {
   const [bossName, setBossName] = useState("")
-  const [fileName, setFileName] = useState("")
+  const [file, setFile] = useState<File | null>(null)
+  const [saving, setSaving] = useState(false)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     if (selectedItems.length === 0) return toast.error("Selecciona al menos una actividad pendiente")
     if (!bossName.trim()) return toast.error("Ingresa el nombre del jefe")
-    if (!fileName.trim()) return toast.error("Sube o registra el documento firmado")
+    if (!file) return toast.error("Sube el documento firmado")
 
-    onApprove(bossName.trim(), fileName.trim())
+    setSaving(true)
+    const approved = await onApprove(bossName.trim(), file)
+    setSaving(false)
+    if (!approved) return
     setBossName("")
-    setFileName("")
+    setFile(null)
     onClose()
   }
 
@@ -442,23 +420,19 @@ function ApprovalDialog({
               Evidencia firmada
               <Input
                 type="file"
-                onChange={(event) => setFileName(event.target.files?.[0]?.name ?? "")}
+                accept="application/pdf"
+                onChange={(event) => setFile(event.target.files?.[0] ?? null)}
               />
             </Label>
-            <Input
-              className="mt-3"
-              value={fileName}
-              onChange={(event) => setFileName(event.target.value)}
-              placeholder="Tambien puedes escribir el nombre del archivo mock"
-            />
+            {file && <p className="mt-3 truncate text-sm text-muted-foreground">{file.name}</p>}
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit" className="gap-2">
-              <FileCheck2 className="h-4 w-4" />
+            <Button type="submit" className="gap-2" disabled={saving}>
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileCheck2 className="h-4 w-4" />}
               Aprobar seleccionados
             </Button>
           </DialogFooter>
@@ -471,9 +445,11 @@ function ApprovalDialog({
 function DetailDialog({
   item,
   onClose,
+  onPreview,
 }: {
   item: WorkPlanItem | null
   onClose: () => void
+  onPreview: (item: WorkPlanItem) => void
 }) {
   if (!item) return null
 
@@ -486,7 +462,7 @@ function DetailDialog({
         <div className="space-y-4">
           <div className="grid gap-3 md:grid-cols-2">
             <InfoBlock label="Actividad" value={item.activity} />
-            <InfoBlock label="Responsable" value={`${employeeName(item.responsibleId)} - ${employeeJob(item.responsibleId)}`} />
+            <InfoBlock label="Responsable" value={`${item.responsibleName} - ${item.responsibleJob}`} />
             <InfoBlock label="Presupuesto" value={formatCurrency(item.budget)} />
             <InfoBlock label="Estado" value={statusLabel(item.status)} />
           </div>
@@ -499,10 +475,13 @@ function DetailDialog({
           {item.signedEvidence && (
             <div className="rounded-md border border-border p-4">
               <h3 className="mb-2 text-sm font-semibold text-foreground">Documento firmado</h3>
-              <p className="text-sm font-medium text-foreground">{item.signedEvidence.fileName}</p>
-              <p className="text-xs text-muted-foreground">
-                Cargado: {formatDateTime(item.signedEvidence.uploadedAt)} por {item.signedEvidence.uploadedBy}
-              </p>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-foreground">{item.signedEvidence.originalName}</p>
+                  <p className="text-xs text-muted-foreground">Cargado: {formatDateTime(item.signedEvidence.createdAt)}</p>
+                </div>
+                <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onPreview(item)}><Eye className="h-4 w-4" />Previsualizar</Button>
+              </div>
             </div>
           )}
         </div>
@@ -510,6 +489,36 @@ function DetailDialog({
           <Button type="button" onClick={onClose}>
             Cerrar
           </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+type DocumentPreview = { url: string; mimeType: string; name: string }
+
+function DocumentPreviewDialog({ preview, onClose }: { preview: DocumentPreview | null; onClose: () => void }) {
+  if (!preview) return null
+  const isImage = preview.mimeType.startsWith("image/")
+  const isPdf = preview.mimeType === "application/pdf" || preview.name.toLowerCase().endsWith(".pdf")
+
+  return (
+    <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="!flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12"><DialogTitle className="truncate">{preview.name}</DialogTitle></DialogHeader>
+        <div className="min-h-0 flex-1 bg-slate-100 p-3">
+          {isImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={preview.url} alt={preview.name} className="h-full w-full object-contain" />
+          ) : isPdf ? (
+            <iframe src={preview.url} title={preview.name} className="h-full w-full rounded-md border border-border bg-white" />
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm text-muted-foreground"><FileText className="h-10 w-10" />Este tipo de archivo no admite previsualización en el navegador.</div>
+          )}
+        </div>
+        <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+          <Button type="button" variant="outline" onClick={onClose}>Cerrar</Button>
+          <Button type="button" className="gap-2" asChild><a href={preview.url} download={preview.name}><Download className="h-4 w-4" />Descargar</a></Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -526,7 +535,9 @@ function InfoBlock({ label, value }: { label: string; value: string }) {
 }
 
 export default function WorkPlanPage() {
-  const [items, setItems] = useState<WorkPlanItem[]>(initialWorkPlanItems)
+  const [items, setItems] = useState<WorkPlanItem[]>([])
+  const [employees, setEmployees] = useState<EmployeeOption[]>([])
+  const [loading, setLoading] = useState(true)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [viewMode, setViewMode] = useState<ViewMode>("list")
   const [search, setSearch] = useState("")
@@ -535,6 +546,26 @@ export default function WorkPlanPage() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [approvalOpen, setApprovalOpen] = useState(false)
   const [detailItem, setDetailItem] = useState<WorkPlanItem | null>(null)
+  const [preview, setPreview] = useState<DocumentPreview | null>(null)
+
+  async function loadItems() {
+    setLoading(true)
+    try {
+      const result = await listWorkPlanItems({ limit: 100 })
+      setItems((result.items ?? []).map(normalizeWorkPlanItem))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el plan de trabajo")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void loadItems()
+    void listEmployees()
+      .then((result) => setEmployees(toEmployeeOptions(result)))
+      .catch((error) => toast.error(error instanceof Error ? error.message : "No se pudieron cargar los funcionarios"))
+  }, [])
 
   const filteredItems = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -545,7 +576,7 @@ export default function WorkPlanPage() {
         item.consecutive.toLowerCase().includes(query) ||
         item.activity.toLowerCase().includes(query) ||
         item.objective.toLowerCase().includes(query) ||
-        employeeName(item.responsibleId).toLowerCase().includes(query)
+        item.responsibleName.toLowerCase().includes(query)
       const matchesYear = yearFilter === "all" || String(item.year) === yearFilter
       const matchesStatus = statusFilter === "all" || item.status === statusFilter
 
@@ -590,34 +621,47 @@ export default function WorkPlanPage() {
     })
   }
 
-  function createItem(form: WorkPlanForm) {
-    const year = Number(form.year) || currentYear
-    const nextNumber = items.length + 1
-    const item: WorkPlanItem = {
-      id: createId("work-plan"),
-      consecutive: `PT-${year}-${String(nextNumber).padStart(3, "0")}`,
-      year,
-      activity: form.activity.trim(),
-      objective: form.objective.trim(),
-      budget: parseBudget(form.budget),
-      responsibleId: form.responsibleId,
-      evidence: form.evidence.trim(),
-      status: "PENDING_APPROVAL",
-      createdAt: nowIso(),
+  async function createItem(form: WorkPlanForm): Promise<boolean> {
+    try {
+      const saved = await createWorkPlanItem({
+        year: Number(form.year) || currentYear,
+        activity: form.activity.trim(),
+        objective: form.objective.trim(),
+        budget: parseBudget(form.budget),
+        responsibleEmployeeId: form.responsibleId,
+        expectedEvidence: form.evidence.trim(),
+      })
+      const normalized = normalizeWorkPlanItem(saved)
+      setItems((current) => [normalized, ...current])
+      setSelectedIds((current) => [...current, normalized.id])
+      toast.success("Actividad creada y pendiente de aprobación")
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo crear la actividad")
+      return false
     }
-
-    setItems((current) => [item, ...current])
-    setSelectedIds((current) => [...current, item.id])
-    toast.success("Actividad creada y pendiente de aprobacion")
   }
 
-  function generatePdf(itemsToApprove: WorkPlanItem[]) {
+  async function generatePdf(itemsToApprove: WorkPlanItem[]) {
     if (itemsToApprove.length === 0) {
       toast.error("Selecciona al menos una actividad pendiente")
       return
     }
 
     const year = yearFilter === "all" ? currentYear : Number(yearFilter)
+    try {
+      const generated = await generateWorkPlanDocument({
+        year,
+        workPlanItemIds: itemsToApprove.map((item) => item.id),
+      })
+      const blob = await downloadWorkPlanFile(generated.downloadUrl)
+      saveBlob(blob, generated.fileName || `Plan_Trabajo_${year}_Pendiente_Aprobacion.pdf`)
+      toast.success("Documento generado para firma del jefe")
+      return
+    } catch (error) {
+      toast.info("El generador del backend aún no está disponible; se generará el documento localmente.")
+    }
+
     const doc = new jsPDF("p", "mm", "a4")
     const pageWidth = doc.internal.pageSize.getWidth()
     const pageHeight = doc.internal.pageSize.getHeight()
@@ -698,7 +742,7 @@ export default function WorkPlanPage() {
         index + 1,
         item.activity,
         item.objective,
-        employeeName(item.responsibleId),
+        item.responsibleName,
         formatCurrency(item.budget),
         item.evidence,
       ]),
@@ -739,49 +783,67 @@ export default function WorkPlanPage() {
     toast.success("Documento generado para firma del jefe")
   }
 
-  function approveSelected(bossName: string, evidenceFileName: string) {
-    const approvedAt = nowIso()
-    const selectedSet = new Set(selectedPendingItems.map((item) => item.id))
-
-    setItems((current) =>
-      current.map((item) =>
-        selectedSet.has(item.id)
-          ? {
-              ...item,
-              status: "APPROVED",
-              approvedBy: bossName,
-              approvedAt,
-              signedEvidence: {
-                fileName: evidenceFileName,
-                uploadedAt: approvedAt,
-                uploadedBy: bossName,
-              },
-            }
-          : item,
-      ),
-    )
-    setSelectedIds((current) => current.filter((id) => !selectedSet.has(id)))
-    toast.success("Actividades aprobadas con evidencia firmada")
+  async function approveSelected(bossName: string, file: File): Promise<boolean> {
+    try {
+      await approveWorkPlan({
+        workPlanItemIds: selectedPendingItems.map((item) => item.id),
+        approvedBy: bossName,
+        file,
+        type: "WORK_PLAN_SIGNED",
+        isConfirmed: true,
+      })
+      const approvedIds = new Set(selectedPendingItems.map((item) => item.id))
+      setSelectedIds((current) => current.filter((id) => !approvedIds.has(id)))
+      await loadItems()
+      toast.success("Actividades aprobadas con evidencia firmada")
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo aprobar el plan de trabajo")
+      return false
+    }
   }
 
-  function downloadEvidence(item: WorkPlanItem) {
+  async function downloadEvidence(item: WorkPlanItem) {
     if (!item.signedEvidence) {
       toast.error("Esta actividad aun no tiene evidencia firmada")
       return
     }
 
-    const blob = new Blob(
-      [
-        `Evidencia firmada mock\nActividad: ${item.activity}\nArchivo: ${item.signedEvidence.fileName}\nAprobado por: ${item.approvedBy}\nFecha: ${formatDateTime(item.approvedAt)}\n`,
-      ],
-      { type: "text/plain;charset=utf-8" },
-    )
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.href = url
-    link.download = item.signedEvidence.fileName
-    link.click()
-    URL.revokeObjectURL(url)
+    try {
+      const blob = await downloadWorkPlanFile(item.signedEvidence.downloadUrl)
+      saveBlob(blob, item.signedEvidence.originalName)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar la evidencia")
+    }
+  }
+
+  async function openDetail(item: WorkPlanItem) {
+    try {
+      const detail = normalizeWorkPlanItem(await getWorkPlanItem(item.id))
+      setItems((current) => current.map((record) => record.id === detail.id ? detail : record))
+      setDetailItem(detail)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el detalle de la actividad")
+    }
+  }
+
+  async function previewEvidence(item: WorkPlanItem) {
+    if (!item.signedEvidence) return
+    try {
+      const blob = await downloadWorkPlanFile(item.signedEvidence.downloadUrl)
+      setPreview({
+        url: URL.createObjectURL(blob),
+        mimeType: blob.type || item.signedEvidence.mimeType || "application/octet-stream",
+        name: item.signedEvidence.originalName,
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo abrir la evidencia")
+    }
+  }
+
+  function closePreview() {
+    if (preview?.url) URL.revokeObjectURL(preview.url)
+    setPreview(null)
   }
 
   return (
@@ -872,7 +934,7 @@ export default function WorkPlanPage() {
               type="button"
               variant="outline"
               className="gap-2"
-              onClick={() => generatePdf(selectedPendingItems)}
+              onClick={() => void generatePdf(selectedPendingItems)}
               disabled={selectedPendingItems.length === 0}
             >
               <Download className="h-4 w-4" />
@@ -924,7 +986,14 @@ export default function WorkPlanPage() {
           </div>
         </div>
 
-        {filteredItems.length === 0 ? (
+        {loading ? (
+          <Card>
+            <CardContent className="flex items-center justify-center gap-2 p-8 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Cargando plan de trabajo...
+            </CardContent>
+          </Card>
+        ) : filteredItems.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-sm text-muted-foreground">
               No hay actividades que coincidan con los filtros actuales.
@@ -952,7 +1021,7 @@ export default function WorkPlanPage() {
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">{item.consecutive}</p>
                     </div>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => setDetailItem(item)}>
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void openDetail(item)}>
                       <Eye className="h-4 w-4" />
                       Ver
                     </Button>
@@ -961,7 +1030,7 @@ export default function WorkPlanPage() {
                   <div className="grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
                     <p className="flex items-center gap-2">
                       <UserRound className="h-4 w-4" />
-                      {employeeName(item.responsibleId)}
+                      {item.responsibleName}
                     </p>
                     <p className="flex items-center gap-2">
                       <CalendarDays className="h-4 w-4" />
@@ -973,7 +1042,7 @@ export default function WorkPlanPage() {
                     </p>
                     <p className="flex items-center gap-2">
                       <FileCheck2 className="h-4 w-4" />
-                      {item.signedEvidence?.fileName ?? "Sin firma cargada"}
+                      {item.signedEvidence?.originalName ?? "Sin firma cargada"}
                     </p>
                   </div>
                 </CardContent>
@@ -1027,8 +1096,8 @@ export default function WorkPlanPage() {
                         <p className="max-w-[300px] truncate text-muted-foreground">{item.objective}</p>
                       </td>
                       <td className="px-4 py-3">
-                        <p className="max-w-[190px] truncate font-medium text-foreground">{employeeName(item.responsibleId)}</p>
-                        <p className="max-w-[190px] truncate text-muted-foreground">{employeeJob(item.responsibleId)}</p>
+                        <p className="max-w-[190px] truncate font-medium text-foreground">{item.responsibleName}</p>
+                        <p className="max-w-[190px] truncate text-muted-foreground">{item.responsibleJob}</p>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">{formatCurrency(item.budget)}</td>
                       <td className="px-4 py-3">
@@ -1051,7 +1120,7 @@ export default function WorkPlanPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-56">
-                            <DropdownMenuItem onSelect={() => setDetailItem(item)}>
+                            <DropdownMenuItem onSelect={() => void openDetail(item)}>
                               <Eye className="h-4 w-4" />
                               Ver detalle
                             </DropdownMenuItem>
@@ -1060,7 +1129,7 @@ export default function WorkPlanPage() {
                                 <DropdownMenuItem
                                   onSelect={() => {
                                     setSelectedIds([item.id])
-                                    generatePdf([item])
+                                    void generatePdf([item])
                                   }}
                                 >
                                   <Download className="h-4 w-4" />
@@ -1080,7 +1149,7 @@ export default function WorkPlanPage() {
                             {item.signedEvidence && (
                               <>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onSelect={() => downloadEvidence(item)}>
+                                <DropdownMenuItem onSelect={() => void downloadEvidence(item)}>
                                   <Download className="h-4 w-4" />
                                   Descargar evidencia
                                 </DropdownMenuItem>
@@ -1098,14 +1167,15 @@ export default function WorkPlanPage() {
         )}
       </section>
 
-      <WorkPlanDialog open={dialogOpen} onClose={() => setDialogOpen(false)} onSave={createItem} />
+      <WorkPlanDialog open={dialogOpen} employees={employees} onClose={() => setDialogOpen(false)} onSave={createItem} />
       <ApprovalDialog
         open={approvalOpen}
         selectedItems={selectedPendingItems}
         onClose={() => setApprovalOpen(false)}
         onApprove={approveSelected}
       />
-      <DetailDialog item={detailItem} onClose={() => setDetailItem(null)} />
+      <DetailDialog item={detailItem} onClose={() => setDetailItem(null)} onPreview={(item) => void previewEvidence(item)} />
+      <DocumentPreviewDialog preview={preview} onClose={closePreview} />
     </main>
   )
 }

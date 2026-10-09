@@ -15,11 +15,10 @@ import {
   Plus,
   Search,
   Target,
+  Trash2,
   Upload,
   UserRound,
 } from "lucide-react"
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -43,19 +42,25 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
+import {
+  createHealthyLifestyle,
+  deleteHealthyLifestyle,
+  downloadHealthyLifestyleEvidence,
+  exportHealthyLifestyle,
+  getHealthyLifestyle,
+  listHealthyLifestyles,
+  updateHealthyLifestyle,
+  uploadHealthyLifestyleEvidence,
+} from "@/services/healthyLifestyleService"
 import type { Employee } from "@/types/manager/employee"
+import type {
+  HealthyLifestyleActivity,
+  HealthyLifestyleActivityStatus as ActivityStatus,
+  HealthyLifestyleActivityType as ActivityType,
+  UpsertHealthyLifestyleDto,
+} from "@/types/manager/healthy-lifestyle"
 
 type ViewMode = "cards" | "list"
-type ActivityType = "CAMPAIGN" | "TALK" | "DAY" | "ACTIVITY"
-type ActivityStatus = "PLANNED" | "IN_PROGRESS" | "COMPLETED"
-
-type Evidence = {
-  id: string
-  fileName: string
-  description: string
-  uploadedAt: string
-  isConfirmed: boolean
-}
 
 type EmployeeOption = {
   id: string
@@ -63,19 +68,8 @@ type EmployeeOption = {
   email?: string
 }
 
-type HealthyLifestyleRecord = {
-  id: string
-  name: string
-  type: ActivityType
-  startDate: string
-  endDate: string
-  responsibleEmployeeId: string
+type HealthyLifestyleRecord = HealthyLifestyleActivity & {
   responsibleName: string
-  objective: string
-  scope: string
-  status: ActivityStatus
-  evidence?: Evidence
-  createdAt: string
 }
 
 type HealthyLifestyleForm = {
@@ -94,6 +88,12 @@ type EvidenceForm = {
   isConfirmed: boolean
 }
 
+type EvidencePreview = {
+  title: string
+  url: string
+  mimeType: string
+}
+
 const emptyForm: HealthyLifestyleForm = {
   name: "",
   type: "CAMPAIGN",
@@ -110,51 +110,6 @@ const emptyEvidenceForm: EvidenceForm = {
   isConfirmed: true,
 }
 
-const initialRecords: HealthyLifestyleRecord[] = [
-  {
-    id: "healthy-1",
-    name: "Campaña de prevención de alcoholismo y tabaquismo",
-    type: "CAMPAIGN",
-    startDate: "2026-09-01",
-    endDate: "2026-09-30",
-    responsibleEmployeeId: "mock-employee-1",
-    responsibleName: "Responsable SG-SST",
-    objective:
-      "Promover hábitos saludables y prevenir el consumo de alcohol, tabaco y sustancias psicoactivas en el entorno laboral.",
-    scope: "Todos los trabajadores directos, contratistas y personal operativo.",
-    status: "IN_PROGRESS",
-    evidence: {
-      id: "evidence-1",
-      fileName: "programa-estilos-vida-saludable-2026.pdf",
-      description: "Programa anual y cronograma de campañas.",
-      uploadedAt: "2026-09-02T09:00:00.000Z",
-      isConfirmed: true,
-    },
-    createdAt: "2026-08-28T10:00:00.000Z",
-  },
-  {
-    id: "healthy-2",
-    name: "Jornada de pausas activas y ergonomía",
-    type: "DAY",
-    startDate: "2026-10-12",
-    endDate: "2026-10-12",
-    responsibleEmployeeId: "mock-employee-2",
-    responsibleName: "Talento Humano",
-    objective: "Fomentar pausas activas y prácticas ergonómicas durante la jornada laboral.",
-    scope: "Áreas administrativas y comerciales.",
-    status: "PLANNED",
-    createdAt: "2026-09-05T14:20:00.000Z",
-  },
-]
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
-}
-
 function formatDate(value?: string | null) {
   if (!value) return "No registrada"
   return value.slice(0, 10)
@@ -169,6 +124,26 @@ function formatDateTime(value?: string | null) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date)
+}
+
+function bogotaDateKey(value?: string | null) {
+  if (!value) return ""
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value.slice(0, 10)
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Bogota",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date)
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((item) => item.type === type)?.value ?? ""
+  return `${part("year")}-${part("month")}-${part("day")}`
+}
+
+function completedWithDelay(record: HealthyLifestyleActivity) {
+  const evidenceDate = bogotaDateKey(record.evidence?.createdAt)
+  return Boolean(evidenceDate && record.endDate && evidenceDate > record.endDate.slice(0, 10))
 }
 
 function employeeFullName(employee: Employee) {
@@ -272,7 +247,7 @@ function activityTypeLabel(type: ActivityType) {
 }
 
 function statusLabel(status: ActivityStatus) {
-  if (status === "COMPLETED") return "Ejecutada"
+  if (status === "COMPLETED") return "Cumplida"
   if (status === "IN_PROGRESS") return "En ejecución"
   return "Planeada"
 }
@@ -283,94 +258,30 @@ function statusClassName(status: ActivityStatus) {
   return "bg-warning/10 text-warning border-warning/20"
 }
 
-function inferStatus(startDate: string, endDate: string): ActivityStatus {
-  const today = new Date().toISOString().slice(0, 10)
-  if (endDate < today) return "COMPLETED"
-  if (startDate <= today && endDate >= today) return "IN_PROGRESS"
-  return "PLANNED"
+function normalizeRecord(record: HealthyLifestyleActivity, employees: EmployeeOption[] = []): HealthyLifestyleRecord {
+  const backendName = record.responsibleEmployee
+    ? `${record.responsibleEmployee.name} ${record.responsibleEmployee.lastName}`.trim()
+    : ""
+  return {
+    ...record,
+    status: record.evidence || record.evidenceId ? "COMPLETED" : record.status,
+    responsibleName: backendName || findEmployeeName(employees, record.responsibleEmployeeId) || "Responsable no disponible",
+  }
 }
 
-function downloadProgramPdf(record: HealthyLifestyleRecord) {
-  const doc = new jsPDF("p", "mm", "a4")
-  const pageWidth = doc.internal.pageSize.getWidth()
-  const margin = 14
-  const primaryColor: [number, number, number] = [31, 92, 77]
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
 
-  doc.setFillColor(...primaryColor)
-  doc.roundedRect(margin, 12, pageWidth - margin * 2, 24, 3, 3, "F")
-  doc.setTextColor(255, 255, 255)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(13)
-  doc.text("PROGRAMA DE ESTILOS DE VIDA SALUDABLE", margin + 5, 23)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(8)
-  doc.text(`${activityTypeLabel(record.type)} · ${formatDate(record.startDate)} a ${formatDate(record.endDate)}`, margin + 5, 30)
-
-  autoTable(doc, {
-    startY: 44,
-    theme: "grid",
-    margin: { left: margin, right: margin },
-    body: [
-      ["Nombre actividad", record.name, "Tipo", activityTypeLabel(record.type)],
-      ["Responsable", record.responsibleName, "Estado", statusLabel(record.status)],
-      ["Fecha inicio", formatDate(record.startDate), "Fecha fin", formatDate(record.endDate)],
-    ],
-    styles: { font: "helvetica", fontSize: 9, cellPadding: 2.5, lineColor: [220, 226, 224], lineWidth: 0.1 },
-    columnStyles: {
-      0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 34 },
-      2: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 28 },
-    },
-  })
-
-  const contentY = ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 74) + 10
-  doc.setTextColor(30, 41, 59)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(10)
-  doc.text("Objetivo", margin, contentY)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(9)
-  doc.text(doc.splitTextToSize(record.objective, pageWidth - margin * 2), margin, contentY + 7)
-
-  const scopeY = contentY + 28
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(10)
-  doc.text("Alcance", margin, scopeY)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(9)
-  doc.text(doc.splitTextToSize(record.scope, pageWidth - margin * 2), margin, scopeY + 7)
-
-  autoTable(doc, {
-    startY: scopeY + 30,
-    theme: "grid",
-    margin: { left: margin, right: margin },
-    head: [["Componente", "Descripción"]],
-    body: [
-      ["Promoción", "Actividades orientadas a hábitos saludables dentro y fuera del entorno laboral."],
-      ["Prevención", "Campañas específicas para prevenir farmacodependencia, alcoholismo y tabaquismo."],
-      ["Evidencia", record.evidence?.fileName ?? "Pendiente por cargar"],
-    ],
-    styles: { font: "helvetica", fontSize: 9, cellPadding: 2.5, lineColor: [220, 226, 224], lineWidth: 0.1 },
-    headStyles: { fillColor: primaryColor, textColor: 255, fontStyle: "bold" },
-    columnStyles: {
-      0: { cellWidth: 42, fontStyle: "bold" },
-    },
-  })
-
-  const signatureY = 250
-  doc.setDrawColor(120, 130, 140)
-  doc.line(margin, signatureY, margin + 78, signatureY)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(8)
-  doc.text("Responsable de la actividad", margin, signatureY + 6)
-
-  doc.setDrawColor(220, 226, 224)
-  doc.line(margin, 280, pageWidth - margin, 280)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(7)
-  doc.setTextColor(100, 116, 139)
-  doc.text("Documento generado desde SafeCloud - Sistema de Gestión Integral", margin, 286)
-
-  doc.save(`estilos-vida-saludable-${record.name.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
+function canPreview(mimeType?: string) {
+  return Boolean(mimeType?.startsWith("image/") || mimeType === "application/pdf" || mimeType?.startsWith("text/"))
 }
 
 function InfoBlock({ label, value }: { label: string; value: string }) {
@@ -413,7 +324,7 @@ function ActivityDialog({
   employees: EmployeeOption[]
   employeesLoading: boolean
   onClose: () => void
-  onSave: (form: HealthyLifestyleForm, responsibleName: string, recordId?: string) => void
+  onSave: (form: HealthyLifestyleForm, responsibleName: string, recordId?: string) => Promise<boolean>
 }) {
   const [form, setForm] = useState<HealthyLifestyleForm>(emptyForm)
   const [saving, setSaving] = useState(false)
@@ -458,9 +369,9 @@ function ActivityDialog({
     const responsibleName = findEmployeeName(employees, form.responsibleEmployeeId) || record?.responsibleName || "Responsable seleccionado"
 
     setSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, 250))
-    onSave(form, responsibleName, record?.id)
+    const saved = await onSave(form, responsibleName, record?.id)
     setSaving(false)
+    if (!saved) return
     setForm(emptyForm)
     onClose()
   }
@@ -506,12 +417,17 @@ function ActivityDialog({
                 </label>
                 <Label className="grid gap-2">
                   Fecha inicio
-                  <Input type="date" value={form.startDate} onChange={(event) => update("startDate", event.target.value)} />
+                  <Input type="date" value={form.startDate} onChange={(event) => update("startDate", event.target.value)} disabled={editing} />
                 </Label>
                 <Label className="grid gap-2">
                   Fecha fin
-                  <Input type="date" value={form.endDate} onChange={(event) => update("endDate", event.target.value)} />
+                  <Input type="date" value={form.endDate} onChange={(event) => update("endDate", event.target.value)} disabled={editing} />
                 </Label>
+                {editing && (
+                  <p className="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700 md:col-span-2">
+                    Las fechas quedan fijas después de crear la actividad para conservar la trazabilidad del cumplimiento.
+                  </p>
+                )}
                 <div className="md:col-span-2">
                   <EmployeePicker
                     employees={employees}
@@ -562,23 +478,38 @@ function ActivityDialog({
 
 function EvidenceDialog({
   record,
+  uploading,
   onClose,
   onUpload,
 }: {
   record: HealthyLifestyleRecord | null
+  uploading: boolean
   onClose: () => void
-  onUpload: (recordId: string, form: EvidenceForm) => void
+  onUpload: (recordId: string, form: EvidenceForm, file: File) => Promise<boolean>
 }) {
   const [form, setForm] = useState<EvidenceForm>(emptyEvidenceForm)
+  const [file, setFile] = useState<File | null>(null)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    if (!record) return
+    setForm({
+      fileName: record.evidence?.originalName ?? "",
+      description: record.evidence?.description ?? "",
+      isConfirmed: record.evidence?.isConfirmed ?? true,
+    })
+    setFile(null)
+  }, [record])
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!record) return
-    if (!form.fileName.trim()) return toast.error("Selecciona la evidencia")
+    if (!file) return toast.error("Selecciona la evidencia")
     if (!form.description.trim()) return toast.error("Describe brevemente la evidencia")
 
-    onUpload(record.id, form)
+    const uploaded = await onUpload(record.id, form, file)
+    if (!uploaded) return
     setForm(emptyEvidenceForm)
+    setFile(null)
     onClose()
   }
 
@@ -597,14 +528,18 @@ function EvidenceDialog({
               Archivo
               <Input
                 type="file"
-                onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.files?.[0]?.name ?? "" }))}
+                onChange={(event) => {
+                  const selected = event.target.files?.[0] ?? null
+                  setFile(selected)
+                  setForm((current) => ({ ...current, fileName: selected?.name ?? "" }))
+                }}
               />
             </Label>
             <Input
               className="mt-3"
               value={form.fileName}
-              onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.value }))}
-              placeholder="También puedes escribir el nombre del archivo mock"
+              readOnly
+              placeholder="Selecciona un archivo"
             />
           </div>
 
@@ -629,11 +564,11 @@ function EvidenceDialog({
           </label>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} disabled={uploading}>
               Cancelar
             </Button>
-            <Button type="submit" className="gap-2">
-              <Upload className="h-4 w-4" />
+            <Button type="submit" className="gap-2" disabled={uploading}>
+              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
               Guardar evidencia
             </Button>
           </DialogFooter>
@@ -647,10 +582,14 @@ function DetailDialog({
   record,
   onClose,
   onDownload,
+  onViewEvidence,
+  onDownloadEvidence,
 }: {
   record: HealthyLifestyleRecord | null
   onClose: () => void
   onDownload: (record: HealthyLifestyleRecord) => void
+  onViewEvidence: (record: HealthyLifestyleRecord) => void
+  onDownloadEvidence: (record: HealthyLifestyleRecord) => void
 }) {
   if (!record) return null
 
@@ -671,6 +610,11 @@ function DetailDialog({
             <InfoBlock label="Inicio" value={formatDate(record.startDate)} />
             <InfoBlock label="Fin" value={formatDate(record.endDate)} />
           </div>
+          {completedWithDelay(record) && (
+            <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+              Con retraso: la evidencia fue cargada después de la fecha fin establecida.
+            </p>
+          )}
 
           <InfoBlock label="Responsable" value={record.responsibleName} />
 
@@ -693,12 +637,22 @@ function DetailDialog({
               Evidencia
             </h3>
             {record.evidence ? (
-              <div className="rounded-md bg-secondary p-3 text-sm">
-                <p className="font-medium text-foreground">{record.evidence.fileName}</p>
-                <p className="text-muted-foreground">{record.evidence.description}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {formatDateTime(record.evidence.uploadedAt)} · {record.evidence.isConfirmed ? "Confirmada" : "Sin confirmar"}
-                </p>
+              <div className="flex flex-col gap-3 rounded-md bg-secondary p-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-foreground">{record.evidence.originalName}</p>
+                  <p className="text-muted-foreground">{record.evidence.description}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {formatDateTime(record.evidence.createdAt)} · {record.evidence.isConfirmed ? "Confirmada" : "Sin confirmar"}
+                  </p>
+                </div>
+                <div className="flex shrink-0 gap-2">
+                  <Button type="button" size="sm" variant="outline" onClick={() => onViewEvidence(record)}>
+                    <Eye className="h-4 w-4" /> Ver
+                  </Button>
+                  <Button type="button" size="sm" variant="outline" onClick={() => onDownloadEvidence(record)}>
+                    <Download className="h-4 w-4" /> Descargar
+                  </Button>
+                </div>
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">Aún no hay evidencia cargada.</p>
@@ -720,10 +674,43 @@ function DetailDialog({
   )
 }
 
+function EvidencePreviewDialog({ preview, onClose }: { preview: EvidencePreview | null; onClose: () => void }) {
+  return (
+    <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">
+        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
+          <DialogTitle>{preview?.title ?? "Evidencia"}</DialogTitle>
+        </DialogHeader>
+        <div className="min-h-0 flex-1 overflow-auto p-4">
+          {preview && canPreview(preview.mimeType) ? (
+            preview.mimeType.startsWith("image/") ? (
+              <img src={preview.url} alt={preview.title} className="mx-auto max-h-[70dvh] max-w-full rounded-md object-contain" />
+            ) : (
+              <iframe title={preview.title} src={preview.url} className="h-[70dvh] w-full rounded-md border border-border" />
+            )
+          ) : (
+            <div className="flex min-h-72 flex-col items-center justify-center rounded-md border border-dashed border-border text-center text-muted-foreground">
+              <FileText className="mb-3 h-10 w-10" />
+              <p className="font-medium">Vista previa no disponible</p>
+              <p className="text-sm">Puedes descargar el archivo desde el detalle.</p>
+            </div>
+          )}
+        </div>
+        <DialogFooter className="shrink-0 border-t border-border px-6 py-4">
+          <Button type="button" onClick={onClose}>Cerrar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export default function HealthyLifestylesPage() {
-  const [records, setRecords] = useState<HealthyLifestyleRecord[]>(initialRecords)
+  const [records, setRecords] = useState<HealthyLifestyleRecord[]>([])
   const [employees, setEmployees] = useState<EmployeeOption[]>([])
   const [employeesLoading, setEmployeesLoading] = useState(true)
+  const [recordsLoading, setRecordsLoading] = useState(true)
+  const [uploading, setUploading] = useState(false)
+  const [busyRecordId, setBusyRecordId] = useState<string | null>(null)
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<ActivityType | "all">("all")
   const [viewMode, setViewMode] = useState<ViewMode>("list")
@@ -731,22 +718,39 @@ export default function HealthyLifestylesPage() {
   const [editingRecord, setEditingRecord] = useState<HealthyLifestyleRecord | null>(null)
   const [detailRecord, setDetailRecord] = useState<HealthyLifestyleRecord | null>(null)
   const [evidenceRecord, setEvidenceRecord] = useState<HealthyLifestyleRecord | null>(null)
+  const [preview, setPreview] = useState<EvidencePreview | null>(null)
+
+  async function loadRecords(employeeOptions: EmployeeOption[] = employees, showError = true) {
+    try {
+      const response = await listHealthyLifestyles({ limit: 100 })
+      setRecords(response.items.map((record) => normalizeRecord(record, employeeOptions)))
+    } catch (error) {
+      if (showError) toast.error(error instanceof Error ? error.message : "No se pudieron cargar las actividades saludables")
+    }
+  }
 
   useEffect(() => {
     let mounted = true
 
-    async function loadEmployeeOptions() {
+    async function loadPage() {
+      setRecordsLoading(true)
       try {
-        const employeeList = await listEmployees()
-        if (mounted) setEmployees(toEmployeeOptions(employeeList))
+        const [employeeList, activities] = await Promise.all([listEmployees(), listHealthyLifestyles({ limit: 100 })])
+        if (!mounted) return
+        const employeeOptions = toEmployeeOptions(employeeList)
+        setEmployees(employeeOptions)
+        setRecords(activities.items.map((record) => normalizeRecord(record, employeeOptions)))
       } catch (error) {
-        if (mounted) toast.error(error instanceof Error ? error.message : "No se pudo cargar los funcionarios")
+        if (mounted) toast.error(error instanceof Error ? error.message : "No se pudo cargar el módulo de estilos de vida saludable")
       } finally {
-        if (mounted) setEmployeesLoading(false)
+        if (mounted) {
+          setEmployeesLoading(false)
+          setRecordsLoading(false)
+        }
       }
     }
 
-    loadEmployeeOptions()
+    void loadPage()
 
     return () => {
       mounted = false
@@ -779,63 +783,127 @@ export default function HealthyLifestylesPage() {
     }
   }, [records])
 
-  function handleSave(form: HealthyLifestyleForm, responsibleName: string, recordId?: string) {
-    const payload = {
+  async function handleSave(form: HealthyLifestyleForm, _responsibleName: string, recordId?: string) {
+    const existingRecord = recordId ? records.find((record) => record.id === recordId) : undefined
+    const payload: UpsertHealthyLifestyleDto = {
       name: form.name.trim(),
       type: form.type,
-      startDate: form.startDate,
-      endDate: form.endDate,
+      startDate: existingRecord?.startDate ?? form.startDate,
+      endDate: existingRecord?.endDate ?? form.endDate,
       responsibleEmployeeId: form.responsibleEmployeeId,
-      responsibleName,
       objective: form.objective.trim(),
       scope: form.scope.trim(),
-      status: inferStatus(form.startDate, form.endDate),
     }
 
-    if (recordId) {
-      setRecords((current) =>
-        current.map((record) =>
-          record.id === recordId
-            ? {
-                ...record,
-                ...payload,
-              }
-            : record,
-        ),
-      )
-      toast.success("Actividad saludable actualizada")
-      return
+    try {
+      if (recordId) {
+        await updateHealthyLifestyle(recordId, payload)
+        toast.success("Actividad saludable actualizada")
+      } else {
+        await createHealthyLifestyle(payload)
+        toast.success("Actividad saludable creada")
+      }
+      await loadRecords(employees, false)
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar la actividad saludable")
+      return false
     }
-
-    setRecords((current) => [
-      {
-        id: createId("healthy"),
-        ...payload,
-        createdAt: new Date().toISOString(),
-      },
-      ...current,
-    ])
-    toast.success("Actividad saludable creada")
   }
 
-  function handleUpload(recordId: string, form: EvidenceForm) {
-    setRecords((current) =>
-      current.map((record) =>
-        record.id === recordId
-          ? {
-              ...record,
-              evidence: {
-                id: createId("evidence"),
-                fileName: form.fileName.trim(),
-                description: form.description.trim(),
-                uploadedAt: new Date().toISOString(),
-                isConfirmed: form.isConfirmed,
-              },
-            }
-          : record,
-      ),
-    )
-    toast.success("Evidencia cargada")
+  async function handleUpload(recordId: string, form: EvidenceForm, file: File) {
+    setUploading(true)
+    try {
+      const evidence = await uploadHealthyLifestyleEvidence(recordId, {
+        file,
+        description: form.description.trim(),
+        isConfirmed: form.isConfirmed,
+      })
+      const currentRecord = records.find((record) => record.id === recordId)
+      setRecords((current) => current.map((record) => record.id === recordId ? { ...record, evidence, evidenceId: evidence.id, status: "COMPLETED" } : record))
+      setDetailRecord((current) => current?.id === recordId ? { ...current, evidence, evidenceId: evidence.id, status: "COMPLETED" } : current)
+      await loadRecords(employees, false)
+      const uploadedLate = Boolean(currentRecord && completedWithDelay({ ...currentRecord, evidence, evidenceId: evidence.id, status: "COMPLETED" }))
+      toast.success(uploadedLate ? "Evidencia cargada. La actividad quedó cumplida con retraso." : "Evidencia cargada. La actividad quedó cumplida.")
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar la evidencia")
+      return false
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  async function openDetail(record: HealthyLifestyleRecord) {
+    setBusyRecordId(record.id)
+    try {
+      setDetailRecord(normalizeRecord(await getHealthyLifestyle(record.id), employees))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el detalle")
+    } finally {
+      setBusyRecordId(null)
+    }
+  }
+
+  async function downloadProgramPdf(record: HealthyLifestyleRecord) {
+    setBusyRecordId(record.id)
+    try {
+      const blob = await exportHealthyLifestyle(record.id)
+      downloadBlob(blob, `estilos-vida-saludable-${record.name.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar el programa")
+    } finally {
+      setBusyRecordId(null)
+    }
+  }
+
+  async function handleDelete(record: HealthyLifestyleRecord) {
+    if (!window.confirm(`¿Eliminar la actividad "${record.name}"?`)) return
+    setBusyRecordId(record.id)
+    try {
+      await deleteHealthyLifestyle(record.id)
+      setRecords((current) => current.filter((item) => item.id !== record.id))
+      toast.success("Actividad saludable eliminada")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar la actividad")
+    } finally {
+      setBusyRecordId(null)
+    }
+  }
+
+  async function viewEvidence(record: HealthyLifestyleRecord) {
+    if (!record.evidence) return toast.error("La actividad no tiene evidencia")
+    setBusyRecordId(record.id)
+    try {
+      const blob = await downloadHealthyLifestyleEvidence(record.evidence.downloadUrl)
+      setPreview({
+        title: record.evidence.originalName,
+        url: URL.createObjectURL(blob),
+        mimeType: record.evidence.mimeType || blob.type || "application/octet-stream",
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo abrir la evidencia")
+    } finally {
+      setBusyRecordId(null)
+    }
+  }
+
+  async function downloadEvidence(record: HealthyLifestyleRecord) {
+    if (!record.evidence) return toast.error("La actividad no tiene evidencia")
+    setBusyRecordId(record.id)
+    try {
+      const blob = await downloadHealthyLifestyleEvidence(record.evidence.downloadUrl)
+      downloadBlob(blob, record.evidence.originalName)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar la evidencia")
+    } finally {
+      setBusyRecordId(null)
+    }
+  }
+
+  function closePreview() {
+    if (preview) URL.revokeObjectURL(preview.url)
+    setPreview(null)
   }
 
   function openEdit(record: HealthyLifestyleRecord) {
@@ -863,7 +931,7 @@ export default function HealthyLifestylesPage() {
         </Button>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-5"><Metric label="Actividades" value={stats.total} /><Metric label="Planeadas" value={stats.planned} tone="amber" /><Metric label="En ejecución" value={stats.inProgress} tone="blue" /><Metric label="Ejecutadas" value={stats.completed} tone="green" /><Metric label="Con evidencia" value={stats.withEvidence} tone="green" /></section>
+      <section className="grid grid-cols-2 gap-3 lg:grid-cols-5"><Metric label="Actividades" value={stats.total} /><Metric label="Planeadas" value={stats.planned} tone="amber" /><Metric label="En ejecución" value={stats.inProgress} tone="blue" /><Metric label="Cumplidas" value={stats.completed} tone="green" /><Metric label="Con evidencia" value={stats.withEvidence} tone="green" /></section>
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="mt-4 grid gap-3 md:grid-cols-[minmax(220px,1fr)_240px]">
           <Label className="grid gap-2">
@@ -938,10 +1006,11 @@ export default function HealthyLifestylesPage() {
                         <Badge variant="outline" className={statusClassName(record.status)}>
                           {statusLabel(record.status)}
                         </Badge>
+                        {completedWithDelay(record) && <span className="text-xs font-semibold text-red-600">Con retraso</span>}
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">{activityTypeLabel(record.type)}</p>
                     </div>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => setDetailRecord(record)}>
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void openDetail(record)} disabled={busyRecordId === record.id}>
                       <Eye className="h-4 w-4" />
                       Ver
                     </Button>
@@ -969,7 +1038,7 @@ export default function HealthyLifestylesPage() {
                       <Edit className="h-4 w-4" />
                       Editar
                     </Button>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => downloadProgramPdf(record)}>
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void downloadProgramPdf(record)} disabled={busyRecordId === record.id}>
                       <Download className="h-4 w-4" />
                       PDF
                     </Button>
@@ -1012,11 +1081,14 @@ export default function HealthyLifestylesPage() {
                     <td className="px-4 py-3">
                       <p className="max-w-[260px] truncate text-muted-foreground">{record.objective}</p>
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">{record.evidence?.fileName ?? "Sin evidencia"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{record.evidence?.originalName ?? "Sin evidencia"}</td>
                     <td className="px-4 py-3">
-                      <Badge variant="outline" className={statusClassName(record.status)}>
-                        {statusLabel(record.status)}
-                      </Badge>
+                      <div className="grid justify-items-start gap-1">
+                        <Badge variant="outline" className={statusClassName(record.status)}>
+                          {statusLabel(record.status)}
+                        </Badge>
+                        {completedWithDelay(record) && <span className="text-xs font-semibold text-red-600">Con retraso</span>}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-right">
                       <DropdownMenu>
@@ -1026,7 +1098,7 @@ export default function HealthyLifestylesPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuItem onSelect={() => setDetailRecord(record)}>
+                          <DropdownMenuItem onSelect={() => void openDetail(record)} disabled={busyRecordId === record.id}>
                             <Eye className="h-4 w-4" />
                             Ver detalle
                           </DropdownMenuItem>
@@ -1034,7 +1106,7 @@ export default function HealthyLifestylesPage() {
                             <Edit className="h-4 w-4" />
                             Editar
                           </DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => downloadProgramPdf(record)}>
+                          <DropdownMenuItem onSelect={() => void downloadProgramPdf(record)} disabled={busyRecordId === record.id}>
                             <Download className="h-4 w-4" />
                             Descargar programa
                           </DropdownMenuItem>
@@ -1043,12 +1115,24 @@ export default function HealthyLifestylesPage() {
                             <Upload className="h-4 w-4" />
                             Subir evidencia
                           </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onSelect={() => void handleDelete(record)} className="text-destructive" disabled={busyRecordId === record.id}>
+                            <Trash2 className="h-4 w-4" />
+                            Eliminar
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>
                   </tr>
                 ))}
-                {filteredRecords.length === 0 && (
+                {recordsLoading && (
+                  <tr>
+                    <td colSpan={8} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                      <span className="inline-flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Cargando actividades...</span>
+                    </td>
+                  </tr>
+                )}
+                {!recordsLoading && filteredRecords.length === 0 && (
                   <tr>
                     <td colSpan={8} className="px-4 py-10 text-center text-sm text-muted-foreground">
                       No hay actividades de estilos de vida saludable para mostrar.
@@ -1072,8 +1156,15 @@ export default function HealthyLifestylesPage() {
         }}
         onSave={handleSave}
       />
-      <EvidenceDialog record={evidenceRecord} onClose={() => setEvidenceRecord(null)} onUpload={handleUpload} />
-      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={downloadProgramPdf} />
+      <EvidenceDialog record={evidenceRecord} uploading={uploading} onClose={() => setEvidenceRecord(null)} onUpload={handleUpload} />
+      <DetailDialog
+        record={detailRecord}
+        onClose={() => setDetailRecord(null)}
+        onDownload={(record) => void downloadProgramPdf(record)}
+        onViewEvidence={(record) => void viewEvidence(record)}
+        onDownloadEvidence={(record) => void downloadEvidence(record)}
+      />
+      <EvidencePreviewDialog preview={preview} onClose={closePreview} />
     </main>
   )
 }

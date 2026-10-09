@@ -17,8 +17,6 @@ import {
   Upload,
   UserRound,
 } from "lucide-react"
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -42,21 +40,32 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
+import {
+  createHygieneDailyEvidence,
+  createHygieneProgram,
+  downloadHygieneEvidence,
+  exportHygieneService,
+  getHygieneService,
+  listHygieneServices,
+  updateHygieneDailyEvidence,
+  updateHygieneProgram,
+  uploadHygieneEvidence,
+} from "@/services/hygieneServicesService"
 import type { Employee } from "@/types/manager/employee"
+import type {
+  HygieneClassification,
+  HygieneImplementationType,
+  HygieneProgramProcedureType,
+  HygieneServiceDocument,
+  HygieneServiceRecord as ApiHygieneServiceRecord,
+} from "@/types/manager/hygieneServices"
 
 type ViewMode = "cards" | "list"
 type RecordKind = "DAILY_EVIDENCE" | "PROGRAM"
-type ImplementationType = "FORMAT" | "PROCEDURE" | "OTHER"
-type Classification = "HYGIENE" | "POTABLE_WATER"
-type ProgramProcedureType = "HYGIENE" | "POTABLE_WATER" | "WASTE_DISPOSAL" | "SANITARY_SERVICES"
-
-type Evidence = {
-  id: string
-  fileName: string
-  description: string
-  uploadedAt: string
-  isConfirmed: boolean
-}
+type ImplementationType = HygieneImplementationType
+type Classification = HygieneClassification
+type ProgramProcedureType = HygieneProgramProcedureType
+type Evidence = HygieneServiceDocument
 
 type EmployeeOption = {
   id: string
@@ -108,7 +117,7 @@ type ProgramForm = {
 }
 
 type EvidenceForm = {
-  fileName: string
+  file: File | null
   description: string
   isConfirmed: boolean
 }
@@ -130,47 +139,9 @@ const emptyProgramForm: ProgramForm = {
 }
 
 const emptyEvidenceForm: EvidenceForm = {
-  fileName: "",
+  file: null,
   description: "",
   isConfirmed: true,
-}
-
-const initialRecords: HygieneServiceRecord[] = [
-  {
-    id: "hygiene-service-1",
-    kind: "DAILY_EVIDENCE",
-    recordName: "Inspección diaria de servicios sanitarios",
-    implementationType: "FORMAT",
-    classification: "HYGIENE",
-    date: "2026-09-09",
-    responsibleEmployeeId: "mock-employee-1",
-    responsibleName: "Responsable SG-SST",
-    observations: "Servicios sanitarios disponibles, limpios y con suministro básico.",
-    evidence: {
-      id: "evidence-1",
-      fileName: "registro-fotografico-servicios-sanitarios.pdf",
-      description: "Soporte fotográfico de verificación diaria.",
-      uploadedAt: "2026-09-09T14:00:00.000Z",
-      isConfirmed: true,
-    },
-    createdAt: "2026-09-09T14:00:00.000Z",
-  },
-  {
-    id: "hygiene-service-2",
-    kind: "PROGRAM",
-    name: "Programa de suministro de agua potable y saneamiento básico",
-    procedureType: "POTABLE_WATER",
-    date: "2026-09-01",
-    createdAt: "2026-09-01T09:00:00.000Z",
-  },
-]
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
 }
 
 function formatDate(value?: string | null) {
@@ -329,82 +300,29 @@ function kindClassName(kind: RecordKind) {
     : "bg-blue-600 text-white border-transparent"
 }
 
-function downloadRecordPdf(record: HygieneServiceRecord) {
-  const doc = new jsPDF("p", "mm", "a4")
-  const pageWidth = doc.internal.pageSize.getWidth()
-  const margin = 14
-  const primaryColor: [number, number, number] = [31, 92, 77]
+function normalizeRecord(record: ApiHygieneServiceRecord): HygieneServiceRecord {
+  if (record.kind === "PROGRAM") return { ...record, evidence: record.evidence ?? undefined }
+  const employee = record.responsibleEmployee
+  const responsibleName = record.responsibleName
+    || `${employee?.name ?? ""} ${employee?.lastName ?? ""}`.trim()
+    || employee?.email
+    || "Responsable no disponible"
+  return {
+    ...record,
+    responsibleName,
+    otherImplementation: record.otherImplementation ?? undefined,
+    observations: record.observations ?? "",
+    evidence: record.evidence ?? undefined,
+  }
+}
 
-  doc.setFillColor(...primaryColor)
-  doc.roundedRect(margin, 12, pageWidth - margin * 2, 24, 3, 3, "F")
-  doc.setTextColor(255, 255, 255)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(13)
-  doc.text("SERVICIOS DE HIGIENE", margin + 5, 23)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(8)
-  doc.text(`${kindLabel(record.kind)} · Fecha: ${formatDate(recordDate(record))}`, margin + 5, 30)
-
-  const body =
-    record.kind === "PROGRAM"
-      ? [
-          ["Nombre", record.name, "Tipo procedimiento", procedureTypeLabel(record.procedureType)],
-          ["Fecha", formatDate(record.date), "Evidencia", record.evidence?.fileName ?? "Pendiente"],
-        ]
-      : [
-          ["Nombre registro", record.recordName, "Implementación", implementationLabel(record.implementationType)],
-          ["Clasificación", classificationLabel(record.classification), "Fecha", formatDate(record.date)],
-          ["Responsable", record.responsibleName, "Evidencia", record.evidence?.fileName ?? "Pendiente"],
-        ]
-
-  autoTable(doc, {
-    startY: 44,
-    theme: "grid",
-    margin: { left: margin, right: margin },
-    body,
-    styles: { font: "helvetica", fontSize: 9, cellPadding: 2.5, lineColor: [220, 226, 224], lineWidth: 0.1 },
-    columnStyles: {
-      0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 38 },
-      2: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 40 },
-    },
-  })
-
-  const y = ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 76) + 12
-  doc.setTextColor(30, 41, 59)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(10)
-  doc.text(record.kind === "PROGRAM" ? "Descripción del programa" : "Observaciones", margin, y)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(9)
-  const paragraph =
-    record.kind === "PROGRAM"
-      ? "Programa orientado al control de condiciones de higiene, suministro de agua potable, servicios sanitarios y disposición adecuada de residuos."
-      : record.observations || "Sin observaciones."
-  doc.text(doc.splitTextToSize(paragraph, pageWidth - margin * 2), margin, y + 7)
-
-  const evidenceY = y + 35
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(10)
-  doc.text("Evidencia", margin, evidenceY)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(9)
-  doc.text(record.evidence ? record.evidence.fileName : "Pendiente por cargar", margin, evidenceY + 7)
-
-  const signatureY = 250
-  doc.setDrawColor(120, 130, 140)
-  doc.line(margin, signatureY, margin + 78, signatureY)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(8)
-  doc.text("Responsable", margin, signatureY + 6)
-
-  doc.setDrawColor(220, 226, 224)
-  doc.line(margin, 280, pageWidth - margin, 280)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(7)
-  doc.setTextColor(100, 116, 139)
-  doc.text("Documento generado desde SafeCloud - Sistema de Gestión Integral", margin, 286)
-
-  doc.save(`servicios-higiene-${recordTitle(record).replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
+function saveBlob(blob: Blob, fileName: string) {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
 }
 
 function InfoBlock({ label, value }: { label: string; value: string }) {
@@ -447,7 +365,7 @@ function DailyEvidenceDialog({
   employees: EmployeeOption[]
   employeesLoading: boolean
   onClose: () => void
-  onSave: (form: DailyEvidenceForm, responsibleName: string, recordId?: string) => void
+  onSave: (form: DailyEvidenceForm, responsibleName: string, recordId?: string) => Promise<boolean>
 }) {
   const [form, setForm] = useState<DailyEvidenceForm>(emptyDailyForm)
   const [saving, setSaving] = useState(false)
@@ -480,9 +398,9 @@ function DailyEvidenceDialog({
     const responsibleName = findEmployeeName(employees, form.responsibleEmployeeId) || record?.responsibleName || "Responsable seleccionado"
 
     setSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, 250))
-    onSave(form, responsibleName, record?.id)
+    const saved = await onSave(form, responsibleName, record?.id)
     setSaving(false)
+    if (!saved) return
     setForm(emptyDailyForm)
     onClose()
   }
@@ -576,7 +494,7 @@ function ProgramDialog({
   open: boolean
   record: ProgramRecord | null
   onClose: () => void
-  onSave: (form: ProgramForm, recordId?: string) => void
+  onSave: (form: ProgramForm, recordId?: string) => Promise<boolean>
 }) {
   const [form, setForm] = useState<ProgramForm>(emptyProgramForm)
   const [saving, setSaving] = useState(false)
@@ -596,9 +514,9 @@ function ProgramDialog({
     if (!form.date) return toast.error("Selecciona la fecha")
 
     setSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, 250))
-    onSave(form, record?.id)
+    const saved = await onSave(form, record?.id)
     setSaving(false)
+    if (!saved) return
     setForm(emptyProgramForm)
     onClose()
   }
@@ -656,17 +574,21 @@ function EvidenceDialog({
 }: {
   record: HygieneServiceRecord | null
   onClose: () => void
-  onUpload: (recordId: string, form: EvidenceForm) => void
+  onUpload: (recordId: string, form: EvidenceForm) => Promise<boolean>
 }) {
   const [form, setForm] = useState<EvidenceForm>(emptyEvidenceForm)
+  const [uploading, setUploading] = useState(false)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!record) return
-    if (!form.fileName.trim()) return toast.error("Selecciona la evidencia")
+    if (!form.file) return toast.error("Selecciona la evidencia")
     if (!form.description.trim()) return toast.error("Describe brevemente la evidencia")
 
-    onUpload(record.id, form)
+    setUploading(true)
+    const uploaded = await onUpload(record.id, form)
+    setUploading(false)
+    if (!uploaded) return
     setForm(emptyEvidenceForm)
     onClose()
   }
@@ -682,9 +604,9 @@ function EvidenceDialog({
           <div className="rounded-md border border-dashed border-border bg-secondary p-4">
             <Label className="grid gap-2">
               Archivo
-              <Input type="file" onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.files?.[0]?.name ?? "" }))} />
+              <Input type="file" onChange={(event) => setForm((current) => ({ ...current, file: event.target.files?.[0] ?? null }))} />
             </Label>
-            <Input className="mt-3" value={form.fileName} onChange={(event) => setForm((current) => ({ ...current, fileName: event.target.value }))} placeholder="También puedes escribir el nombre del archivo mock" />
+            {form.file && <p className="mt-3 truncate text-sm text-muted-foreground">{form.file.name}</p>}
           </div>
 
           <Label className="grid gap-2">
@@ -699,7 +621,7 @@ function EvidenceDialog({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit" className="gap-2"><Upload className="h-4 w-4" />Guardar evidencia</Button>
+            <Button type="submit" className="gap-2" disabled={uploading}>{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}Guardar evidencia</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -711,10 +633,12 @@ function DetailDialog({
   record,
   onClose,
   onDownload,
+  onPreviewEvidence,
 }: {
   record: HygieneServiceRecord | null
   onClose: () => void
   onDownload: (record: HygieneServiceRecord) => void
+  onPreviewEvidence: (record: HygieneServiceRecord) => void
 }) {
   if (!record) return null
 
@@ -748,11 +672,14 @@ function DetailDialog({
             </h3>
             {record.evidence ? (
               <div className="rounded-md bg-secondary p-3 text-sm">
-                <p className="font-medium text-foreground">{record.evidence.fileName}</p>
-                <p className="text-muted-foreground">{record.evidence.description}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {formatDateTime(record.evidence.uploadedAt)} · {record.evidence.isConfirmed ? "Confirmada" : "Sin confirmar"}
-                </p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-foreground">{record.evidence.originalName}</p>
+                    <p className="text-muted-foreground">{record.evidence.description || "Sin descripción"}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(record.evidence.createdAt)} · {record.evidence.isConfirmed ? "Confirmada" : "Sin confirmar"}</p>
+                  </div>
+                  <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onPreviewEvidence(record)}><Eye className="h-4 w-4" />Previsualizar</Button>
+                </div>
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">Aún no hay evidencia cargada.</p>
@@ -769,8 +696,38 @@ function DetailDialog({
   )
 }
 
+type EvidencePreview = { url: string; mimeType: string; name: string }
+
+function EvidencePreviewDialog({ preview, onClose }: { preview: EvidencePreview | null; onClose: () => void }) {
+  if (!preview) return null
+  const isImage = preview.mimeType.startsWith("image/")
+  const isPdf = preview.mimeType === "application/pdf" || preview.name.toLowerCase().endsWith(".pdf")
+  return (
+    <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="!flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12"><DialogTitle className="truncate">{preview.name}</DialogTitle></DialogHeader>
+        <div className="min-h-0 flex-1 bg-slate-100 p-3">
+          {isImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={preview.url} alt={preview.name} className="h-full w-full object-contain" />
+          ) : isPdf ? (
+            <iframe src={preview.url} title={preview.name} className="h-full w-full rounded-md border border-border bg-white" />
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm text-muted-foreground"><FileText className="h-10 w-10" />Este tipo de archivo no admite previsualización en el navegador.</div>
+          )}
+        </div>
+        <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+          <Button type="button" variant="outline" onClick={onClose}>Cerrar</Button>
+          <Button type="button" className="gap-2" asChild><a href={preview.url} download={preview.name}><Download className="h-4 w-4" />Descargar</a></Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export default function HygieneServicesPage() {
-  const [records, setRecords] = useState<HygieneServiceRecord[]>(initialRecords)
+  const [records, setRecords] = useState<HygieneServiceRecord[]>([])
+  const [recordsLoading, setRecordsLoading] = useState(true)
   const [employees, setEmployees] = useState<EmployeeOption[]>([])
   const [employeesLoading, setEmployeesLoading] = useState(true)
   const [search, setSearch] = useState("")
@@ -782,6 +739,23 @@ export default function HygieneServicesPage() {
   const [editingProgram, setEditingProgram] = useState<ProgramRecord | null>(null)
   const [detailRecord, setDetailRecord] = useState<HygieneServiceRecord | null>(null)
   const [evidenceRecord, setEvidenceRecord] = useState<HygieneServiceRecord | null>(null)
+  const [preview, setPreview] = useState<EvidencePreview | null>(null)
+
+  async function loadRecords() {
+    setRecordsLoading(true)
+    try {
+      const result = await listHygieneServices({ limit: 100 })
+      setRecords((result.items ?? []).map(normalizeRecord))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron cargar los servicios de higiene")
+    } finally {
+      setRecordsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void loadRecords()
+  }, [])
 
   useEffect(() => {
     let mounted = true
@@ -825,63 +799,111 @@ export default function HygieneServicesPage() {
     withEvidence: records.filter((record) => Boolean(record.evidence)).length,
   }), [records])
 
-  function handleSaveDaily(form: DailyEvidenceForm, responsibleName: string, recordId?: string) {
+  async function handleSaveDaily(form: DailyEvidenceForm, responsibleName: string, recordId?: string): Promise<boolean> {
     const payload = {
       recordName: form.recordName.trim(),
       implementationType: form.implementationType,
-      otherImplementation: form.implementationType === "OTHER" ? form.otherImplementation.trim() : undefined,
+      otherImplementation: form.implementationType === "OTHER" ? form.otherImplementation.trim() : null,
       classification: form.classification,
       date: form.date,
       responsibleEmployeeId: form.responsibleEmployeeId,
-      responsibleName,
       observations: form.observations.trim(),
     }
 
-    if (recordId) {
-      setRecords((current) => current.map((record) => record.id === recordId ? { ...record, ...payload } as HygieneServiceRecord : record))
-      toast.success("Evidencia diaria actualizada")
-      return
+    try {
+      const saved = recordId
+        ? await updateHygieneDailyEvidence(recordId, payload)
+        : await createHygieneDailyEvidence(payload)
+      const normalized = normalizeRecord({ ...saved, responsibleName })
+      setRecords((current) => recordId
+        ? current.map((record) => record.id === recordId ? normalized : record)
+        : [normalized, ...current])
+      toast.success(recordId ? "Evidencia diaria actualizada" : "Evidencia diaria creada")
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar la evidencia diaria")
+      return false
     }
-
-    setRecords((current) => [{ id: createId("hygiene"), kind: "DAILY_EVIDENCE", ...payload, createdAt: new Date().toISOString() }, ...current])
-    toast.success("Evidencia diaria creada")
   }
 
-  function handleSaveProgram(form: ProgramForm, recordId?: string) {
+  async function handleSaveProgram(form: ProgramForm, recordId?: string): Promise<boolean> {
     const payload = {
       name: form.name.trim(),
       procedureType: form.procedureType,
       date: form.date,
     }
 
-    if (recordId) {
-      setRecords((current) => current.map((record) => record.id === recordId ? { ...record, ...payload } as HygieneServiceRecord : record))
-      toast.success("Programa actualizado")
-      return
+    try {
+      const saved = recordId
+        ? await updateHygieneProgram(recordId, payload)
+        : await createHygieneProgram(payload)
+      const normalized = normalizeRecord(saved)
+      setRecords((current) => recordId
+        ? current.map((record) => record.id === recordId ? normalized : record)
+        : [normalized, ...current])
+      toast.success(recordId ? "Programa actualizado" : "Programa creado")
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar el programa")
+      return false
     }
-
-    setRecords((current) => [{ id: createId("program"), kind: "PROGRAM", ...payload, createdAt: new Date().toISOString() }, ...current])
-    toast.success("Programa creado")
   }
 
-  function handleUpload(recordId: string, form: EvidenceForm) {
-    setRecords((current) =>
-      current.map((record) =>
-        record.id === recordId
-          ? {
-              ...record,
-              evidence: {
-                id: createId("evidence"),
-                fileName: form.fileName.trim(),
-                description: form.description.trim(),
-                uploadedAt: new Date().toISOString(),
-                isConfirmed: form.isConfirmed,
-              },
-            }
-          : record,
-      ),
-    )
-    toast.success("Evidencia cargada")
+  async function handleUpload(recordId: string, form: EvidenceForm): Promise<boolean> {
+    if (!form.file) return false
+    try {
+      const evidence = await uploadHygieneEvidence(recordId, {
+        file: form.file,
+        description: form.description,
+        isConfirmed: form.isConfirmed,
+      })
+      setRecords((current) => current.map((record) => record.id === recordId ? { ...record, evidence } : record))
+      setDetailRecord((current) => current?.id === recordId ? { ...current, evidence } : current)
+      toast.success("Evidencia cargada")
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar la evidencia")
+      return false
+    }
+  }
+
+  async function openDetail(record: HygieneServiceRecord) {
+    try {
+      const detail = normalizeRecord(await getHygieneService(record.id))
+      setRecords((current) => current.map((item) => item.id === detail.id ? detail : item))
+      setDetailRecord(detail)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cargar el detalle")
+    }
+  }
+
+  async function downloadRecordPdf(record: HygieneServiceRecord) {
+    try {
+      const blob = await exportHygieneService(record.id)
+      const safeName = recordTitle(record).replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ_-]+/g, "-")
+      saveBlob(blob, `${safeName || "servicio-higiene"}.pdf`)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar el registro")
+    }
+  }
+
+  async function previewEvidence(record: HygieneServiceRecord) {
+    if (!record.evidence) return
+    try {
+      const blob = await downloadHygieneEvidence(record.id, record.evidence.id)
+      setPreview({
+        url: URL.createObjectURL(blob),
+        mimeType: blob.type || record.evidence.mimeType || "application/octet-stream",
+        name: record.evidence.originalName,
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo abrir la evidencia")
+    }
+  }
+
+  function closePreview() {
+    if (preview?.url) URL.revokeObjectURL(preview.url)
+    setPreview(null)
   }
 
   function openEdit(record: HygieneServiceRecord) {
@@ -957,6 +979,12 @@ export default function HygieneServicesPage() {
 
         {viewMode === "cards" ? (
           <div className="grid gap-4 xl:grid-cols-2">
+            {recordsLoading && (
+              <div className="col-span-full flex items-center justify-center gap-2 rounded-md border border-border bg-card px-4 py-10 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Cargando servicios de higiene...
+              </div>
+            )}
             {filteredRecords.map((record) => (
               <Card key={record.id} className="border-border bg-card">
                 <CardContent className="space-y-4 p-5">
@@ -968,7 +996,7 @@ export default function HygieneServicesPage() {
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">{recordCategory(record)}</p>
                     </div>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => setDetailRecord(record)}>
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void openDetail(record)}>
                       <Eye className="h-4 w-4" />
                       Ver
                     </Button>
@@ -980,12 +1008,17 @@ export default function HygieneServicesPage() {
                   </div>
                   <div className="flex flex-wrap justify-end gap-2 border-t border-border pt-3">
                     <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => openEdit(record)}><Edit className="h-4 w-4" />Editar</Button>
-                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => downloadRecordPdf(record)}><Download className="h-4 w-4" />PDF</Button>
+                    <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void downloadRecordPdf(record)}><Download className="h-4 w-4" />PDF</Button>
                     <Button type="button" size="sm" className="gap-2" onClick={() => setEvidenceRecord(record)}><Upload className="h-4 w-4" />Evidencia</Button>
                   </div>
                 </CardContent>
               </Card>
             ))}
+            {!recordsLoading && filteredRecords.length === 0 && (
+              <div className="col-span-full rounded-md border border-border bg-card px-4 py-10 text-center text-sm text-muted-foreground">
+                No hay registros de servicios de higiene para mostrar.
+              </div>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto rounded-md border border-border bg-card">
@@ -1012,16 +1045,16 @@ export default function HygieneServicesPage() {
                     <td className="px-4 py-3 text-muted-foreground">{recordCategory(record)}</td>
                     <td className="px-4 py-3 text-muted-foreground">{formatDate(recordDate(record))}</td>
                     <td className="px-4 py-3 text-muted-foreground">{recordResponsible(record)}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{record.evidence?.fileName ?? "Sin evidencia"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{record.evidence?.originalName ?? "Sin evidencia"}</td>
                     <td className="px-4 py-3 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button type="button" variant="ghost" size="icon" aria-label="Abrir acciones"><MoreHorizontal className="h-4 w-4" /></Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuItem onSelect={() => setDetailRecord(record)}><Eye className="h-4 w-4" />Ver detalle</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => void openDetail(record)}><Eye className="h-4 w-4" />Ver detalle</DropdownMenuItem>
                           <DropdownMenuItem onSelect={() => openEdit(record)}><Edit className="h-4 w-4" />Editar</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => downloadRecordPdf(record)}><Download className="h-4 w-4" />Descargar</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => void downloadRecordPdf(record)}><Download className="h-4 w-4" />Descargar</DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onSelect={() => setEvidenceRecord(record)}><Upload className="h-4 w-4" />Subir evidencia</DropdownMenuItem>
                         </DropdownMenuContent>
@@ -1029,7 +1062,14 @@ export default function HygieneServicesPage() {
                     </td>
                   </tr>
                 ))}
-                {filteredRecords.length === 0 && (
+                {recordsLoading && (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                      <span className="inline-flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" />Cargando servicios de higiene...</span>
+                    </td>
+                  </tr>
+                )}
+                {!recordsLoading && filteredRecords.length === 0 && (
                   <tr>
                     <td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground">No hay registros de servicios de higiene para mostrar.</td>
                   </tr>
@@ -1050,7 +1090,8 @@ export default function HygieneServicesPage() {
       />
       <ProgramDialog open={programDialogOpen} record={editingProgram} onClose={() => { setProgramDialogOpen(false); setEditingProgram(null) }} onSave={handleSaveProgram} />
       <EvidenceDialog record={evidenceRecord} onClose={() => setEvidenceRecord(null)} onUpload={handleUpload} />
-      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={downloadRecordPdf} />
+      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={(record) => void downloadRecordPdf(record)} onPreviewEvidence={(record) => void previewEvidence(record)} />
+      <EvidencePreviewDialog preview={preview} onClose={closePreview} />
     </main>
   )
 }
