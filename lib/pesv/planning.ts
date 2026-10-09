@@ -1,7 +1,10 @@
-export type PesvModule = "objectives" | "programs" | "work-plan" | "training" | "behavior" | "emergencies"
+import { operationalConfigs, operationalStatus, validateOperationalRecord } from "./operations"
+import { assuranceConfigs, assuranceStatus, validateAssurance } from "./assurance"
+
+export type PesvModule = "objectives" | "programs" | "work-plan" | "training" | "behavior" | "emergencies" | "managed-roads" | "journeys" | "vehicle-inspections" | "change-contractors" | "document-retention" | "statistics" | "audits" | "improvement" | "communications"
 export type Values = Record<string, string | string[]>
 export type Option = { value: string; label: string; description?: string; eligible?: boolean; year?: string }
-export type Reference = "policies" | "risks" | "objectives" | "programs" | "people" | "competencies" | "trainingActivities" | "procedures" | "routes" | "vehicles" | "emergencyPlans" | "workActivities"
+export type Reference = "policies" | "risks" | "objectives" | "programs" | "people" | "competencies" | "trainingActivities" | "procedures" | "routes" | "vehicles" | "emergencyPlans" | "workActivities" | "managedRoads" | "roadProtocols" | "journeyProcedures" | "journeys" | "vehicleProfiles" | "inspectionProcedures" | "changeProcedures" | "contractors" | "archiveProcedures" | "roadInvestigations" | "lossMatrices" | "auditProcedures" | "pesvAudits" | "auditFindings" | "communicationMechanisms"
 export type Field = {
   key: string; label: string; section: string
   type?: "text" | "textarea" | "number" | "date" | "year" | "money" | "select" | "reference"
@@ -9,6 +12,7 @@ export type Field = {
   min?: number; max?: number; showFor?: string[]; showWhen?: [string, string]; wide?: boolean
   requiredWhen?: [string, string[]]
   criticalOnly?: boolean
+  readOnly?: boolean
 }
 export type Kind = {
   id: string; title: string; singular: string; fields: Field[]
@@ -44,6 +48,8 @@ const dates = (section: string) => [field("startDate", "Fecha de inicio", sectio
 export const programTypes = ["Velocidad segura", "Prevención de la fatiga", "Prevención de la distracción", "Cero tolerancia al alcohol y sustancias psicoactivas", "Protección de actores viales vulnerables", "Otro"]
 export const competencyRoles = ["Líder PESV", "Miembro del Comité de Seguridad Vial", "Capacitador en seguridad vial", "Planificador de rutas / coordinador de desplazamientos", "Coordinador / técnico de mantenimiento", "Auditor de seguridad vial", "Brigadista vial / primer respondiente", "Investigador interno de siniestros viales", "Conductor en desplazamientos laborales"]
 export const configs: Record<PesvModule, ModuleConfig> = {
+  ...operationalConfigs,
+  ...assuranceConfigs,
   emergencies: {
     title: "Plan de preparación y respuesta ante emergencias viales", subtitle: "PPRAEV · Planes de respuesta, formación y simulacros anuales",
     kinds: [
@@ -266,6 +272,21 @@ export function loadCatalogs(): Catalogs {
     vehicles: [...new Map(diagnoses.flatMap(d => (d.vehicles ?? []).map(v => ({ value: `${d.id}:${v.id}`, label: `${v.plate} · ${v.vehicleType} · ${d.year}`, year: String(d.year) }))).map(v => [v.value, v])).values()],
     emergencyPlans: toOptions(readItems("emergencies").filter(r => r.kind === "emergency-plan")),
     workActivities: toOptions(readItems("work-plan")),
+    managedRoads: toOptions(readItems("managed-roads").filter(r => r.kind === "managed-road")),
+    roadProtocols: toOptions(readItems("managed-roads").filter(r => r.kind === "road-protocol")),
+    journeyProcedures: toOptions(readItems("journeys").filter(r => r.kind === "journey-procedure")),
+    journeys: toOptions(readItems("journeys").filter(r => r.kind === "journey")),
+    vehicleProfiles: toOptions(readItems("vehicle-inspections").filter(r => r.kind === "vehicle-profile")),
+    inspectionProcedures: toOptions(readItems("vehicle-inspections").filter(r => r.kind === "inspection-procedure")),
+    changeProcedures: toOptions(readItems("change-contractors").filter(r => r.kind === "change-procedure")),
+    contractors: toOptions(readItems("change-contractors").filter(r => r.kind === "contractor")),
+    archiveProcedures: toOptions(readItems("document-retention").filter(r => r.kind === "archive-procedure")),
+    roadInvestigations: readStore<{ cases: { id: string; values: Values }[] }>("safecloud:pesv-road-investigations", { cases: [] }).cases.map(c => ({ value: c.id, label: text(c.values.name) })),
+    lossMatrices: toOptions(readItems("statistics").filter(r => r.kind === "loss-matrix")),
+    auditProcedures: toOptions(readItems("audits").filter(r => r.kind === "audit-procedure")),
+    pesvAudits: toOptions(readItems("audits").filter(r => r.kind === "pesv-audit")),
+    auditFindings: toOptions(readItems("audits").filter(r => r.kind === "audit-finding")),
+    communicationMechanisms: toOptions(readItems("communications").filter(r => r.kind === "communication-mechanism")),
   }
 }
 export function completion(item: RecordItem) {
@@ -281,6 +302,10 @@ export function completion(item: RecordItem) {
   return item.entries.filter(e => e.kind === "FOLLOW_UP").at(-1)?.progress ?? 0
 }
 export function itemStatus(item: RecordItem) {
+  const assurance = assuranceStatus(item, dateToday())
+  if (assurance) return assurance
+  const operational = operationalStatus(item, dateToday())
+  if (operational) return operational
   if (item.kind === "competency" || item.kind === "behavior-evaluation") return text(item.values.result)
   if (item.kind === "procedure" || item.kind === "emergency-plan") return "Documentado"
   if (item.kind === "road-drill" && completion(item) === 100 && !item.evidence.some(e => e.targetId === item.entries.filter(e => e.kind === "FOLLOW_UP").at(-1)?.id)) return "Pendiente de evidencia"
@@ -312,7 +337,7 @@ export function validateRecord(kind: Kind, values: Values, activities: Activity[
   }
   if (text(values.endDate) && text(values.startDate) > text(values.endDate)) return "La fecha final no puede ser anterior a la inicial."
   if (text(values.periodEnd) && text(values.periodStart) > text(values.periodEnd)) return "Revisa el rango del período evaluado."
-  if (text(values.periodEnd) && text(values.evaluationDate) < text(values.periodEnd)) return "La evaluación no puede ser anterior al final del período evaluado."
+  if (text(values.periodEnd) && text(values.evaluationDate) && text(values.evaluationDate) < text(values.periodEnd)) return "La evaluación no puede ser anterior al final del período evaluado."
   if (text(values.evaluationDate) > dateToday()) return "La fecha de evaluación no puede estar en el futuro."
   if (text(values.startDate) && (Number(text(values.startDate).slice(0, 4)) !== Number(values.year) || Number(text(values.endDate).slice(0, 4)) !== Number(values.year))) return "Las fechas del plan deben pertenecer a la vigencia seleccionada."
   if (kind.id === "objective") {
@@ -332,5 +357,14 @@ export function validateRecord(kind: Kind, values: Values, activities: Activity[
       if (!Number.isFinite(Number(activity.budget)) || Number(activity.budget) < 0) return "El presupuesto de las actividades no puede ser negativo."
     }
   }
-  return null
+  if (kind.id === "vehicle-inspection") {
+    const profile = readItems("vehicle-inspections").find(p => p.id === values.vehicleProfileId)
+    if (profile && profile.values.vehicleType !== values.vehicleType) return "El tipo inspeccionado debe coincidir con la hoja de vida del vehículo."
+  }
+  if (kind.id === "contractor-check") {
+    const contractor = readItems("change-contractors").find(p => p.id === values.contractorId)
+    if (contractor?.values.pesvRequired === "Sí" && values.check_pesv === "No aplica") return "El PESV es exigible para este contratista; no se puede marcar como No aplica."
+    if (values.reason === "Previo a recorrido ocasional" && !text(values.journeyId)) return "Relaciona el recorrido para verificar al contratista ocasional antes de salir."
+  }
+  return validateAssurance(kind, values, previous, dateToday()) ?? validateOperationalRecord(kind, values, previous, dateToday())
 }

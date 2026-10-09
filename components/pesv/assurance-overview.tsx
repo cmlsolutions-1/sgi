@@ -1,0 +1,28 @@
+"use client"
+
+import Link from "next/link"
+import { communicationCoverage, documentedAudit, statisticalSummary } from "@/lib/pesv/assurance"
+import { dateToday, text, type PesvModule, type RecordItem } from "@/lib/pesv/planning"
+import { pesvSteps, stepApplies } from "@/lib/pesv/standards"
+
+const currency = (n: number) => new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n)
+export function AssuranceOverview({ module, items, year, kindId }: { module: PesvModule; items: RecordItem[]; year: string; kindId: string }) {
+  const selected = items.filter(i => !year || i.values.year === year)
+  if (module === "statistics" && kindId === "statistical-event") {
+    const rows = statisticalSummary(selected, "0000-01-01", "9999-12-31")
+    const months = Array.from({ length: 12 }, (_, index) => {
+      const prefix = `${year}-${String(index + 1).padStart(2, "0")}`
+      const records = selected.filter(i => i.kind === "statistical-event" && (!year ? Number(text(i.values.eventDate).slice(5, 7)) === index + 1 : text(i.values.eventDate).startsWith(prefix)))
+      return { month: new Intl.DateTimeFormat("es-CO", { month: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2026, index, 1))), laboral: records.filter(i => i.values.journey === "Laboral").length, daily: records.filter(i => i.values.journey === "Cotidiano / no laboral").length }
+    })
+    const max = Math.max(1, ...months.map(m => Math.max(m.laboral, m.daily)))
+    return <section className="space-y-4 border-y py-4"><div className="flex flex-wrap justify-between gap-2"><h2 className="font-semibold">Siniestros registrados por contexto y nivel de pérdida</h2><Link className="text-sm text-primary underline" href="/dashboard/pesv-investigations">Investigaciones de siniestros</Link></div><div className="overflow-x-auto"><table className="w-full text-sm"><thead className="bg-blue-50 text-blue-900 dark:bg-blue-950 dark:text-blue-100"><tr>{["Desplazamiento", "Nivel de pérdida", "Siniestros", "Fallecidos", "Lesionados", "Costos"].map(label => <th className="whitespace-nowrap px-3 py-2 text-left" key={label}>{label}</th>)}</tr></thead><tbody>{rows.map(row => <tr key={`${row.journey}-${row.level}`} className="border-b"><td className="px-3 py-2">{row.journey}</td><td className="px-3 py-2">{row.level}</td><td className="px-3 py-2 font-semibold">{row.events}</td><td className="px-3 py-2">{row.fatalities}</td><td className="px-3 py-2">{row.injured}</td><td className="whitespace-nowrap px-3 py-2">{currency(row.costs)}</td></tr>)}</tbody></table></div><h3 className="text-sm font-semibold">Evolución mensual · {year || "Todas las vigencias"}</h3><div className="flex flex-wrap gap-4 text-xs"><span className="flex items-center gap-2"><span className="h-2 w-2 bg-blue-600" />Laborales</span><span className="flex items-center gap-2"><span className="h-2 w-2 bg-emerald-600" />Cotidianos / no laborales</span></div><div className="overflow-x-auto"><div className="grid min-w-[600px] grid-cols-12 gap-3">{months.map(m => <div key={m.month} className="text-center text-xs"><div className="flex h-28 items-end justify-center gap-1 border-b"><div title={`Laborales: ${m.laboral}`} className="w-4 bg-blue-600" style={{ height: `${m.laboral / max * 100}%` }} /><div title={`No laborales: ${m.daily}`} className="w-4 bg-emerald-600" style={{ height: `${m.daily / max * 100}%` }} /></div><p className="mt-2">{m.month}</p><p className="text-muted-foreground">{m.laboral} / {m.daily}</p></div>)}</div></div></section>
+  }
+  if (module === "audits") {
+    const audits = selected.filter(i => i.kind === "pesv-audit")
+    const latest = audits.filter(documentedAudit).sort((a, b) => text(a.values.auditDate).localeCompare(text(b.values.auditDate))).at(-1)
+    return <section className="space-y-3 border-y py-4"><div className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm"><span>Auditorías programadas: <strong>{audits.length}</strong></span><span>Con informe y evaluación completa: <strong className="text-green-700">{audits.filter(documentedAudit).length}</strong></span><Link className="text-primary underline" href="/dashboard/pesv-indicators">Indicadores y autogestión</Link></div>{!latest && <p className="border-l-2 border-amber-500 pl-3 text-sm text-amber-700">{year && `${year}-12-31` < dateToday() ? "Vigencia sin auditoría anual documentada." : "Pendiente la auditoría anual con evaluación de los pasos aplicables e informe PDF."}</p>}{latest && <p className="text-sm">Última auditoría documentada: <strong>{text(latest.values.name)}</strong> · {text(latest.values.auditDate)} · {pesvSteps.filter((_, i) => stepApplies(i + 1, text(latest.values.level)) && latest.values[`step_${i + 1}`] === "Cumple").length} / {pesvSteps.filter((_, i) => stepApplies(i + 1, text(latest.values.level))).length} pasos aplicables cumplen.</p>}</section>
+  }
+  if (module === "communications") return <section className="space-y-3 border-y py-4"><h2 className="font-semibold">Control de comunicaciones trimestrales · {year || "Selecciona una vigencia"}</h2>{year && <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{communicationCoverage(items, year, dateToday()).map(q => <div className="border-l-2 border-blue-300 pl-3" key={q.quarter}><p className="text-sm font-medium">Trimestre {q.quarter}</p><p className={`text-sm ${q.status === "Documentada" ? "text-green-700" : q.status === "Trimestre sin comunicación" ? "text-red-600" : "text-amber-700"}`}>{q.status}</p><p className="text-xs text-muted-foreground">{q.count} comunicación(es)</p></div>)}</div>}</section>
+  return null
+}

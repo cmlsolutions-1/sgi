@@ -35,6 +35,8 @@ import {
   HeartPulse,
   FileSignature,
   Handshake,
+  Route,
+  Car,
 } from "lucide-react"
 import type { ModuleNode } from "@/store/auth.store"
 
@@ -213,6 +215,16 @@ export const navigation: NavigationItem[] = [
       { code: "PESV_BEHAVIOR", name: "Comportamiento seguro", href: "/dashboard/pesv-behavior", icon: UserCheck },
       { code: "PESV_EMERGENCIES", name: "Emergencias Viales", href: "/dashboard/pesv-emergencies", icon: FlameKindling },
       { code: "PESV_INVESTIGATIONS", name: "Investigación de Siniestros", href: "/dashboard/pesv-investigations", icon: FileSearch },
+      { code: "PESV_MANAGED_ROADS", name: "Vías administradas", href: "/dashboard/pesv-managed-roads", icon: Route },
+      { code: "PESV_JOURNEYS", name: "Desplazamientos laborales", href: "/dashboard/pesv-journeys", icon: Route },
+      { code: "PESV_VEHICLE_INSPECTIONS", name: "Inspección de vehículos", href: "/dashboard/pesv-vehicle-inspections", icon: Car },
+      { code: "PESV_CHANGE_CONTRACTORS", name: "Cambios y contratistas", href: "/dashboard/pesv-change-contractors", icon: Handshake },
+      { code: "PESV_DOCUMENT_RETENTION", name: "Archivo documental", href: "/dashboard/pesv-document-retention", icon: Archive },
+      { code: "PESV_INDICATORS", name: "Indicadores y autogestión", href: "/dashboard/pesv-indicators", icon: BarChart3 },
+      { code: "PESV_STATISTICS", name: "Estadísticas de siniestros", href: "/dashboard/pesv-statistics", icon: BarChart3 },
+      { code: "PESV_AUDITS", name: "Auditoría anual", href: "/dashboard/pesv-audits", icon: ClipboardCheck },
+      { code: "PESV_IMPROVEMENT", name: "Mejora continua · ACPM", href: "/dashboard/pesv-improvement", icon: FileCheck2 },
+      { code: "PESV_COMMUNICATIONS", name: "Comunicación y participación", href: "/dashboard/pesv-communications", icon: Users },
     ],
   },
   {
@@ -395,6 +407,16 @@ const alwaysVisibleCodes = new Set<string>([
   "PESV_BEHAVIOR",
   "PESV_EMERGENCIES",
   "PESV_INVESTIGATIONS",
+  "PESV_MANAGED_ROADS",
+  "PESV_JOURNEYS",
+  "PESV_VEHICLE_INSPECTIONS",
+  "PESV_CHANGE_CONTRACTORS",
+  "PESV_DOCUMENT_RETENTION",
+  "PESV_INDICATORS",
+  "PESV_STATISTICS",
+  "PESV_AUDITS",
+  "PESV_IMPROVEMENT",
+  "PESV_COMMUNICATIONS",
 ])
 
 const moduleCodeAliases: Record<string, string[]> = {

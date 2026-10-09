@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import {
+  Archive,
   BriefcaseBusiness,
   Bug,
   Building2,
@@ -43,6 +44,7 @@ export type FormVisualIcon =
   | "tracking"
   | "accountability"
   | "analytics"
+  | "custody"
 
 type Tone = "blue" | "cyan" | "emerald" | "amber" | "violet" | "rose"
 
@@ -67,6 +69,7 @@ const icons = {
   tracking: Target,
   accountability: Presentation,
   analytics: ChartNoAxesCombined,
+  custody: Archive,
 } satisfies Record<FormVisualIcon, typeof Target>
 
 const tones: Record<Tone, string> = {
