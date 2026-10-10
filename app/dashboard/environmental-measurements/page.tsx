@@ -32,6 +32,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listManagedDocuments } from "@/services/documentManagementService"
 import { listEmployees } from "@/services/employeeService"
@@ -466,28 +468,18 @@ function MeasurementDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>{record ? "Editar medición ambiental" : "Nueva medición ambiental"}</DialogTitle>
+      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl">
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="analytics" tone="blue" /><div><DialogTitle>{record ? "Editar medición ambiental" : "Nueva medición ambiental"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra la medición, su resultado y los controles relacionados.</p></div></div>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4">
-          <div className="grid gap-4 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-slate-50/40 px-6 py-5">
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="details" title="Datos de la medición" description="Identifica la medición, fecha, laboratorio y resultado." tone="blue" /><div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="measurement-name">Nombre de la medición</Label>
               <Input id="measurement-name" value={form.name} onChange={(event) => update("name", event.target.value)} placeholder="Ej. Medición de ruido en planta" />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="measurement-type">Tipo de medición</Label>
-              <select id="measurement-type" value={form.measurementType} onChange={(event) => update("measurementType", event.target.value as MeasurementType)} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
-                <option value="NOISE">Ruido</option>
-                <option value="LIGHTING">Iluminación</option>
-                <option value="VIBRATION">Vibraciones</option>
-                <option value="CHEMICAL">Químicos</option>
-                <option value="BIOLOGICAL">Biológicos</option>
-                <option value="TEMPERATURE">Temperatura</option>
-                <option value="OTHER">Otro</option>
-              </select>
-            </div>
+            <div><Label className="mb-2 block">Tipo de medición</Label><Select value={form.measurementType} onValueChange={(value) => update("measurementType", value as MeasurementType)}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="NOISE">Ruido</SelectItem><SelectItem value="LIGHTING">Iluminación</SelectItem><SelectItem value="VIBRATION">Vibraciones</SelectItem><SelectItem value="CHEMICAL">Químicos</SelectItem><SelectItem value="BIOLOGICAL">Biológicos</SelectItem><SelectItem value="TEMPERATURE">Temperatura</SelectItem><SelectItem value="OTHER">Otro</SelectItem></SelectContent></Select></div>
             <div className="grid gap-2">
               <Label htmlFor="measurement-date">Fecha de medición</Label>
               <Input id="measurement-date" type="date" value={form.measurementDate} onChange={(event) => update("measurementDate", event.target.value)} />
@@ -496,23 +488,15 @@ function MeasurementDialog({
               <Label htmlFor="measurement-lab">Empresa o laboratorio</Label>
               <Input id="measurement-lab" value={form.laboratory} onChange={(event) => update("laboratory", event.target.value)} placeholder="Nombre del laboratorio" />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="measurement-result">Resultado</Label>
-              <select id="measurement-result" value={form.result} onChange={(event) => update("result", event.target.value as MeasurementResult)} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
-                <option value="COMPLIES">Cumple</option>
-                <option value="DOES_NOT_COMPLY">No cumple</option>
-                <option value="IN_EVALUATION">En evaluación</option>
-              </select>
-            </div>
+            <div><Label className="mb-2 block">Resultado</Label><Select value={form.result} onValueChange={(value) => update("result", value as MeasurementResult)}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="COMPLIES">Cumple</SelectItem><SelectItem value="DOES_NOT_COMPLY">No cumple</SelectItem><SelectItem value="IN_EVALUATION">En evaluación</SelectItem></SelectContent></Select></div>
             <EmployeePicker employees={employees} loading={employeesLoading} value={form.responsibleEmployeeId} onChange={(employeeId) => update("responsibleEmployeeId", employeeId)} />
+            </div></section>
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="tracking" title="Relaciones y seguimiento" description="Relaciona el procedimiento, riesgo y observaciones de la medición." tone="cyan" /><div className="grid gap-4 md:grid-cols-2">
             <SearchableOptionPicker label="Procedimiento" value={form.procedureDocumentId} options={documents} loading={catalogsLoading} placeholder="Buscar procedimiento..." emptyMessage="No hay procedimientos disponibles." onChange={(id) => update("procedureDocumentId", id)} />
             <SearchableOptionPicker label="Riesgo asociado" value={form.riskId} options={risks} loading={catalogsLoading} placeholder="Buscar riesgo químico, físico o biológico..." emptyMessage="No hay riesgos disponibles." onChange={(id) => update("riskId", id)} />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="measurement-observations">Observaciones</Label>
-            <Textarea id="measurement-observations" value={form.observations} onChange={(event) => update("observations", event.target.value)} placeholder="Hallazgos, recomendaciones o seguimiento requerido" />
-          </div>
-          <DialogFooter className="gap-2 sm:gap-0">
+            <div className="grid gap-2 md:col-span-2"><Label htmlFor="measurement-observations">Observaciones</Label><Textarea id="measurement-observations" value={form.observations} onChange={(event) => update("observations", event.target.value)} placeholder="Hallazgos, recomendaciones o seguimiento requerido" rows={4} /></div>
+          </div></section></div>
+          <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
             <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{record ? "Guardar cambios" : "Crear medición"}</Button>
           </DialogFooter>
@@ -570,31 +554,24 @@ function ProcedureDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>{record ? "Editar procedimiento" : "Nuevo procedimiento"}</DialogTitle>
+      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-3xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-3xl">
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="document" tone="blue" /><div><DialogTitle>{record ? "Editar procedimiento" : "Nuevo procedimiento"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Relaciona el procedimiento usado para las mediciones ambientales.</p></div></div>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4">
-          <div className="grid gap-4 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto bg-slate-50/40 px-6 py-5"><section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="details" title="Información del procedimiento" description="Define el tipo, fecha y documento relacionado." tone="blue" /><div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="procedure-name">Nombre</Label>
               <Input id="procedure-name" value={form.name} onChange={(event) => update("name", event.target.value)} placeholder="Nombre del procedimiento" />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="procedure-type">Tipo de procedimiento</Label>
-              <select id="procedure-type" value={form.procedureType} onChange={(event) => update("procedureType", event.target.value as ProcedureType)} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
-                <option value="FORMATO">Formato</option>
-                <option value="PROCEDIMIENTO">Procedimiento</option>
-                <option value="OTRO">Otro</option>
-              </select>
-            </div>
+            <div><Label className="mb-2 block">Tipo de procedimiento</Label><Select value={form.procedureType} onValueChange={(value) => update("procedureType", value as ProcedureType)}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="FORMATO">Formato</SelectItem><SelectItem value="PROCEDIMIENTO">Procedimiento</SelectItem><SelectItem value="OTRO">Otro</SelectItem></SelectContent></Select></div>
             <div className="grid gap-2">
               <Label htmlFor="procedure-date">Fecha</Label>
               <Input id="procedure-date" type="date" value={form.date} onChange={(event) => update("date", event.target.value)} />
             </div>
-          </div>
-          <SearchableOptionPicker label="Relacionar procedimiento de gestión documental" value={form.relatedProcedureId} options={documents} loading={catalogsLoading} placeholder="Buscar documento..." emptyMessage="No hay documentos disponibles." onChange={(id) => update("relatedProcedureId", id)} />
-          <DialogFooter className="gap-2 sm:gap-0">
+            <div className="md:col-span-2"><SearchableOptionPicker label="Relacionar procedimiento de gestión documental" value={form.relatedProcedureId} options={documents} loading={catalogsLoading} placeholder="Buscar documento..." emptyMessage="No hay documentos disponibles." onChange={(id) => update("relatedProcedureId", id)} /></div>
+          </div></section></div>
+          <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
             <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{record ? "Guardar cambios" : "Crear procedimiento"}</Button>
           </DialogFooter>
@@ -635,7 +612,7 @@ function EvidenceDialog({
 
   return (
     <Dialog open={Boolean(record)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="module-dialog-polish sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Subir evidencia</DialogTitle>
         </DialogHeader>
@@ -678,7 +655,7 @@ function DetailDialog({
 
   return (
     <Dialog open={Boolean(record)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-3xl">
+      <DialogContent className="module-dialog-polish max-h-[92vh] overflow-y-auto sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>{recordTitle(record)}</DialogTitle>
         </DialogHeader>
@@ -739,7 +716,7 @@ function EvidencePreviewDialog({ preview, onClose }: { preview: EvidencePreview 
   const isPdf = preview.mimeType === "application/pdf" || preview.name.toLowerCase().endsWith(".pdf")
   return (
     <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="!flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+      <DialogContent className="module-dialog-polish !flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12"><DialogTitle className="truncate">{preview.name}</DialogTitle></DialogHeader>
         <div className="min-h-0 flex-1 bg-slate-100 p-3">
           {isImage ? (
@@ -950,7 +927,7 @@ export default function EnvironmentalMeasurementsPage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col gap-6 p-4 md:p-6">
+    <main className="module-polish flex flex-1 flex-col gap-6 p-4 md:p-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Mediciones Ambientales</h1>
@@ -966,11 +943,11 @@ export default function EnvironmentalMeasurementsPage() {
         </div>
       </div>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Mediciones</p><p className="mt-2 text-2xl font-bold text-foreground">{measurementsCount}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Procedimientos</p><p className="mt-2 text-2xl font-bold text-foreground">{proceduresCount}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Con evidencia</p><p className="mt-2 text-2xl font-bold text-foreground">{withEvidenceCount}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">No cumplen</p><p className="mt-2 text-2xl font-bold text-foreground">{notComplyCount}</p></CardContent></Card>
+      <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2"><span className="text-xl font-bold text-slate-900">{measurementsCount}</span><span className="text-xs font-medium text-slate-600">Mediciones</span></div>
+        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2"><span className="text-xl font-bold text-blue-700">{proceduresCount}</span><span className="text-xs font-medium text-slate-600">Procedimientos</span></div>
+        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2"><span className="text-xl font-bold text-emerald-700">{withEvidenceCount}</span><span className="text-xs font-medium text-slate-600">Con evidencia</span></div>
+        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2"><span className="text-xl font-bold text-rose-700">{notComplyCount}</span><span className="text-xs font-medium text-slate-600">No cumplen</span></div>
       </section>
 
       <section className="rounded-md border border-border bg-card p-4">

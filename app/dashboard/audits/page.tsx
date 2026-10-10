@@ -29,6 +29,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listManagedDocuments } from "@/services/documentManagementService"
 import { listEmployees } from "@/services/employeeService"
@@ -457,12 +459,21 @@ function AuditDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>{audit ? "Editar auditoría SST" : "Nueva auditoría SST"}</DialogTitle>
+      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl">
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+          <div className="flex items-start gap-3 text-left">
+            <FormDialogIcon icon="tracking" tone="blue" />
+            <div>
+              <DialogTitle>{audit ? "Editar auditoría SST" : "Nueva auditoría SST"}</DialogTitle>
+              <p className="mt-1 text-sm text-muted-foreground">Programa la auditoría, define su alcance y asigna el equipo responsable.</p>
+            </div>
+          </div>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4">
-          <div className="grid gap-4 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-slate-50/40 px-6 py-5">
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <FormSectionTitle icon="details" title="Información general" description="Identifica la auditoría, su vigencia y la fecha programada." tone="blue" />
+            <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="audit-year">Año / Vigencia</Label>
               <Input id="audit-year" type="number" min="2000" max="2100" value={form.year} onChange={(event) => update("year", event.target.value)} />
@@ -475,28 +486,32 @@ function AuditDialog({
               <Label htmlFor="audit-name">Nombre de la auditoría</Label>
               <Input id="audit-name" value={form.name} onChange={(event) => update("name", event.target.value)} placeholder="Ej. Auditoría interna SG-SST" />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="audit-type">Tipo de auditoría</Label>
-              <select id="audit-type" value={form.auditType} onChange={(event) => update("auditType", event.target.value as AuditType)} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
-                <option value="INTERNAL">Interna</option>
-                <option value="EXTERNAL">Externa</option>
-              </select>
+            <div>
+              <Label className="mb-2 block">Tipo de auditoría</Label>
+              <Select value={form.auditType} onValueChange={(value) => update("auditType", value as AuditType)}>
+                <SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger>
+                <SelectContent><SelectItem value="INTERNAL">Interna</SelectItem><SelectItem value="EXTERNAL">Externa</SelectItem></SelectContent>
+              </Select>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="audit-methodology">Metodología</Label>
-              <select id="audit-methodology" value={form.methodology} onChange={(event) => update("methodology", event.target.value as AuditMethodology)} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
-                <option value="PRESENTIAL">Presencial</option>
-                <option value="VIRTUAL">Virtual</option>
-              </select>
+            <div>
+              <Label className="mb-2 block">Metodología</Label>
+              <Select value={form.methodology} onValueChange={(value) => update("methodology", value as AuditMethodology)}>
+                <SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger>
+                <SelectContent><SelectItem value="PRESENTIAL">Presencial</SelectItem><SelectItem value="VIRTUAL">Virtual</SelectItem></SelectContent>
+              </Select>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="audit-status">Estado</Label>
-              <select id="audit-status" value={form.status} onChange={(event) => update("status", event.target.value as AuditStatus)} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
-                <option value="ACTIVE">Activa</option>
-                <option value="EXPIRED">Vencida</option>
-                <option value="FINISHED">Finalizada</option>
-              </select>
+            <div>
+              <Label className="mb-2 block">Estado</Label>
+              <Select value={form.status} onValueChange={(value) => update("status", value as AuditStatus)}>
+                <SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger>
+                <SelectContent><SelectItem value="ACTIVE">Activa</SelectItem><SelectItem value="EXPIRED">Vencida</SelectItem><SelectItem value="FINISHED">Finalizada</SelectItem></SelectContent>
+              </Select>
             </div>
+            </div>
+          </section>
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <FormSectionTitle icon="employee" title="Equipo y procedimiento" description="Asigna el auditor y relaciona el procedimiento aplicable." tone="cyan" />
+            <div className="grid gap-4 md:grid-cols-2">
             {form.auditType === "INTERNAL" ? (
               <EmployeePicker employees={employees} loading={loading} value={form.internalAuditorId} onChange={(employeeId) => update("internalAuditorId", employeeId)} />
             ) : (
@@ -506,12 +521,17 @@ function AuditDialog({
               </div>
             )}
             <SearchableOptionPicker label="Procedimiento relacionado" value={form.procedureId} options={documents} loading={loading} placeholder="Buscar procedimiento..." emptyMessage="No hay procedimientos disponibles." onChange={(id) => update("procedureId", id)} />
+            </div>
+          </section>
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <FormSectionTitle icon="document" title="Alcance de la auditoría" description="Describe los procesos, sedes y requisitos que serán evaluados." tone="amber" />
+            <div className="grid gap-2">
+              <Label htmlFor="audit-scope">Alcance</Label>
+              <Textarea id="audit-scope" value={form.scope} onChange={(event) => update("scope", event.target.value)} placeholder="Procesos, sedes, módulos o requisitos que cubre la auditoría" rows={4} />
+            </div>
+          </section>
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="audit-scope">Alcance</Label>
-            <Textarea id="audit-scope" value={form.scope} onChange={(event) => update("scope", event.target.value)} placeholder="Procesos, sedes, módulos o requisitos que cubre la auditoría" />
-          </div>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
             <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{audit ? "Guardar cambios" : "Crear auditoría"}</Button>
           </DialogFooter>
@@ -550,7 +570,7 @@ function EvidenceDialog({
 
   return (
     <Dialog open={Boolean(audit)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="module-dialog-polish sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Cargar documento de auditoría</DialogTitle>
         </DialogHeader>
@@ -615,7 +635,7 @@ function ActionDialog({
 
   return (
     <Dialog open={Boolean(audit)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="module-dialog-polish sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Agregar acción ACPM</DialogTitle>
         </DialogHeader>
@@ -665,7 +685,7 @@ function DetailDialog({
 
   return (
     <Dialog open={Boolean(audit)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-4xl">
+      <DialogContent className="module-dialog-polish max-h-[92vh] overflow-y-auto sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>{audit.name}</DialogTitle>
         </DialogHeader>
@@ -893,7 +913,7 @@ export default function AuditsPage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col gap-6 p-4 md:p-6">
+    <main className="module-polish flex flex-1 flex-col gap-6 p-4 md:p-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Auditorías SST</h1>
@@ -904,11 +924,11 @@ export default function AuditsPage() {
         </Button>
       </div>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Plan anual</p><p className="mt-2 text-2xl font-bold text-foreground">{stats.total}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Activas</p><p className="mt-2 text-2xl font-bold text-foreground">{stats.active}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Vencidas</p><p className="mt-2 text-2xl font-bold text-foreground">{stats.expired}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Finalizadas</p><p className="mt-2 text-2xl font-bold text-foreground">{stats.finished}</p></CardContent></Card>
+      <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2"><span className="text-xl font-bold text-slate-900">{stats.total}</span><span className="text-xs font-medium text-slate-600">Plan anual</span></div>
+        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2"><span className="text-xl font-bold text-emerald-700">{stats.active}</span><span className="text-xs font-medium text-slate-600">Activas</span></div>
+        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2"><span className="text-xl font-bold text-rose-700">{stats.expired}</span><span className="text-xs font-medium text-slate-600">Vencidas</span></div>
+        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2"><span className="text-xl font-bold text-blue-700">{stats.finished}</span><span className="text-xs font-medium text-slate-600">Finalizadas</span></div>
       </section>
 
       <section className="rounded-md border border-border bg-card p-4">

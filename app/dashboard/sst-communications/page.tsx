@@ -37,6 +37,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
 import {
@@ -218,18 +220,18 @@ function CommunicationDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>{editing ? "Editar comunicacion SST" : "Nueva comunicacion SST"}</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            Registra el mecanismo de comunicación. La evidencia inicial se carga luego desde los 3 puntos del registro.
-          </p>
+          <div className="flex items-start gap-3 text-left">
+            <FormDialogIcon icon="document" tone="blue" />
+            <div><DialogTitle>{editing ? "Editar comunicacion SST" : "Nueva comunicacion SST"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra el mecanismo de comunicación y su responsable.</p></div>
+          </div>
         </DialogHeader>
 
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
             <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Datos del mecanismo</h3>
+              <FormSectionTitle icon="details" title="Datos del mecanismo" description="Define el nombre, tipo y medio utilizado para la comunicación." tone="blue" />
               <div className="grid gap-4 md:grid-cols-2">
                 <Label className="grid gap-2 md:col-span-2">
                   Nombre del mecanismo
@@ -239,31 +241,8 @@ function CommunicationDialog({
                     placeholder="Ej. Canal interno de reportes SST"
                   />
                 </Label>
-                <Label className="grid gap-2">
-                  Tipo
-                  <select
-                    value={form.type}
-                    onChange={(event) => setForm((current) => ({ ...current, type: event.target.value as CommunicationType }))}
-                    className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    <option value="INTERNAL">Interno</option>
-                    <option value="EXTERNAL">Externo</option>
-                  </select>
-                </Label>
-                <Label className="grid gap-2">
-                  Medio
-                  <select
-                    value={form.medium}
-                    onChange={(event) => setForm((current) => ({ ...current, medium: event.target.value as CommunicationMedium }))}
-                    className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    {mediumOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </Label>
+                <div><Label className="mb-2 block">Tipo</Label><Select value={form.type} onValueChange={(value) => setForm((current) => ({ ...current, type: value as CommunicationType }))}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="INTERNAL">Interno</SelectItem><SelectItem value="EXTERNAL">Externo</SelectItem></SelectContent></Select></div>
+                <div><Label className="mb-2 block">Medio</Label><Select value={form.medium} onValueChange={(value) => setForm((current) => ({ ...current, medium: value as CommunicationMedium }))}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent>{mediumOptions.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent></Select></div>
                 {form.medium === "OTHER" && (
                   <Label className="grid gap-2 md:col-span-2">
                     Otro medio
@@ -274,35 +253,9 @@ function CommunicationDialog({
                     />
                   </Label>
                 )}
-                <Label className="grid gap-2">
-                  Tipo de responsable
-                  <select
-                    value={form.responsibleType}
-                    onChange={(event) =>
-                      setForm((current) => ({ ...current, responsibleType: event.target.value as ResponsibleType }))
-                    }
-                    className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    <option value="EMPLOYEE">Empleado</option>
-                    <option value="MANAGER">Gerente</option>
-                  </select>
-                </Label>
+                <div><Label className="mb-2 block">Tipo de responsable</Label><Select value={form.responsibleType} onValueChange={(value) => setForm((current) => ({ ...current, responsibleType: value as ResponsibleType }))}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="EMPLOYEE">Empleado</SelectItem><SelectItem value="MANAGER">Gerente</SelectItem></SelectContent></Select></div>
                 {form.responsibleType === "EMPLOYEE" ? (
-                  <Label className="grid gap-2">
-                    Empleado responsable
-                    <select
-                      value={form.responsibleEmployeeId}
-                      onChange={(event) => setForm((current) => ({ ...current, responsibleEmployeeId: event.target.value }))}
-                      className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                    >
-                      <option value="">Selecciona un empleado</option>
-                      {employees.map((employee) => (
-                        <option key={employee.id} value={employee.id}>
-                          {employee.name} {employee.lastName} - {employee.job}
-                        </option>
-                      ))}
-                    </select>
-                  </Label>
+                  <div><Label className="mb-2 block">Empleado responsable</Label><Select value={form.responsibleEmployeeId} onValueChange={(value) => setForm((current) => ({ ...current, responsibleEmployeeId: value }))}><SelectTrigger className="h-10 w-full"><SelectValue placeholder="Selecciona un empleado" /></SelectTrigger><SelectContent>{employees.map((employee) => <SelectItem key={employee.id} value={employee.id}>{employee.name} {employee.lastName} - {employee.job}</SelectItem>)}</SelectContent></Select></div>
                 ) : (
                   <Label className="grid gap-2">
                     Gerente responsable
@@ -321,17 +274,7 @@ function CommunicationDialog({
                     onChange={(event) => setForm((current) => ({ ...current, implementationDate: event.target.value }))}
                   />
                 </Label>
-                <Label className="grid gap-2">
-                  Informo a miembros del COPASST
-                  <select
-                    value={form.informedCopasst}
-                    onChange={(event) => setForm((current) => ({ ...current, informedCopasst: event.target.value as "YES" | "NO" }))}
-                    className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    <option value="YES">Si</option>
-                    <option value="NO">No</option>
-                  </select>
-                </Label>
+                <div><Label className="mb-2 block">Informó a miembros del COPASST</Label><Select value={form.informedCopasst} onValueChange={(value) => setForm((current) => ({ ...current, informedCopasst: value as "YES" | "NO" }))}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="YES">Sí</SelectItem><SelectItem value="NO">No</SelectItem></SelectContent></Select></div>
                 <Label className="grid gap-2 md:col-span-2">
                   Observaciones
                   <Textarea
@@ -345,10 +288,10 @@ function CommunicationDialog({
             </section>
 
             <section className="rounded-md border border-primary/20 bg-primary/5 p-4">
+              <FormSectionTitle icon="tracking" title="Flujo documental" description="Completa la evidencia inicial, firma y documento final." tone="cyan" />
               <div className="flex items-start gap-3">
                 <FileCheck2 className="mt-0.5 h-5 w-5 text-primary" />
                 <div>
-                  <h3 className="text-sm font-semibold text-foreground">Flujo documental</h3>
                   <p className="text-sm text-muted-foreground">
                     Después de guardar, carga la evidencia inicial desde los 3 puntos. Con esa evidencia se habilita el PDF para firma y luego podrás subir el documento firmado.
                   </p>
@@ -410,7 +353,7 @@ function EvidenceDialog({
 
   return (
     <Dialog open={Boolean(record)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-w-2xl bg-card">
+      <DialogContent className="module-dialog-polish max-w-2xl bg-card">
         <form onSubmit={submit} className="space-y-4">
           <DialogHeader>
             <DialogTitle>{kind === "initial" ? "Cargar evidencia inicial" : "Cargar documento firmado"}</DialogTitle>
@@ -475,7 +418,7 @@ function EvidencePreviewDialog({
 }) {
   return (
     <Dialog open={Boolean(preview)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">
+      <DialogContent className="module-dialog-polish flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <DialogTitle>{preview?.title ?? "Evidencia firmada"}</DialogTitle>
         </DialogHeader>
@@ -735,7 +678,7 @@ export default function SstCommunicationsPage() {
   }
 
   return (
-    <main className="space-y-6">
+    <main className="module-polish space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Comunicaciones SST</h1>
@@ -756,27 +699,27 @@ export default function SstCommunicationsPage() {
         </Button>
       </div>
 
-      <section className="overflow-x-auto px-3 py-1">
-        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:border-slate-200 [&>div]:bg-slate-50 [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
-            <span className="text-xs text-muted-foreground">Total</span>
-            <span className="text-sm font-semibold">{stats.total}</span>
+      <section className="overflow-x-auto py-1">
+        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3">
+          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
+            <span className="text-xl font-bold text-slate-900">{stats.total}</span>
+            <span className="text-xs font-medium text-slate-600">Total</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
-            <span className="text-xs text-muted-foreground">Internas</span>
-            <span className="text-sm font-semibold text-primary">{stats.internal}</span>
+          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2">
+            <span className="text-xl font-bold text-blue-700">{stats.internal}</span>
+            <span className="text-xs font-medium text-slate-600">Internas</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
-            <span className="text-xs text-muted-foreground">Externas</span>
-            <span className="text-sm font-semibold">{stats.external}</span>
+          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-cyan-200 bg-cyan-50 px-3.5 py-2">
+            <span className="text-xl font-bold text-cyan-700">{stats.external}</span>
+            <span className="text-xs font-medium text-slate-600">Externas</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
-            <span className="text-xs text-muted-foreground">Con evidencia</span>
-            <span className="text-sm font-semibold text-primary">{stats.withInitialEvidence}</span>
+          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2">
+            <span className="text-xl font-bold text-blue-700">{stats.withInitialEvidence}</span>
+            <span className="text-xs font-medium text-slate-600">Con evidencia</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
-            <span className="text-xs text-muted-foreground">Firmadas</span>
-            <span className="text-sm font-semibold text-green-700">{stats.signed}</span>
+          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2">
+            <span className="text-xl font-bold text-emerald-700">{stats.signed}</span>
+            <span className="text-xs font-medium text-slate-600">Firmadas</span>
           </div>
         </div>
       </section>
@@ -953,7 +896,7 @@ export default function SstCommunicationsPage() {
       </section>
 
       <Dialog open={Boolean(detailRecord)} onOpenChange={(nextOpen) => !nextOpen && setDetailRecord(null)}>
-        <DialogContent className="max-w-4xl bg-card">
+        <DialogContent className="module-dialog-polish max-w-4xl bg-card">
           <DialogHeader>
             <DialogTitle>Detalle de la comunicación SST</DialogTitle>
           </DialogHeader>

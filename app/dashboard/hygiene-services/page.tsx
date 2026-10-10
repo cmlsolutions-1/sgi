@@ -38,6 +38,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
 import {
@@ -407,50 +409,28 @@ function DailyEvidenceDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-4xl">
+      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-4xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>{record ? "Editar evidencia diaria" : "Nueva evidencia diaria"}</DialogTitle>
-          <p className="text-sm text-muted-foreground">Registra la verificación diaria o constante de las condiciones higiénicas.</p>
+          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="sanitation" tone="cyan" /><div><DialogTitle>{record ? "Editar evidencia diaria" : "Nueva evidencia diaria"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra la verificación diaria de las condiciones higiénicas.</p></div></div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
             <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Datos del registro</h3>
+              <FormSectionTitle icon="details" title="Datos del registro" description="Identifica la evidencia, su clasificación, fecha y responsable." tone="blue" />
               <div className="grid gap-4 md:grid-cols-2">
                 <Label className="grid gap-2">
                   Nombre del registro
                   <Input value={form.recordName} onChange={(event) => update("recordName", event.target.value)} placeholder="Inspección diaria de baños" />
                 </Label>
-                <label className="grid gap-2">
-                  <span className="text-sm font-medium text-foreground">Tipo de implementación</span>
-                  <select
-                    value={form.implementationType}
-                    onChange={(event) => update("implementationType", event.target.value as ImplementationType)}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    <option value="FORMAT">Formato</option>
-                    <option value="PROCEDURE">Procedimiento</option>
-                    <option value="OTHER">Otro</option>
-                  </select>
-                </label>
+                <div><Label className="mb-2 block">Tipo de implementación</Label><Select value={form.implementationType} onValueChange={(value) => update("implementationType", value as ImplementationType)}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="FORMAT">Formato</SelectItem><SelectItem value="PROCEDURE">Procedimiento</SelectItem><SelectItem value="OTHER">Otro</SelectItem></SelectContent></Select></div>
                 {form.implementationType === "OTHER" && (
                   <Label className="grid gap-2 md:col-span-2">
                     Describir implementación
                     <Input value={form.otherImplementation} onChange={(event) => update("otherImplementation", event.target.value)} placeholder="Describe el tipo de soporte o mecanismo usado" />
                   </Label>
                 )}
-                <label className="grid gap-2">
-                  <span className="text-sm font-medium text-foreground">Clasificación</span>
-                  <select
-                    value={form.classification}
-                    onChange={(event) => update("classification", event.target.value as Classification)}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    <option value="HYGIENE">Higiene</option>
-                    <option value="POTABLE_WATER">Agua potable</option>
-                  </select>
-                </label>
+                <div><Label className="mb-2 block">Clasificación</Label><Select value={form.classification} onValueChange={(value) => update("classification", value as Classification)}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="HYGIENE">Higiene</SelectItem><SelectItem value="POTABLE_WATER">Agua potable</SelectItem></SelectContent></Select></div>
                 <Label className="grid gap-2">
                   Fecha
                   <Input type="date" value={form.date} onChange={(event) => update("date", event.target.value)} />
@@ -466,10 +446,7 @@ function DailyEvidenceDialog({
               </div>
             </section>
 
-            <Label className="grid gap-2 rounded-md border border-border p-4">
-              Observaciones
-              <Textarea value={form.observations} onChange={(event) => update("observations", event.target.value)} rows={4} placeholder="Describe hallazgos, cumplimiento o novedades del registro." />
-            </Label>
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="document" title="Observaciones" description="Describe hallazgos, cumplimiento o novedades del registro." tone="cyan" /><Textarea value={form.observations} onChange={(event) => update("observations", event.target.value)} rows={4} placeholder="Describe hallazgos, cumplimiento o novedades del registro." /></section>
           </div>
 
           <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
@@ -523,38 +500,25 @@ function ProgramDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-w-3xl bg-card">
-        <DialogHeader>
-          <DialogTitle>{record ? "Editar programa" : "Nuevo programa"}</DialogTitle>
-          <p className="text-sm text-muted-foreground">Relaciona el programa o procedimiento de higiene y saneamiento básico.</p>
+      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-3xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-3xl">
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="sanitation" tone="cyan" /><div><DialogTitle>{record ? "Editar programa" : "Nuevo programa"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Relaciona el programa o procedimiento de higiene y saneamiento básico.</p></div></div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto bg-slate-50/40 px-6 py-5"><section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="details" title="Información del programa" description="Define el nombre, el procedimiento y su fecha." tone="blue" /><div className="grid gap-4 md:grid-cols-2">
             <Label className="grid gap-2 md:col-span-2">
               Nombre
               <Input value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} placeholder="Programa de higiene y agua potable" />
             </Label>
-            <label className="grid gap-2">
-              <span className="text-sm font-medium text-foreground">Relacionar tipo de procedimiento</span>
-              <select
-                value={form.procedureType}
-                onChange={(event) => setForm((current) => ({ ...current, procedureType: event.target.value as ProgramProcedureType }))}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              >
-                <option value="HYGIENE">Higiene</option>
-                <option value="POTABLE_WATER">Agua potable</option>
-                <option value="WASTE_DISPOSAL">Disposición de residuos</option>
-                <option value="SANITARY_SERVICES">Servicios sanitarios</option>
-              </select>
-            </label>
+            <div><Label className="mb-2 block">Relacionar tipo de procedimiento</Label><Select value={form.procedureType} onValueChange={(value) => setForm((current) => ({ ...current, procedureType: value as ProgramProcedureType }))}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="HYGIENE">Higiene</SelectItem><SelectItem value="POTABLE_WATER">Agua potable</SelectItem><SelectItem value="WASTE_DISPOSAL">Disposición de residuos</SelectItem><SelectItem value="SANITARY_SERVICES">Servicios sanitarios</SelectItem></SelectContent></Select></div>
             <Label className="grid gap-2">
               Fecha
               <Input type="date" value={form.date} onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))} />
             </Label>
-          </div>
+          </div></section></div>
 
-          <DialogFooter>
+          <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
             <Button type="submit" className="gap-2" disabled={saving}>
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -595,7 +559,7 @@ function EvidenceDialog({
 
   return (
     <Dialog open={Boolean(record)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-w-2xl bg-card">
+      <DialogContent className="module-dialog-polish max-w-2xl bg-card">
         <DialogHeader>
           <DialogTitle>Subir evidencia</DialogTitle>
           <p className="text-sm text-muted-foreground">Adjunta soporte fotográfico, fílmico, formato diligenciado o documento del programa.</p>
@@ -644,7 +608,7 @@ function DetailDialog({
 
   return (
     <Dialog open={Boolean(record)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+      <DialogContent className="module-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <DialogTitle>{recordTitle(record)}</DialogTitle>
           <p className="text-sm text-muted-foreground">Consulta el detalle del soporte de servicios de higiene.</p>
@@ -704,7 +668,7 @@ function EvidencePreviewDialog({ preview, onClose }: { preview: EvidencePreview 
   const isPdf = preview.mimeType === "application/pdf" || preview.name.toLowerCase().endsWith(".pdf")
   return (
     <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="!flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+      <DialogContent className="module-dialog-polish !flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12"><DialogTitle className="truncate">{preview.name}</DialogTitle></DialogHeader>
         <div className="min-h-0 flex-1 bg-slate-100 p-3">
           {isImage ? (
@@ -918,7 +882,7 @@ export default function HygieneServicesPage() {
   }
 
   return (
-    <main className="space-y-6">
+    <main className="module-polish space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Servicios de Higiene</h1>

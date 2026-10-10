@@ -41,6 +41,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
 import {
@@ -238,18 +240,15 @@ function WorkPlanDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>Nueva actividad del plan de trabajo</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            Las actividades quedan pendientes hasta cargar el plan firmado por el jefe.
-          </p>
+          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="tracking" tone="blue" /><div><DialogTitle>Nueva actividad del plan de trabajo</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Programa la actividad, su evidencia esperada, responsable y presupuesto.</p></div></div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
             <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Datos de la actividad</h3>
+              <FormSectionTitle icon="details" title="Datos de la actividad" description="Identifica la actividad y la vigencia del plan." tone="blue" />
               <div className="grid gap-4 md:grid-cols-[160px_minmax(0,1fr)]">
                 <Label className="grid gap-2">
                   Año
@@ -283,6 +282,7 @@ function WorkPlanDialog({
             </section>
 
             <section className="rounded-md border border-border p-4">
+              <FormSectionTitle icon="document" title="Objetivo y evidencia" description="Explica el propósito y el soporte esperado para demostrar cumplimiento." tone="cyan" />
               <div className="grid gap-4 lg:grid-cols-2">
                 <Label className="grid gap-2">
                   Objetivo
@@ -306,23 +306,9 @@ function WorkPlanDialog({
             </section>
 
             <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Responsable y presupuesto</h3>
+              <FormSectionTitle icon="employee" title="Responsable y presupuesto" description="Asigna la ejecución y define los recursos económicos." tone="emerald" />
               <div className="grid gap-4 md:grid-cols-2">
-                <label className="block">
-                  <span className="mb-1 block text-sm font-semibold text-foreground">Responsable</span>
-                  <select
-                    value={form.responsibleId}
-                    onChange={(event) => setForm((current) => ({ ...current, responsibleId: event.target.value }))}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    <option value="">Selecciona responsable</option>
-                    {employees.map((employee) => (
-                      <option key={employee.id} value={employee.id}>
-                         {employee.name} - {employee.job}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                <div><Label className="mb-2 block">Responsable</Label><Select value={form.responsibleId} onValueChange={(value) => setForm((current) => ({ ...current, responsibleId: value }))}><SelectTrigger className="h-10 w-full"><SelectValue placeholder="Selecciona responsable" /></SelectTrigger><SelectContent>{employees.map((employee) => <SelectItem key={employee.id} value={employee.id}>{employee.name} - {employee.job}</SelectItem>)}</SelectContent></Select></div>
                 <Label className="grid gap-2">
                   Presupuesto
                   <div className="relative">
@@ -393,7 +379,7 @@ function ApprovalDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="module-dialog-polish max-w-2xl">
         <DialogHeader>
           <DialogTitle>Cargar plan firmado</DialogTitle>
           <p className="text-sm text-muted-foreground">
@@ -455,7 +441,7 @@ function DetailDialog({
 
   return (
     <Dialog open={Boolean(item)} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="module-dialog-polish max-w-3xl">
         <DialogHeader>
           <DialogTitle>Detalle {item.consecutive}</DialogTitle>
         </DialogHeader>
@@ -504,7 +490,7 @@ function DocumentPreviewDialog({ preview, onClose }: { preview: DocumentPreview 
 
   return (
     <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="!flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+      <DialogContent className="module-dialog-polish !flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12"><DialogTitle className="truncate">{preview.name}</DialogTitle></DialogHeader>
         <div className="min-h-0 flex-1 bg-slate-100 p-3">
           {isImage ? (
@@ -847,7 +833,7 @@ export default function WorkPlanPage() {
   }
 
   return (
-    <main className="space-y-6">
+    <main className="module-polish space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Plan de Trabajo</h1>

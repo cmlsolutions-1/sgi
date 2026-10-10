@@ -32,6 +32,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { IntelligenceCenter } from "@/components/intelligence/intelligence-center"
 import { buildInspectionInsights } from "@/lib/intelligence-engine"
@@ -381,61 +383,34 @@ function InspectionDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>{record ? "Editar inspección" : "Nueva inspección"}</DialogTitle>
+      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl">
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="tracking" tone="blue" /><div><DialogTitle>{record ? "Editar inspección" : "Nueva inspección"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra el elemento, resultado, área y responsable de la inspección.</p></div></div>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4">
-          <div className="grid gap-4 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-slate-50/40 px-6 py-5">
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="details" title="Información de la inspección" description="Identifica el elemento, la acción realizada y su resultado." tone="blue" /><div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="element-name">Nombre del elemento</Label>
               <Input id="element-name" value={form.elementName} onChange={(event) => update("elementName", event.target.value)} placeholder="Ej. Extintor, escalera, máquina" />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="element-type">Tipo de elemento</Label>
-              <select id="element-type" value={form.elementType} onChange={(event) => update("elementType", event.target.value as ElementType)} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
-                <option value="INSTALLATION">Instalación</option>
-                <option value="MACHINERY">Maquinaria</option>
-                <option value="EQUIPMENT">Equipo</option>
-                <option value="EMERGENCY">Emergencias</option>
-                <option value="OTHER">Otro</option>
-              </select>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="inspection-action">Acción</Label>
-              <select id="inspection-action" value={form.action} onChange={(event) => update("action", event.target.value as InspectionAction)} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
-                <option value="INSPECTION">Inspección</option>
-                <option value="MAINTENANCE">Mantenimiento</option>
-              </select>
-            </div>
+            <div><Label className="mb-2 block">Tipo de elemento</Label><Select value={form.elementType} onValueChange={(value) => update("elementType", value as ElementType)}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="INSTALLATION">Instalación</SelectItem><SelectItem value="MACHINERY">Maquinaria</SelectItem><SelectItem value="EQUIPMENT">Equipo</SelectItem><SelectItem value="EMERGENCY">Emergencias</SelectItem><SelectItem value="OTHER">Otro</SelectItem></SelectContent></Select></div>
+            <div><Label className="mb-2 block">Acción</Label><Select value={form.action} onValueChange={(value) => update("action", value as InspectionAction)}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="INSPECTION">Inspección</SelectItem><SelectItem value="MAINTENANCE">Mantenimiento</SelectItem></SelectContent></Select></div>
             <div className="grid gap-2">
               <Label htmlFor="inspection-date">Fecha</Label>
               <Input id="inspection-date" type="date" value={form.date} onChange={(event) => update("date", event.target.value)} />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="inspection-result">Resultado</Label>
-              <select id="inspection-result" value={form.result} onChange={(event) => update("result", event.target.value as InspectionResult)} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
-                <option value="COMPLIES">Cumple</option>
-                <option value="DOES_NOT_COMPLY">No cumple</option>
-                <option value="PARTIAL">Parcial</option>
-              </select>
-            </div>
+            <div><Label className="mb-2 block">Resultado</Label><Select value={form.result} onValueChange={(value) => update("result", value as InspectionResult)}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="COMPLIES">Cumple</SelectItem><SelectItem value="DOES_NOT_COMPLY">No cumple</SelectItem><SelectItem value="PARTIAL">Parcial</SelectItem></SelectContent></Select></div>
             <label className="flex min-h-10 items-center gap-2 rounded-md border border-input px-3 text-sm text-foreground md:mt-6">
               <input type="checkbox" checked={form.copasstParticipated} onChange={(event) => update("copasstParticipated", event.target.checked)} />
               Participó el COPASST
             </label>
             <WorkAreaPicker areas={areas} loading={loading} value={form.workAreaId} onChange={(areaId) => update("workAreaId", areaId)} />
             <EmployeePicker employees={employees} loading={loading} value={form.responsibleEmployeeId} onChange={(employeeId) => update("responsibleEmployeeId", employeeId)} />
+          </div></section>
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="document" title="Descripción y hallazgos" description="Detalla el alcance, las observaciones y recomendaciones." tone="cyan" /><div className="grid gap-4 md:grid-cols-2"><Label className="grid gap-2">Descripción<Textarea value={form.description} onChange={(event) => update("description", event.target.value)} placeholder="Describe qué se inspecciona o mantiene" rows={4} /></Label><Label className="grid gap-2">Observaciones<Textarea value={form.observations} onChange={(event) => update("observations", event.target.value)} placeholder="Hallazgos, acciones o recomendaciones" rows={4} /></Label></div></section>
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="inspection-description">Descripción</Label>
-            <Textarea id="inspection-description" value={form.description} onChange={(event) => update("description", event.target.value)} placeholder="Describe qué se inspecciona o mantiene" />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="inspection-observations">Observaciones</Label>
-            <Textarea id="inspection-observations" value={form.observations} onChange={(event) => update("observations", event.target.value)} placeholder="Hallazgos, acciones o recomendaciones" />
-          </div>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
             <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{record ? "Guardar cambios" : "Crear inspección"}</Button>
           </DialogFooter>
@@ -476,7 +451,7 @@ function EvidenceDialog({
 
   return (
     <Dialog open={Boolean(record)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="module-dialog-polish sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Subir evidencia</DialogTitle>
         </DialogHeader>
@@ -519,7 +494,7 @@ function DetailDialog({
 
   return (
     <Dialog open={Boolean(record)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-3xl">
+      <DialogContent className="module-dialog-polish max-h-[92vh] overflow-y-auto sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>{record.elementName}</DialogTitle>
         </DialogHeader>
@@ -569,7 +544,7 @@ function EvidencePreviewDialog({ preview, onClose }: { preview: EvidencePreview 
   const isPdf = preview.mimeType === "application/pdf" || preview.name.toLowerCase().endsWith(".pdf")
   return (
     <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="!flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+      <DialogContent className="module-dialog-polish !flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12"><DialogTitle className="truncate">{preview.name}</DialogTitle></DialogHeader>
         <div className="min-h-0 flex-1 bg-slate-100 p-3">
           {isImage ? (
@@ -778,7 +753,7 @@ export default function InspectionsPage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col gap-6 p-4 md:p-6">
+    <main className="module-polish flex flex-1 flex-col gap-6 p-4 md:p-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Inspecciones</h1>
@@ -802,11 +777,11 @@ export default function InspectionsPage() {
         ]}
       />
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Inspecciones</p><p className="mt-2 text-2xl font-bold text-foreground">{inspectionsCount}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Mantenimientos</p><p className="mt-2 text-2xl font-bold text-foreground">{maintenanceCount}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Con evidencia</p><p className="mt-2 text-2xl font-bold text-foreground">{withEvidenceCount}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Pendientes</p><p className="mt-2 text-2xl font-bold text-foreground">{pendingCount}</p></CardContent></Card>
+      <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2"><span className="text-xl font-bold text-slate-900">{inspectionsCount}</span><span className="text-xs font-medium text-slate-600">Inspecciones</span></div>
+        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2"><span className="text-xl font-bold text-blue-700">{maintenanceCount}</span><span className="text-xs font-medium text-slate-600">Mantenimientos</span></div>
+        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2"><span className="text-xl font-bold text-emerald-700">{withEvidenceCount}</span><span className="text-xs font-medium text-slate-600">Con evidencia</span></div>
+        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2"><span className="text-xl font-bold text-amber-700">{pendingCount}</span><span className="text-xs font-medium text-slate-600">Pendientes</span></div>
       </section>
 
       <section className="rounded-md border border-border bg-card p-4">

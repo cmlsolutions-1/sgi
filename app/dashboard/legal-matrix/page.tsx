@@ -35,6 +35,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import {
   createLegalMatrixItem,
@@ -184,35 +186,17 @@ function LegalMatrixDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-4xl">
+      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-4xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>{editing ? "Editar item del normograma" : "Nuevo item del normograma"}</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            Registra la norma legal aplicable y su fecha de vencimiento. El documento soporte se carga desde las acciones del item.
-          </p>
+          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="document" tone="blue" /><div><DialogTitle>{editing ? "Editar item del normograma" : "Nuevo item del normograma"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra la norma aplicable, su vigencia y la entidad que la expide.</p></div></div>
         </DialogHeader>
 
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
             <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Datos de la norma</h3>
+              <FormSectionTitle icon="details" title="Datos de la norma" description="Identifica el documento legal y sus fechas de aplicación." tone="blue" />
               <div className="grid gap-4 md:grid-cols-2">
-                <Label className="grid gap-2">
-                  Tipo de documento
-                  <select
-                    value={form.documentType}
-                    onChange={(event) =>
-                      setForm((current) => ({ ...current, documentType: event.target.value as LegalDocumentType }))
-                    }
-                    className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    {documentTypeOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </Label>
+                <div><Label className="mb-2 block">Tipo de documento</Label><Select value={form.documentType} onValueChange={(value) => setForm((current) => ({ ...current, documentType: value as LegalDocumentType }))}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent>{documentTypeOptions.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent></Select></div>
                 {form.documentType === "OTRO" && (
                   <Label className="grid gap-2">
                     Otro tipo
@@ -259,10 +243,10 @@ function LegalMatrixDialog({
             </section>
 
             <section className="rounded-md border border-primary/20 bg-primary/5 p-4">
+              <FormSectionTitle icon="document" title="Documento legal de soporte" description="El soporte se adjunta después de crear el registro." tone="cyan" />
               <div className="flex items-start gap-3">
                 <Upload className="mt-0.5 h-5 w-5 text-primary" />
                 <div>
-                  <h3 className="text-sm font-semibold text-foreground">Documento legal de soporte</h3>
                   <p className="text-sm text-muted-foreground">
                     Una vez creado el item, usa los 3 puntos de la tabla y selecciona Cargar evidencia para adjuntar el documento legal.
                   </p>
@@ -319,7 +303,7 @@ function EvidenceDialog({
 
   return (
     <Dialog open={Boolean(item)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-w-2xl bg-card">
+      <DialogContent className="module-dialog-polish max-w-2xl bg-card">
         <form onSubmit={submit} className="space-y-4">
           <DialogHeader>
             <DialogTitle>Cargar evidencia</DialogTitle>
@@ -384,7 +368,7 @@ function EvidencePreviewDialog({
 }) {
   return (
     <Dialog open={Boolean(preview)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">
+      <DialogContent className="module-dialog-polish flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <DialogTitle>{preview?.title ?? "Documento legal"}</DialogTitle>
         </DialogHeader>
@@ -606,7 +590,7 @@ export default function LegalMatrixPage() {
   }
 
   return (
-    <main className="space-y-6">
+    <main className="module-polish space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Matriz Legal</h1>
@@ -631,23 +615,23 @@ export default function LegalMatrixPage() {
         </div>
       </div>
 
-      <section className="overflow-x-auto px-3 py-1">
-        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:border-slate-200 [&>div]:bg-slate-50 [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
-            <span className="text-xs text-muted-foreground">Total</span>
-            <span className="text-sm font-semibold">{stats.total}</span>
+      <section className="overflow-x-auto py-1">
+        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3">
+          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
+            <span className="text-xl font-bold text-slate-900">{stats.total}</span>
+            <span className="text-xs font-medium text-slate-600">Total</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
-            <span className="text-xs text-muted-foreground">Vigentes</span>
-            <span className="text-sm font-semibold text-green-700">{stats.active}</span>
+          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2">
+            <span className="text-xl font-bold text-emerald-700">{stats.active}</span>
+            <span className="text-xs font-medium text-slate-600">Vigentes</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
-            <span className="text-xs text-muted-foreground">Vencidos</span>
-            <span className="text-sm font-semibold text-destructive">{stats.expired}</span>
+          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2">
+            <span className="text-xl font-bold text-rose-700">{stats.expired}</span>
+            <span className="text-xs font-medium text-slate-600">Vencidos</span>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5">
-            <span className="text-xs text-muted-foreground">Con documento</span>
-            <span className="text-sm font-semibold text-primary">{stats.withEvidence}</span>
+          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2">
+            <span className="text-xl font-bold text-blue-700">{stats.withEvidence}</span>
+            <span className="text-xs font-medium text-slate-600">Con documento</span>
           </div>
         </div>
       </section>

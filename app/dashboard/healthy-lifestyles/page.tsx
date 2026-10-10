@@ -40,6 +40,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
 import {
@@ -381,18 +383,15 @@ function ActivityDialog({
       open={open}
       onOpenChange={handleOpenChange}
     >
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-4xl">
+      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-4xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>{editing ? "Editar actividad saludable" : "Nueva actividad saludable"}</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            Registra el programa, campaña o jornada orientada a estilos de vida y entornos de trabajo saludables.
-          </p>
+          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="prevention" tone="emerald" /><div><DialogTitle>{editing ? "Editar actividad saludable" : "Nueva actividad saludable"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra una campaña o jornada orientada al bienestar y los hábitos saludables.</p></div></div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
             <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Datos de la actividad</h3>
+              <FormSectionTitle icon="details" title="Datos de la actividad" description="Identifica la actividad, el tipo, las fechas y su responsable." tone="blue" />
               <div className="grid gap-4 md:grid-cols-2">
                 <Label className="grid gap-2">
                   Nombre actividad
@@ -402,19 +401,7 @@ function ActivityDialog({
                     placeholder="Campaña de prevención de tabaquismo"
                   />
                 </Label>
-                <label className="grid gap-2">
-                  <span className="text-sm font-medium text-foreground">Tipo</span>
-                  <select
-                    value={form.type}
-                    onChange={(event) => update("type", event.target.value as ActivityType)}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    <option value="CAMPAIGN">Campaña</option>
-                    <option value="TALK">Charla</option>
-                    <option value="DAY">Jornada</option>
-                    <option value="ACTIVITY">Actividad</option>
-                  </select>
-                </label>
+                <div><Label className="mb-2 block">Tipo</Label><Select value={form.type} onValueChange={(value) => update("type", value as ActivityType)}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="CAMPAIGN">Campaña</SelectItem><SelectItem value="TALK">Charla</SelectItem><SelectItem value="DAY">Jornada</SelectItem><SelectItem value="ACTIVITY">Actividad</SelectItem></SelectContent></Select></div>
                 <Label className="grid gap-2">
                   Fecha inicio
                   <Input type="date" value={form.startDate} onChange={(event) => update("startDate", event.target.value)} disabled={editing} />
@@ -439,7 +426,9 @@ function ActivityDialog({
               </div>
             </section>
 
-            <section className="grid gap-4 md:grid-cols-2">
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="tracking" title="Propósito y alcance" description="Explica el objetivo y la población o áreas beneficiadas." tone="cyan" />
+              <div className="grid gap-4 md:grid-cols-2">
               <Label className="grid gap-2 rounded-md border border-border p-4">
                 Objetivo
                 <Textarea
@@ -458,6 +447,7 @@ function ActivityDialog({
                   placeholder="Define población objetivo, áreas y cobertura."
                 />
               </Label>
+              </div>
             </section>
           </div>
 
@@ -515,7 +505,7 @@ function EvidenceDialog({
 
   return (
     <Dialog open={Boolean(record)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-w-2xl bg-card">
+      <DialogContent className="module-dialog-polish max-w-2xl bg-card">
         <DialogHeader>
           <DialogTitle>Subir evidencia</DialogTitle>
           <p className="text-sm text-muted-foreground">
@@ -595,7 +585,7 @@ function DetailDialog({
 
   return (
     <Dialog open={Boolean(record)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+      <DialogContent className="module-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <DialogTitle>{record.name}</DialogTitle>
           <p className="text-sm text-muted-foreground">
@@ -677,7 +667,7 @@ function DetailDialog({
 function EvidencePreviewDialog({ preview, onClose }: { preview: EvidencePreview | null; onClose: () => void }) {
   return (
     <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">
+      <DialogContent className="module-dialog-polish flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <DialogTitle>{preview?.title ?? "Evidencia"}</DialogTitle>
         </DialogHeader>
@@ -917,7 +907,7 @@ export default function HealthyLifestylesPage() {
   }
 
   return (
-    <main className="space-y-6">
+    <main className="module-polish space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Estilos de Vida Saludable</h1>
