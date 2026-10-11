@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listManagedDocuments } from "@/services/documentManagementService"
@@ -37,6 +37,7 @@ import { listEmployees } from "@/services/employeeService"
 import {
   createSstAudit,
   createSstAuditAction,
+  downloadSstAuditDocument,
   exportSstAudit,
   getSstAudit,
   listSstAuditActions,
@@ -676,20 +677,26 @@ function DetailDialog({
   audit,
   onClose,
   onDownload,
+  onPreviewEvidence,
+  onDownloadEvidence,
+  previewLoadingId,
 }: {
   audit: AuditRecord | null
   onClose: () => void
   onDownload: (audit: AuditRecord) => void
+  onPreviewEvidence: (evidence: Evidence) => void
+  onDownloadEvidence: (evidence: Evidence) => void
+  previewLoadingId: string | null
 }) {
   if (!audit) return null
 
   return (
     <Dialog open={Boolean(audit)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish max-h-[92vh] overflow-y-auto sm:max-w-4xl">
+      <DialogContent className="record-detail-dialog max-w-4xl sm:max-w-4xl">
         <DialogHeader>
-          <DialogTitle>{audit.name}</DialogTitle>
+          <DetailDialogHeading icon="details" tone="blue" title={audit.name} description="Consulta la programación, el alcance, los documentos y las acciones derivadas de la auditoría." badge={<Badge variant="outline" className={statusClassName(audit.status)}>{statusLabel(audit.status)}</Badge>} />
         </DialogHeader>
-        <div className="grid gap-4">
+        <div className="record-detail-body grid gap-4">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline" className={statusClassName(audit.status)}>{statusLabel(audit.status)}</Badge>
             <Badge variant="outline">{auditTypeLabel(audit.auditType)}</Badge>
@@ -707,9 +714,9 @@ function DetailDialog({
               <h3 className="font-semibold text-foreground">Documentos de auditoría</h3>
               <div className="mt-3 grid gap-2">
                 {audit.evidences.length ? audit.evidences.map((evidence) => (
-                  <div key={evidence.id} className="rounded-md bg-secondary/40 p-3 text-sm">
-                    <p className="font-medium text-foreground">{evidence.label}</p>
-                    <p className="text-muted-foreground">{evidence.fileName}</p>
+                  <div key={evidence.id} className="record-detail-file text-sm">
+                    <div className="min-w-0"><p className="font-medium text-foreground">{evidence.label}</p><p className="break-all text-muted-foreground">{evidence.fileName}</p><p className="mt-1 text-xs text-muted-foreground">{formatDate(evidence.uploadedAt)} · {evidence.isConfirmed ? "Confirmado" : "Sin confirmar"}</p></div>
+                    <div className="grid shrink-0 grid-cols-2 gap-2"><Button type="button" size="sm" variant="outline" className="gap-2" disabled={previewLoadingId === evidence.id} onClick={() => onPreviewEvidence(evidence)}>{previewLoadingId === evidence.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}Previsualizar</Button><Button type="button" size="sm" className="gap-2" onClick={() => onDownloadEvidence(evidence)}><Download className="h-4 w-4" />Descargar</Button></div>
                   </div>
                 )) : <p className="text-sm text-muted-foreground">Sin documentos cargados.</p>}
               </div>
@@ -736,6 +743,15 @@ function DetailDialog({
   )
 }
 
+type AuditEvidencePreview = { url: string; mimeType: string; name: string }
+
+function AuditEvidencePreviewDialog({ preview, onClose }: { preview: AuditEvidencePreview | null; onClose: () => void }) {
+  if (!preview) return null
+  const isImage = preview.mimeType.startsWith("image/")
+  const isPdf = preview.mimeType === "application/pdf" || preview.name.toLowerCase().endsWith(".pdf")
+  return <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && onClose()}><DialogContent className="module-dialog-polish !flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl"><DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12"><DialogTitle className="break-all text-base">{preview.name}</DialogTitle></DialogHeader><div className="min-h-0 flex-1 bg-slate-100 p-3">{isImage ? <img src={preview.url} alt={preview.name} className="h-full w-full object-contain" /> : isPdf ? <iframe src={preview.url} title={preview.name} className="h-full w-full rounded-md border border-border bg-white" /> : <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm text-muted-foreground"><FileText className="h-10 w-10" />Vista previa no disponible para este formato.</div>}</div><DialogFooter className="shrink-0 border-t border-border bg-white px-6 py-4"><Button type="button" variant="outline" onClick={onClose}>Cerrar</Button><Button type="button" className="gap-2" asChild><a href={preview.url} download={preview.name}><Download className="h-4 w-4" />Descargar</a></Button></DialogFooter></DialogContent></Dialog>
+}
+
 export default function AuditsPage() {
   const [audits, setAudits] = useState<AuditRecord[]>([])
   const [employees, setEmployees] = useState<EmployeeOption[]>([])
@@ -754,6 +770,8 @@ export default function AuditsPage() {
   const [evidenceAudit, setEvidenceAudit] = useState<AuditRecord | null>(null)
   const [actionAudit, setActionAudit] = useState<AuditRecord | null>(null)
   const [detailAudit, setDetailAudit] = useState<AuditRecord | null>(null)
+  const [previewLoadingId, setPreviewLoadingId] = useState<string | null>(null)
+  const [evidencePreview, setEvidencePreview] = useState<AuditEvidencePreview | null>(null)
 
   async function loadAudits() {
     setLoadingAudits(true)
@@ -912,6 +930,40 @@ export default function AuditsPage() {
     }
   }
 
+  async function previewAuditEvidence(evidence: Evidence) {
+    try {
+      setPreviewLoadingId(evidence.id)
+      const blob = await downloadSstAuditDocument(evidence.downloadUrl)
+      setEvidencePreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return { url: URL.createObjectURL(blob), mimeType: blob.type || evidence.mimeType || "application/octet-stream", name: evidence.fileName }
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo previsualizar el documento")
+    } finally {
+      setPreviewLoadingId(null)
+    }
+  }
+
+  async function downloadAuditEvidence(evidence: Evidence) {
+    try {
+      const blob = await downloadSstAuditDocument(evidence.downloadUrl)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = evidence.fileName
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar el documento")
+    }
+  }
+
+  function closeEvidencePreview() {
+    if (evidencePreview?.url) URL.revokeObjectURL(evidencePreview.url)
+    setEvidencePreview(null)
+  }
+
   return (
     <main className="module-polish flex flex-1 flex-col gap-6 p-4 md:p-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -1032,7 +1084,8 @@ export default function AuditsPage() {
       />
       <EvidenceDialog audit={evidenceAudit} uploading={uploadingEvidence} onClose={() => setEvidenceAudit(null)} onUpload={handleUploadEvidence} />
       <ActionDialog audit={actionAudit} saving={savingAction} onClose={() => setActionAudit(null)} onSave={handleSaveAction} />
-      <DetailDialog audit={detailAudit} onClose={() => setDetailAudit(null)} onDownload={downloadAuditPdf} />
+      <DetailDialog audit={detailAudit} onClose={() => setDetailAudit(null)} onDownload={downloadAuditPdf} onPreviewEvidence={(evidence) => void previewAuditEvidence(evidence)} onDownloadEvidence={(evidence) => void downloadAuditEvidence(evidence)} previewLoadingId={previewLoadingId} />
+      <AuditEvidencePreviewDialog preview={evidencePreview} onClose={closeEvidencePreview} />
     </main>
   )
 }

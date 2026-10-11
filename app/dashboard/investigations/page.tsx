@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { DetailDialogHeading } from "@/components/ui/form-dialog-visuals"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listAcpms } from "@/services/acpmService"
@@ -52,6 +53,7 @@ import { listIncidents } from "@/services/incidentService"
 import {
   changeInvestigationStatus,
   createInvestigation,
+  downloadInvestigationEvidence,
   getInvestigation,
   getInvestigationSummary,
   getInvestigationTraceability,
@@ -862,16 +864,22 @@ function DetailDialog({
   traceability,
   loading,
   deletingEvidenceId,
+  previewLoadingId,
   onClose,
   onUploadEvidence,
+  onPreviewEvidence,
+  onDownloadEvidence,
   onDeleteEvidence,
 }: {
   investigation: Investigation | null
   traceability: InvestigationTraceability[]
   loading: boolean
   deletingEvidenceId: string | null
+  previewLoadingId: string | null
   onClose: () => void
   onUploadEvidence: (investigation: Investigation) => void
+  onPreviewEvidence: (evidence: InvestigationEvidence) => void
+  onDownloadEvidence: (evidence: InvestigationEvidence) => void
   onDeleteEvidence: (investigation: Investigation, evidence: InvestigationEvidence) => Promise<void>
 }) {
   const evidences = investigation?.evidences ?? []
@@ -879,15 +887,12 @@ function DetailDialog({
 
   return (
     <Dialog open={Boolean(investigation)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+      <DialogContent className="record-detail-dialog max-w-5xl sm:max-w-5xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>Detalle de investigación</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            {investigation?.consecutive} · {investigation ? efficacyLabel(investigation.efficacyStatus) : ""}
-          </p>
+          <DetailDialogHeading icon="details" tone="blue" title="Detalle de investigación" description={`${investigation?.consecutive ?? ""} · ${investigation ? efficacyLabel(investigation.efficacyStatus) : ""}`} />
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
+        <div className="record-detail-body space-y-5">
           {loading ? (
             <div className="flex items-center justify-center gap-2 rounded-md border border-border p-8 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -967,7 +972,20 @@ function DetailDialog({
                               variant="outline"
                               size="sm"
                               className="gap-2"
-                              onClick={() => window.open(evidence.downloadUrl, "_blank", "noopener,noreferrer")}
+                              disabled={previewLoadingId === evidence.id}
+                              onClick={() => onPreviewEvidence(evidence)}
+                            >
+                              {previewLoadingId === evidence.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
+                              Previsualizar
+                            </Button>
+                          )}
+                          {evidence.downloadUrl && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="gap-2"
+                              onClick={() => onDownloadEvidence(evidence)}
                             >
                               <Download className="h-4 w-4" />
                               Descargar
@@ -1035,6 +1053,25 @@ function DetailDialog({
   )
 }
 
+type EvidencePreview = { url: string; mimeType: string; name: string }
+
+function EvidencePreviewDialog({ preview, onClose }: { preview: EvidencePreview | null; onClose: () => void }) {
+  if (!preview) return null
+  const isImage = preview.mimeType.startsWith("image/")
+  const isPdf = preview.mimeType === "application/pdf" || preview.name.toLowerCase().endsWith(".pdf")
+  return (
+    <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="module-dialog-polish !flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl">
+        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12"><DialogTitle className="break-all text-base">{preview.name}</DialogTitle></DialogHeader>
+        <div className="min-h-0 flex-1 bg-slate-100 p-3">
+          {isImage ? <img src={preview.url} alt={preview.name} className="h-full w-full object-contain" /> : isPdf ? <iframe src={preview.url} title={preview.name} className="h-full w-full rounded-md border border-border bg-white" /> : <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm text-muted-foreground"><FileText className="h-10 w-10" />Vista previa no disponible para este formato.</div>}
+        </div>
+        <DialogFooter className="shrink-0 border-t border-border bg-white px-6 py-4"><Button type="button" variant="outline" onClick={onClose}>Cerrar</Button><Button type="button" className="gap-2" asChild><a href={preview.url} download={preview.name}><Download className="h-4 w-4" />Descargar</a></Button></DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export default function InvestigationsPage() {
   const [investigations, setInvestigations] = useState<Investigation[]>([])
   const [summary, setSummary] = useState<InvestigationSummary>(emptySummary)
@@ -1052,6 +1089,8 @@ export default function InvestigationsPage() {
   const [detailLoading, setDetailLoading] = useState(false)
   const [evidenceInvestigation, setEvidenceInvestigation] = useState<Investigation | null>(null)
   const [deletingEvidenceId, setDeletingEvidenceId] = useState<string | null>(null)
+  const [previewLoadingId, setPreviewLoadingId] = useState<string | null>(null)
+  const [evidencePreview, setEvidencePreview] = useState<EvidencePreview | null>(null)
   const [verificationAction, setVerificationAction] = useState<{
     investigation: Investigation
     isEffective: boolean
@@ -1202,6 +1241,40 @@ export default function InvestigationsPage() {
     } finally {
       setDeletingEvidenceId(null)
     }
+  }
+
+  async function handlePreviewEvidence(evidence: InvestigationEvidence) {
+    try {
+      setPreviewLoadingId(evidence.id)
+      const blob = await downloadInvestigationEvidence(evidence.downloadUrl)
+      setEvidencePreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url)
+        return { url: URL.createObjectURL(blob), mimeType: blob.type || evidence.mimeType || "application/octet-stream", name: evidence.originalName }
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo previsualizar la evidencia")
+    } finally {
+      setPreviewLoadingId(null)
+    }
+  }
+
+  async function handleDownloadEvidence(evidence: InvestigationEvidence) {
+    try {
+      const blob = await downloadInvestigationEvidence(evidence.downloadUrl)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = evidence.originalName
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar la evidencia")
+    }
+  }
+
+  function closeEvidencePreview() {
+    if (evidencePreview?.url) URL.revokeObjectURL(evidencePreview.url)
+    setEvidencePreview(null)
   }
 
   async function handleOpenDetail(investigation: Investigation) {
@@ -1574,13 +1647,17 @@ export default function InvestigationsPage() {
         traceability={detailTraceability}
         loading={detailLoading}
         deletingEvidenceId={deletingEvidenceId}
+        previewLoadingId={previewLoadingId}
         onUploadEvidence={setEvidenceInvestigation}
+        onPreviewEvidence={(evidence) => void handlePreviewEvidence(evidence)}
+        onDownloadEvidence={(evidence) => void handleDownloadEvidence(evidence)}
         onDeleteEvidence={handleDeleteEvidence}
         onClose={() => {
           setDetailInvestigation(null)
           setDetailTraceability([])
         }}
       />
+      <EvidencePreviewDialog preview={evidencePreview} onClose={closeEvidencePreview} />
     </main>
   )
 }

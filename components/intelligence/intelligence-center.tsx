@@ -114,7 +114,7 @@ export function IntelligenceCenter({
     {
       id: "assistant-welcome",
       role: "assistant",
-      content: "Hola. Soy tu consultor SafeCloud. Puedo consultar la información real del sistema, verificar funcionarios, afiliaciones, documentos, medidas, riesgos y prioridades. No completaré respuestas con datos que no pueda comprobar.",
+      content: "Hola. Soy tu consultor SafeCloud. Puedo consultar la información real de los módulos del SGI, verificar registros, estados, pendientes, vencimientos, funcionarios y evidencias. Si un dato no está disponible, te lo diré en lugar de asumirlo.",
     },
   ])
 

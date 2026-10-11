@@ -4,6 +4,8 @@ import { type FormEvent, useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 import {
   BriefcaseBusiness,
+  CheckCircle2,
+  CircleOff,
   Download,
   Edit,
   ExternalLink,
@@ -19,6 +21,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiCard } from "@/components/dashboard/kpi-card"
 import {
   Dialog,
   DialogContent,
@@ -36,7 +39,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -556,25 +559,43 @@ export function JobsManager() {
         </Card>
       )}
 
-      <div className="w-full">
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
-            <span className="text-xs text-muted-foreground">Cargos</span>
-            <span className="text-xl font-bold leading-none">{stats.total}</span>
-          </div>
-          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2">
-            <span className="text-xs text-muted-foreground">Activos</span>
-            <span className="text-xl font-bold leading-none text-emerald-700">{stats.active}</span>
-          </div>
-          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2">
-            <span className="text-xs text-muted-foreground">Inactivos</span>
-            <span className="text-xl font-bold leading-none text-destructive">{stats.inactive}</span>
-          </div>
-          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2">
-            <span className="text-xs text-muted-foreground">Con evidencia</span>
-            <span className="text-xl font-bold leading-none text-blue-700">{stats.withEvidence}</span>
-          </div>
-        </div>
+      <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:grid-cols-4">
+        <KpiCard
+          compact
+          title="Cargos"
+          value={stats.total}
+          description="Registrados en el sistema"
+          trend="stable"
+          icon={<BriefcaseBusiness className="h-5 w-5" />}
+          className="border-b border-r border-slate-200 lg:border-b-0"
+        />
+        <KpiCard
+          compact
+          title="Activos"
+          value={stats.active}
+          description="Disponibles para asignación"
+          trend="up"
+          icon={<CheckCircle2 className="h-5 w-5" />}
+          className="border-b border-slate-200 lg:border-b-0 lg:border-r"
+        />
+        <KpiCard
+          compact
+          title="Inactivos"
+          value={stats.inactive}
+          description="Requieren revisión"
+          trend="down"
+          icon={<CircleOff className="h-5 w-5" />}
+          className="border-r border-slate-200"
+        />
+        <KpiCard
+          compact
+          title="Con evidencia"
+          value={stats.withEvidence}
+          description="Con soporte documental"
+          trend="stable"
+          icon={<FileText className="h-5 w-5" />}
+          className="border-slate-200"
+        />
       </div>
 
       <Card className="border-border bg-card">
@@ -813,14 +834,11 @@ export function JobsManager() {
 
       <Dialog open={Boolean(detailJob)} onOpenChange={(nextOpen) => !nextOpen && setDetailJob(null)}>
         {detailJob && (
-          <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+          <DialogContent className="record-detail-dialog max-w-5xl sm:max-w-5xl">
             <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-              <DialogTitle>Detalle del perfil de cargo</DialogTitle>
-              <p className="text-sm text-muted-foreground">
-                Verifica tareas, medio de labor, nivel de riesgo y soportes remitidos al medico ocupacional.
-              </p>
+              <DetailDialogHeading icon="job" tone="blue" title="Detalle del perfil de cargo" description="Verifica tareas, medio de labor, nivel de riesgo y soportes remitidos al médico ocupacional." />
             </DialogHeader>
-            <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
+            <div className="record-detail-body space-y-5">
               {(() => {
                 const documents = documentsByJob[detailJob.id] ?? []
                 return (

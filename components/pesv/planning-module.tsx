@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DetailDialogHeading } from "@/components/ui/form-dialog-visuals"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
@@ -61,9 +62,9 @@ export function FormField({ label, children }: { label: string; children: ReactN
 }
 export function Modal({ open, onOpenChange, title, children, footer }: { open: boolean; onOpenChange: (open: boolean) => void; title: string; children: ReactNode; footer?: ReactNode }) {
   return <Dialog open={open} onOpenChange={onOpenChange}>
-    <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] !max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0">
-      <DialogHeader className="shrink-0 border-b px-6 py-5 pr-12"><DialogTitle>{title}</DialogTitle></DialogHeader>
-      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">{children}</div>
+    <DialogContent className="record-detail-dialog !max-w-5xl">
+      <DialogHeader><DetailDialogHeading icon="details" tone="blue" title={title} description="Consulta y gestiona la información relacionada con este registro del PESV." /></DialogHeader>
+      <div className="record-detail-body">{children}</div>
       {footer && <DialogFooter className="shrink-0 border-t px-6 py-4">{footer}</DialogFooter>}
     </DialogContent>
   </Dialog>

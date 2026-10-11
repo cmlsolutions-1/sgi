@@ -44,6 +44,15 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
   return json.data as T
 }
 
+async function parseFileOrThrow(response: Response, fallbackMessage: string): Promise<Blob> {
+  if (!response.ok) {
+    const json = (await response.json().catch(() => null)) as ApiErrorResponse | null
+    const detail = json?.errors?.find((error) => error.message)?.message
+    throw new Error(detail ?? json?.message ?? fallbackMessage)
+  }
+  return response.blob()
+}
+
 function buildQuery(filters: InvestigationFilters = {}) {
   const params = new URLSearchParams()
 
@@ -152,6 +161,11 @@ export async function getInvestigationEvidence(
 ): Promise<InvestigationEvidence> {
   const res = await apiFetch(`/api/investigations/${investigationId}/documents/${documentId}`, { method: "GET" })
   return parseOrThrow<InvestigationEvidence>(res, "No se pudo cargar la evidencia")
+}
+
+export async function downloadInvestigationEvidence(downloadUrl: string): Promise<Blob> {
+  const res = await apiFetch(downloadUrl, { method: "GET" })
+  return parseFileOrThrow(res, "No se pudo descargar la evidencia de la investigación")
 }
 
 export async function deleteInvestigationEvidence(investigationId: string, documentId: string): Promise<void> {

@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Textarea } from "@/components/ui/textarea"
 import {
   createCustodyRecord,
@@ -829,21 +829,15 @@ export default function CustodyPage() {
       </section>
 
       <Dialog open={Boolean(detailRecord)} onOpenChange={(nextOpen) => !nextOpen && setDetailRecord(null)}>
-        <DialogContent className="max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl gap-0 overflow-hidden bg-white p-0 sm:max-w-4xl">
+        <DialogContent className="record-detail-dialog max-w-4xl sm:max-w-4xl">
           <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
-            <div className="flex items-start gap-3 text-left">
-              <FormDialogIcon icon="custody" tone="blue" />
-              <div>
-                <DialogTitle>Detalle de custodia</DialogTitle>
-                <p className="mt-1 text-sm text-muted-foreground">Consulta el responsable, la vigencia y el estado de sus soportes.</p>
-              </div>
-            </div>
+            <DetailDialogHeading icon="custody" tone="blue" title="Detalle de custodia" description="Consulta el responsable, la vigencia y el estado de sus soportes." />
           </DialogHeader>
           {detailRecord && (
-            <div className="max-h-[calc(100dvh-11rem)] space-y-4 overflow-y-auto bg-slate-50/40 px-6 py-5">
+            <div className="record-detail-body space-y-4">
               <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                 <FormSectionTitle icon="custody" title="Información de la custodia" description="Datos de la institución y persona responsable." tone="blue" />
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-3">
                   <InfoBlock label="Institución custodio" value={detailRecord.custodianInstitution} />
                   <InfoBlock label="Persona responsable" value={detailRecord.responsiblePerson} />
                   <InfoBlock label="Inicio custodia" value={formatDate(detailRecord.custodyStartDate)} />
@@ -857,22 +851,24 @@ export default function CustodyPage() {
               <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                 <FormSectionTitle icon="document" title="Evidencias documentales" description="Estado de los documentos requeridos para completar el registro." tone="cyan" />
                 <div className="grid gap-4 md:grid-cols-2">
-                  <InfoBlock
-                    label="Soporte custodia"
-                    value={
-                      detailRecord.custodyEvidence
-                        ? `${detailRecord.custodyEvidence.originalName} · ${formatDateTime(detailRecord.custodyEvidence.createdAt)}`
-                        : "Sin soporte"
-                    }
-                  />
-                  <InfoBlock
-                    label="Compromiso confidencialidad"
-                    value={
-                      detailRecord.confidentialityEvidence
-                        ? `${detailRecord.confidentialityEvidence.originalName} · ${formatDateTime(detailRecord.confidentialityEvidence.createdAt)}`
-                        : "Pendiente de firma"
-                    }
-                  />
+                  {(["custody", "confidentiality"] as EvidenceKind[]).map((kind) => {
+                    const evidence = evidenceFor(detailRecord, kind)
+                    return (
+                      <div key={kind} className="record-detail-file">
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{evidenceLabel(kind)}</p>
+                          <p className="mt-1 break-all text-sm font-semibold text-slate-900">{evidence?.originalName ?? (kind === "custody" ? "Sin soporte" : "Pendiente de firma")}</p>
+                          {evidence ? <p className="mt-1 text-xs text-muted-foreground">Cargado: {formatDateTime(evidence.createdAt)}</p> : null}
+                        </div>
+                        {evidence ? (
+                          <div className="grid shrink-0 grid-cols-2 gap-2">
+                            <Button type="button" size="sm" variant="outline" className="gap-2" onClick={() => void viewEvidence(detailRecord, kind)}><Eye className="h-4 w-4" />Previsualizar</Button>
+                            <Button type="button" size="sm" className="gap-2" onClick={() => void downloadEvidence(detailRecord, kind)}><Download className="h-4 w-4" />Descargar</Button>
+                          </div>
+                        ) : null}
+                      </div>
+                    )
+                  })}
                 </div>
               </section>
             </div>

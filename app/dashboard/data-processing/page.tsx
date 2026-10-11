@@ -27,6 +27,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { DetailDialogHeading } from "@/components/ui/form-dialog-visuals"
 import {
   Select,
   SelectContent,
@@ -395,13 +396,13 @@ export default function DataProcessingPage() {
       </Card>
 
       <Dialog open={Boolean(selected)} onOpenChange={(open) => !open && setSelected(null)}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+        <DialogContent className="record-detail-dialog max-w-4xl sm:max-w-4xl">
           {selected && (
             <>
               <DialogHeader>
-                <DialogTitle>Detalle de autorización</DialogTitle>
+                <DetailDialogHeading icon="details" tone="blue" title="Detalle de autorización" description="Consulta el estado del consentimiento, su vigencia y la trazabilidad de la autorización." badge={<StatusBadge status={selected.status} />} />
               </DialogHeader>
-              <div className="space-y-5">
+              <div className="record-detail-body space-y-5">
                 <div className="rounded-lg border bg-slate-50 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>

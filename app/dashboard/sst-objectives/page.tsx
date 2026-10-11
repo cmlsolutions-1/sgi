@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { DetailDialogHeading } from "@/components/ui/form-dialog-visuals"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { createSstPolicy, listSstPolicies } from "@/services/sstPolicyService"
@@ -847,12 +848,11 @@ function DetailDialog({
 
   return (
     <Dialog open={Boolean(objective)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-6xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-6xl">
+      <DialogContent className="record-detail-dialog max-w-6xl sm:max-w-6xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>Detalle del objetivo SST</DialogTitle>
-          <p className="text-sm text-muted-foreground">Consulta politica relacionada, seguimiento, difusión y evidencias.</p>
+          <DetailDialogHeading icon="details" tone="blue" title="Detalle del objetivo SST" description="Consulta política relacionada, seguimiento, difusión y evidencias." badge={<Badge variant="outline" className={statusClassName(status)}>{statusLabel(status)}</Badge>} />
         </DialogHeader>
-        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
+        <div className="record-detail-body space-y-5">
           <div className="grid gap-4 md:grid-cols-4">
             <InfoBlock label="Objetivo" value={objective.name} />
             <InfoBlock label="Vigencia" value={String(objective.year)} />

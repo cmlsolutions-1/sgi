@@ -412,6 +412,114 @@
     background-color: #ffffff;
   }
 
+  .record-detail-dialog {
+    display: flex !important;
+    width: calc(100vw - 1rem) !important;
+    max-height: calc(100dvh - 2rem) !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    border-color: #e2e8f0 !important;
+    border-radius: 1rem !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 24px 60px rgb(15 23 42 / 0.18) !important;
+  }
+
+  .record-detail-dialog > [data-slot="dialog-header"] {
+    flex: 0 0 auto;
+    padding: 1rem 3rem 1rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    background: linear-gradient(135deg, rgb(248 250 252 / 0.98), rgb(240 249 255 / 0.82));
+  }
+
+  .record-detail-dialog > [data-slot="dialog-footer"] {
+    flex: 0 0 auto;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    background-color: #ffffff;
+  }
+
+  .record-detail-body {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 1.25rem 1.5rem;
+    background-color: rgb(248 250 252 / 0.6);
+  }
+
+  .record-detail-section {
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.875rem;
+    background-color: #ffffff;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+  }
+
+  .record-detail-info {
+    min-width: 0;
+    padding: 0.875rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    background: linear-gradient(145deg, #ffffff, #f8fafc);
+  }
+
+  .record-detail-dialog .record-detail-body > section.rounded-md,
+  .record-detail-dialog .record-detail-body > div.rounded-md,
+  .record-detail-dialog .record-detail-body > div.grid > div.rounded-md,
+  .record-detail-dialog .record-detail-body > div.grid > div.border {
+    border-color: #e2e8f0;
+    border-radius: 0.875rem;
+    background-color: #ffffff;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+  }
+
+  .record-detail-dialog .record-detail-body > div.grid > div.bg-secondary,
+  .record-detail-dialog .record-detail-body > section.grid > div.bg-secondary {
+    border: 1px solid #e2e8f0;
+    background: linear-gradient(145deg, #ffffff, #f8fafc);
+  }
+
+  .record-detail-dialog .record-detail-body .bg-secondary {
+    border-color: #e2e8f0;
+    background-color: #f8fafc;
+  }
+
+  .record-detail-dialog .record-detail-body .truncate {
+    overflow: visible;
+    white-space: normal;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+  }
+
+  .record-detail-dialog .record-detail-body p,
+  .record-detail-dialog .record-detail-body dd {
+    overflow-wrap: anywhere;
+  }
+
+  .record-detail-file {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.875rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    background-color: #f8fafc;
+  }
+
+  .record-detail-file p:first-child {
+    overflow-wrap: anywhere;
+  }
+
+  @media (min-width: 640px) {
+    .record-detail-file {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
   @media (max-width: 640px) {
     .module-polish {
       gap: 1rem;
@@ -431,6 +539,12 @@
     }
 
     .record-dialog-polish > form:not(:has(> div[class*="overflow-y-auto"])) {
+      padding-inline: 1rem;
+    }
+
+    .record-detail-dialog > [data-slot="dialog-header"],
+    .record-detail-dialog > [data-slot="dialog-footer"],
+    .record-detail-body {
       padding-inline: 1rem;
     }
   }

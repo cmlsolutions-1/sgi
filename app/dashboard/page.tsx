@@ -38,8 +38,9 @@ import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { KpiCard } from "@/components/dashboard/kpi-card"
 import { IntelligenceCenter } from "@/components/intelligence/intelligence-center"
-import { buildDashboardInsights } from "@/lib/intelligence-engine"
+import { buildDashboardInsights, sortInsights } from "@/lib/intelligence-engine"
 import { askSafeCloud } from "@/lib/safecloud-assistant"
+import { buildSystemKnowledgeInsights, loadSystemKnowledge, type SystemModuleKnowledge } from "@/lib/system-knowledge"
 import {
   buildReportPdf,
   defaultDateRangeFilter,
@@ -360,6 +361,7 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardData>(initialData)
   const [errors, setErrors] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
+  const [systemKnowledge, setSystemKnowledge] = useState<SystemModuleKnowledge[]>([])
   const [dateFilter, setDateFilter] = useState<DateRangeFilter>(() => defaultDateRangeFilter())
 
   const moduleCodes = useMemo(() => flattenModuleCodes(modules), [modules])
@@ -373,6 +375,10 @@ export default function DashboardPage() {
 
     const loadDashboard = async () => {
       setLoading(true)
+
+      void loadSystemKnowledge().then((knowledge) => {
+        if (mounted) setSystemKnowledge(knowledge)
+      })
 
       const [
         employeesResult,
@@ -438,7 +444,10 @@ export default function DashboardPage() {
     }
   }, [data, range.endDate, range.startDate])
 
-  const intelligenceInsights = useMemo(() => buildDashboardInsights(data), [data])
+  const intelligenceInsights = useMemo(
+    () => sortInsights([...buildDashboardInsights(data), ...buildSystemKnowledgeInsights(systemKnowledge)]),
+    [data, systemKnowledge],
+  )
 
   const metrics = useMemo(() => {
     const activeEmployees = filteredData.employees.filter((employee) => employee.status).length
@@ -720,8 +729,8 @@ export default function DashboardPage() {
           })
         }
         assistantSuggestions={[
-          "¿Cuántos empleados tengo?",
-          "¿Quién tiene afiliaciones incompletas?",
+          "¿Qué tengo pendiente en todo el SGI?",
+          "¿Tengo registros pendientes en custodia?",
           "¿Qué debo atender primero?",
         ]}
         description={
@@ -731,8 +740,10 @@ export default function DashboardPage() {
         }
       />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+      <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm md:grid-cols-3 2xl:grid-cols-6">
         <KpiCard
+          compact
+          className="border-b border-r border-slate-200 2xl:border-b-0"
           title="Funcionarios"
           value={filteredData.employees.length}
           target={metrics.activeEmployees}
@@ -741,6 +752,8 @@ export default function DashboardPage() {
           icon={<Users className="h-5 w-5" />}
         />
         <KpiCard
+          compact
+          className="border-b border-slate-200 md:border-r 2xl:border-b-0"
           title="Riesgos laborales"
           value={filteredData.risks.length}
           target={metrics.highRisks}
@@ -749,6 +762,8 @@ export default function DashboardPage() {
           icon={<ShieldAlert className="h-5 w-5" />}
         />
         <KpiCard
+          compact
+          className="border-b border-r border-slate-200 md:border-r-0 2xl:border-b-0 2xl:border-r"
           title="Medidas preventivas"
           value={filteredData.preventiveMeasures.length}
           target={metrics.pendingMeasures}
@@ -757,6 +772,8 @@ export default function DashboardPage() {
           icon={<ClipboardList className="h-5 w-5" />}
         />
         <KpiCard
+          compact
+          className="border-b border-slate-200 md:border-b-0 md:border-r 2xl:border-r"
           title="Capacitaciones"
           value={filteredData.trainings.length}
           target={metrics.activeTrainings}
@@ -765,6 +782,8 @@ export default function DashboardPage() {
           icon={<BookOpenCheck className="h-5 w-5" />}
         />
         <KpiCard
+          compact
+          className="border-r border-slate-200 md:border-b-0 2xl:border-r"
           title="Documentos SGI"
           value={filteredData.documents.length}
           target={metrics.activeDocuments}
@@ -773,6 +792,8 @@ export default function DashboardPage() {
           icon={<FileText className="h-5 w-5" />}
         />
         <KpiCard
+          compact
+          className="border-slate-200"
           title="Novedades laborales"
           value={filteredData.incidents.length}
           target={metrics.activeIncidents}

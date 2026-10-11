@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
@@ -585,15 +585,12 @@ function DetailDialog({
 
   return (
     <Dialog open={Boolean(record)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+      <DialogContent className="record-detail-dialog max-w-5xl sm:max-w-5xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>{record.name}</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            Consulta el programa, alcance, responsable y evidencia asociada.
-          </p>
+          <DetailDialogHeading icon="details" tone="emerald" title={record.name} description="Consulta el programa, alcance, responsable y evidencia asociada." />
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
+        <div className="record-detail-body space-y-5">
           <div className="grid gap-4 md:grid-cols-4">
             <InfoBlock label="Tipo" value={activityTypeLabel(record.type)} />
             <InfoBlock label="Estado" value={statusLabel(record.status)} />
@@ -627,7 +624,7 @@ function DetailDialog({
               Evidencia
             </h3>
             {record.evidence ? (
-              <div className="flex flex-col gap-3 rounded-md bg-secondary p-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <div className="record-detail-file text-sm">
                 <div className="min-w-0">
                   <p className="truncate font-medium text-foreground">{record.evidence.originalName}</p>
                   <p className="text-muted-foreground">{record.evidence.description}</p>
@@ -635,11 +632,11 @@ function DetailDialog({
                     {formatDateTime(record.evidence.createdAt)} · {record.evidence.isConfirmed ? "Confirmada" : "Sin confirmar"}
                   </p>
                 </div>
-                <div className="flex shrink-0 gap-2">
-                  <Button type="button" size="sm" variant="outline" onClick={() => onViewEvidence(record)}>
-                    <Eye className="h-4 w-4" /> Ver
+                <div className="grid shrink-0 grid-cols-2 gap-2">
+                  <Button type="button" size="sm" variant="outline" className="gap-2" onClick={() => onViewEvidence(record)}>
+                    <Eye className="h-4 w-4" /> Previsualizar
                   </Button>
-                  <Button type="button" size="sm" variant="outline" onClick={() => onDownloadEvidence(record)}>
+                  <Button type="button" size="sm" className="gap-2" onClick={() => onDownloadEvidence(record)}>
                     <Download className="h-4 w-4" /> Descargar
                   </Button>
                 </div>

@@ -3,7 +3,10 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react"
 import Link from "next/link"
 import {
+  ShieldPlus,
   Calendar,
+  CheckCircle2,
+  CircleOff,
   Download,
   Edit,
   ExternalLink,
@@ -20,6 +23,7 @@ import {
   TriangleAlert,
   Upload,
   UserCheck,
+  LandPlot,
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -95,6 +99,7 @@ import type {
   EmployeeGender,
   UpdateEmployeeDto,
 } from "@/types/manager/employee"
+import { KpiCard } from "../dashboard/kpi-card"
 
 type EmployeeViewMode = "cards" | "list"
 type LaborNewsViewMode = "cards" | "list"
@@ -1963,26 +1968,45 @@ export default function EmployeesPage() {
       </div>
 
       <div className="space-y-6">
-          <div className="w-full">
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
-                <span className="text-xs text-muted-foreground">Total</span>
-                <span className="text-xl font-bold leading-none">{stats.total}</span>
-              </div>
-              <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2">
-                <span className="text-xs text-muted-foreground">Activos</span>
-                <span className="text-xl font-bold leading-none text-emerald-700">{stats.active}</span>
-              </div>
-              <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2">
-                <span className="text-xs text-muted-foreground">Inactivos</span>
-                <span className="text-xl font-bold leading-none text-red-700">{stats.inactive}</span>
-              </div>
-              <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2">
-                <span className="text-xs text-muted-foreground">Áreas vinculadas</span>
-                <span className="text-xl font-bold leading-none text-blue-700">{stats.workAreas}</span>
-              </div>
-            </div>
-          </div>
+
+          <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:grid-cols-4">
+        <KpiCard
+          compact
+          title="Total"
+          value={stats.total}
+          description="Registrados en el sistema"
+          trend="stable"
+          icon={<ShieldPlus className="h-5 w-5" />}
+          className="border-b border-r border-slate-200 lg:border-b-0"
+        />
+        <KpiCard
+          compact
+          title="Activos"
+          value={stats.active}
+          description="Disponibles para asignación"
+          trend="up"
+          icon={<CheckCircle2 className="h-5 w-5" />}
+          className="border-b border-slate-200 lg:border-b-0 lg:border-r"
+        />
+        <KpiCard
+          compact
+          title="Inactivos"
+          value={stats.inactive}
+          description="Requieren revisión"
+          trend="down"
+          icon={<CircleOff className="h-5 w-5" />}
+          className="border-r border-slate-200"
+        />
+        <KpiCard
+          compact
+          title="Áreas vinculadas"
+          value={stats.workAreas}
+          description="Con soporte documental"
+          trend="stable"
+          icon={<LandPlot className="h-5 w-5" />}
+          className="border-slate-200"
+        />
+      </div>
 
           <Card className="bg-card border-border">
             <CardHeader className="px-4 pb-2 pt-3">

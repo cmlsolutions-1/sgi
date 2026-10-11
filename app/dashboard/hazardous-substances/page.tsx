@@ -41,7 +41,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listManagedDocuments } from "@/services/documentManagementService"
@@ -748,22 +748,23 @@ function DetailDialog({
   onClose,
   onDownload,
   onPreviewEvidence,
+  onDownloadEvidence,
 }: {
   record: HazardousSubstanceRecord | null
   onClose: () => void
   onDownload: (record: HazardousSubstanceRecord) => void
   onPreviewEvidence: (record: HazardousSubstanceRecord) => void
+  onDownloadEvidence: (record: HazardousSubstanceRecord) => void
 }) {
   if (!record) return null
 
   return (
     <Dialog open={Boolean(record)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+      <DialogContent className="record-detail-dialog max-w-5xl sm:max-w-5xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>{recordTitle(record)}</DialogTitle>
-          <p className="text-sm text-muted-foreground">Consulta el detalle del registro de sustancias peligrosas.</p>
+          <DetailDialogHeading icon="details" tone="rose" title={recordTitle(record)} description="Consulta la clasificación, el responsable y la evidencia del registro." />
         </DialogHeader>
-        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
+        <div className="record-detail-body space-y-5">
           <div className="grid gap-4 md:grid-cols-4">
             <InfoBlock label="Tipo registro" value={kindLabel(record.kind)} />
             <InfoBlock label="Clasificación" value={recordCategory(record)} />
@@ -788,14 +789,14 @@ function DetailDialog({
           <section className="rounded-md border border-border p-4">
             <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground"><FileText className="h-4 w-4" />Evidencia</h3>
             {record.evidence ? (
-              <div className="rounded-md bg-secondary p-3 text-sm">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="record-detail-file text-sm">
+                <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0">
                     <p className="truncate font-medium text-foreground">{record.evidence.originalName}</p>
                     <p className="text-muted-foreground">{record.evidence.description || "Sin descripción"}</p>
                     <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(record.evidence.createdAt)} · {record.evidence.isConfirmed ? "Confirmada" : "Sin confirmar"}</p>
                   </div>
-                  <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onPreviewEvidence(record)}><Eye className="h-4 w-4" />Previsualizar</Button>
+                  <div className="grid shrink-0 grid-cols-2 gap-2"><Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onPreviewEvidence(record)}><Eye className="h-4 w-4" />Previsualizar</Button><Button type="button" size="sm" className="gap-2" onClick={() => onDownloadEvidence(record)}><Download className="h-4 w-4" />Descargar</Button></div>
                 </div>
               </div>
             ) : (
@@ -1050,6 +1051,16 @@ export default function HazardousSubstancesPage() {
     }
   }
 
+  async function downloadEvidenceFile(record: HazardousSubstanceRecord) {
+    if (!record.evidence) return
+    try {
+      const blob = await downloadHazardousSubstanceEvidence(record.id, record.evidence.id)
+      saveBlob(blob, record.evidence.originalName)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar la evidencia")
+    }
+  }
+
   function openEdit(record: HazardousSubstanceRecord) {
     if (record.kind === "PROGRAM") {
       setEditingProgram(record)
@@ -1211,7 +1222,7 @@ export default function HazardousSubstancesPage() {
       />
       <ProgramDialog open={programDialogOpen} record={editingProgram} onClose={() => { setProgramDialogOpen(false); setEditingProgram(null) }} onSave={handleSaveProgram} />
       <EvidenceDialog record={evidenceRecord} onClose={() => setEvidenceRecord(null)} onUpload={handleUpload} />
-      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={(record) => void downloadRecordPdf(record)} onPreviewEvidence={(record) => void previewEvidence(record)} />
+      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={(record) => void downloadRecordPdf(record)} onPreviewEvidence={(record) => void previewEvidence(record)} onDownloadEvidence={(record) => void downloadEvidenceFile(record)} />
       <EvidencePreviewDialog preview={preview} onClose={() => { if (preview?.url) URL.revokeObjectURL(preview.url); setPreview(null) }} />
     </main>
   )

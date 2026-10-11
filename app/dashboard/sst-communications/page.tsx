@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
@@ -896,37 +896,29 @@ export default function SstCommunicationsPage() {
       </section>
 
       <Dialog open={Boolean(detailRecord)} onOpenChange={(nextOpen) => !nextOpen && setDetailRecord(null)}>
-        <DialogContent className="module-dialog-polish max-w-4xl bg-card">
+        <DialogContent className="record-detail-dialog max-w-4xl sm:max-w-4xl">
           <DialogHeader>
-            <DialogTitle>Detalle de la comunicación SST</DialogTitle>
+            <DetailDialogHeading icon="details" tone="blue" title="Detalle de la comunicación SST" description="Consulta el mecanismo, responsable, estado de implementación y evidencias asociadas." />
           </DialogHeader>
           {detailRecord && (
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="record-detail-body grid gap-4 md:grid-cols-2">
               <InfoBlock label="Mecanismo" value={detailRecord.mechanismName} />
               <InfoBlock label="Tipo" value={typeLabel(detailRecord.type)} />
               <InfoBlock label="Medio" value={mediumLabel(detailRecord)} />
               <InfoBlock label="Responsable" value={responsibleLabel(detailRecord, employees)} />
               <InfoBlock label="Fecha implementación" value={formatDate(detailRecord.implementationDate)} />
               <InfoBlock label="COPASST" value={detailRecord.informedCopasst ? "Informado" : "Pendiente"} />
-              <div className="rounded-md bg-secondary p-3 md:col-span-2">
-                <p className="text-xs font-medium uppercase text-muted-foreground">Evidencia inicial</p>
-                <p className="mt-1 text-sm text-foreground">
-                  {detailRecord.initialEvidence
-                    ? `${detailRecord.initialEvidence.originalName} · ${formatDateTime(detailRecord.initialEvidence.createdAt)}`
-                    : "Sin evidencia inicial"}
-                </p>
+              <div className="record-detail-section md:col-span-2">
+                <FormSectionTitle icon="document" title="Evidencia inicial" description="Soporte con el que se registró la comunicación." tone="cyan" />
+                {detailRecord.initialEvidence ? <div className="record-detail-file"><div className="min-w-0"><p className="break-all text-sm font-semibold">{detailRecord.initialEvidence.originalName}</p><p className="mt-1 text-xs text-muted-foreground">Cargado: {formatDateTime(detailRecord.initialEvidence.createdAt)}</p></div><div className="grid shrink-0 grid-cols-2 gap-2"><Button type="button" size="sm" variant="outline" className="gap-2" disabled={busyRecordId === detailRecord.id} onClick={() => void viewEvidence(detailRecord, "initial")}><Eye className="h-4 w-4" />Previsualizar</Button><Button type="button" size="sm" className="gap-2" disabled={busyRecordId === detailRecord.id} onClick={() => void downloadEvidence(detailRecord, "initial")}><Download className="h-4 w-4" />Descargar</Button></div></div> : <p className="text-sm text-muted-foreground">Sin evidencia inicial.</p>}
               </div>
               <div className="rounded-md bg-secondary p-3 md:col-span-2">
                 <p className="text-xs font-medium uppercase text-muted-foreground">Observaciones</p>
                 <p className="mt-1 text-sm text-foreground">{detailRecord.observations || "Sin observaciones"}</p>
               </div>
-              <div className="rounded-md bg-secondary p-3 md:col-span-2">
-                <p className="text-xs font-medium uppercase text-muted-foreground">Evidencia firmada</p>
-                <p className="mt-1 text-sm text-foreground">
-                  {detailRecord.signedEvidence
-                    ? `${detailRecord.signedEvidence.originalName} · ${formatDateTime(detailRecord.signedEvidence.createdAt)}`
-                    : "Sin evidencia firmada"}
-                </p>
+              <div className="record-detail-section md:col-span-2">
+                <FormSectionTitle icon="document" title="Documento firmado" description="Evidencia final firmada por la gerencia." tone="emerald" />
+                {detailRecord.signedEvidence ? <div className="record-detail-file"><div className="min-w-0"><p className="break-all text-sm font-semibold">{detailRecord.signedEvidence.originalName}</p><p className="mt-1 text-xs text-muted-foreground">Cargado: {formatDateTime(detailRecord.signedEvidence.createdAt)}</p></div><div className="grid shrink-0 grid-cols-2 gap-2"><Button type="button" size="sm" variant="outline" className="gap-2" disabled={busyRecordId === detailRecord.id} onClick={() => void viewEvidence(detailRecord, "signed")}><Eye className="h-4 w-4" />Previsualizar</Button><Button type="button" size="sm" className="gap-2" disabled={busyRecordId === detailRecord.id} onClick={() => void downloadEvidence(detailRecord, "signed")}><Download className="h-4 w-4" />Descargar</Button></div></div> : <p className="text-sm text-muted-foreground">Sin evidencia firmada.</p>}
               </div>
             </div>
           )}

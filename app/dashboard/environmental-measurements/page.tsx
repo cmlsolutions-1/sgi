@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listManagedDocuments } from "@/services/documentManagementService"
@@ -645,21 +645,23 @@ function DetailDialog({
   onClose,
   onDownload,
   onPreviewEvidence,
+  onDownloadEvidence,
 }: {
   record: EnvironmentalRecord | null
   onClose: () => void
   onDownload: (record: EnvironmentalRecord) => void
   onPreviewEvidence: (record: EnvironmentalRecord) => void
+  onDownloadEvidence: (record: EnvironmentalRecord) => void
 }) {
   if (!record) return null
 
   return (
     <Dialog open={Boolean(record)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish max-h-[92vh] overflow-y-auto sm:max-w-3xl">
+      <DialogContent className="record-detail-dialog max-w-4xl sm:max-w-4xl">
         <DialogHeader>
-          <DialogTitle>{recordTitle(record)}</DialogTitle>
+          <DetailDialogHeading icon="details" tone="cyan" title={recordTitle(record)} description="Consulta el procedimiento, el riesgo relacionado, el resultado y su evidencia." />
         </DialogHeader>
-        <div className="grid gap-4">
+        <div className="record-detail-body grid gap-4">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline" className={kindClassName(record.kind)}>{kindLabel(record.kind)}</Badge>
             {record.kind === "MEASUREMENT" && <Badge variant="outline" className={resultClassName(record.result)}>{resultLabel(record.result)}</Badge>}
@@ -688,13 +690,13 @@ function DetailDialog({
           <div className="rounded-md border border-border p-4">
             <h3 className="font-semibold text-foreground">Evidencia</h3>
             {record.evidence ? (
-              <div className="mt-2 flex flex-col gap-3 rounded-md bg-secondary p-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="record-detail-file mt-2">
                 <div className="min-w-0 text-sm">
                   <p className="truncate font-medium text-foreground">{record.evidence.originalName}</p>
                   <p className="text-muted-foreground">{record.evidence.description || "Sin descripción"}</p>
                   <p className="text-xs text-muted-foreground">{formatDateTime(record.evidence.createdAt)}</p>
                 </div>
-                <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onPreviewEvidence(record)}><Eye className="h-4 w-4" />Previsualizar</Button>
+                <div className="grid shrink-0 grid-cols-2 gap-2"><Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onPreviewEvidence(record)}><Eye className="h-4 w-4" />Previsualizar</Button><Button type="button" size="sm" className="gap-2" onClick={() => onDownloadEvidence(record)}><Download className="h-4 w-4" />Descargar</Button></div>
               </div>
             ) : <p className="mt-2 text-sm text-muted-foreground">Sin evidencia cargada.</p>}
           </div>
@@ -916,6 +918,16 @@ export default function EnvironmentalMeasurementsPage() {
     }
   }
 
+  async function downloadEvidenceFile(record: EnvironmentalRecord) {
+    if (!record.evidence) return
+    try {
+      const blob = await downloadEnvironmentalEvidence(record.id, record.evidence.id)
+      saveBlob(blob, record.evidence.originalName)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar la evidencia")
+    }
+  }
+
   function openEdit(record: EnvironmentalRecord) {
     if (record.kind === "MEASUREMENT") {
       setEditingMeasurement(record)
@@ -1085,7 +1097,7 @@ export default function EnvironmentalMeasurementsPage() {
         onSave={handleSaveProcedure}
       />
       <EvidenceDialog record={evidenceRecord} onClose={() => setEvidenceRecord(null)} onUpload={handleUpload} />
-      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={(record) => void downloadRecordPdf(record)} onPreviewEvidence={(record) => void previewEvidence(record)} />
+      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={(record) => void downloadRecordPdf(record)} onPreviewEvidence={(record) => void previewEvidence(record)} onDownloadEvidence={(record) => void downloadEvidenceFile(record)} />
       <EvidencePreviewDialog preview={preview} onClose={() => { if (preview?.url) URL.revokeObjectURL(preview.url); setPreview(null) }} />
     </main>
   )

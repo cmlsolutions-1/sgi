@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { IntelligenceCenter } from "@/components/intelligence/intelligence-center"
@@ -484,21 +484,23 @@ function DetailDialog({
   onClose,
   onDownload,
   onPreviewEvidence,
+  onDownloadEvidence,
 }: {
   record: InspectionRecord | null
   onClose: () => void
   onDownload: (record: InspectionRecord) => void
   onPreviewEvidence: (record: InspectionRecord) => void
+  onDownloadEvidence: (record: InspectionRecord) => void
 }) {
   if (!record) return null
 
   return (
     <Dialog open={Boolean(record)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish max-h-[92vh] overflow-y-auto sm:max-w-3xl">
+      <DialogContent className="record-detail-dialog max-w-4xl sm:max-w-4xl">
         <DialogHeader>
-          <DialogTitle>{record.elementName}</DialogTitle>
+          <DetailDialogHeading icon="details" tone="blue" title={record.elementName} description="Consulta el resultado, el área, el responsable y la evidencia de la inspección." badge={<Badge variant="outline" className={resultClassName(record.result)}>{resultLabel(record.result)}</Badge>} />
         </DialogHeader>
-        <div className="grid gap-4">
+        <div className="record-detail-body grid gap-4">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline" className="bg-blue-600 text-white border-transparent">{actionLabel(record.action)}</Badge>
             <Badge variant="outline" className={resultClassName(record.result)}>{resultLabel(record.result)}</Badge>
@@ -516,13 +518,13 @@ function DetailDialog({
           <div className="rounded-md border border-border p-4">
             <h3 className="font-semibold text-foreground">Evidencia</h3>
             {record.evidence ? (
-              <div className="mt-2 flex flex-col gap-3 rounded-md bg-secondary p-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="record-detail-file mt-2">
                 <div className="min-w-0 text-sm">
                   <p className="truncate font-medium text-foreground">{record.evidence.originalName}</p>
                   <p className="text-muted-foreground">{record.evidence.description || "Sin descripción"}</p>
                   <p className="text-xs text-muted-foreground">{formatDateTime(record.evidence.createdAt)}</p>
                 </div>
-                <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onPreviewEvidence(record)}><Eye className="h-4 w-4" />Previsualizar</Button>
+                <div className="grid shrink-0 grid-cols-2 gap-2"><Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onPreviewEvidence(record)}><Eye className="h-4 w-4" />Previsualizar</Button><Button type="button" size="sm" className="gap-2" onClick={() => onDownloadEvidence(record)}><Download className="h-4 w-4" />Descargar</Button></div>
               </div>
             ) : <p className="mt-2 text-sm text-muted-foreground">Sin evidencia cargada.</p>}
           </div>
@@ -703,6 +705,16 @@ export default function InspectionsPage() {
       })
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo previsualizar la evidencia")
+    }
+  }
+
+  async function downloadEvidenceFile(record: InspectionRecord) {
+    if (!record.evidence) return
+    try {
+      const blob = await downloadInspectionEvidence(record.id, record.evidence.id)
+      saveBlob(blob, record.evidence.originalName)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo descargar la evidencia")
     }
   }
 
@@ -911,7 +923,7 @@ export default function InspectionsPage() {
         onSave={handleSave}
       />
       <EvidenceDialog record={evidenceRecord} onClose={() => setEvidenceRecord(null)} onUpload={handleUpload} />
-      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={(record) => void downloadInspectionPdf(record)} onPreviewEvidence={(record) => void previewEvidence(record)} />
+      <DetailDialog record={detailRecord} onClose={() => setDetailRecord(null)} onDownload={(record) => void downloadInspectionPdf(record)} onPreviewEvidence={(record) => void previewEvidence(record)} onDownloadEvidence={(record) => void downloadEvidenceFile(record)} />
       <EvidencePreviewDialog preview={preview} onClose={() => { if (preview?.url) URL.revokeObjectURL(preview.url); setPreview(null) }} />
     </main>
   )

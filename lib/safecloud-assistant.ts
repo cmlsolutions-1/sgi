@@ -7,6 +7,7 @@ import { listTraining } from "@/services/trainingService"
 import type { DashboardIntelligenceData } from "@/lib/intelligence-engine"
 import type { Employee, EmployeeDocument } from "@/types/manager/employee"
 import type { IntelligenceInsight } from "@/types/intelligence"
+import { answerFromSystemKnowledge, answerSystemPending, loadSystemKnowledge } from "@/lib/system-knowledge"
 
 type AssistantModule = "employees" | "risks" | "measures" | "trainings" | "documents" | "incidents" | "responsible"
 
@@ -302,12 +303,14 @@ function capabilitiesAnswer() {
 
 export async function askSafeCloud(question: string, options: AskSafeCloudOptions = {}) {
   const normalizedQuestion = normalize(question)
-  const data: AssistantSnapshot = options.data
-    ? { ...options.data, unavailableModules: [] }
-    : await loadSnapshot()
+  const [snapshot, systemKnowledge] = await Promise.all([
+    options.data ? Promise.resolve({ ...options.data, unavailableModules: [] } as AssistantSnapshot) : loadSnapshot(),
+    loadSystemKnowledge(),
+  ])
+  const data = snapshot
 
   if (/que puedo preguntar|que sabes|como me ayudas|ayuda|capacidades/.test(normalizedQuestion)) {
-    return capabilitiesAnswer()
+    return `${capabilitiesAnswer()}\n• ¿Tengo registros o pendientes en custodia, auditorías, inspecciones o cualquier otro módulo?\n• ¿Qué novedades requieren atención en todo el SGI?`
   }
 
   const asksAboutEmployees = /empleado|funcionario|eps|arl|pension|caja|afiliacion|seguridad social/.test(normalizedQuestion)
@@ -353,6 +356,13 @@ export async function askSafeCloud(question: string, options: AskSafeCloudOption
     }
     return "No detecto alertas de evidencias en el contexto actual con la información disponible."
   }
+
+  if (/que tengo pendiente|pendientes generales|que debo hacer|^que novedades tengo|novedades.*(sistema|sgi|general)|resumen.*(sistema|sgi|general)/.test(normalizedQuestion)) {
+    return answerSystemPending(systemKnowledge)
+  }
+
+  const moduleAnswer = answerFromSystemKnowledge(question, systemKnowledge)
+  if (moduleAnswer) return moduleAnswer
 
   const countAnswer = answerSystemCounts(question, data)
   if (countAnswer) return countAnswer

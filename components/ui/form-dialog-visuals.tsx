@@ -22,6 +22,7 @@ import {
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { DialogTitle } from "@/components/ui/dialog"
 
 export type FormVisualIcon =
   | "acpm"
@@ -115,6 +116,65 @@ export function FormSectionTitle({
         <h3 className="text-sm font-semibold text-foreground">{title}</h3>
         {description ? <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{description}</p> : null}
       </div>
+    </div>
+  )
+}
+
+export function DetailDialogHeading({
+  title,
+  description,
+  badge,
+  icon = "details",
+  tone = "blue",
+}: {
+  title: ReactNode
+  description?: ReactNode
+  badge?: ReactNode
+  icon?: FormVisualIcon
+  tone?: Tone
+}) {
+  return (
+    <div className="flex min-w-0 items-start gap-3 text-left">
+      <FormDialogIcon icon={icon} tone={tone} />
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <DialogTitle className="min-w-0 break-words text-lg leading-tight text-slate-950">{title}</DialogTitle>
+          {badge ? <div className="shrink-0">{badge}</div> : null}
+        </div>
+        {description ? <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{description}</p> : null}
+      </div>
+    </div>
+  )
+}
+
+export function DetailSection({
+  icon = "details",
+  title,
+  description,
+  tone = "cyan",
+  children,
+  className,
+}: {
+  icon?: FormVisualIcon
+  title: ReactNode
+  description?: ReactNode
+  tone?: Tone
+  children: ReactNode
+  className?: string
+}) {
+  return (
+    <section className={cn("record-detail-section", className)}>
+      <FormSectionTitle icon={icon} title={title} description={description} tone={tone} />
+      {children}
+    </section>
+  )
+}
+
+export function DetailInfoBlock({ label, value, className }: { label: ReactNode; value: ReactNode; className?: string }) {
+  return (
+    <div className={cn("record-detail-info", className)}>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">{label}</p>
+      <div className="mt-1.5 break-words text-sm font-medium leading-relaxed text-slate-900">{value}</div>
     </div>
   )
 }

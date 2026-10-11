@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
@@ -608,13 +608,12 @@ function DetailDialog({
 
   return (
     <Dialog open={Boolean(record)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
+      <DialogContent className="record-detail-dialog max-w-5xl sm:max-w-5xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>{recordTitle(record)}</DialogTitle>
-          <p className="text-sm text-muted-foreground">Consulta el detalle del soporte de servicios de higiene.</p>
+          <DetailDialogHeading icon="details" tone="cyan" title={recordTitle(record)} description="Consulta el responsable, la clasificación y el soporte de servicios de higiene." />
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
+        <div className="record-detail-body space-y-5">
           <div className="grid gap-4 md:grid-cols-4">
             <InfoBlock label="Tipo registro" value={kindLabel(record.kind)} />
             <InfoBlock label="Fecha" value={formatDate(recordDate(record))} />

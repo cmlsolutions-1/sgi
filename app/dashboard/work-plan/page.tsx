@@ -160,6 +160,13 @@ function formatCurrency(value: number) {
   }).format(value)
 }
 
+function formatFileSize(value?: number | null) {
+  if (!value || value <= 0) return "Tamaño no disponible"
+  if (value < 1024) return `${value} B`
+  if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`
+  return `${(value / (1024 * 1024)).toFixed(1)} MB`
+}
+
 function normalizeNumberInput(value: string) {
   return value.replace(/\D/g, "")
 }
@@ -432,47 +439,99 @@ function DetailDialog({
   item,
   onClose,
   onPreview,
+  onDownload,
 }: {
   item: WorkPlanItem | null
   onClose: () => void
   onPreview: (item: WorkPlanItem) => void
+  onDownload: (item: WorkPlanItem) => void
 }) {
   if (!item) return null
 
   return (
     <Dialog open={Boolean(item)} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="module-dialog-polish max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>Detalle {item.consecutive}</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <div className="grid gap-3 md:grid-cols-2">
-            <InfoBlock label="Actividad" value={item.activity} />
-            <InfoBlock label="Responsable" value={`${item.responsibleName} - ${item.responsibleJob}`} />
-            <InfoBlock label="Presupuesto" value={formatCurrency(item.budget)} />
-            <InfoBlock label="Estado" value={statusLabel(item.status)} />
-          </div>
-          <InfoBlock label="Objetivo" value={item.objective} />
-          <InfoBlock label="Evidencia esperada" value={item.evidence} />
-          <div className="grid gap-3 md:grid-cols-2">
-            <InfoBlock label="Aprobado por" value={item.approvedBy ?? "Pendiente"} />
-            <InfoBlock label="Fecha aprobacion" value={formatDateTime(item.approvedAt)} />
-          </div>
-          {item.signedEvidence && (
-            <div className="rounded-md border border-border p-4">
-              <h3 className="mb-2 text-sm font-semibold text-foreground">Documento firmado</h3>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-foreground">{item.signedEvidence.originalName}</p>
-                  <p className="text-xs text-muted-foreground">Cargado: {formatDateTime(item.signedEvidence.createdAt)}</p>
-                </div>
-                <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => onPreview(item)}><Eye className="h-4 w-4" />Previsualizar</Button>
+      <DialogContent className="record-detail-dialog max-w-5xl sm:max-w-5xl">
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-5 py-4 pr-12 sm:px-6">
+          <div className="flex items-start gap-3 text-left">
+            <FormDialogIcon icon="tracking" tone="blue" />
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <DialogTitle>Detalle del plan de trabajo</DialogTitle>
+                <Badge variant="outline" className={statusClassName(item.status)}>{statusLabel(item.status)}</Badge>
               </div>
+              <p className="mt-1 break-words text-sm text-muted-foreground">
+                {item.consecutive} · Vigencia {item.year}
+              </p>
             </div>
+          </div>
+        </DialogHeader>
+        <div className="record-detail-body space-y-5">
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+            <FormSectionTitle icon="details" title="Información de la actividad" description="Datos principales, responsable y recursos asignados." tone="blue" />
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <InfoBlock label="Actividad" value={item.activity} className="sm:col-span-2" />
+              <InfoBlock label="Presupuesto" value={formatCurrency(item.budget)} />
+              <InfoBlock label="Responsable" value={item.responsibleName} />
+              <InfoBlock label="Cargo" value={item.responsibleJob} />
+              <InfoBlock label="Fecha de creación" value={formatDateTime(item.createdAt)} />
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+            <FormSectionTitle icon="document" title="Objetivo y evidencia esperada" description="Propósito de la actividad y soporte definido para demostrar su cumplimiento." tone="cyan" />
+            <div className="grid gap-3 lg:grid-cols-2">
+              <InfoBlock label="Objetivo" value={item.objective} />
+              <InfoBlock label="Evidencia esperada" value={item.evidence} />
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+            <FormSectionTitle icon="employee" title="Aprobación" description="Información de la persona que aprobó la actividad y la fecha del proceso." tone="emerald" />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <InfoBlock label="Aprobado por" value={item.approvedBy ?? "Pendiente de aprobación"} />
+              <InfoBlock label="Fecha de aprobación" value={formatDateTime(item.approvedAt)} />
+            </div>
+          </section>
+
+          {item.signedEvidence && (
+            <section className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-4 shadow-sm sm:p-5">
+              <FormSectionTitle icon="document" title="Documento firmado" description="Evidencia cargada para la aprobación del plan de trabajo." tone="emerald" />
+              <div className="flex min-w-0 flex-col gap-4 rounded-xl border border-emerald-200 bg-white p-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex min-w-0 items-start gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
+                    <FileCheck2 className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="break-all text-sm font-semibold leading-relaxed text-slate-900">{item.signedEvidence.originalName}</p>
+                    <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500">
+                      <span>{formatFileSize(item.signedEvidence.size)}</span>
+                      <span>Cargado: {formatDateTime(item.signedEvidence.createdAt)}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid shrink-0 grid-cols-1 gap-2 sm:grid-cols-2">
+                  <Button type="button" variant="outline" size="sm" className="w-full gap-2" onClick={() => onPreview(item)}>
+                    <Eye className="h-4 w-4" />Previsualizar
+                  </Button>
+                  <Button type="button" size="sm" className="w-full gap-2" onClick={() => onDownload(item)}>
+                    <Download className="h-4 w-4" />Descargar
+                  </Button>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {!item.signedEvidence && (
+            <section className="rounded-xl border border-amber-200 bg-amber-50/60 p-4">
+              <div className="flex items-start gap-3">
+                <FileText className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
+                <div><h3 className="text-sm font-semibold text-amber-950">Evidencia pendiente</h3><p className="mt-1 text-sm text-amber-900/75">Esta actividad todavía no tiene un documento firmado cargado.</p></div>
+              </div>
+            </section>
           )}
         </div>
-        <DialogFooter>
-          <Button type="button" onClick={onClose}>
+        <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-4 py-4 sm:px-6">
+          <Button type="button" variant="outline" onClick={onClose}>
             Cerrar
           </Button>
         </DialogFooter>
@@ -490,19 +549,24 @@ function DocumentPreviewDialog({ preview, onClose }: { preview: DocumentPreview 
 
   return (
     <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="module-dialog-polish !flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-5xl">
-        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12"><DialogTitle className="truncate">{preview.name}</DialogTitle></DialogHeader>
-        <div className="min-h-0 flex-1 bg-slate-100 p-3">
+      <DialogContent className="module-dialog-polish !flex h-[min(88dvh,860px)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl">
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-5 py-4 pr-12 sm:px-6">
+          <div className="flex min-w-0 items-start gap-3 text-left">
+            <FormDialogIcon icon="document" tone="cyan" />
+            <div className="min-w-0"><DialogTitle className="break-all leading-snug">{preview.name}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Vista previa de la evidencia firmada.</p></div>
+          </div>
+        </DialogHeader>
+        <div className="min-h-0 flex-1 bg-slate-100/80 p-3 sm:p-4">
           {isImage ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={preview.url} alt={preview.name} className="h-full w-full object-contain" />
+            <img src={preview.url} alt={preview.name} className="h-full w-full rounded-lg border border-slate-200 bg-white object-contain" />
           ) : isPdf ? (
-            <iframe src={preview.url} title={preview.name} className="h-full w-full rounded-md border border-border bg-white" />
+            <iframe src={preview.url} title={preview.name} className="h-full w-full rounded-lg border border-slate-200 bg-white" />
           ) : (
-            <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-sm text-muted-foreground"><FileText className="h-10 w-10" />Este tipo de archivo no admite previsualización en el navegador.</div>
+            <div className="flex h-full flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-slate-300 bg-white p-6 text-center text-sm text-muted-foreground"><FileText className="h-10 w-10 text-slate-400" />Este tipo de archivo no admite previsualización en el navegador.</div>
           )}
         </div>
-        <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
+        <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-4 py-4 sm:px-6">
           <Button type="button" variant="outline" onClick={onClose}>Cerrar</Button>
           <Button type="button" className="gap-2" asChild><a href={preview.url} download={preview.name}><Download className="h-4 w-4" />Descargar</a></Button>
         </DialogFooter>
@@ -511,11 +575,11 @@ function DocumentPreviewDialog({ preview, onClose }: { preview: DocumentPreview 
   )
 }
 
-function InfoBlock({ label, value }: { label: string; value: string }) {
+function InfoBlock({ label, value, className = "" }: { label: string; value: string; className?: string }) {
   return (
-    <div className="rounded-md bg-secondary p-3">
-      <p className="text-xs font-medium uppercase text-muted-foreground">{label}</p>
-      <p className="mt-1 text-sm font-medium text-foreground">{value}</p>
+    <div className={`min-w-0 rounded-lg border border-slate-200 bg-slate-50/70 p-3.5 ${className}`}>
+      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</p>
+      <p className="mt-1 break-words text-sm font-semibold leading-relaxed text-slate-900">{value}</p>
     </div>
   )
 }
@@ -1160,7 +1224,7 @@ export default function WorkPlanPage() {
         onClose={() => setApprovalOpen(false)}
         onApprove={approveSelected}
       />
-      <DetailDialog item={detailItem} onClose={() => setDetailItem(null)} onPreview={(item) => void previewEvidence(item)} />
+      <DetailDialog item={detailItem} onClose={() => setDetailItem(null)} onPreview={(item) => void previewEvidence(item)} onDownload={(item) => void downloadEvidence(item)} />
       <DocumentPreviewDialog preview={preview} onClose={closePreview} />
     </main>
   )
