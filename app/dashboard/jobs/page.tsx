@@ -28,8 +28,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
+import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -418,19 +418,29 @@ export function JobsManager() {
           </p>
         </div>
 
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={openCreateDialog} className="gap-2" disabled={workAreas.length === 0}>
-              <Plus className="h-4 w-4" />
-              Nuevo cargo
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-4xl">
-            <form onSubmit={handleSubmit}>
-              <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
-                <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="job" tone="blue" /><div><DialogTitle>{form.id ? "Editar cargo" : "Crear cargo"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra el perfil para que pueda ser informado y soportado ante el médico que realiza evaluaciones ocupacionales.</p></div></div>
-              </DialogHeader>
-              <div className="max-h-[calc(100dvh-13rem)] space-y-5 overflow-y-auto bg-slate-50/40 px-6 py-5">
+        <Button onClick={openCreateDialog} className="gap-2" disabled={workAreas.length === 0}>
+          <Plus className="h-4 w-4" />
+          Nuevo cargo
+        </Button>
+        <SafeCloudFormDrawer
+          open={open}
+          onOpenChange={setOpen}
+          title={form.id ? "Editar cargo" : "Crear cargo"}
+          description="Registra el perfil para que pueda ser informado y soportado ante el médico que realiza evaluaciones ocupacionales."
+          icon={<FormDialogIcon icon="job" tone="blue" />}
+          formProps={{ onSubmit: handleSubmit }}
+          footer={
+            <>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={saving}>
+                {saving ? "Guardando..." : "Guardar cargo"}
+              </Button>
+            </>
+          }
+        >
+              <div className="space-y-5">
                 <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                   <FormSectionTitle icon="job" title="Datos del cargo" description="Identifica el cargo y el área a la que pertenece." tone="blue" />
                   <div className="grid gap-4 md:grid-cols-2">
@@ -538,17 +548,7 @@ export function JobsManager() {
                   Las evidencias documentales se cargan desde las acciones del cargo.
                 </div>
               </div>
-              <DialogFooter className="border-t border-slate-200 bg-white px-6 py-4">
-                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit" disabled={saving}>
-                  {saving ? "Guardando..." : "Guardar cargo"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+        </SafeCloudFormDrawer>
       </div>
 
       {workAreas.length === 0 && (

@@ -19,6 +19,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
   DropdownMenu,
@@ -30,6 +31,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listManagedDocuments } from "@/services/documentManagementService"
@@ -459,8 +461,7 @@ function AuditDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left">
             <FormDialogIcon icon="tracking" tone="blue" />
@@ -474,7 +475,7 @@ function AuditDialog({
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-slate-50/40 px-6 py-5">
           <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <FormSectionTitle icon="details" title="Información general" description="Identifica la auditoría, su vigencia y la fecha programada." tone="blue" />
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="audit-year">Año / Vigencia</Label>
               <Input id="audit-year" type="number" min="2000" max="2100" value={form.year} onChange={(event) => update("year", event.target.value)} />
@@ -512,7 +513,7 @@ function AuditDialog({
           </section>
           <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <FormSectionTitle icon="employee" title="Equipo y procedimiento" description="Asigna el auditor y relaciona el procedimiento aplicable." tone="cyan" />
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4">
             {form.auditType === "INTERNAL" ? (
               <EmployeePicker employees={employees} loading={loading} value={form.internalAuditorId} onChange={(employeeId) => update("internalAuditorId", employeeId)} />
             ) : (
@@ -537,8 +538,7 @@ function AuditDialog({
             <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{audit ? "Guardar cambios" : "Crear auditoría"}</Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -570,8 +570,7 @@ function EvidenceDialog({
   }
 
   return (
-    <Dialog open={Boolean(audit)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish sm:max-w-xl">
+    <SafeCloudFormDrawerFrame open={Boolean(audit)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader>
           <DialogTitle>Cargar documento de auditoría</DialogTitle>
         </DialogHeader>
@@ -602,8 +601,7 @@ function EvidenceDialog({
             <Button type="submit" className="gap-2" disabled={uploading}>{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}Cargar</Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -976,12 +974,12 @@ export default function AuditsPage() {
         </Button>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2"><span className="text-xl font-bold text-slate-900">{stats.total}</span><span className="text-xs font-medium text-slate-600">Plan anual</span></div>
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2"><span className="text-xl font-bold text-emerald-700">{stats.active}</span><span className="text-xs font-medium text-slate-600">Activas</span></div>
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2"><span className="text-xl font-bold text-rose-700">{stats.expired}</span><span className="text-xs font-medium text-slate-600">Vencidas</span></div>
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2"><span className="text-xl font-bold text-blue-700">{stats.finished}</span><span className="text-xs font-medium text-slate-600">Finalizadas</span></div>
-      </section>
+      <KpiStrip items={[
+        { title: "Plan anual", value: stats.total, description: "Auditorías programadas", icon: "calendar", tone: "slate" },
+        { title: "Activas", value: stats.active, description: "Auditorías vigentes", icon: "active", tone: "green" },
+        { title: "Vencidas", value: stats.expired, description: "Requieren seguimiento", icon: "overdue", tone: "red" },
+        { title: "Finalizadas", value: stats.finished, description: "Auditorías cerradas", icon: "completed", tone: "blue" },
+      ]} />
 
       <section className="rounded-md border border-border bg-card p-4">
         <div className="grid gap-3 lg:grid-cols-[140px_180px_1fr] lg:items-end">

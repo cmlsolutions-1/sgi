@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -379,8 +380,7 @@ function CommitteeDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-card p-0">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={onOpenChange}>
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <DialogTitle>{record ? "Actualizar Comité de Seguridad Vial" : "Crear Comité de Seguridad Vial"}</DialogTitle>
         </DialogHeader>
@@ -450,8 +450,7 @@ function CommitteeDialog({
             <Button type="submit">{record ? "Guardar cambios" : "Crear comité"}</Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -491,8 +490,7 @@ function ReviewDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-card p-0">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={onOpenChange}>
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <DialogTitle>Nueva revisión trimestral PESV</DialogTitle>
         </DialogHeader>
@@ -552,8 +550,7 @@ function ReviewDialog({
             <Button type="submit">Guardar revisión</Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 

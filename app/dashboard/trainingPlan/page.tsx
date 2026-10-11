@@ -28,6 +28,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
@@ -205,14 +206,14 @@ function TopicDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant={topic ? "action" : "default"} size="sm" className="gap-2">
+    <SafeCloudFormDrawerFrame
+      open={open}
+      onOpenChange={setOpen}
+      trigger={<Button variant={topic ? "action" : "default"} size="sm" className="gap-2">
           {topic ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           {topic ? "Editar" : "Nuevo tema"}
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="bg-card">
+        </Button>}
+    >
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>{topic ? "Editar tema" : "Nuevo tema de capacitacion"}</DialogTitle>
@@ -247,8 +248,7 @@ function TopicDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -405,16 +405,16 @@ function TrainingDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger ?? (
+    <SafeCloudFormDrawerFrame
+      open={open}
+      onOpenChange={setOpen}
+      trigger={trigger ?? (
           <Button variant={training ? "action" : "default"} size="sm" className="gap-2">
             {training ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
             {training ? "Editar" : "Nueva capacitacion"}
           </Button>
         )}
-      </DialogTrigger>
-      <DialogContent className="max-h-[90vh] max-w-3xl overflow-hidden bg-white p-0">
+    >
         <form onSubmit={handleSubmit}>
           <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4">
             <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="training" tone="blue" /><div><DialogTitle>{training ? "Editar capacitación" : "Nueva capacitación"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Programa la actividad, define su modalidad y asigna participantes.</p></div></div>
@@ -602,8 +602,7 @@ function TrainingDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 

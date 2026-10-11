@@ -19,6 +19,7 @@ import { EmergencyDocumentPanel } from "@/components/emergency/EmergencyDocument
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
@@ -27,6 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -164,13 +166,24 @@ function EmergencyBrigadeDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[90dvh] max-w-4xl overflow-y-auto border-slate-200 bg-white p-0">
-        <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
-          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="brigade" tone="rose" /><div><DialogTitle>{brigade ? "Editar brigada de emergencia" : "Nueva brigada de emergencia"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Define el propósito de la brigada y selecciona sus integrantes.</p></div></div>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4 bg-slate-50/40 px-6 py-5">
+    <SafeCloudFormDrawer
+      open={open}
+      onOpenChange={(nextOpen) => !nextOpen && onClose()}
+      title={brigade ? "Editar brigada de emergencia" : "Nueva brigada de emergencia"}
+      description="Define el propósito de la brigada y selecciona sus integrantes."
+      icon={<FormDialogIcon icon="brigade" tone="rose" />}
+      formProps={{ onSubmit: handleSubmit }}
+      footer={
+        <>
+          <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button type="submit" className="gap-2" disabled={saving}>
+            {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+            Guardar
+          </Button>
+        </>
+      }
+    >
+        <div className="space-y-4">
           <FormSectionTitle icon="details" title="Datos de la brigada" description="Define el tipo, objetivo y funciones del equipo de respuesta." tone="rose" />
           <div className="grid gap-2">
             <Label>Tipo de brigada</Label>
@@ -260,18 +273,8 @@ function EmergencyBrigadeDialog({
             </div>
           </section>
 
-          <DialogFooter className="border-t border-slate-200 bg-white pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancelar
-            </Button>
-            <Button type="submit" className="gap-2" disabled={saving}>
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-              Guardar
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+    </SafeCloudFormDrawer>
   )
 }
 
@@ -384,22 +387,11 @@ export default function EmergencyBrigadesPage() {
         </Button>
       </div>
 
-      <div className="overflow-x-auto px-3 py-1">
-        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
-          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
-            <span className="text-xs text-muted-foreground">Total</span>
-            <span className="text-sm font-semibold">{brigades.length}</span>
-          </div>
-          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
-            <span className="text-xs text-muted-foreground">Activas</span>
-            <span className="text-sm font-semibold text-green-600">{activeCount}</span>
-          </div>
-          <div className="flex items-center gap-2 border-blue-200 bg-blue-50">
-            <span className="text-xs text-muted-foreground">Integrantes</span>
-            <span className="text-sm font-semibold">{membersCount}</span>
-          </div>
-        </div>
-      </div>
+      <KpiStrip items={[
+        { title: "Total", value: brigades.length, description: "Brigadas conformadas", icon: "emergency", tone: "slate" },
+        { title: "Activas", value: activeCount, description: "Brigadas vigentes", icon: "active", tone: "green" },
+        { title: "Integrantes", value: membersCount, description: "Funcionarios brigadistas", icon: "users", tone: "blue" },
+      ]} />
 
       <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
         <form onSubmit={handleFilter} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_240px_160px_auto]">

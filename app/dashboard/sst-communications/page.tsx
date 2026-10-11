@@ -21,6 +21,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -38,6 +39,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
@@ -219,8 +221,7 @@ function CommunicationDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left">
             <FormDialogIcon icon="document" tone="blue" />
@@ -310,8 +311,7 @@ function CommunicationDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -699,30 +699,13 @@ export default function SstCommunicationsPage() {
         </Button>
       </div>
 
-      <section className="overflow-x-auto py-1">
-        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3">
-          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
-            <span className="text-xl font-bold text-slate-900">{stats.total}</span>
-            <span className="text-xs font-medium text-slate-600">Total</span>
-          </div>
-          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2">
-            <span className="text-xl font-bold text-blue-700">{stats.internal}</span>
-            <span className="text-xs font-medium text-slate-600">Internas</span>
-          </div>
-          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-cyan-200 bg-cyan-50 px-3.5 py-2">
-            <span className="text-xl font-bold text-cyan-700">{stats.external}</span>
-            <span className="text-xs font-medium text-slate-600">Externas</span>
-          </div>
-          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2">
-            <span className="text-xl font-bold text-blue-700">{stats.withInitialEvidence}</span>
-            <span className="text-xs font-medium text-slate-600">Con evidencia</span>
-          </div>
-          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2">
-            <span className="text-xl font-bold text-emerald-700">{stats.signed}</span>
-            <span className="text-xs font-medium text-slate-600">Firmadas</span>
-          </div>
-        </div>
-      </section>
+      <KpiStrip items={[
+        { title: "Total", value: stats.total, description: "Comunicaciones registradas", icon: "total", tone: "slate" },
+        { title: "Internas", value: stats.internal, description: "Dirigidas al equipo", icon: "internal", tone: "blue" },
+        { title: "Externas", value: stats.external, description: "Dirigidas a terceros", icon: "external", tone: "cyan" },
+        { title: "Con evidencia", value: stats.withInitialEvidence, description: "Con soporte inicial", icon: "evidence", tone: "blue" },
+        { title: "Firmadas", value: stats.signed, description: "Con confirmación firmada", icon: "completed", tone: "green" },
+      ]} />
 
       <Card className="border-border bg-card">
         <CardContent className="p-4">

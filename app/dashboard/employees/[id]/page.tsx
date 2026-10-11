@@ -53,6 +53,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { EmployeeFormDialog } from "@/components/dashboard/employee-form-dialog"
+import { SafeCloudFormDrawerAdapter } from "@/components/ui/safecloud-form-drawer"
 import {
   createEmployeeCertification,
   createEmployeeContract,
@@ -394,7 +395,7 @@ function SocialSecurityDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <SafeCloudFormDrawerAdapter open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={item.entityId ? "action" : "default"} size="sm" className="gap-2">
           {item.entityId ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
@@ -496,7 +497,7 @@ function SocialSecurityDialog({
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerAdapter>
   )
 }
 
@@ -953,7 +954,7 @@ function EducationDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <SafeCloudFormDrawerAdapter open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={education ? "action" : "default"} size="sm" className="gap-2">
           {education ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
@@ -1125,7 +1126,7 @@ function EducationDialog({
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerAdapter>
   )
 }
 
@@ -1216,7 +1217,7 @@ function CertificationDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <SafeCloudFormDrawerAdapter open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={certification ? "action" : "default"} size="sm" className="gap-2">
           {certification ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
@@ -1292,7 +1293,7 @@ function CertificationDialog({
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerAdapter>
   )
 }
 
@@ -1373,7 +1374,7 @@ function ContractDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <SafeCloudFormDrawerAdapter open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={contract ? "action" : "default"} size="sm" className="gap-2">
           {contract ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
@@ -1483,7 +1484,7 @@ function ContractDialog({
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerAdapter>
   )
 }
 
@@ -1591,7 +1592,7 @@ function EvaluationDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <SafeCloudFormDrawerAdapter open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={evaluation ? "action" : "default"} size="sm" className="gap-2">
           {evaluation ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
@@ -1703,7 +1704,7 @@ function EvaluationDialog({
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerAdapter>
   )
 }
 
@@ -1844,7 +1845,7 @@ function MedicalEvaluationDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <SafeCloudFormDrawerAdapter open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={medicalEvaluation ? "action" : "default"} size="sm" className="gap-2">
           {medicalEvaluation ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
@@ -2003,7 +2004,7 @@ function MedicalEvaluationDialog({
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerAdapter>
   )
 }
 
@@ -2091,7 +2092,7 @@ function EppDeliveryDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <SafeCloudFormDrawerAdapter open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={delivery ? "action" : "default"} size="sm" className="gap-2">
           {delivery ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
@@ -2150,7 +2151,7 @@ function EppDeliveryDialog({
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerAdapter>
   )
 }
 

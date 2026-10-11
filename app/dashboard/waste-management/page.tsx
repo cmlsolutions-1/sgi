@@ -22,6 +22,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -39,6 +40,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
@@ -389,8 +391,7 @@ function DailyEvidenceDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-4xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="sanitation" tone="emerald" /><div><DialogTitle>{record ? "Editar evidencia de residuos" : "Nueva evidencia de residuos"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra la verificación diaria o constante del manejo de residuos.</p></div></div>
         </DialogHeader>
@@ -426,8 +427,7 @@ function DailyEvidenceDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -468,8 +468,7 @@ function ProgramDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-3xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-3xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="sanitation" tone="emerald" /><div><DialogTitle>{record ? "Editar programa" : "Nuevo programa"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Relaciona el programa o procedimiento de manejo de residuos.</p></div></div>
         </DialogHeader>
@@ -495,8 +494,7 @@ function ProgramDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -879,7 +877,12 @@ export default function WasteManagementPage() {
         </div>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4"><Metric label="Registros" value={stats.total} /><Metric label="Evidencias" value={stats.daily} tone="blue" /><Metric label="Programas" value={stats.programs} tone="green" /><Metric label="Con soporte" value={stats.withEvidence} tone="amber" /></section>
+      <KpiStrip items={[
+        { title: "Registros", value: stats.total, description: "Gestiones de residuos", icon: "waste", tone: "slate" },
+        { title: "Evidencias", value: stats.daily, description: "Evidencias diarias", icon: "document", tone: "blue" },
+        { title: "Programas", value: stats.programs, description: "Programas registrados", icon: "program", tone: "green" },
+        { title: "Con soporte", value: stats.withEvidence, description: "Con evidencia cargada", icon: "evidence", tone: "cyan" },
+      ]} />
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="mt-4 grid gap-3 md:grid-cols-[minmax(220px,1fr)_240px]">
           <Label className="grid gap-2">

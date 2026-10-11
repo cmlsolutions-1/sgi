@@ -6,14 +6,7 @@ import { Edit, Loader2, MoreHorizontal, Plus, Search, Trash2, Users } from "luci
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -174,19 +167,30 @@ export function WorkAreasManager() {
           <p className="text-muted-foreground">Crea las areas antes de registrar cargos de trabajo.</p>
         </div>
 
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={openCreateDialog} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Nueva area
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="overflow-hidden border-slate-200 bg-white p-0">
-            <form onSubmit={handleSubmit}>
-              <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
-                <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="area" tone="blue" /><div><DialogTitle>{form.id ? "Editar área" : "Crear área"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Define un área para organizar funcionarios y cargos de trabajo.</p></div></div>
-              </DialogHeader>
-              <div className="grid gap-4 bg-slate-50/40 px-6 py-5">
+        <Button onClick={openCreateDialog} className="gap-2">
+          <Plus className="h-4 w-4" />
+          Nueva area
+        </Button>
+        <SafeCloudFormDrawer
+          open={open}
+          onOpenChange={setOpen}
+          title={form.id ? "Editar área" : "Crear área"}
+          description="Define un área para organizar funcionarios y cargos de trabajo."
+          icon={<FormDialogIcon icon="area" tone="blue" />}
+          formProps={{ onSubmit: handleSubmit }}
+          bodyClassName="bg-slate-50/40"
+          footer={
+            <>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={saving}>
+                {saving ? "Guardando..." : "Guardar area"}
+              </Button>
+            </>
+          }
+        >
+              <div className="grid gap-4">
                 <FormSectionTitle icon="details" title="Datos del área" description="Asigna un nombre claro y una descripción breve." tone="cyan" />
                 <div className="grid gap-2">
                   <Label htmlFor="work-area-name">Nombre</Label>
@@ -220,17 +224,7 @@ export function WorkAreasManager() {
                   </p>
                 </div>
               </div>
-              <DialogFooter className="border-t border-slate-200 bg-white px-6 py-4">
-                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit" disabled={saving}>
-                  {saving ? "Guardando..." : "Guardar area"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+        </SafeCloudFormDrawer>
       </div>
 
       <Card className="border-border bg-card">

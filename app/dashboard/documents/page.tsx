@@ -25,6 +25,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -36,6 +37,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerAdapter } from "@/components/ui/safecloud-form-drawer"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -548,7 +550,7 @@ export default function DocumentsPage() {
           </p>
         </div>
 
-        <Dialog open={dialogOpen} onOpenChange={(open) => (open ? setDialogOpen(true) : resetForm())}>
+        <SafeCloudFormDrawerAdapter open={dialogOpen} onOpenChange={(open) => (open ? setDialogOpen(true) : resetForm())}>
           <DialogTrigger asChild>
             <Button onClick={openCreateDialog} className="gap-2">
               <Plus className="h-4 w-4" />
@@ -744,7 +746,7 @@ export default function DocumentsPage() {
               </Button>
             </DialogFooter>
           </DialogContent>
-        </Dialog>
+        </SafeCloudFormDrawerAdapter>
       </div>
 
       <Dialog open={Boolean(fileDialogDocument)} onOpenChange={(open) => !open && closeFileDialog()}>
@@ -912,28 +914,12 @@ export default function DocumentsPage() {
         </DialogContent>
       </Dialog>
 
-      <div className="overflow-x-auto px-3 py-1">
-        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
-          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
-            <span className="text-xs text-muted-foreground">Total</span>
-            <span className="text-sm font-semibold">{stats.total}</span>
-          </div>
-          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
-            <span className="text-xs text-muted-foreground">Activos</span>
-            <span className="text-sm font-semibold text-green-600">{stats.active}</span>
-          </div>
-          <div className="flex items-center gap-2 border-red-200 bg-red-50">
-            <span className="text-xs text-muted-foreground">Inactivos</span>
-            <span className="text-sm font-semibold">{stats.inactive}</span>
-          </div>
-          {DOCUMENT_TYPES.map((type) => (
-            <div key={type.value} className="flex items-center gap-2 border-blue-200 bg-blue-50">
-              <span className="text-xs text-muted-foreground">{type.label}</span>
-              <span className="text-sm font-semibold">{stats.byType[type.value] ?? 0}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <KpiStrip items={[
+        { title: "Total", value: stats.total, description: "Documentos registrados", icon: "document", tone: "slate" },
+        { title: "Activos", value: stats.active, description: "Documentos vigentes", icon: "active", tone: "green" },
+        { title: "Inactivos", value: stats.inactive, description: "Fuera de circulación", icon: "inactive", tone: "red" },
+        ...DOCUMENT_TYPES.map((type) => ({ title: type.label, value: stats.byType[type.value] ?? 0, description: "Clasificados por tipo", icon: "document" as const, tone: "blue" as const })),
+      ]} />
 
       <Card>
         <CardContent className="p-3">

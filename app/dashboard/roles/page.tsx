@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -237,24 +238,25 @@ export default function RolesPage() {
           <p className="text-muted-foreground">Crea roles, visualiza y asigna permisos para los usuarios de la empresa.</p>
         </div>
 
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={openCreateDialog} className="gap-2">
+        <SafeCloudFormDrawerFrame
+          open={open}
+          onOpenChange={setOpen}
+          trigger={<Button onClick={openCreateDialog} className="gap-2">
               <Plus className="h-4 w-4" />
               Nuevo rol
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-h-[90dvh] w-[calc(100vw-2rem)] max-w-3xl overflow-y-auto bg-card p-4 sm:p-6">
-            <form onSubmit={handleSubmit}>
-              <DialogHeader>
-                <DialogTitle>{form.id ? "Editar rol" : "Crear rol"}</DialogTitle>
+            </Button>}
+        >
+            <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
+                <DialogTitle className="text-lg">{form.id ? "Editar rol" : "Crear rol"}</DialogTitle>
               </DialogHeader>
 
-              <div className="grid gap-4 py-4">
+              <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="role-name">Nombre</Label>
+                  <Label htmlFor="role-name" className="text-sm">Nombre</Label>
                   <Input
                     id="role-name"
+                    className="h-10 text-sm"
                     value={form.name}
                     onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
                     placeholder="Ej: Coordinador SST"
@@ -262,9 +264,10 @@ export default function RolesPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="role-description">Descripcion</Label>
+                  <Label htmlFor="role-description" className="text-sm">Descripcion</Label>
                   <Textarea
                     id="role-description"
+                    className="min-h-20 resize-y text-sm"
                     value={form.description}
                     onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
                     placeholder="Describe el alcance del rol"
@@ -277,21 +280,21 @@ export default function RolesPage() {
                     <Label>Permisos</Label>
                     <Badge variant="secondary">{form.permissionIds.length} seleccionados</Badge>
                   </div>
-                  <div className="max-h-[min(360px,45vh)] overflow-y-auto rounded-lg border border-border">
+                  <div className="overflow-hidden rounded-lg border border-border">
                     {Object.entries(groupedPermissions).map(([group, items]) => (
-                      <div key={group} className="border-b border-border last:border-0 p-4">
-                        <h3 className="mb-3 text-sm font-semibold text-foreground">{group}</h3>
-                        <div className="grid gap-3 sm:grid-cols-2">
+                      <div key={group} className="border-b border-border p-3 last:border-0">
+                        <h3 className="mb-2 text-sm font-semibold text-foreground">{group}</h3>
+                        <div className="grid gap-2">
                           {items.map((permission) => (
                             <label
                               key={permission.id}
-                              className="flex items-center gap-3 rounded-md bg-secondary/50 p-3 text-sm"
+                              className="flex min-w-0 items-center gap-2.5 rounded-md bg-secondary/50 px-3 py-2.5 text-sm leading-snug"
                             >
                               <Checkbox
                                 checked={form.permissionIds.includes(permission.id)}
                                 onCheckedChange={() => togglePermission(permission.id)}
                               />
-                              <span>{permission.name}</span>
+                              <span className="min-w-0 break-words">{permission.name}</span>
                             </label>
                           ))}
                         </div>
@@ -301,7 +304,7 @@ export default function RolesPage() {
                 </div>
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4">
                 <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                   Cancelar
                 </Button>
@@ -310,8 +313,7 @@ export default function RolesPage() {
                 </Button>
               </DialogFooter>
             </form>
-          </DialogContent>
-        </Dialog>
+        </SafeCloudFormDrawerFrame>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

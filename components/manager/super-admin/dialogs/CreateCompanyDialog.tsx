@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { SafeCloudFormDrawerAdapter } from "@/components/ui/safecloud-form-drawer"
 
 import { Edit, Loader2, Plus } from "lucide-react"
 
@@ -101,7 +102,7 @@ export function CreateCompanyDialog({ company, trigger, onCreate, onUpdate }: Pr
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <SafeCloudFormDrawerAdapter open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger ?? (
           <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
@@ -196,6 +197,6 @@ export function CreateCompanyDialog({ company, trigger, onCreate, onUpdate }: Pr
           </Button>
         </DialogFooter>
       </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerAdapter>
   )
 }

@@ -27,6 +27,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -44,6 +45,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listAcpms } from "@/services/acpmService"
@@ -419,8 +421,7 @@ function InvestigationDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-7xl flex-col gap-0 overflow-hidden bg-card p-0 sm:max-w-7xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <DialogTitle>{editing ? "Editar investigación" : "Nueva investigación"}</DialogTitle>
           <p className="text-sm text-muted-foreground">
@@ -443,7 +444,7 @@ function InvestigationDialog({
                 </div>
               </div>
 
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-3">
                 <div className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
                   <span className="text-xs font-semibold text-muted-foreground">Novedad laboral</span>
                   <Select value={form.incidentId} onValueChange={(value) => setForm((current) => ({ ...current, incidentId: value }))}>
@@ -493,7 +494,7 @@ function InvestigationDialog({
                 {form.reviewers.map((reviewer, index) => (
                   <div
                     key={reviewer.id}
-                    className="grid gap-3 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs lg:grid-cols-[190px_minmax(0,1fr)_44px] lg:items-end"
+                    className="grid min-w-0 gap-3 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs"
                   >
                     <div className="grid gap-1.5">
                       <span className="text-xs font-semibold text-muted-foreground">Tipo</span>
@@ -533,7 +534,7 @@ function InvestigationDialog({
                       type="button"
                       variant="destructive"
                       size="icon"
-                      className="h-10 w-10"
+                      className="h-10 w-full sm:w-10 sm:justify-self-end"
                       onClick={() => removeReviewer(reviewer.id)}
                       aria-label="Quitar investigador"
                     >
@@ -558,7 +559,7 @@ function InvestigationDialog({
 
             <section className="rounded-md border border-border p-4">
               <h3 className="mb-3 text-sm font-semibold text-foreground">Plan de acciones</h3>
-              <div className="grid gap-4 xl:grid-cols-3">
+              <div className="grid gap-4">
                 <Label className="grid gap-2">
                   Acciones correctivas
                   <Textarea
@@ -608,7 +609,7 @@ function InvestigationDialog({
                 </div>
               </div>
 
-              <div className="grid gap-3 lg:grid-cols-[240px_minmax(0,1fr)_240px]">
+              <div className="grid gap-3">
                 <div className="grid gap-1.5 rounded-xl border border-slate-300 bg-slate-50/70 p-3 shadow-xs">
                   <span className="text-xs font-semibold text-muted-foreground">Origen ACPM</span>
                   <Select
@@ -692,8 +693,7 @@ function InvestigationDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -1324,26 +1324,12 @@ export default function InvestigationsPage() {
         </Button>
       </div>
 
-      <div className="w-full">
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
-            <span className="text-xs text-muted-foreground">Investigaciones</span>
-            <span className="text-xl font-bold leading-none">{computedSummary.total}</span>
-          </div>
-          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2">
-            <span className="text-xs text-muted-foreground">Reportadas</span>
-            <span className="text-xl font-bold leading-none text-blue-700">{computedSummary.reported}</span>
-          </div>
-          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2">
-            <span className="text-xs text-muted-foreground">Por verificar</span>
-            <span className="text-xl font-bold leading-none text-amber-700">{computedSummary.pendingVerification}</span>
-          </div>
-          <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2">
-            <span className="text-xs text-muted-foreground">Cerradas eficaces</span>
-            <span className="text-xl font-bold leading-none text-emerald-700">{computedSummary.closedEffective}</span>
-          </div>
-        </div>
-      </div>
+      <KpiStrip items={[
+        { title: "Investigaciones", value: computedSummary.total, description: "Investigaciones registradas", icon: "analysis", tone: "slate" },
+        { title: "Reportadas", value: computedSummary.reported, description: "Casos recién reportados", icon: "document", tone: "blue" },
+        { title: "Por verificar", value: computedSummary.pendingVerification, description: "Requieren validación", icon: "pending", tone: "amber" },
+        { title: "Cerradas eficaces", value: computedSummary.closedEffective, description: "Cierres verificados", icon: "completed", tone: "green" },
+      ]} />
 
       <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_200px_180px_220px_160px_160px_auto]">

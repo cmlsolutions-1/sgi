@@ -33,6 +33,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
@@ -52,6 +53,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
@@ -590,16 +592,16 @@ function IncidentDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger ?? (
+    <SafeCloudFormDrawerFrame
+      open={open}
+      onOpenChange={setOpen}
+      trigger={trigger ?? (
           <Button variant={incident ? "action" : "default"} size="sm" className="gap-2">
             {incident ? <Edit className="h-4 w-4" /> : <TriangleAlert className="h-4 w-4" />}
             {incident ? "Editar" : "Nueva novedad"}
           </Button>
         )}
-      </DialogTrigger>
-      <DialogContent className="max-h-[90vh] max-w-4xl overflow-hidden bg-white p-0">
+    >
         <form className="flex max-h-[90vh] flex-col" onSubmit={handleSubmit}>
           <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4">
             <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="labor" tone="amber" /><div><DialogTitle>{incident ? "Editar novedad laboral" : "Nueva novedad laboral"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra el caso, su clasificación y la información necesaria para su seguimiento.</p></div></div>
@@ -882,8 +884,7 @@ function IncidentDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -1457,19 +1458,17 @@ export function LaborNewsManager({ employees }: { employees: Employee[] }) {
         </CardContent>
       </Card>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {incidentsByType
-          .filter((item) => item.total > 0)
-          .slice(0, 8)
-          .map((item) => (
-            <Card key={item.value} className="bg-card border-border">
-              <CardContent className="p-4">
-                <p className="truncate text-xs font-medium text-muted-foreground">{item.label}</p>
-                <p className="mt-1 text-2xl font-bold text-foreground">{item.total}</p>
-              </CardContent>
-            </Card>
-          ))}
-      </div>
+      <KpiStrip items={incidentsByType
+        .filter((item) => item.total > 0)
+        .slice(0, 8)
+        .map((item) => ({
+          title: item.label,
+          value: item.total,
+          description: "Novedades registradas",
+          icon: "risk" as const,
+          tone: "blue" as const,
+        }))}
+      />
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <AnalyticsChartCard title="Novedades por tipo" description="Distribucion de los tipos registrados en el periodo filtrado.">

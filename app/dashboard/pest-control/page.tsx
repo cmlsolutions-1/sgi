@@ -8,7 +8,9 @@ import { SanitaryDocumentPanel } from "@/components/sanitary/SanitaryDocumentPan
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -122,13 +124,24 @@ function PestControlDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[90dvh] max-w-xl overflow-y-auto border-slate-200 bg-white p-0">
-        <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
-          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="pest" tone="amber" /><div><DialogTitle>{record ? "Editar control de plagas" : "Nuevo control de plagas"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra la visita, el proveedor y la fecha del próximo control.</p></div></div>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4 bg-slate-50/40 px-6 py-5">
+    <SafeCloudFormDrawer
+      open={open}
+      onOpenChange={(nextOpen) => !nextOpen && onClose()}
+      title={record ? "Editar control de plagas" : "Nuevo control de plagas"}
+      description="Registra la visita, el proveedor y la fecha del próximo control."
+      icon={<FormDialogIcon icon="pest" tone="amber" />}
+      formProps={{ onSubmit: handleSubmit }}
+      footer={
+        <>
+          <Button type="button" variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button>
+          <Button type="submit" className="gap-2" disabled={saving}>
+            {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+            {record ? "Actualizar" : "Guardar"}
+          </Button>
+        </>
+      }
+    >
+        <div className="space-y-4">
           <FormSectionTitle icon="details" title="Datos del control" description="Registra las fechas de atención y la empresa prestadora." tone="amber" />
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">
@@ -168,18 +181,8 @@ function PestControlDialog({
             </p>
           </div>
 
-          <DialogFooter className="border-t border-slate-200 bg-white pt-4">
-            <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
-              Cancelar
-            </Button>
-            <Button type="submit" className="gap-2" disabled={saving}>
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-              {record ? "Actualizar" : "Guardar"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+    </SafeCloudFormDrawer>
   )
 }
 
@@ -272,22 +275,11 @@ export default function PestControlPage() {
         </Button>
       </div>
 
-      <div className="overflow-x-auto px-3 py-1">
-        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
-          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
-            <span className="text-xs text-muted-foreground">Controles</span>
-            <span className="text-sm font-semibold">{records.length}</span>
-          </div>
-          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
-            <span className="text-xs text-muted-foreground">Activos</span>
-            <span className="text-sm font-semibold text-emerald-700">{activeCount}</span>
-          </div>
-          <div className="flex items-center gap-2 border-blue-200 bg-blue-50">
-            <span className="text-xs text-muted-foreground">Próximas visitas</span>
-            <span className="text-sm font-semibold text-blue-700">{scheduledCount}</span>
-          </div>
-        </div>
-      </div>
+      <KpiStrip items={[
+        { title: "Controles", value: records.length, description: "Controles registrados", icon: "pest", tone: "slate" },
+        { title: "Activos", value: activeCount, description: "Controles vigentes", icon: "active", tone: "green" },
+        { title: "Próximas visitas", value: scheduledCount, description: "Visitas programadas", icon: "calendar", tone: "blue" },
+      ]} />
 
       <Card className="rounded-lg">
         <CardContent className="space-y-4 p-4 sm:p-5">

@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { SafeCloudFormDrawerAdapter } from "@/components/ui/safecloud-form-drawer"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Plus, Loader2, Shield, ChevronDown, ChevronRight } from "lucide-react"
 import { usePermissions } from "@/hooks/usePermissions"
@@ -108,7 +109,7 @@ export function CreateRoleDialog({ disabled, loading, onCreate }: Props) {
   const modules = Object.keys(groupedPermissions).sort()
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <SafeCloudFormDrawerAdapter open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
           <Shield className="h-4 w-4 mr-2" />
@@ -144,7 +145,7 @@ export function CreateRoleDialog({ disabled, loading, onCreate }: Props) {
             <Textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="bg-input border-border text-frontend min-h-[80px]"
+              className="min-h-[80px] border-border bg-input text-foreground"
               placeholder="Descripción opcional del rol"
             />
           </div>
@@ -171,19 +172,19 @@ export function CreateRoleDialog({ disabled, loading, onCreate }: Props) {
                   const allSelected = selectedCount === moduleIds.length
 
                   return (
-                    <div key={module} className="p-3">
-                      <div className="flex items-center justify-between">
+                    <div key={module} className="min-w-0 p-3">
+                      <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
                         <button
                           type="button"
                           onClick={() => toggleModule(module)}
-                          className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary"
+                          className="flex min-w-0 items-center gap-2 text-left text-sm font-medium text-foreground hover:text-primary"
                         >
                           {isExpanded ? (
                             <ChevronDown className="h-4 w-4" />
                           ) : (
                             <ChevronRight className="h-4 w-4" />
                           )}
-                          {module}
+                          <span className="min-w-0 break-words">{module}</span>
                           <span className="text-xs text-muted-foreground">
                             ({selectedCount}/{perms.length})
                           </span>
@@ -203,7 +204,7 @@ export function CreateRoleDialog({ disabled, loading, onCreate }: Props) {
                       {isExpanded && (
                         <div className="mt-3 grid gap-2 pl-6">
                           {perms.map((perm) => (
-                            <div key={perm.id} className="flex items-center gap-2">
+                            <div key={perm.id} className="flex min-w-0 items-start gap-2">
                               <Checkbox
                                 id={perm.id}
                                 checked={form.permissionIds.includes(perm.id)}
@@ -212,11 +213,11 @@ export function CreateRoleDialog({ disabled, loading, onCreate }: Props) {
                               />
                               <Label
                                 htmlFor={perm.id}
-                                className="text-sm text-foreground cursor-pointer flex-1"
+                                className="min-w-0 flex-1 cursor-pointer break-words text-sm text-foreground"
                               >
                                 {perm.name}
                                 {perm.key && (
-                                  <span className="ml-2 text-xs text-muted-foreground font-mono">
+                                  <span className="block break-all font-mono text-xs text-muted-foreground sm:ml-2 sm:inline">
                                     {perm.key}
                                   </span>
                                 )}
@@ -256,6 +257,6 @@ export function CreateRoleDialog({ disabled, loading, onCreate }: Props) {
           </Button>
         </DialogFooter>
       </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerAdapter>
   )
 }

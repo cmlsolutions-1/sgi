@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -50,6 +51,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -239,8 +241,7 @@ function AccountabilityDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-3xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-3xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left">
             <FormDialogIcon icon="accountability" tone="blue" />
@@ -341,8 +342,7 @@ function AccountabilityDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -713,7 +713,12 @@ export default function AccountabilityPage() {
         </Button>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4"><Metric label="Rendiciones" value={stats.total} /><Metric label="Automáticas" value={stats.automatic} tone="blue" /><Metric label="Con soporte" value={stats.withDocument} tone="green" /><Metric label="Plan ejecutado promedio" value={`${stats.averageExecution}%`} tone="amber" /></section>
+      <KpiStrip items={[
+        { title: "Rendiciones", value: stats.total, description: "Informes registrados", icon: "total", tone: "slate" },
+        { title: "Automáticas", value: stats.automatic, description: "Generadas por SafeCloud", icon: "automatic", tone: "blue" },
+        { title: "Con soporte", value: stats.withDocument, description: "Con evidencia documental", icon: "evidence", tone: "green" },
+        { title: "Plan ejecutado", value: `${stats.averageExecution}%`, description: "Promedio de ejecución", icon: "progress", tone: "amber" },
+      ]} />
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="mb-4">
           <h2 className="text-sm font-semibold text-foreground">Buscar y consultar</h2>

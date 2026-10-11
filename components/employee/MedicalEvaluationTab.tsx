@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer";
 import { Label } from "@/components/ui/label";
 import { Plus, Calendar, User, Building, FileText, Download, CheckCircle, CircleDashed, Upload } from "lucide-react";
 import { Employee } from "@/lib/mock-data";
@@ -139,18 +139,23 @@ export function MedicalEvaluationTab({ employee, onAddEvaluation }: MedicalEvalu
               <FileText className="h-5 w-5" />
               Evaluaciones Médico-Ocupacionales
             </CardTitle>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
+            <SafeCloudFormDrawer
+              open={dialogOpen}
+              onOpenChange={setDialogOpen}
+              trigger={<Button>
                   <Plus className="h-4 w-4 mr-2" />
                   Agregar Evaluación
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-card border-border max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Agregar Evaluación Médico-Ocupacional</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                </Button>}
+              title="Agregar Evaluación Médico-Ocupacional"
+              formProps={{ onSubmit: handleSubmit }}
+              footer={
+                <>
+                  <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+                  <Button type="submit">Guardar Evaluación</Button>
+                </>
+              }
+            >
+                <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label >Tipo de Evaluación</Label>
@@ -253,15 +258,8 @@ export function MedicalEvaluationTab({ employee, onAddEvaluation }: MedicalEvalu
             )}
           </div>
                   
-                  <div className="flex justify-end gap-2 pt-4">
-                    <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                      Cancelar
-                    </Button>
-                    <Button type="submit">Guardar Evaluación</Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
+                </div>
+            </SafeCloudFormDrawer>
           </div>
         </CardHeader>
         <CardContent>

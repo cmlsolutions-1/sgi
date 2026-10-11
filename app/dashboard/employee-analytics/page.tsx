@@ -37,6 +37,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -54,6 +55,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawer, SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
@@ -448,8 +450,7 @@ function AnalysisDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-4xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left">
             <FormDialogIcon icon="analytics" tone="violet" />
@@ -538,8 +539,7 @@ function AnalysisDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -579,13 +579,20 @@ function ImprovementDialog({
   }
 
   return (
-    <Dialog open={Boolean(record)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-w-2xl bg-card">
-        <DialogHeader>
-          <DialogTitle>Accion de mejora</DialogTitle>
-          <p className="text-sm text-muted-foreground">Registra el plan de accion asociado al resultado estadistico.</p>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <SafeCloudFormDrawer
+      open={Boolean(record)}
+      onOpenChange={(nextOpen) => !nextOpen && onClose()}
+      title="Accion de mejora"
+      description="Registra el plan de accion asociado al resultado estadistico."
+      formProps={{ onSubmit: handleSubmit }}
+      footer={
+        <>
+          <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Guardar accion</Button>
+        </>
+      }
+    >
+        <div className="space-y-4">
           <Label className="grid gap-2">
             Descripcion
             <Textarea value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} rows={4} placeholder="Describe la accion de mejora." />
@@ -600,13 +607,8 @@ function ImprovementDialog({
               <Input type="date" value={form.dueDate} onChange={(event) => setForm((current) => ({ ...current, dueDate: event.target.value }))} />
             </Label>
           </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Guardar accion</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+    </SafeCloudFormDrawer>
   )
 }
 
@@ -1067,7 +1069,12 @@ export default function EmployeeAnalyticsPage() {
         </div>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4"><Metric label="Analisis" value={stats.total} /><Metric label="Con evidencia" value={stats.withEvidence} tone="green" /><Metric label="Con mejora" value={stats.withAction} tone="blue" /><Metric label="Anuales" value={stats.annual} tone="amber" /></section>
+      <KpiStrip items={[
+        { title: "Análisis", value: stats.total, description: "Registros generados", icon: "analysis", tone: "blue" },
+        { title: "Con evidencia", value: stats.withEvidence, description: "Con soporte documental", icon: "evidence", tone: "green" },
+        { title: "Con mejora", value: stats.withAction, description: "Con acciones definidas", icon: "progress", tone: "cyan" },
+        { title: "Anuales", value: stats.annual, description: "Del periodo anual", icon: "calendar", tone: "amber" },
+      ]} />
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="mb-4">
           <h2 className="text-sm font-semibold text-foreground">Buscar y filtrar</h2>

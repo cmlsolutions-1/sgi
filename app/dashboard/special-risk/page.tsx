@@ -27,6 +27,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -44,6 +45,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
@@ -229,8 +231,7 @@ function RiskDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <DialogTitle>{editing ? "Editar riesgo especial" : "Nuevo riesgo especial"}</DialogTitle>
           <p className="text-sm text-muted-foreground">
@@ -253,7 +254,7 @@ function RiskDialog({
                 </div>
               </div>
 
-              <div className="grid gap-4 lg:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="special-risk-employee">Funcionario</Label>
                   <Select
@@ -333,7 +334,7 @@ function RiskDialog({
                   <p className="mt-0.5 text-xs text-muted-foreground">Define el periodo, la cotización y el estado del registro.</p>
                 </div>
               </div>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <Label className="grid gap-2">
                   Fecha inicio
                   <Input
@@ -412,8 +413,7 @@ function RiskDialog({
             <Button type="submit">{editing ? "Guardar cambios" : "Crear registro"}</Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -864,14 +864,12 @@ export default function SpecialRiskPage() {
         </Button>
       </div>
 
-      <div className="overflow-x-auto px-3 py-1">
-        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:border-slate-200 [&>div]:bg-slate-50 [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
-          <Metric label="Registros" value={stats.total} />
-          <Metric label="Activos" value={stats.active} tone="green" />
-          <Metric label="Finalizados" value={stats.finished} tone="blue" />
-          <Metric label="Con cotizacion especial" value={stats.specialContribution} tone="amber" />
-        </div>
-      </div>
+      <KpiStrip items={[
+        { title: "Registros", value: stats.total, description: "Riesgos especiales", icon: "risk", tone: "slate" },
+        { title: "Activos", value: stats.active, description: "Actualmente vigentes", icon: "active", tone: "green" },
+        { title: "Finalizados", value: stats.finished, description: "Procesos cerrados", icon: "completed", tone: "blue" },
+        { title: "Cotización especial", value: stats.specialContribution, description: "Con aporte especial", icon: "budget", tone: "amber" },
+      ]} />
 
       <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
         <div className="grid gap-3 lg:grid-cols-[minmax(220px,1fr)_260px_180px]">

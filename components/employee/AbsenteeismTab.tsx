@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer"
 import { Label } from "@/components/ui/label"
 import { Calendar, Download, FileText, Plus, Trash2, Upload } from "lucide-react"
 import jsPDF from "jspdf"
@@ -288,20 +288,23 @@ export function AbsenteeismTab({ employee }: { employee: Employee }) {
               </Badge>
             </CardTitle>
 
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="gap-2">
+            <SafeCloudFormDrawer
+              open={dialogOpen}
+              onOpenChange={setDialogOpen}
+              trigger={<Button className="gap-2">
                   <Plus className="h-4 w-4" />
                   Agregar ausentismo
-                </Button>
-              </DialogTrigger>
-
-              <DialogContent className="bg-card border-border max-w-lg">
-                <DialogHeader>
-                  <DialogTitle>{editingId ? "Editar Ausentismo" : "Registrar Ausentismo"}</DialogTitle>
-                </DialogHeader>
-
-                <form onSubmit={saveRecord} className="space-y-4">
+                </Button>}
+              title={editingId ? "Editar Ausentismo" : "Registrar Ausentismo"}
+              formProps={{ onSubmit: saveRecord }}
+              footer={
+                <>
+                  <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+                  <Button type="submit" disabled={saving}>{saving ? "Guardando..." : "Guardar"}</Button>
+                </>
+              }
+            >
+                <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label>Tipo *</Label>
@@ -390,17 +393,8 @@ export function AbsenteeismTab({ employee }: { employee: Employee }) {
                     )}
                   </div>
 
-                  <div className="flex justify-end gap-2 pt-2">
-                    <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                      Cancelar
-                    </Button>
-                    <Button type="submit" disabled={saving}>
-                      {saving ? "Guardando..." : "Guardar"}
-                    </Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
+                </div>
+            </SafeCloudFormDrawer>
           </div>
         </CardHeader>
 

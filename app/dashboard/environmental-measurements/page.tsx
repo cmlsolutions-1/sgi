@@ -22,6 +22,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
   DropdownMenu,
@@ -33,6 +34,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listManagedDocuments } from "@/services/documentManagementService"
@@ -467,14 +469,13 @@ function MeasurementDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="analytics" tone="blue" /><div><DialogTitle>{record ? "Editar medición ambiental" : "Nueva medición ambiental"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra la medición, su resultado y los controles relacionados.</p></div></div>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-slate-50/40 px-6 py-5">
-          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="details" title="Datos de la medición" description="Identifica la medición, fecha, laboratorio y resultado." tone="blue" /><div className="grid gap-4 md:grid-cols-2">
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="details" title="Datos de la medición" description="Identifica la medición, fecha, laboratorio y resultado." tone="blue" /><div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="measurement-name">Nombre de la medición</Label>
               <Input id="measurement-name" value={form.name} onChange={(event) => update("name", event.target.value)} placeholder="Ej. Medición de ruido en planta" />
@@ -491,18 +492,17 @@ function MeasurementDialog({
             <div><Label className="mb-2 block">Resultado</Label><Select value={form.result} onValueChange={(value) => update("result", value as MeasurementResult)}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="COMPLIES">Cumple</SelectItem><SelectItem value="DOES_NOT_COMPLY">No cumple</SelectItem><SelectItem value="IN_EVALUATION">En evaluación</SelectItem></SelectContent></Select></div>
             <EmployeePicker employees={employees} loading={employeesLoading} value={form.responsibleEmployeeId} onChange={(employeeId) => update("responsibleEmployeeId", employeeId)} />
             </div></section>
-          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="tracking" title="Relaciones y seguimiento" description="Relaciona el procedimiento, riesgo y observaciones de la medición." tone="cyan" /><div className="grid gap-4 md:grid-cols-2">
-            <SearchableOptionPicker label="Procedimiento" value={form.procedureDocumentId} options={documents} loading={catalogsLoading} placeholder="Buscar procedimiento..." emptyMessage="No hay procedimientos disponibles." onChange={(id) => update("procedureDocumentId", id)} />
-            <SearchableOptionPicker label="Riesgo asociado" value={form.riskId} options={risks} loading={catalogsLoading} placeholder="Buscar riesgo químico, físico o biológico..." emptyMessage="No hay riesgos disponibles." onChange={(id) => update("riskId", id)} />
-            <div className="grid gap-2 md:col-span-2"><Label htmlFor="measurement-observations">Observaciones</Label><Textarea id="measurement-observations" value={form.observations} onChange={(event) => update("observations", event.target.value)} placeholder="Hallazgos, recomendaciones o seguimiento requerido" rows={4} /></div>
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="tracking" title="Relaciones y seguimiento" description="Relaciona el procedimiento, riesgo y observaciones de la medición." tone="cyan" /><div className="grid gap-4">
+            <div className="min-w-0"><SearchableOptionPicker label="Procedimiento" value={form.procedureDocumentId} options={documents} loading={catalogsLoading} placeholder="Buscar procedimiento..." emptyMessage="No hay procedimientos disponibles." onChange={(id) => update("procedureDocumentId", id)} /></div>
+            <div className="min-w-0"><SearchableOptionPicker label="Riesgo asociado" value={form.riskId} options={risks} loading={catalogsLoading} placeholder="Buscar riesgo químico, físico o biológico..." emptyMessage="No hay riesgos disponibles." onChange={(id) => update("riskId", id)} /></div>
+            <div className="grid min-w-0 gap-2"><Label htmlFor="measurement-observations">Observaciones</Label><Textarea id="measurement-observations" value={form.observations} onChange={(event) => update("observations", event.target.value)} placeholder="Hallazgos, recomendaciones o seguimiento requerido" rows={4} /></div>
           </div></section></div>
           <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
             <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{record ? "Guardar cambios" : "Crear medición"}</Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -553,8 +553,7 @@ function ProcedureDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-3xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-3xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="document" tone="blue" /><div><DialogTitle>{record ? "Editar procedimiento" : "Nuevo procedimiento"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Relaciona el procedimiento usado para las mediciones ambientales.</p></div></div>
         </DialogHeader>
@@ -576,8 +575,7 @@ function ProcedureDialog({
             <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{record ? "Guardar cambios" : "Crear procedimiento"}</Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -955,12 +953,12 @@ export default function EnvironmentalMeasurementsPage() {
         </div>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2"><span className="text-xl font-bold text-slate-900">{measurementsCount}</span><span className="text-xs font-medium text-slate-600">Mediciones</span></div>
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2"><span className="text-xl font-bold text-blue-700">{proceduresCount}</span><span className="text-xs font-medium text-slate-600">Procedimientos</span></div>
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2"><span className="text-xl font-bold text-emerald-700">{withEvidenceCount}</span><span className="text-xs font-medium text-slate-600">Con evidencia</span></div>
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2"><span className="text-xl font-bold text-rose-700">{notComplyCount}</span><span className="text-xs font-medium text-slate-600">No cumplen</span></div>
-      </section>
+      <KpiStrip items={[
+        { title: "Mediciones", value: measurementsCount, description: "Mediciones registradas", icon: "measurement", tone: "slate" },
+        { title: "Procedimientos", value: proceduresCount, description: "Procedimientos definidos", icon: "document", tone: "blue" },
+        { title: "Con evidencia", value: withEvidenceCount, description: "Con soporte cargado", icon: "evidence", tone: "green" },
+        { title: "No cumplen", value: notComplyCount, description: "Requieren intervención", icon: "findings", tone: "red" },
+      ]} />
 
       <section className="rounded-md border border-border bg-card p-4">
         <div className="grid gap-3 lg:grid-cols-[1fr_180px_190px_auto] lg:items-end">

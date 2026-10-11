@@ -24,6 +24,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -41,6 +42,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
@@ -379,11 +381,7 @@ function ActivityDialog({
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={handleOpenChange}
-    >
-      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-4xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={handleOpenChange}>
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="prevention" tone="emerald" /><div><DialogTitle>{editing ? "Editar actividad saludable" : "Nueva actividad saludable"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra una campaña o jornada orientada al bienestar y los hábitos saludables.</p></div></div>
         </DialogHeader>
@@ -392,7 +390,7 @@ function ActivityDialog({
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
             <section className="rounded-md border border-border p-4">
               <FormSectionTitle icon="details" title="Datos de la actividad" description="Identifica la actividad, el tipo, las fechas y su responsable." tone="blue" />
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <Label className="grid gap-2">
                   Nombre actividad
                   <Input
@@ -428,7 +426,7 @@ function ActivityDialog({
 
             <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <FormSectionTitle icon="tracking" title="Propósito y alcance" description="Explica el objetivo y la población o áreas beneficiadas." tone="cyan" />
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4">
               <Label className="grid gap-2 rounded-md border border-border p-4">
                 Objetivo
                 <Textarea
@@ -461,8 +459,7 @@ function ActivityDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -918,7 +915,13 @@ export default function HealthyLifestylesPage() {
         </Button>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-5"><Metric label="Actividades" value={stats.total} /><Metric label="Planeadas" value={stats.planned} tone="amber" /><Metric label="En ejecución" value={stats.inProgress} tone="blue" /><Metric label="Cumplidas" value={stats.completed} tone="green" /><Metric label="Con evidencia" value={stats.withEvidence} tone="green" /></section>
+      <KpiStrip items={[
+        { title: "Actividades", value: stats.total, description: "Actividades saludables", icon: "hygiene", tone: "slate" },
+        { title: "Planeadas", value: stats.planned, description: "Pendientes por iniciar", icon: "calendar", tone: "amber" },
+        { title: "En ejecución", value: stats.inProgress, description: "Actualmente en desarrollo", icon: "progress", tone: "blue" },
+        { title: "Cumplidas", value: stats.completed, description: "Actividades completadas", icon: "completed", tone: "green" },
+        { title: "Con evidencia", value: stats.withEvidence, description: "Con soporte cargado", icon: "evidence", tone: "cyan" },
+      ]} />
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="mt-4 grid gap-3 md:grid-cols-[minmax(220px,1fr)_240px]">
           <Label className="grid gap-2">

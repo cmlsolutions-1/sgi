@@ -20,6 +20,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -289,13 +290,13 @@ export default function DataProcessingPage() {
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <MetricCard title="Total empleados" value={summary.totalEmployees} icon={ShieldCheck} />
-        <MetricCard title="Autorizaciones aceptadas" value={summary.accepted} icon={CheckCircle2} />
-        <MetricCard title="Pendientes" value={summary.pending} icon={FileClock} />
-        <MetricCard title="Vencidas" value={summary.expired} icon={AlertTriangle} />
-        <MetricCard title="Requieren nueva aceptación" value={summary.requiresReacceptance} icon={RefreshCw} />
-      </div>
+      <KpiStrip items={[
+        { title: "Total empleados", value: summary.totalEmployees, description: "Funcionarios evaluados", icon: "users", tone: "slate" },
+        { title: "Aceptadas", value: summary.accepted, description: "Autorizaciones vigentes", icon: "completed", tone: "green" },
+        { title: "Pendientes", value: summary.pending, description: "Esperando autorización", icon: "pending", tone: "amber" },
+        { title: "Vencidas", value: summary.expired, description: "Requieren actualización", icon: "overdue", tone: "red" },
+        { title: "Nueva aceptación", value: summary.requiresReacceptance, description: "Deben autorizar nuevamente", icon: "document", tone: "blue" },
+      ]} />
 
       <Card className="rounded-lg">
         <CardHeader className="gap-4">

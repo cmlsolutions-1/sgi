@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -271,8 +272,7 @@ function PesvResponsibleDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto bg-card">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={onOpenChange}>
         <DialogHeader>
           <DialogTitle>{record ? "Actualizar responsable PESV" : "Asignar responsable PESV"}</DialogTitle>
         </DialogHeader>
@@ -381,8 +381,7 @@ function PesvResponsibleDialog({
             <Button type="submit">{record ? "Guardar cambios" : "Asignar responsable"}</Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 

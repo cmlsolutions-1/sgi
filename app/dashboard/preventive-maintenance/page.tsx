@@ -20,6 +20,7 @@ import { PreventiveMaintenanceDocumentPanel } from "@/components/preventive-main
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -27,6 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -199,13 +201,24 @@ function MaintenanceDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto border-slate-200 bg-white p-0">
-        <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
-          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="maintenance" tone="cyan" /><div><DialogTitle>{maintenance ? "Editar mantenimiento preventivo" : "Nuevo mantenimiento preventivo"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Programa la acción preventiva y asigna al funcionario responsable.</p></div></div>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4 bg-slate-50/40 px-6 py-5">
+    <SafeCloudFormDrawer
+      open={open}
+      onOpenChange={(nextOpen) => !nextOpen && onClose()}
+      title={maintenance ? "Editar mantenimiento preventivo" : "Nuevo mantenimiento preventivo"}
+      description="Programa la acción preventiva y asigna al funcionario responsable."
+      icon={<FormDialogIcon icon="maintenance" tone="cyan" />}
+      formProps={{ onSubmit: handleSubmit }}
+      footer={
+        <>
+          <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button type="submit" className="gap-2" disabled={saving}>
+            {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+            Guardar
+          </Button>
+        </>
+      }
+    >
+        <div className="space-y-4">
           <FormSectionTitle icon="details" title="Datos del mantenimiento" description="Define la acción, fecha, responsable y alcance del mantenimiento." tone="cyan" />
           <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
@@ -260,18 +273,8 @@ function MaintenanceDialog({
             />
           </div>
 
-          <DialogFooter className="border-t border-slate-200 bg-white pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancelar
-            </Button>
-            <Button type="submit" className="gap-2" disabled={saving}>
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-              Guardar
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+    </SafeCloudFormDrawer>
   )
 }
 
@@ -390,20 +393,11 @@ export default function PreventiveMaintenancePage() {
         </Button>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-              <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
-                <span className="text-xs text-muted-foreground">Total</span>
-                <span className="text-xl font-bold leading-none">{maintenances.length}</span>
-              </div>
-              <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2">
-                <span className="text-xs text-muted-foreground">Activos</span>
-                <span className="text-xl font-bold leading-none text-emerald-700">{activeCount}</span>
-              </div>
-              <div className="flex min-h-14 flex-row-reverse items-center justify-end gap-3 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2">
-                <span className="text-xs text-muted-foreground">Inactivos</span>
-                <span className="text-xl font-bold leading-none text-red-700">{maintenances.length - activeCount}</span>
-              </div>
-      </section>
+      <KpiStrip items={[
+        { title: "Total", value: maintenances.length, description: "Mantenimientos registrados", icon: "total", tone: "slate" },
+        { title: "Activos", value: activeCount, description: "Planes de mantenimiento activos", icon: "active", tone: "green" },
+        { title: "Inactivos", value: maintenances.length - activeCount, description: "Fuera de programación", icon: "inactive", tone: "red" },
+      ]} />
 
       <Card>
         <CardContent className="space-y-5 p-5">

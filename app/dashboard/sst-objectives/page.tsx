@@ -23,6 +23,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -40,6 +41,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawer, SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { createSstPolicy, listSstPolicies } from "@/services/sstPolicyService"
@@ -290,15 +292,20 @@ function PolicyDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-w-2xl border-slate-200 bg-white">
-        <DialogHeader>
-          <DialogTitle>Crear política SST</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            Crea primero la politica para poder relacionarla en los objetivos SST.
-          </p>
-        </DialogHeader>
-        <form onSubmit={submit} className="space-y-4">
+    <SafeCloudFormDrawer
+      open={open}
+      onOpenChange={(nextOpen) => !nextOpen && onClose()}
+      title="Crear política SST"
+      description="Crea primero la politica para poder relacionarla en los objetivos SST."
+      formProps={{ onSubmit: submit }}
+      footer={
+        <>
+          <Button type="button" variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button>
+          <Button type="submit" disabled={saving}>{saving ? "Creando..." : "Crear política"}</Button>
+        </>
+      }
+    >
+        <div className="space-y-4">
           <Label className="grid gap-2">
             Nombre de la política
             <Input
@@ -317,17 +324,8 @@ function PolicyDialog({
               className="border-slate-300 bg-white shadow-sm focus-visible:ring-primary/20"
             />
           </Label>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={saving}>
-              {saving ? "Creando..." : "Crear política"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+    </SafeCloudFormDrawer>
   )
 }
 
@@ -403,8 +401,7 @@ function ObjectiveDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-6xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-6xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-5 py-4 pr-12 sm:px-6">
           <div className="flex items-start gap-3 text-left">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -430,8 +427,8 @@ function ObjectiveDialog({
                   <p className="mt-0.5 text-xs text-muted-foreground">Identifica el objetivo y explica claramente qué se desea alcanzar.</p>
                 </div>
               </div>
-              <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_140px_240px]">
-                <Label className="grid gap-2">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Label className="grid gap-2 sm:col-span-2">
                   <span>Nombre del objetivo <span className="text-destructive">*</span></span>
                   <Input
                     value={form.name}
@@ -505,8 +502,8 @@ function ObjectiveDialog({
                   <p className="mt-0.5 text-xs text-muted-foreground">Establece cómo se medirá el avance y cuál es el resultado esperado.</p>
                 </div>
               </div>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_140px_180px_180px]">
-                <Label className="grid gap-2">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Label className="grid gap-2 sm:col-span-2">
                   Meta
                   <Input
                     value={form.goal}
@@ -560,8 +557,8 @@ function ObjectiveDialog({
                   <p className="mt-0.5 text-xs text-muted-foreground">Relaciona la política, asigna un responsable y define el periodo de ejecución.</p>
                 </div>
               </div>
-              <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px_170px_170px]">
-                <div className="block">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="block sm:col-span-2">
                   <span className="mb-2 block text-sm font-medium text-foreground">Política SST relacionada</span>
                   <Select value={form.policyId} onValueChange={(value) => setForm((current) => ({ ...current, policyId: value }))}>
                     <SelectTrigger className="h-10 w-full"><SelectValue placeholder="Selecciona política" /></SelectTrigger>
@@ -572,7 +569,7 @@ function ObjectiveDialog({
                     </SelectContent>
                   </Select>
                 </div>
-                <Label className="grid gap-2">
+                <Label className="grid gap-2 sm:col-span-2">
                   Responsable del seguimiento
                   <Input
                     value={form.trackingResponsible}
@@ -623,8 +620,7 @@ function ObjectiveDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -661,13 +657,15 @@ function FollowUpDialog({
   }
 
   return (
-    <Dialog open={Boolean(objective)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-w-2xl bg-card">
-        <DialogHeader>
-          <DialogTitle>Registrar seguimiento</DialogTitle>
-          <p className="text-sm text-muted-foreground">Agrega avance, observaciones y evidencia hasta cumplir el objetivo.</p>
-        </DialogHeader>
-        <form onSubmit={submit} className="space-y-4">
+    <SafeCloudFormDrawer
+      open={Boolean(objective)}
+      onOpenChange={(nextOpen) => !nextOpen && onClose()}
+      title="Registrar seguimiento"
+      description="Agrega avance, observaciones y evidencia hasta cumplir el objetivo."
+      formProps={{ onSubmit: submit }}
+      footer={<><Button type="button" variant="outline" onClick={onClose}>Cancelar</Button><Button type="submit">Guardar seguimiento</Button></>}
+    >
+        <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <Label className="grid gap-2">
               Fecha
@@ -724,15 +722,8 @@ function FollowUpDialog({
               placeholder="Opcional"
             />
           </Label>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancelar
-            </Button>
-            <Button type="submit">Guardar seguimiento</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+    </SafeCloudFormDrawer>
   )
 }
 
@@ -763,13 +754,15 @@ function DiffusionDialog({
   }
 
   return (
-    <Dialog open={Boolean(objective)} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-w-2xl bg-card">
-        <DialogHeader>
-          <DialogTitle>Registrar difusión</DialogTitle>
-          <p className="text-sm text-muted-foreground">Registra cómo se difundió la política u objetivo SST.</p>
-        </DialogHeader>
-        <form onSubmit={submit} className="space-y-4">
+    <SafeCloudFormDrawer
+      open={Boolean(objective)}
+      onOpenChange={(nextOpen) => !nextOpen && onClose()}
+      title="Registrar difusión"
+      description="Registra cómo se difundió la política u objetivo SST."
+      formProps={{ onSubmit: submit }}
+      footer={<><Button type="button" variant="outline" onClick={onClose}>Cancelar</Button><Button type="submit">Guardar difusión</Button></>}
+    >
+        <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <Label className="grid gap-2">
               Medio de difusión
@@ -816,15 +809,8 @@ function DiffusionDialog({
               placeholder="Opcional"
             />
           </Label>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancelar
-            </Button>
-            <Button type="submit">Guardar difusión</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+    </SafeCloudFormDrawer>
   )
 }
 
@@ -1281,13 +1267,13 @@ export default function SstObjectivesPage() {
         </div>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-        <Metric label="Políticas" value={summary.policies} />
-        <Metric label="Objetivos" value={summary.total} />
-        <Metric label="Pendientes" value={summary.pending} tone="amber" />
-        <Metric label="En ejecución" value={summary.inProgress} tone="blue" />
-        <Metric label="Cumplidos" value={summary.fulfilled} tone="green" />
-      </section>
+      <KpiStrip items={[
+        { title: "Políticas", value: summary.policies, description: "Políticas SST registradas", icon: "document", tone: "slate" },
+        { title: "Objetivos", value: summary.total, description: "Objetivos definidos", icon: "objective", tone: "blue" },
+        { title: "Pendientes", value: summary.pending, description: "Aún sin iniciar", icon: "pending", tone: "amber" },
+        { title: "En ejecución", value: summary.inProgress, description: "Con seguimiento activo", icon: "progress", tone: "cyan" },
+        { title: "Cumplidos", value: summary.fulfilled, description: "Objetivos alcanzados", icon: "completed", tone: "green" },
+      ]} />
 
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
           <div className="mb-3">

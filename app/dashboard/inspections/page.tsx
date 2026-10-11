@@ -22,6 +22,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
   DropdownMenu,
@@ -33,11 +34,9 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { IntelligenceCenter } from "@/components/intelligence/intelligence-center"
-import { buildInspectionInsights } from "@/lib/intelligence-engine"
-import { askSafeCloud } from "@/lib/safecloud-assistant"
 import { listEmployees } from "@/services/employeeService"
 import { listWorkAreaOptions } from "@/services/workAreaService"
 import {
@@ -382,14 +381,13 @@ function InspectionDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="tracking" tone="blue" /><div><DialogTitle>{record ? "Editar inspección" : "Nueva inspección"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra el elemento, resultado, área y responsable de la inspección.</p></div></div>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-slate-50/40 px-6 py-5">
-          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="details" title="Información de la inspección" description="Identifica el elemento, la acción realizada y su resultado." tone="blue" /><div className="grid gap-4 md:grid-cols-2">
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="details" title="Información de la inspección" description="Identifica el elemento, la acción realizada y su resultado." tone="blue" /><div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="element-name">Nombre del elemento</Label>
               <Input id="element-name" value={form.elementName} onChange={(event) => update("elementName", event.target.value)} placeholder="Ej. Extintor, escalera, máquina" />
@@ -401,22 +399,21 @@ function InspectionDialog({
               <Input id="inspection-date" type="date" value={form.date} onChange={(event) => update("date", event.target.value)} />
             </div>
             <div><Label className="mb-2 block">Resultado</Label><Select value={form.result} onValueChange={(value) => update("result", value as InspectionResult)}><SelectTrigger className="h-10 w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="COMPLIES">Cumple</SelectItem><SelectItem value="DOES_NOT_COMPLY">No cumple</SelectItem><SelectItem value="PARTIAL">Parcial</SelectItem></SelectContent></Select></div>
-            <label className="flex min-h-10 items-center gap-2 rounded-md border border-input px-3 text-sm text-foreground md:mt-6">
+            <label className="flex min-h-10 items-center gap-2 rounded-md border border-input px-3 text-sm text-foreground">
               <input type="checkbox" checked={form.copasstParticipated} onChange={(event) => update("copasstParticipated", event.target.checked)} />
               Participó el COPASST
             </label>
             <WorkAreaPicker areas={areas} loading={loading} value={form.workAreaId} onChange={(areaId) => update("workAreaId", areaId)} />
             <EmployeePicker employees={employees} loading={loading} value={form.responsibleEmployeeId} onChange={(employeeId) => update("responsibleEmployeeId", employeeId)} />
           </div></section>
-          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="document" title="Descripción y hallazgos" description="Detalla el alcance, las observaciones y recomendaciones." tone="cyan" /><div className="grid gap-4 md:grid-cols-2"><Label className="grid gap-2">Descripción<Textarea value={form.description} onChange={(event) => update("description", event.target.value)} placeholder="Describe qué se inspecciona o mantiene" rows={4} /></Label><Label className="grid gap-2">Observaciones<Textarea value={form.observations} onChange={(event) => update("observations", event.target.value)} placeholder="Hallazgos, acciones o recomendaciones" rows={4} /></Label></div></section>
+          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="document" title="Descripción y hallazgos" description="Detalla el alcance, las observaciones y recomendaciones." tone="cyan" /><div className="grid gap-4"><Label className="grid gap-2">Descripción<Textarea value={form.description} onChange={(event) => update("description", event.target.value)} placeholder="Describe qué se inspecciona o mantiene" rows={4} /></Label><Label className="grid gap-2">Observaciones<Textarea value={form.observations} onChange={(event) => update("observations", event.target.value)} placeholder="Hallazgos, acciones o recomendaciones" rows={4} /></Label></div></section>
           </div>
           <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4">
             <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
             <Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{record ? "Guardar cambios" : "Crear inspección"}</Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -644,7 +641,6 @@ export default function InspectionsPage() {
   const maintenanceCount = records.filter((record) => record.action === "MAINTENANCE").length
   const withEvidenceCount = records.filter((record) => record.evidence).length
   const pendingCount = records.filter((record) => record.result !== "COMPLIES").length
-  const intelligenceInsights = useMemo(() => buildInspectionInsights(records), [records])
 
   async function handleSave(form: InspectionForm, recordId?: string): Promise<boolean> {
     const responsibleName = findEmployeeName(employees, form.responsibleEmployeeId)
@@ -723,47 +719,6 @@ export default function InspectionsPage() {
     setDialogOpen(true)
   }
 
-  function focusRecords() {
-    window.setTimeout(() => {
-      document.getElementById("inspection-records")?.scrollIntoView({ behavior: "smooth", block: "start" })
-    }, 0)
-  }
-
-  function handleIntelligenceAction(actionId: string) {
-    if (actionId === "upload-evidence") {
-      const record =
-        records.find((item) => !item.evidence && item.elementName.toLowerCase().includes("extintor")) ??
-        records.find((item) => !item.evidence)
-      if (record) setEvidenceRecord(record)
-      return
-    }
-
-    if (actionId === "schedule-follow-up") {
-      setEditingRecord(null)
-      setDialogOpen(true)
-      return
-    }
-
-    if (actionId === "review-non-compliant") {
-      setResultFilter("DOES_NOT_COMPLY")
-      focusRecords()
-      return
-    }
-
-    if (actionId === "review-partial") {
-      setResultFilter("PARTIAL")
-      focusRecords()
-      return
-    }
-
-    if (actionId === "review-copasst") {
-      setActionFilter("ALL")
-      setResultFilter("ALL")
-      setSearch("Sin COPASST")
-      focusRecords()
-    }
-  }
-
   return (
     <main className="module-polish flex flex-1 flex-col gap-6 p-4 md:p-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -776,25 +731,12 @@ export default function InspectionsPage() {
         </Button>
       </div>
 
-      <IntelligenceCenter
-        insights={intelligenceInsights}
-        contextLabel="Inspecciones"
-        title="Analisis inteligente de inspecciones"
-        onAction={(action) => handleIntelligenceAction(action.id)}
-        onAsk={(question) => askSafeCloud(question, { insights: intelligenceInsights })}
-        assistantSuggestions={[
-          "¿Hay evidencias pendientes?",
-          "¿Cuántos empleados tengo?",
-          "¿Qué puedo preguntarte?",
-        ]}
-      />
-
-      <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2"><span className="text-xl font-bold text-slate-900">{inspectionsCount}</span><span className="text-xs font-medium text-slate-600">Inspecciones</span></div>
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2"><span className="text-xl font-bold text-blue-700">{maintenanceCount}</span><span className="text-xs font-medium text-slate-600">Mantenimientos</span></div>
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2"><span className="text-xl font-bold text-emerald-700">{withEvidenceCount}</span><span className="text-xs font-medium text-slate-600">Con evidencia</span></div>
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2"><span className="text-xl font-bold text-amber-700">{pendingCount}</span><span className="text-xs font-medium text-slate-600">Pendientes</span></div>
-      </section>
+      <KpiStrip items={[
+        { title: "Inspecciones", value: inspectionsCount, description: "Inspecciones registradas", icon: "analysis", tone: "slate" },
+        { title: "Mantenimientos", value: maintenanceCount, description: "Acciones de mantenimiento", icon: "program", tone: "blue" },
+        { title: "Con evidencia", value: withEvidenceCount, description: "Con soporte cargado", icon: "evidence", tone: "green" },
+        { title: "Pendientes", value: pendingCount, description: "Requieren seguimiento", icon: "pending", tone: "amber" },
+      ]} />
 
       <section className="rounded-md border border-border bg-card p-4">
         <div className="grid gap-3 lg:grid-cols-[1fr_180px_180px_auto] lg:items-end">

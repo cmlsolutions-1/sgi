@@ -25,6 +25,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -42,6 +43,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listManagedDocuments } from "@/services/documentManagementService"
@@ -533,8 +535,7 @@ function SubstanceDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="labor" tone="amber" /><div><DialogTitle>{record ? "Editar sustancia peligrosa" : "Nueva sustancia peligrosa"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra clasificación, controles asociados, responsable y evidencias.</p></div></div>
         </DialogHeader>
@@ -543,7 +544,7 @@ function SubstanceDialog({
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
             <section className="rounded-md border border-border p-4">
               <FormSectionTitle icon="details" title="Información de la sustancia" description="Identifica el producto, su clasificación y condiciones de almacenamiento." tone="blue" />
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4">
                 <Label className="grid gap-2">
                   Nombre de la sustancia
                   <Input value={form.substanceName} onChange={(event) => update("substanceName", event.target.value)} placeholder="Nombre del producto o sustancia" />
@@ -567,7 +568,7 @@ function SubstanceDialog({
 
             <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <FormSectionTitle icon="prevention" title="Controles relacionados" description="Relaciona responsable, riesgo, medida preventiva y procedimiento." tone="cyan" />
-              <div className="grid gap-4 lg:grid-cols-2">
+              <div className="grid gap-4">
               <EmployeePicker employees={employees} loading={employeesLoading} value={form.responsibleEmployeeId} onChange={(employeeId) => update("responsibleEmployeeId", employeeId)} />
               <SearchableOptionPicker
                 label="Riesgo asociado"
@@ -616,8 +617,7 @@ function SubstanceDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -654,8 +654,7 @@ function ProgramDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-3xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-3xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="tracking" tone="blue" /><div><DialogTitle>{record ? "Editar programa" : "Nuevo programa"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Relaciona el programa o procedimiento para sustancias peligrosas.</p></div></div>
         </DialogHeader>
@@ -680,8 +679,7 @@ function ProgramDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -1090,7 +1088,12 @@ export default function HazardousSubstancesPage() {
         </div>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4"><Metric label="Registros" value={stats.total} /><Metric label="Sustancias" value={stats.substances} tone="blue" /><Metric label="Programas" value={stats.programs} tone="green" /><Metric label="Con evidencia" value={stats.withEvidence} tone="amber" /></section>
+      <KpiStrip items={[
+        { title: "Registros", value: stats.total, description: "Gestiones registradas", icon: "total", tone: "slate" },
+        { title: "Sustancias", value: stats.substances, description: "Sustancias identificadas", icon: "chemical", tone: "red" },
+        { title: "Programas", value: stats.programs, description: "Programas de control", icon: "program", tone: "green" },
+        { title: "Con evidencia", value: stats.withEvidence, description: "Con soporte documental", icon: "evidence", tone: "blue" },
+      ]} />
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="mt-4 grid gap-3 md:grid-cols-[minmax(220px,1fr)_240px]">
           <Label className="grid gap-2">

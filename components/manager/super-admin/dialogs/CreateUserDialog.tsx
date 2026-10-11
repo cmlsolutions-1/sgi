@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { SafeCloudFormDrawerAdapter } from "@/components/ui/safecloud-form-drawer"
 import { Edit2, Plus, Loader2 } from "lucide-react"
 import type { CreateCompanyAdminDto } from "@/types/manager/user"
 import type { User } from "@/types/manager/user"
@@ -129,7 +130,7 @@ export function CreateUserDialog({ disabled, companyName, loading, user, onCreat
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <SafeCloudFormDrawerAdapter open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           variant={isEditing ? "action" : "default"}
@@ -241,6 +242,6 @@ export function CreateUserDialog({ disabled, companyName, loading, user, onCreat
           </Button>
         </DialogFooter>
       </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerAdapter>
   )
 }

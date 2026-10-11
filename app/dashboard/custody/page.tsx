@@ -21,6 +21,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -38,6 +39,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Textarea } from "@/components/ui/textarea"
 import {
   createCustodyRecord,
@@ -176,8 +178,7 @@ function CustodyDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-4xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left">
             <FormDialogIcon icon="custody" tone="blue" />
@@ -262,8 +263,7 @@ function CustodyDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -620,13 +620,13 @@ export default function CustodyPage() {
         </Button>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-        <Metric label="Registros" value={summary.total} />
-        <Metric label="Con soporte" value={summary.withCustodyEvidence} tone="blue" />
-        <Metric label="Compromiso firmado" value={summary.withConfidentiality} tone="blue" />
-        <Metric label="Completos" value={summary.complete} tone="green" />
-        <Metric label="Pendientes" value={summary.pending} tone="amber" />
-      </section>
+      <KpiStrip items={[
+        { title: "Registros", value: summary.total, description: "Custodias registradas", icon: "total", tone: "slate" },
+        { title: "Con soporte", value: summary.withCustodyEvidence, description: "Evidencia de custodia", icon: "evidence", tone: "blue" },
+        { title: "Compromiso firmado", value: summary.withConfidentiality, description: "Confidencialidad soportada", icon: "document", tone: "cyan" },
+        { title: "Completos", value: summary.complete, description: "Documentación completa", icon: "completed", tone: "green" },
+        { title: "Pendientes", value: summary.pending, description: "Requieren completar", icon: "pending", tone: "amber" },
+      ]} />
 
       <Card className="border-slate-200 bg-white shadow-sm">
         <CardContent className="p-4">

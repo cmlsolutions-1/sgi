@@ -29,6 +29,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -46,6 +47,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { getSgiResponsible } from "@/services/employeeService"
@@ -261,8 +263,7 @@ function CertificationDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-4xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-5 py-4 pr-12 sm:px-6">
           <div className="flex items-start gap-3 text-left">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -293,7 +294,7 @@ function CertificationDialog({
                   </p>
                 </div>
               </div>
-              <div className="grid gap-4 md:grid-cols-3">
+              <div className="grid gap-4">
                 <InfoBlock label="Responsable" value={responsible.name} icon={UserRound} />
                 <InfoBlock label="Cargo" value={responsible.job} icon={ShieldCheck} />
                 <InfoBlock label="Correo" value={responsible.email} icon={Mail} />
@@ -313,7 +314,7 @@ function CertificationDialog({
                 </div>
               </div>
 
-              <div className="grid gap-x-5 gap-y-4 md:grid-cols-2">
+              <div className="grid gap-x-5 gap-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="certification-competence">
                     Tipo de competencia <span className="text-destructive">*</span>
@@ -421,8 +422,7 @@ function CertificationDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -950,12 +950,12 @@ export default function SstTrainingCertificationsPage() {
         </Button>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Metric label="Registros" value={summary.total} />
-        <Metric label="Vigentes" value={summary.valid} tone="green" />
-        <Metric label="Vencidos" value={summary.expired} tone="red" />
-        <Metric label="Con evidencia" value={summary.withEvidence} tone="blue" />
-      </section>
+      <KpiStrip items={[
+        { title: "Registros", value: summary.total, description: "Formaciones registradas", icon: "training", tone: "slate" },
+        { title: "Vigentes", value: summary.valid, description: "Certificaciones válidas", icon: "active", tone: "green" },
+        { title: "Vencidos", value: summary.expired, description: "Requieren renovación", icon: "overdue", tone: "red" },
+        { title: "Con evidencia", value: summary.withEvidence, description: "Con soporte cargado", icon: "evidence", tone: "blue" },
+      ]} />
 
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-3.5">

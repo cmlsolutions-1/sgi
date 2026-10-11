@@ -27,6 +27,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -44,6 +45,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading, FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -281,8 +283,7 @@ function AcpmDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-6xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-6xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left">
             <FormDialogIcon icon="acpm" tone="blue" />
@@ -294,7 +295,7 @@ function AcpmDialog({
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-slate-50/40 px-6 py-5">
             <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <FormSectionTitle icon="details" title="Datos generales" description="Identifica el tipo, origen y vigencia de la acción." tone="blue" />
-              <div className="grid gap-4 lg:grid-cols-[130px_170px_180px_minmax(0,1fr)]">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <Label className="grid gap-2">
                   Año
                   <Input
@@ -329,7 +330,7 @@ function AcpmDialog({
                     </SelectContent>
                   </Select>
                 </div>
-                <Label className="grid gap-2">
+                <Label className="grid gap-2 sm:col-span-2">
                   Nombre del ACPM
                   <Input
                     value={form.name}
@@ -342,7 +343,7 @@ function AcpmDialog({
 
             <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <FormSectionTitle icon="employee" title="Descripción y responsable" description="Explica la acción y asigna a la persona encargada." tone="cyan" />
-              <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+              <div className="grid gap-4">
                 <Label className="grid gap-2">
                   Descripcion
                   <Textarea
@@ -378,7 +379,7 @@ function AcpmDialog({
 
             <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <FormSectionTitle icon="labor" title="No conformidad" description="Registra la situación que dio origen a la acción." tone="amber" />
-              <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px_260px]">
+              <div className="grid gap-4">
                 <Label className="grid gap-2">
                   Descripcion de la situacion
                   <Textarea
@@ -420,8 +421,7 @@ function AcpmDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -473,8 +473,7 @@ function FollowUpDialog({
   }
 
   return (
-    <Dialog open={Boolean(acpm)} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl">
+    <SafeCloudFormDrawerFrame open={Boolean(acpm)} onOpenChange={(open) => !open && onClose()}>
         <DialogHeader>
           <DialogTitle>Agregar seguimiento</DialogTitle>
           <p className="text-sm text-muted-foreground">
@@ -532,8 +531,7 @@ function FollowUpDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -1265,7 +1263,14 @@ export default function AcpmPage() {
         </Button>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6"><Metric label="ACPM" value={stats.total} /><Metric label="Activos" value={stats.active} tone="green" /><Metric label="En ejecucion" value={stats.inProgress} tone="blue" /><Metric label="Pendiente cierre" value={stats.pendingClosure} tone="amber" /><Metric label="Cerrados" value={stats.closed} tone="green" /><Metric label="Inactivos" value={stats.inactive} tone="red" /></section>
+      <KpiStrip items={[
+        { title: "ACPM", value: stats.total, description: "Acciones registradas", icon: "total", tone: "slate" },
+        { title: "Activos", value: stats.active, description: "Acciones vigentes", icon: "active", tone: "green" },
+        { title: "En ejecución", value: stats.inProgress, description: "Actualmente en gestión", icon: "progress", tone: "blue" },
+        { title: "Pendiente cierre", value: stats.pendingClosure, description: "Requieren validación", icon: "pending", tone: "amber" },
+        { title: "Cerrados", value: stats.closed, description: "Acciones completadas", icon: "completed", tone: "green" },
+        { title: "Inactivos", value: stats.inactive, description: "Fuera de gestión", icon: "inactive", tone: "red" },
+      ]} />
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="mb-4">
           <h2 className="text-sm font-semibold text-foreground">Buscar y filtrar</h2>

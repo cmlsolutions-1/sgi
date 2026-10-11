@@ -7,14 +7,7 @@ import { toast } from "sonner"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
@@ -222,22 +215,29 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
+    <SafeCloudFormDrawer
+      open={open}
+      onOpenChange={setOpen}
+      trigger={trigger || (
           <Button className="gap-2">
             <Plus className="h-4 w-4" />
             Nuevo funcionario
           </Button>
         )}
-      </DialogTrigger>
-      <DialogContent className="!flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-3xl flex-col gap-0 overflow-hidden border-slate-200 bg-white p-0 sm:max-w-3xl">
-        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-          <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
-            <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="employee" tone="blue" /><div><DialogTitle>{employee ? "Editar funcionario" : "Crear funcionario"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra la información personal y su ubicación dentro de la organización.</p></div></div>
-          </DialogHeader>
-
-          <div className="min-h-0 flex-1 overflow-y-auto bg-slate-50/40 px-6 py-4">
+      title={employee ? "Editar funcionario" : "Crear funcionario"}
+      description="Registra la información personal y su ubicación dentro de la organización."
+      icon={<FormDialogIcon icon="employee" tone="blue" />}
+      formProps={{ onSubmit: handleSubmit }}
+      footer={
+        <>
+          <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+          <Button type="submit" disabled={saving || loadingOptions || missingSetup}>
+            {saving ? "Guardando..." : employee ? "Guardar cambios" : "Crear funcionario"}
+          </Button>
+        </>
+      }
+    >
+          <div>
             {loadingOptions ? (
               <div className="flex min-h-[260px] items-center justify-center">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -432,18 +432,7 @@ export function EmployeeFormDialog({ employee, onSave, trigger }: EmployeeFormDi
               </div>
             )}
           </div>
-
-          <DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={saving || loadingOptions || missingSetup}>
-              {saving ? "Guardando..." : employee ? "Guardar cambios" : "Crear funcionario"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawer>
   )
 }
 

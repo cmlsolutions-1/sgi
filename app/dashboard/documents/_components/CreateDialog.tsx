@@ -1,6 +1,7 @@
 "use client"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Button } from "@/components/ui/button"
 import { FilePen, FilePlus2 } from "lucide-react"
 import DocumentFormAssignment from "@/components/document/DocumentFormAssignment"
@@ -28,8 +29,7 @@ export default function CreateDialog({
   onCreated,
 }: Props) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-5xl max-h-[90vh] overflow-y-auto p-0">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={onOpenChange}>
         <DialogHeader className="px-6 pt-6">
           <DialogTitle>Crear documentación</DialogTitle>
         </DialogHeader>
@@ -86,7 +86,6 @@ export default function CreateDialog({
             </div>
           )}
         </div>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }

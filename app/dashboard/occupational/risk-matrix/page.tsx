@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Plus } from "lucide-react"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 
 import { PELIGROS, ND_OPTIONS, NE_OPTIONS, NC_OPTIONS } from "@/lib/riskMatrix/constants"
 import { aceptabilidad, calcNP, calcNR, classifyNR, interpretNP, interpretNR } from "@/lib/riskMatrix/calc"
@@ -216,8 +217,7 @@ export default function RiskMatrixPage() {
       </Card>
 
       {/* MODAL */}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-3xl">
+      <SafeCloudFormDrawerFrame open={open} onOpenChange={setOpen}>
           <DialogHeader>
             <DialogTitle>Nueva fila | Cuadro de Riesgos</DialogTitle>
           </DialogHeader>
@@ -469,8 +469,7 @@ export default function RiskMatrixPage() {
               Guardar fila
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      </SafeCloudFormDrawerFrame>
     </div>
   )
 }

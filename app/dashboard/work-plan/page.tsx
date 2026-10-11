@@ -24,6 +24,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
@@ -42,6 +43,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
@@ -246,8 +248,7 @@ function WorkPlanDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-5xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-5xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="tracking" tone="blue" /><div><DialogTitle>Nueva actividad del plan de trabajo</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Programa la actividad, su evidencia esperada, responsable y presupuesto.</p></div></div>
         </DialogHeader>
@@ -256,7 +257,7 @@ function WorkPlanDialog({
           <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
             <section className="rounded-md border border-border p-4">
               <FormSectionTitle icon="details" title="Datos de la actividad" description="Identifica la actividad y la vigencia del plan." tone="blue" />
-              <div className="grid gap-4 md:grid-cols-[160px_minmax(0,1fr)]">
+              <div className="grid gap-4">
                 <Label className="grid gap-2">
                   Año
                   <Input
@@ -290,7 +291,7 @@ function WorkPlanDialog({
 
             <section className="rounded-md border border-border p-4">
               <FormSectionTitle icon="document" title="Objetivo y evidencia" description="Explica el propósito y el soporte esperado para demostrar cumplimiento." tone="cyan" />
-              <div className="grid gap-4 lg:grid-cols-2">
+              <div className="grid gap-4">
                 <Label className="grid gap-2">
                   Objetivo
                   <Textarea
@@ -348,8 +349,7 @@ function WorkPlanDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -911,24 +911,12 @@ export default function WorkPlanPage() {
         </Button>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
-              <span className="text-xl font-bold leading-none text-foreground">{stats.total}</span>
-              <span className="text-xs font-medium text-slate-600">Actividades</span>
-            </div>
-            <div className="flex min-h-14 items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2">
-              <span className="text-xl font-bold leading-none text-amber-700">{stats.pending}</span>
-              <span className="text-xs font-medium text-slate-600">Pendientes</span>
-            </div>
-            <div className="flex min-h-14 items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2">
-              <span className="text-xl font-bold leading-none text-emerald-700">{stats.approved}</span>
-              <span className="text-xs font-medium text-slate-600">Aprobadas</span>
-            </div>
-            <div className="flex min-h-14 items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2">
-              <span className="text-xl font-bold leading-none text-blue-700">{formatCurrency(stats.budget)}</span>
-              <span className="text-xs font-medium text-slate-600">Presupuesto</span>
-            </div>
-      </section>
+      <KpiStrip items={[
+        { title: "Actividades", value: stats.total, description: "Actividades del plan", icon: "total", tone: "slate" },
+        { title: "Pendientes", value: stats.pending, description: "Pendientes de aprobación", icon: "pending", tone: "amber" },
+        { title: "Aprobadas", value: stats.approved, description: "Actividades aprobadas", icon: "completed", tone: "green" },
+        { title: "Presupuesto", value: formatCurrency(stats.budget), description: "Presupuesto consolidado", icon: "budget", tone: "blue" },
+      ]} />
 
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_150px_220px]">

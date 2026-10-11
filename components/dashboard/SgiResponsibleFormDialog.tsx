@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { SafeCloudFormDrawerAdapter } from "@/components/ui/safecloud-form-drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -378,7 +379,7 @@ export function SgiResponsibleFormDialog({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <SafeCloudFormDrawerAdapter open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-card border-border max-w-2xl max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
@@ -567,7 +568,7 @@ export function SgiResponsibleFormDialog({
         </form>
       </DialogContent>
 
-      </Dialog>
+      </SafeCloudFormDrawerAdapter>
 
       <Dialog open={Boolean(preview)} onOpenChange={(open) => !open && closePreview()}>
         <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-2rem)] max-w-5xl flex-col bg-card p-0">

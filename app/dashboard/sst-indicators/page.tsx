@@ -8,6 +8,7 @@ import { AnalyticsBarChart, AnalyticsChartCard, AnalyticsDonutChart } from "@/co
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -340,12 +341,12 @@ export default function SstIndicatorsPage() {
         </form>
       </section>
 
-      <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2"><span className="text-xl font-bold text-slate-900">{displayedReport.summary?.totalIndicators ?? displayedReport.indicators.length}</span><span className="text-xs font-medium text-slate-600">Indicadores</span></div>
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2"><span className="text-xl font-bold text-emerald-700">{complianceCount}</span><span className="text-xs font-medium text-slate-600">Cumplen</span></div>
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2"><span className="text-xl font-bold text-amber-700">{watchCount}</span><span className="text-xs font-medium text-slate-600">En seguimiento</span></div>
-        <div className="flex min-h-14 items-center gap-3 rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2"><span className="text-xl font-bold text-rose-700">{criticalCount}</span><span className="text-xs font-medium text-slate-600">Críticos</span></div>
-      </section>
+      <KpiStrip items={[
+        { title: "Indicadores", value: displayedReport.summary?.totalIndicators ?? displayedReport.indicators.length, description: "Indicadores calculados", icon: "analysis", tone: "slate" },
+        { title: "Cumplen", value: complianceCount, description: "Resultado satisfactorio", icon: "completed", tone: "green" },
+        { title: "En seguimiento", value: watchCount, description: "Requieren observación", icon: "progress", tone: "amber" },
+        { title: "Críticos", value: criticalCount, description: "Atención prioritaria", icon: "findings", tone: "red" },
+      ]} />
 
       <section className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
         <AnalyticsChartCard title="Resultado por indicador" description={`Periodo generado: ${displayedReport.periodLabel} · ${formatDate(displayedReport.startDate)} a ${formatDate(displayedReport.endDate)}`}>

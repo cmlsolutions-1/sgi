@@ -19,6 +19,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -36,6 +37,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -185,8 +187,7 @@ function LegalMatrixDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="module-dialog-polish record-dialog-polish !flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-4xl flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-4xl">
+    <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
         <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
           <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="document" tone="blue" /><div><DialogTitle>{editing ? "Editar item del normograma" : "Nuevo item del normograma"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra la norma aplicable, su vigencia y la entidad que la expide.</p></div></div>
         </DialogHeader>
@@ -265,8 +266,7 @@ function LegalMatrixDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerFrame>
   )
 }
 
@@ -615,26 +615,12 @@ export default function LegalMatrixPage() {
         </div>
       </div>
 
-      <section className="overflow-x-auto py-1">
-        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3">
-          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2">
-            <span className="text-xl font-bold text-slate-900">{stats.total}</span>
-            <span className="text-xs font-medium text-slate-600">Total</span>
-          </div>
-          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2">
-            <span className="text-xl font-bold text-emerald-700">{stats.active}</span>
-            <span className="text-xs font-medium text-slate-600">Vigentes</span>
-          </div>
-          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2">
-            <span className="text-xl font-bold text-rose-700">{stats.expired}</span>
-            <span className="text-xs font-medium text-slate-600">Vencidos</span>
-          </div>
-          <div className="flex min-h-14 items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2">
-            <span className="text-xl font-bold text-blue-700">{stats.withEvidence}</span>
-            <span className="text-xs font-medium text-slate-600">Con documento</span>
-          </div>
-        </div>
-      </section>
+      <KpiStrip items={[
+        { title: "Total", value: stats.total, description: "Requisitos registrados", icon: "legal", tone: "slate" },
+        { title: "Vigentes", value: stats.active, description: "Requisitos aplicables", icon: "active", tone: "green" },
+        { title: "Vencidos", value: stats.expired, description: "Requieren actualización", icon: "overdue", tone: "red" },
+        { title: "Con documento", value: stats.withEvidence, description: "Con soporte normativo", icon: "evidence", tone: "blue" },
+      ]} />
 
       <Card className="border-border bg-card">
         <CardContent className="p-4">

@@ -2,12 +2,14 @@
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer"
 import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
@@ -43,7 +45,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import {
   DropdownMenu,
@@ -666,20 +667,29 @@ export default function PreventiveMeasuresPage() {
           </p>
         </div>
 
-        <Dialog open={openModal} onOpenChange={(value) => (value ? setOpenModal(true) : resetModal())}>
-          <DialogTrigger asChild>
-            <Button className="gap-2" onClick={openCreateModal}>
-              <Plus className="h-4 w-4" />
-              Nueva Medida
-            </Button>
-          </DialogTrigger>
+        <Button className="gap-2" onClick={openCreateModal}>
+          <Plus className="h-4 w-4" />
+          Nueva Medida
+        </Button>
 
-          <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto border-slate-200 bg-white">
-            <DialogHeader className="border-b border-slate-200 bg-slate-50/70 p-4">
-              <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="prevention" tone="emerald" /><div><DialogTitle>{editingMeasure ? "Editar Medida de Prevención" : "Nueva Medida de Prevención"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Define el origen, la jerarquía de control y el plazo de cumplimiento.</p></div></div>
-            </DialogHeader>
-
-            <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <SafeCloudFormDrawer
+          open={openModal}
+          onOpenChange={(value) => (value ? setOpenModal(true) : resetModal())}
+          title={editingMeasure ? "Editar Medida de Prevención" : "Nueva Medida de Prevención"}
+          description="Define el origen, la jerarquía de control y el plazo de cumplimiento."
+          icon={<FormDialogIcon icon="prevention" tone="emerald" />}
+          footer={
+            <>
+              <Button variant="outline" onClick={resetModal} disabled={saving}>
+                Cancelar
+              </Button>
+              <Button onClick={saveMeasure} disabled={saving}>
+                {saving ? "Guardando..." : editingMeasure ? "Actualizar" : "Crear"}
+              </Button>
+            </>
+          }
+        >
+          <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <FormSectionTitle icon="details" title="Datos de la medida" description="Completa el origen, la acción y los criterios de seguimiento." tone="emerald" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
@@ -875,44 +885,18 @@ export default function PreventiveMeasuresPage() {
                 ) : null}
               </div>
 
-              <div className="flex gap-2 justify-end">
-                <Button variant="outline" onClick={resetModal} disabled={saving}>
-                  Cancelar
-                </Button>
-                <Button onClick={saveMeasure} disabled={saving}>
-                  {saving ? "Guardando..." : editingMeasure ? "Actualizar" : "Crear"}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+          </div>
+        </SafeCloudFormDrawer>
       </div>
 
 
-      <div className="overflow-x-auto px-3 py-1">
-        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
-          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
-            <span className="text-xs text-muted-foreground">Total</span>
-            <span className="text-sm font-semibold">{stats.total}</span>
-          </div>
-          <div className="flex items-center gap-2 border-amber-200 bg-amber-50">
-            <span className="text-xs text-muted-foreground">Pendientes</span>
-            <span className="text-sm font-semibold text-warning">{stats.pending}</span>
-          </div>
-          <div className="flex items-center gap-2 border-red-200 bg-red-50">
-            <span className="text-xs text-red-700">Vencidas</span>
-            <span className="text-sm font-semibold text-red-700">{stats.overdue}</span>
-          </div>
-          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
-            <span className="text-xs text-muted-foreground">Cumplidas</span>
-            <span className="text-sm font-semibold text-green-600">{stats.done}</span>
-          </div>
-          <div className="flex items-center gap-2 border-blue-200 bg-blue-50">
-            <span className="text-xs text-muted-foreground">Desde riesgos</span>
-            <span className="text-sm font-semibold">{stats.riskBased}</span>
-          </div>
-        </div>
-      </div>
+      <KpiStrip items={[
+        { title: "Total", value: stats.total, description: "Medidas registradas", icon: "total", tone: "slate" },
+        { title: "Pendientes", value: stats.pending, description: "Requieren ejecución", icon: "pending", tone: "amber" },
+        { title: "Vencidas", value: stats.overdue, description: "Fecha de cumplimiento vencida", icon: "overdue", tone: "red" },
+        { title: "Cumplidas", value: stats.done, description: "Medidas completadas", icon: "completed", tone: "green" },
+        { title: "Desde riesgos", value: stats.riskBased, description: "Originadas en riesgos", icon: "risk", tone: "blue" },
+      ]} />
 
       <Card className="bg-card border-border">
         <CardContent className="p-4">

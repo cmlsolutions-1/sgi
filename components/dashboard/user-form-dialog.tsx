@@ -3,13 +3,7 @@
 import type React from "react";
 
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -72,20 +66,25 @@ export function UserFormDialog({ user, onSave, trigger }: UserFormDialogProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
+    <SafeCloudFormDrawer
+      open={open}
+      onOpenChange={setOpen}
+      trigger={trigger || (
           <Button className="gap-2">
             <Plus className="h-4 w-4" />
             Nuevo Usuario
           </Button>
         )}
-      </DialogTrigger>
-      <DialogContent className="bg-card border-border">
-        <DialogHeader>
-          <DialogTitle>{user ? "Editar Usuario" : "Crear Usuario"}</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      title={user ? "Editar Usuario" : "Crear Usuario"}
+      formProps={{ onSubmit: handleSubmit }}
+      footer={
+        <>
+          <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+          <Button type="submit">{user ? "Guardar Cambios" : "Crear Usuario"}</Button>
+        </>
+      }
+    >
+        <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">Compañia</Label>
@@ -207,21 +206,8 @@ export function UserFormDialog({ user, onSave, trigger }: UserFormDialogProps) {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
-              Cancelar
-            </Button>
-            <Button type="submit">
-              {user ? "Guardar Cambios" : "Crear Usuario"}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+    </SafeCloudFormDrawer>
   );
 }
 

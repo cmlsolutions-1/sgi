@@ -8,7 +8,9 @@ import { SanitaryDocumentPanel } from "@/components/sanitary/SanitaryDocumentPan
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -115,13 +117,24 @@ function SupplyDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto border-slate-200 bg-white p-0">
-        <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
-          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="supply" tone="cyan" /><div><DialogTitle>{supply ? "Editar insumo de higiene" : "Nuevo insumo de higiene"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra la información técnica y las condiciones de uso del insumo.</p></div></div>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4 bg-slate-50/40 px-6 py-5">
+    <SafeCloudFormDrawer
+      open={open}
+      onOpenChange={(nextOpen) => !nextOpen && onClose()}
+      title={supply ? "Editar insumo de higiene" : "Nuevo insumo de higiene"}
+      description="Registra la información técnica y las condiciones de uso del insumo."
+      icon={<FormDialogIcon icon="supply" tone="cyan" />}
+      formProps={{ onSubmit: handleSubmit }}
+      footer={
+        <>
+          <Button type="button" variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button>
+          <Button type="submit" className="gap-2" disabled={saving}>
+            {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+            {supply ? "Actualizar" : "Guardar"}
+          </Button>
+        </>
+      }
+    >
+        <div className="space-y-4">
           <FormSectionTitle icon="details" title="Datos del insumo" description="Identifica el producto y documenta su manejo seguro." tone="cyan" />
           <div className="grid gap-2">
             <Label>Nombre</Label>
@@ -156,18 +169,8 @@ function SupplyDialog({
               onChange={(event) => setForm((current) => ({ ...current, contraindications: event.target.value }))}
             />
           </div>
-          <DialogFooter className="border-t border-slate-200 bg-white pt-4">
-            <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
-              Cancelar
-            </Button>
-            <Button type="submit" className="gap-2" disabled={saving}>
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-              {supply ? "Actualizar" : "Guardar"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+    </SafeCloudFormDrawer>
   )
 }
 
@@ -241,22 +244,11 @@ export default function HygieneSuppliesPage() {
         </Button>
       </div>
 
-      <div className="overflow-x-auto px-3 py-1">
-        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
-          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
-            <span className="text-xs text-muted-foreground">Total insumos</span>
-            <span className="text-sm font-semibold">{supplies.length}</span>
-          </div>
-          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
-            <span className="text-xs text-muted-foreground">Activos</span>
-            <span className="text-sm font-semibold text-emerald-700">{activeCount}</span>
-          </div>
-          <div className="flex items-center gap-2 border-red-200 bg-red-50">
-            <span className="text-xs text-muted-foreground">Vencidos</span>
-            <span className="text-sm font-semibold text-destructive">{expiredCount}</span>
-          </div>
-        </div>
-      </div>
+      <KpiStrip items={[
+        { title: "Total insumos", value: supplies.length, description: "Insumos registrados", icon: "hygiene", tone: "slate" },
+        { title: "Activos", value: activeCount, description: "Disponibles en inventario", icon: "active", tone: "green" },
+        { title: "Vencidos", value: expiredCount, description: "Requieren reposición", icon: "overdue", tone: "red" },
+      ]} />
 
       <Card className="rounded-lg">
         <CardContent className="space-y-4 p-4 sm:p-5">

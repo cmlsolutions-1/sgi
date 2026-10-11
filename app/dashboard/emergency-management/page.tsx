@@ -19,6 +19,7 @@ import { EmergencyDocumentPanel } from "@/components/emergency/EmergencyDocument
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -144,13 +146,24 @@ function EmergencyManagementDialog({ open, plan, onClose, onSave }: EmergencyMan
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[90dvh] max-w-3xl overflow-y-auto border-slate-200 bg-white p-0">
-        <DialogHeader className="border-b border-slate-200 bg-slate-50/70 px-6 py-4 pr-12">
-          <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="emergency" tone="rose" /><div><DialogTitle>{plan ? "Editar plan de emergencia" : "Nuevo plan de emergencia"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra la versión y el periodo de vigencia del plan.</p></div></div>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4 bg-slate-50/40 px-6 py-5">
+    <SafeCloudFormDrawer
+      open={open}
+      onOpenChange={(nextOpen) => !nextOpen && onClose()}
+      title={plan ? "Editar plan de emergencia" : "Nuevo plan de emergencia"}
+      description="Registra la versión y el periodo de vigencia del plan."
+      icon={<FormDialogIcon icon="emergency" tone="rose" />}
+      formProps={{ onSubmit: handleSubmit }}
+      footer={
+        <>
+          <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button type="submit" className="gap-2" disabled={saving}>
+            {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+            Guardar
+          </Button>
+        </>
+      }
+    >
+        <div className="space-y-4">
           <FormSectionTitle icon="details" title="Datos del plan" description="Identifica el plan y establece su periodo de vigencia." tone="rose" />
           <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
@@ -198,18 +211,8 @@ function EmergencyManagementDialog({ open, plan, onClose, onSave }: EmergencyMan
             />
           </div>
 
-          <DialogFooter className="border-t border-slate-200 bg-white pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancelar
-            </Button>
-            <Button type="submit" className="gap-2" disabled={saving}>
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-              Guardar
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+    </SafeCloudFormDrawer>
   )
 }
 
@@ -302,22 +305,11 @@ export default function EmergencyManagementPage() {
         </Button>
       </div>
 
-      <div className="overflow-x-auto px-3 py-1">
-        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
-          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
-            <span className="text-xs text-muted-foreground">Total</span>
-            <span className="text-sm font-semibold">{plans.length}</span>
-          </div>
-          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
-            <span className="text-xs text-muted-foreground">Activos</span>
-            <span className="text-sm font-semibold text-green-600">{activePlans}</span>
-          </div>
-          <div className="flex items-center gap-2 border-red-200 bg-red-50">
-            <span className="text-xs text-muted-foreground">Inactivos</span>
-            <span className="text-sm font-semibold">{plans.length - activePlans}</span>
-          </div>
-        </div>
-      </div>
+      <KpiStrip items={[
+        { title: "Total", value: plans.length, description: "Planes de emergencia", icon: "emergency", tone: "slate" },
+        { title: "Activos", value: activePlans, description: "Planes vigentes", icon: "active", tone: "green" },
+        { title: "Inactivos", value: plans.length - activePlans, description: "Requieren revisión", icon: "inactive", tone: "red" },
+      ]} />
 
       <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
         <form onSubmit={handleFilter} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_160px_160px_160px_auto]">

@@ -14,10 +14,12 @@ interface KpiCardProps {
   className?: string
   compact?: boolean
   description?: string
+  tone?: "slate" | "blue" | "cyan" | "green" | "amber" | "red"
 }
 
-export function KpiCard({ title, value, target, targetLabel = "Meta", unit, trend, icon, className, compact = false, description }: KpiCardProps) {
+export function KpiCard({ title, value, target, targetLabel = "Meta", unit, trend, icon, className, compact = false, description, tone }: KpiCardProps) {
   const displayValue = compact && typeof value === "number" ? String(value): value
+  const compactTone = tone ?? (trend === "down" ? "red" : trend === "up" ? "green" : "blue")
 
   return (
     <Card className={cn("bg-card border-border", compact && "rounded-none border-0 bg-transparent shadow-none", className)}>
@@ -34,9 +36,13 @@ export function KpiCard({ title, value, target, targetLabel = "Meta", unit, tren
                 <p className="flex min-w-0 items-center gap-2 truncate text-[11px] text-slate-500 sm:text-xs">
                   <span
                     className={cn(
-                      "h-1.5 w-1.5 shrink-0 rounded-full bg-sky-500",
-                      trend === "down" && "bg-red-400",
-                      trend === "up" && "bg-emerald-500",
+                      "h-1.5 w-1.5 shrink-0 rounded-full",
+                      compactTone === "slate" && "bg-slate-400",
+                      compactTone === "blue" && "bg-blue-500",
+                      compactTone === "cyan" && "bg-cyan-500",
+                      compactTone === "green" && "bg-emerald-500",
+                      compactTone === "amber" && "bg-amber-500",
+                      compactTone === "red" && "bg-red-400",
                     )}
                   />
                   <span className="truncate">{description ?? `${targetLabel}: ${target}${unit ?? ""}`}</span>
@@ -52,9 +58,13 @@ export function KpiCard({ title, value, target, targetLabel = "Meta", unit, tren
             {icon && (
               <div className={cn(
                 "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary sm:h-10 sm:w-10",
-                compact && "h-8 w-8 rounded-lg bg-sky-50 text-sky-600 sm:h-8 sm:w-8 [&_svg]:h-4 [&_svg]:w-4",
-                compact && trend === "down" && "bg-red-50 text-red-500",
-                compact && trend === "up" && "bg-emerald-50 text-emerald-600",
+                compact && "h-8 w-8 rounded-lg sm:h-8 sm:w-8 [&_svg]:h-4 [&_svg]:w-4",
+                compact && compactTone === "slate" && "bg-slate-100 text-slate-600",
+                compact && compactTone === "blue" && "bg-blue-50 text-blue-600",
+                compact && compactTone === "cyan" && "bg-cyan-50 text-cyan-600",
+                compact && compactTone === "green" && "bg-emerald-50 text-emerald-600",
+                compact && compactTone === "amber" && "bg-amber-50 text-amber-600",
+                compact && compactTone === "red" && "bg-red-50 text-red-500",
               )}>
                 {icon}
               </div>

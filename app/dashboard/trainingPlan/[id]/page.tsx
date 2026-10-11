@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { SafeCloudFormDrawerAdapter } from "@/components/ui/safecloud-form-drawer"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -145,7 +146,7 @@ function AttendanceDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <SafeCloudFormDrawerAdapter open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={attendance ? "action" : "default"} size="sm" className="gap-2">
           {attendance ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
@@ -209,7 +210,7 @@ function AttendanceDialog({
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+    </SafeCloudFormDrawerAdapter>
   )
 }
 

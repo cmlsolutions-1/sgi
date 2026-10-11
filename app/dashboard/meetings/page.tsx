@@ -6,7 +6,9 @@ import { toast } from "sonner"
 
 import { CommitteeDocumentPanel } from "@/components/committee/CommitteeDocumentPanel"
 import { Button } from "@/components/ui/button"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
+import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Dialog,
@@ -158,16 +160,21 @@ function MeetingDialog({ open, committees, employees, meeting, onClose, onSave }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-xl">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-slate-50/95 px-6 py-4 backdrop-blur">
-          <div className="flex items-start gap-3"><FormDialogIcon icon="meeting" tone="blue" /><div><h2 className="text-lg font-bold text-slate-900">{meeting ? "Editar reunión" : "Nueva reunión"}</h2><p className="mt-1 text-sm text-slate-500">Registra actas, tema, horario y asistentes.</p></div></div>
-          <button type="button" onClick={onClose} className="rounded-md p-2 text-slate-500 hover:bg-slate-100">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5 bg-slate-50/40 p-6">
+    <SafeCloudFormDrawer
+      open={open}
+      onOpenChange={(nextOpen) => !nextOpen && onClose()}
+      title={meeting ? "Editar reunión" : "Nueva reunión"}
+      description="Registra actas, tema, horario y asistentes."
+      icon={<FormDialogIcon icon="meeting" tone="blue" />}
+      formProps={{ onSubmit: handleSubmit }}
+      footer={
+        <>
+          <button type="button" onClick={onClose} className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">Cancelar</button>
+          <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-md bg-[#2f8ed8] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2576b5] disabled:opacity-60">{saving && <Loader2 className="h-4 w-4 animate-spin" />}Guardar</button>
+        </>
+      }
+    >
+        <div className="space-y-5">
           <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-2">
             <div className="block">
               <span className="mb-1 block text-sm font-semibold text-slate-700">Comité</span>
@@ -315,26 +322,8 @@ function MeetingDialog({ open, committees, employees, meeting, onClose, onSave }
             </div>
           </section>
 
-          <div className="flex justify-end gap-3 border-t pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="inline-flex items-center gap-2 rounded-md bg-[#2f8ed8] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2576b5] disabled:opacity-60"
-            >
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-              Guardar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+    </SafeCloudFormDrawer>
   )
 }
 
@@ -433,22 +422,11 @@ export default function MeetingsPage() {
         </button>
       </div>
 
-      <div className="overflow-x-auto px-3 py-1">
-        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
-          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
-            <span className="text-xs text-muted-foreground">Registradas</span>
-            <span className="text-sm font-semibold">{meetings.length}</span>
-          </div>
-          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
-            <span className="text-xs text-muted-foreground">Activas</span>
-            <span className="text-sm font-semibold text-emerald-700">{activeCount}</span>
-          </div>
-          <div className="flex items-center gap-2 border-blue-200 bg-blue-50">
-            <span className="text-xs text-muted-foreground">Comités</span>
-            <span className="text-sm font-semibold">{committees.length}</span>
-          </div>
-        </div>
-      </div>
+      <KpiStrip items={[
+        { title: "Registradas", value: meetings.length, description: "Reuniones programadas", icon: "meeting", tone: "slate" },
+        { title: "Activas", value: activeCount, description: "Reuniones vigentes", icon: "active", tone: "green" },
+        { title: "Comités", value: committees.length, description: "Comités relacionados", icon: "users", tone: "blue" },
+      ]} />
 
       <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
         <form onSubmit={handleSearch} className="grid gap-3 lg:grid-cols-[1fr_220px_180px_auto]">

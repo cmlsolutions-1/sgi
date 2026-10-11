@@ -8,8 +8,10 @@ import { SanitaryDocumentPanel } from "@/components/sanitary/SanitaryDocumentPan
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -156,15 +158,24 @@ function SanitationDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DialogContent className="max-h-[90dvh] w-[calc(100vw-2rem)] max-w-3xl overflow-y-auto bg-white p-0">
-        <DialogHeader>
-          <div className="border-b border-slate-200 bg-slate-50/70 px-5 py-4">
-            <div className="flex items-start gap-3 text-left"><FormDialogIcon icon="sanitation" tone="emerald" /><div><DialogTitle>{record ? "Editar saneamiento" : "Nueva actividad de saneamiento"}</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Registra el tipo de actividad, responsable e insumos utilizados.</p></div></div>
-          </div>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-5 bg-slate-50/40 px-5 pb-5 pt-5">
+    <SafeCloudFormDrawer
+      open={open}
+      onOpenChange={(nextOpen) => !nextOpen && onClose()}
+      title={record ? "Editar saneamiento" : "Nueva actividad de saneamiento"}
+      description="Registra el tipo de actividad, responsable e insumos utilizados."
+      icon={<FormDialogIcon icon="sanitation" tone="emerald" />}
+      formProps={{ onSubmit: handleSubmit }}
+      footer={
+        <>
+          <Button type="button" variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button>
+          <Button type="submit" className="gap-2" disabled={saving}>
+            {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+            {record ? "Actualizar" : "Guardar"}
+          </Button>
+        </>
+      }
+    >
+        <div className="space-y-5">
           <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <FormSectionTitle icon="details" title="Datos de la actividad" description="Define el tipo, fecha y hora de ejecución." tone="emerald" />
             <div className="grid gap-4 md:grid-cols-3">
@@ -275,16 +286,8 @@ function SanitationDialog({
             </section>
           )}
 
-          <DialogFooter className="border-t border-slate-200 pt-4">
-            <Button type="button" variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button>
-            <Button type="submit" className="gap-2" disabled={saving}>
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-              {record ? "Actualizar" : "Guardar"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+    </SafeCloudFormDrawer>
   )
 }
 
@@ -427,18 +430,10 @@ export default function SanitationPage() {
         </Button>
       </div>
 
-      <div className="overflow-x-auto px-3 py-1">
-        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 [&>div]:min-h-14 [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:rounded-lg [&>div]:border [&>div]:px-3.5 [&>div]:py-2 [&>div>span:last-child]:text-xl [&>div>span:last-child]:font-bold [&>div>span:last-child]:leading-none">
-          <div className="flex items-center gap-2 border-slate-200 bg-slate-50">
-            <span className="text-xs text-muted-foreground">Actividades</span>
-            <span className="text-sm font-semibold">{records.length}</span>
-          </div>
-          <div className="flex items-center gap-2 border-emerald-200 bg-emerald-50">
-            <span className="text-xs text-muted-foreground">Activas</span>
-            <span className="text-sm font-semibold text-emerald-700">{activeCount}</span>
-          </div>
-        </div>
-      </div>
+      <KpiStrip items={[
+        { title: "Actividades", value: records.length, description: "Actividades registradas", icon: "sanitation", tone: "slate" },
+        { title: "Activas", value: activeCount, description: "Actualmente vigentes", icon: "active", tone: "green" },
+      ]} />
 
       <Card className="rounded-lg">
         <CardContent className="space-y-4 p-4 sm:p-5">
