@@ -2,6 +2,7 @@
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
 import {
+  type LucideIcon,
   AlertTriangle,
   BarChart3,
   CalendarDays,
@@ -10,14 +11,17 @@ import {
   ExternalLink,
   Eye,
   FileText,
+  GraduationCap,
   LayoutGrid,
   List,
   Loader2,
   MoreHorizontal,
   Plus,
   Search,
+  ShieldCheck,
   Trash2,
   Upload,
+  UsersRound,
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -97,6 +101,16 @@ type UploadForm = {
 
 type DocumentPreview = { document: AccountabilityDocument; url: string; mimeType: string }
 
+type AutomaticResultItem = {
+  label: string
+  value: string
+  description: string
+  icon: LucideIcon
+  iconClassName: string
+  progress?: number
+  progressClassName?: string
+}
+
 const currentYear = new Date().getFullYear()
 
 const emptyForm: AccountabilityForm = {
@@ -148,33 +162,101 @@ function statusClassName(status: AccountabilityStatus) {
   return "bg-warning/10 text-warning border-warning/20"
 }
 
-function resultItems(result: AccountabilityResult) {
+function resultItems(result: AccountabilityResult): AutomaticResultItem[] {
   return [
     {
       label: "Plan anual",
       value: `${result.annualPlanExecution}% ejecutado`,
+      description: "Avance consolidado de la vigencia",
+      icon: BarChart3,
+      iconClassName: "bg-blue-50 text-blue-700",
+      progress: result.annualPlanExecution,
+      progressClassName: "bg-blue-500",
     },
     {
       label: "Capacitaciones",
       value: `${result.trainingsCompleted} de ${result.trainingsPlanned} realizadas`,
+      description: "Actividades de formación completadas",
+      icon: GraduationCap,
+      iconClassName: "bg-cyan-50 text-cyan-700",
     },
     {
       label: "Accidentes",
       value: `${result.accidentsReported} reportados`,
+      description: "Eventos registrados durante el periodo",
+      icon: AlertTriangle,
+      iconClassName: result.accidentsReported > 0 ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700",
     },
     {
       label: "COPASST",
       value: `${result.copasstMeetings} reuniones realizadas`,
+      description: "Seguimiento realizado por el comité",
+      icon: UsersRound,
+      iconClassName: "bg-violet-50 text-violet-700",
     },
     {
       label: "Matriz de riesgos",
       value: result.riskMatrixUpdated ? "Actualizada" : "Pendiente",
+      description: result.riskMatrixUpdated ? "Información vigente para el periodo" : "Requiere actualización",
+      icon: ShieldCheck,
+      iconClassName: result.riskMatrixUpdated ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700",
     },
     {
       label: "Medidas de prevención",
       value: `${result.preventiveMeasuresImplementation}% implementadas`,
+      description: "Nivel de implementación registrado",
+      icon: CheckCircle2,
+      iconClassName: "bg-emerald-50 text-emerald-700",
+      progress: result.preventiveMeasuresImplementation,
+      progressClassName: "bg-emerald-500",
     },
   ]
+}
+
+function AutomaticResultPanel({ result, year, compact = false }: { result: AccountabilityResult; year: number; compact?: boolean }) {
+  return (
+    <section className="flex h-full flex-col overflow-hidden rounded-2xl border border-sky-100 bg-gradient-to-br from-white via-white to-sky-50/60 shadow-sm">
+      <div className={`flex flex-col gap-3 border-b border-sky-100 bg-sky-50/50 ${compact ? "p-4" : "p-5"} sm:flex-row sm:items-center sm:justify-between`}>
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-700 shadow-sm ring-1 ring-sky-100">
+            <BarChart3 className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-slate-900 sm:text-lg">Resultado automático {year}</h2>
+            <p className="mt-0.5 text-xs leading-relaxed text-slate-600 sm:text-sm">Resumen consolidado por SafeCloud con la información registrada en el sistema.</p>
+          </div>
+        </div>
+        <Badge variant="outline" className="w-fit border-sky-200 bg-white text-sky-700 shadow-sm">
+          Generado por el sistema
+        </Badge>
+      </div>
+
+      <div className={`grid flex-1 gap-3 ${compact ? "p-4 sm:grid-cols-2" : "p-5 sm:grid-cols-2 xl:grid-cols-3"}`}>
+        {resultItems(result).map((item) => {
+          const Icon = item.icon
+          return (
+            <div key={item.label} className="group rounded-xl border border-slate-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md">
+              <div className="flex items-start gap-3">
+                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${item.iconClassName}`}>
+                  <Icon className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{item.label}</p>
+                  <p className="mt-1 text-base font-semibold leading-snug text-slate-900">{item.value}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-500">{item.description}</p>
+                </div>
+              </div>
+              {item.progress !== undefined && (
+                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100" aria-label={`${item.label}: ${item.progress}%`}>
+                  <div className={`h-full rounded-full transition-[width] duration-500 ${item.progressClassName ?? "bg-blue-500"}`} style={{ width: `${Math.min(100, Math.max(0, item.progress))}%` }} />
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </section>
+  )
 }
 
 
@@ -464,20 +546,7 @@ function DetailDialog({
             <InfoBlock label="Representante legal" value={record.legalRepresentativeName} />
           </div>
 
-          <section className="rounded-md border border-border p-4">
-            <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
-              <BarChart3 className="h-4 w-4" />
-              Resultado automático
-            </h3>
-            <div className="grid gap-3 md:grid-cols-2">
-              {resultItems(record.result).map((item) => (
-                <div key={item.label} className="rounded-md bg-secondary p-3">
-                  <p className="text-xs font-medium uppercase text-muted-foreground">{item.label}</p>
-                  <p className="mt-1 text-sm font-semibold text-foreground">{item.value}</p>
-                </div>
-              ))}
-            </div>
-          </section>
+          <AutomaticResultPanel result={record.result} year={record.year} compact />
 
           <section className="rounded-md border border-border p-4">
             <h3 className="mb-2 text-sm font-semibold text-foreground">Documentos soporte</h3>
@@ -752,37 +821,52 @@ export default function AccountabilityPage() {
 
       {latestRecord && (
         <section className="grid gap-4 md:grid-cols-3">
-          <Card className="border-border bg-card md:col-span-2">
-            <CardContent className="p-5">
-              <div className="mb-4 flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-semibold text-foreground">Resultado automático {latestRecord.year}</h2>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {resultItems(latestRecord.result).map((item) => (
-                  <div key={item.label} className="rounded-md bg-secondary p-3">
-                    <p className="text-xs font-medium uppercase text-muted-foreground">{item.label}</p>
-                    <p className="mt-1 text-sm font-semibold text-foreground">{item.value}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <div className="h-full md:col-span-2">
+            <AutomaticResultPanel result={latestRecord.result} year={latestRecord.year} />
+          </div>
 
-          <Card className="border-border bg-card">
-            <CardContent className="space-y-3 p-5">
-              <h2 className="text-lg font-semibold text-foreground">Flujo</h2>
-              <div className="flex items-start gap-3 rounded-md bg-secondary p-3">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-700" />
-                <p className="text-sm text-muted-foreground">Crea una rendición por vigencia anual.</p>
+          <Card className="h-full gap-0 overflow-hidden border-sky-100 bg-white py-0 shadow-sm">
+            <CardContent className="p-0">
+              <div className="flex items-center justify-between gap-3 border-b border-sky-100 bg-sky-50/50 p-5">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">Flujo</h2>
+                  <p className="mt-0.5 text-xs text-slate-600">Completa el ciclo de la rendición de cuentas.</p>
+                </div>
+                <Badge variant="outline" className="border-sky-200 bg-white text-sky-700 shadow-sm">3 pasos</Badge>
               </div>
-              <div className="flex items-start gap-3 rounded-md bg-secondary p-3">
-                <FileText className="mt-0.5 h-4 w-4 text-blue-700" />
-                <p className="text-sm text-muted-foreground">Descarga el PDF para firma del responsable y representante legal.</p>
-              </div>
-              <div className="flex items-start gap-3 rounded-md bg-secondary p-3">
-                <Upload className="mt-0.5 h-4 w-4 text-amber-700" />
-                <p className="text-sm text-muted-foreground">Carga el documento firmado como soporte de auditoría.</p>
+
+              <div className="p-5">
+                <div className="relative flex gap-3 pb-5">
+                  <div className="absolute bottom-0 left-5 top-10 w-px bg-slate-200" />
+                  <div className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100">
+                    <CheckCircle2 className="h-4 w-4" />
+                  </div>
+                  <div className="pt-0.5">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Paso 1</p>
+                    <p className="mt-1 text-sm leading-relaxed text-slate-700">Crea una rendición por vigencia anual.</p>
+                  </div>
+                </div>
+
+                <div className="relative flex gap-3 py-5">
+                  <div className="absolute bottom-0 left-5 top-10 w-px bg-slate-200" />
+                  <div className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700 ring-1 ring-blue-100">
+                    <FileText className="h-4 w-4" />
+                  </div>
+                  <div className="pt-0.5">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Paso 2</p>
+                    <p className="mt-1 text-sm leading-relaxed text-slate-700">Descarga el PDF para firma del responsable y representante legal.</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-5">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700 ring-1 ring-amber-100">
+                    <Upload className="h-4 w-4" />
+                  </div>
+                  <div className="pt-0.5">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Paso 3</p>
+                    <p className="mt-1 text-sm leading-relaxed text-slate-700">Carga el documento firmado como soporte de auditoría.</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

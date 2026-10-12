@@ -12,7 +12,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DetailDialogHeading } from "@/components/ui/form-dialog-visuals"
-import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Textarea } from "@/components/ui/textarea"
 import {
   createInitialEvaluation, deleteInitialEvaluationDocument, downloadInitialEvaluationDocument,
@@ -93,20 +92,50 @@ function EvaluationDialog({ open, evaluation, items, companyName, onClose, onSav
     if (!items.length) return toast.error("No se cargó el catálogo de estándares")
     try { setSaving(true); await onSave(form, answers, evaluation?.id); onClose() } catch {} finally { setSaving(false) }
   }
-  return <SafeCloudFormDrawerFrame open={open} onOpenChange={(next) => !next && onClose()}>
-    <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/70 px-5 py-4 pr-12 sm:px-6"><div className="flex items-start gap-3 text-left"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"><ClipboardList className="h-5 w-5" /></div><div><DialogTitle>{evaluation ? "Editar evaluación inicial" : "Crear evaluación inicial"}</DialogTitle><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Diligencia los datos generales y califica los estándares mínimos del SG-SST.</p></div></div></DialogHeader>
-    <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col"><div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-slate-50/40 px-4 py-5 sm:px-6">
+  return <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
+    <DialogContent className="!top-0 !left-0 !flex !h-dvh !max-h-dvh !w-screen !max-w-none !translate-x-0 !translate-y-0 !flex-col !gap-0 !overflow-hidden !rounded-none !border-0 !p-0 sm:!max-w-none">
+    <DialogHeader className="shrink-0 border-b border-slate-200 bg-white px-4 py-4 pr-12 sm:px-6"><div className="flex items-start gap-3 text-left"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"><ClipboardList className="h-5 w-5" /></div><div><DialogTitle>{evaluation ? "Editar evaluación inicial" : "Crear evaluación inicial"}</DialogTitle><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Diligencia los datos generales y califica los estándares mínimos del SG-SST.</p></div></div></DialogHeader>
+    <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col"><div className="min-h-0 flex-1 space-y-5 overflow-y-auto bg-slate-50/40 px-3 py-4 sm:px-5 lg:px-6">
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"><div className="mb-4 flex items-start gap-3"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-700"><FileText className="h-4 w-4" /></div><div><h3 className="text-sm font-semibold">Datos de la evaluación</h3><p className="mt-0.5 text-xs text-muted-foreground">Identifica la evaluación, su vigencia y la persona responsable de diligenciarla.</p></div></div><div className="grid gap-4 sm:grid-cols-2">
         <Label className="grid gap-2"><span>Nombre <span className="text-destructive">*</span></span><Input className={evaluationFieldClassName} maxLength={250} value={form.name} onChange={(e) => setForm((x) => ({ ...x, name: e.target.value }))} /></Label>
         <Label className="grid gap-2"><span>Vigencia <span className="text-destructive">*</span></span><Input className={evaluationFieldClassName} type="number" min={2019} max={9999} value={form.year} onChange={(e) => setForm((x) => ({ ...x, year: e.target.value.replace(/\D/g, "").slice(0, 4) }))} /></Label>
         <Label className="grid gap-2"><span>Fecha <span className="text-destructive">*</span></span><Input className={evaluationFieldClassName} type="date" value={form.date} onChange={(e) => setForm((x) => ({ ...x, date: e.target.value }))} /></Label>
         <Label className="grid gap-2">Empresa<Input className="h-10 border-slate-200 bg-slate-100 text-slate-600 shadow-none" value={form.company || "Empresa de la sesión"} disabled /></Label>
       </div><div className="mt-4 grid gap-4"><Label className="grid gap-2"><span>Responsable <span className="text-destructive">*</span></span><Input className={evaluationFieldClassName} maxLength={250} value={form.responsible} onChange={(e) => setForm((x) => ({ ...x, responsible: e.target.value }))} /></Label><Label className="grid gap-2">Observaciones <span className="font-normal text-muted-foreground">(opcional)</span><Textarea className="border-slate-300 bg-white shadow-sm focus-visible:ring-primary/20" maxLength={4000} rows={2} value={form.observations} onChange={(e) => setForm((x) => ({ ...x, observations: e.target.value }))} /></Label></div></section>
-      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"><div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"><div className="flex items-start gap-3"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-50 text-cyan-700"><CheckCircle2 className="h-4 w-4" /></div><div><h3 className="text-sm font-semibold">Tabla de valores y calificación</h3><p className="mt-0.5 text-sm text-muted-foreground">Cumple totalmente o No aplica otorgan el puntaje posible; No cumple genera hallazgo.</p></div></div><div className="relative w-full lg:w-[360px]"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input className={`${evaluationFieldClassName} pl-9`} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar ítem, ciclo o módulo" /></div></div>
-        <div className="overflow-x-auto rounded-md border"><table className="w-full min-w-[1280px] text-sm"><thead className="border-b bg-secondary text-left text-xs uppercase text-muted-foreground"><tr>{["Ciclo", "Estándar", "Ítem del estándar", "Valor", "Peso porcentual", "Puntaje posible", "Calificación", "Observación"].map((label) => <th key={label} className="px-3 py-3 font-medium">{label}</th>)}</tr></thead><tbody className="divide-y">{filtered.map((item) => { const answer = answers[item.id] ?? { compliance: "DOES_NOT_COMPLY", observation: "" }; return <tr key={item.id} className="align-top"><td className="px-3 py-3 text-muted-foreground">{item.cycle}</td><td className="px-3 py-3 text-muted-foreground">{item.standard}</td><td className="px-3 py-3"><p className="font-medium">{item.code}</p><p className="mt-1 max-w-[360px] text-muted-foreground">{item.standardItem}</p></td><td className="px-3 py-3">{formatNumber(item.value)}</td><td className="px-3 py-3">{formatNumber(item.percentageWeight)}%</td><td className="px-3 py-3">{formatNumber(item.possibleScore)}</td><td className="px-3 py-3"><select className="w-full rounded-md border bg-background px-3 py-2" value={answer.compliance} onChange={(e) => patchAnswer(item.id, { compliance: e.target.value as Compliance })}><option value="COMPLIES">Cumple totalmente</option><option value="DOES_NOT_COMPLY">No cumple</option><option value="NOT_APPLICABLE">No aplica</option></select></td><td className="px-3 py-3"><Input maxLength={4000} value={answer.observation} onChange={(e) => patchAnswer(item.id, { observation: e.target.value })} placeholder="Opcional" /></td></tr> })}</tbody></table></div>
+      <section className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4"><div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"><div className="flex items-start gap-3"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-50 text-cyan-700"><CheckCircle2 className="h-4 w-4" /></div><div><h3 className="text-sm font-semibold">Tabla de valores y calificación</h3><p className="mt-0.5 text-sm text-muted-foreground">Cumple totalmente o No aplica otorgan el puntaje posible; No cumple genera hallazgo.</p></div></div><div className="relative w-full lg:w-[360px]"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input className={`${evaluationFieldClassName} pl-9`} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar ítem, ciclo o módulo" /></div></div>
+        <div className="max-h-[58dvh] min-h-96 overflow-auto rounded-lg border border-slate-200 bg-white">
+          <table className="w-full min-w-[1360px] border-separate border-spacing-0 text-sm">
+            <thead className="text-left text-xs uppercase text-muted-foreground">
+              <tr>
+                <th scope="col" className="sticky top-0 z-30 w-24 min-w-24 border-b bg-slate-100 px-3 py-3 font-medium xl:left-0 xl:z-40">Ciclo</th>
+                <th scope="col" className="sticky top-0 z-30 w-44 min-w-44 border-b bg-slate-100 px-3 py-3 font-medium xl:left-24 xl:z-40">Estándar</th>
+                <th scope="col" className="sticky top-0 z-30 w-80 min-w-80 border-b bg-slate-100 px-3 py-3 font-medium xl:left-[17rem] xl:z-40 xl:shadow-[6px_0_8px_-8px_rgba(15,23,42,0.45)]">Ítem del estándar</th>
+                <th scope="col" className="sticky top-0 z-30 min-w-24 border-b bg-slate-100 px-3 py-3 font-medium">Valor</th>
+                <th scope="col" className="sticky top-0 z-30 min-w-32 border-b bg-slate-100 px-3 py-3 font-medium">Peso porcentual</th>
+                <th scope="col" className="sticky top-0 z-30 min-w-32 border-b bg-slate-100 px-3 py-3 font-medium">Puntaje posible</th>
+                <th scope="col" className="sticky top-0 z-30 w-44 min-w-44 border-b bg-slate-100 px-3 py-3 font-medium xl:right-56 xl:z-40 xl:shadow-[-6px_0_8px_-8px_rgba(15,23,42,0.45)]">Calificación</th>
+                <th scope="col" className="sticky top-0 z-30 w-56 min-w-56 border-b bg-slate-100 px-3 py-3 font-medium xl:right-0 xl:z-40">Observación</th>
+              </tr>
+            </thead>
+            <tbody>{filtered.map((item) => {
+              const answer = answers[item.id] ?? { compliance: "DOES_NOT_COMPLY", observation: "" }
+              return <tr key={item.id} className="group align-top">
+                <td className="w-24 min-w-24 border-b bg-white px-3 py-3 text-muted-foreground group-hover:bg-slate-50 xl:sticky xl:left-0 xl:z-10">{item.cycle}</td>
+                <td className="w-44 min-w-44 border-b bg-white px-3 py-3 text-muted-foreground group-hover:bg-slate-50 xl:sticky xl:left-24 xl:z-10">{item.standard}</td>
+                <td className="w-80 min-w-80 border-b bg-white px-3 py-3 group-hover:bg-slate-50 xl:sticky xl:left-[17rem] xl:z-10 xl:shadow-[6px_0_8px_-8px_rgba(15,23,42,0.45)]"><p className="font-medium">{item.code}</p><p className="mt-1 text-muted-foreground">{item.standardItem}</p></td>
+                <td className="min-w-24 border-b px-3 py-3">{formatNumber(item.value)}</td>
+                <td className="min-w-32 border-b px-3 py-3">{formatNumber(item.percentageWeight)}%</td>
+                <td className="min-w-32 border-b px-3 py-3">{formatNumber(item.possibleScore)}</td>
+                <td className="w-44 min-w-44 border-b bg-white px-3 py-3 group-hover:bg-slate-50 xl:sticky xl:right-56 xl:z-10 xl:shadow-[-6px_0_8px_-8px_rgba(15,23,42,0.45)]"><select className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm shadow-sm" value={answer.compliance} onChange={(e) => patchAnswer(item.id, { compliance: e.target.value as Compliance })}><option value="COMPLIES">Cumple totalmente</option><option value="DOES_NOT_COMPLY">No cumple</option><option value="NOT_APPLICABLE">No aplica</option></select></td>
+                <td className="w-56 min-w-56 border-b bg-white px-3 py-3 group-hover:bg-slate-50 xl:sticky xl:right-0 xl:z-20"><Input maxLength={4000} value={answer.observation} onChange={(e) => patchAnswer(item.id, { observation: e.target.value })} placeholder="Opcional" /></td>
+              </tr>
+            })}</tbody>
+          </table>
+        </div>
       </section>
-    </div><DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-4 py-4 sm:px-6"><Button type="button" variant="outline" disabled={saving} onClick={onClose}>Cancelar</Button><Button type="submit" className="gap-2" disabled={saving}><ClipboardList className="h-4 w-4" />{saving ? "Guardando..." : evaluation ? "Guardar cambios" : "Crear evaluación"}</Button></DialogFooter></form>
-  </SafeCloudFormDrawerFrame>
+    </div><DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-4 py-3 sm:px-6"><Button type="button" variant="outline" disabled={saving} onClick={onClose}>Cancelar</Button><Button type="submit" className="gap-2" disabled={saving}><ClipboardList className="h-4 w-4" />{saving ? "Guardando..." : evaluation ? "Guardar cambios" : "Crear evaluación"}</Button></DialogFooter></form>
+    </DialogContent>
+  </Dialog>
 }
 
 function DetailDialog({ evaluation, findings, documents, loadingId, onClose, onUpload, onPreview, onDownload, onDelete }: {
