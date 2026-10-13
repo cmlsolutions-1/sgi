@@ -297,7 +297,7 @@ export const navigation: NavigationItem[] = [
       },
     ],
   },
-  {
+  /* {
     code: "PESV",
     name: "PESV",
     icon: ShieldCheck,
@@ -310,7 +310,7 @@ export const navigation: NavigationItem[] = [
         icon: module.icon,
       })),
     ],
-  },
+  }, */
   /* {
     code: "DATA_PROCESSING",
     name: "Tratamiento de Datos",
