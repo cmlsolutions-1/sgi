@@ -33,6 +33,7 @@ type SafeCloudFormDrawerFrameProps = {
   onOpenChange: (open: boolean) => void
   trigger?: ReactNode
   children: ReactNode
+  contentClassName?: string
 }
 
 type SafeCloudFormDrawerAdapterProps = {
@@ -75,11 +76,12 @@ export function SafeCloudFormDrawerFrame({
   onOpenChange,
   trigger,
   children,
+  contentClassName,
 }: SafeCloudFormDrawerFrameProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       {trigger ? <SheetTrigger asChild>{trigger}</SheetTrigger> : null}
-      <SafeCloudDrawerContent>{children}</SafeCloudDrawerContent>
+      <SafeCloudDrawerContent className={contentClassName}>{children}</SafeCloudDrawerContent>
     </Sheet>
   )
 }

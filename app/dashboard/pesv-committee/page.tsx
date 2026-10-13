@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import {
   DropdownMenu,
@@ -33,6 +34,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
 import type { Employee } from "@/types/manager/employee"
+import { PesvModuleHeader } from "@/components/pesv/module-experience"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
+import { PesvSelect } from "@/components/pesv/pesv-select"
 
 type PesvResponsibleRecord = {
   id: string
@@ -381,14 +385,20 @@ function CommitteeDialog({
 
   return (
     <SafeCloudFormDrawerFrame open={open} onOpenChange={onOpenChange}>
-        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>{record ? "Actualizar Comité de Seguridad Vial" : "Crear Comité de Seguridad Vial"}</DialogTitle>
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/75 px-6 py-4 pr-12">
+          <div className="flex min-w-0 items-start gap-3">
+            <FormDialogIcon icon="committee" tone="blue" />
+            <div className="min-w-0">
+              <DialogTitle>{record ? "Actualizar Comité de Seguridad Vial" : "Crear Comité de Seguridad Vial"}</DialogTitle>
+              <p className="mt-1 text-sm text-slate-600">Define el marco del comité y selecciona sus integrantes.</p>
+            </div>
+          </div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Marco del PESV</h3>
+          <div className="min-h-0 flex-1 space-y-5 overflow-x-hidden overflow-y-auto bg-slate-50/40 px-6 py-5">
+            <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="document" title="Marco del PESV" description="Establece el objetivo, la visión, el alcance y la fecha de conformación." />
               <div className="grid gap-4">
                 <Label className="grid gap-2">
                   Objetivo general
@@ -409,10 +419,10 @@ function CommitteeDialog({
               </div>
             </section>
 
-            <section className="rounded-md border border-border p-4">
+            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="mb-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <h3 className="text-sm font-semibold text-foreground">Integrantes con poder de decisión</h3>
+                  <FormSectionTitle icon="employee" title="Integrantes con poder de decisión" />
                   <p className="text-sm text-muted-foreground">Selecciona mínimo 3 personas. El líder PESV se incluye automáticamente si está asignado.</p>
                 </div>
                 <Badge variant="outline">{buildMembers(employees, form.memberIds, pesvLeader).length} integrantes</Badge>
@@ -491,30 +501,42 @@ function ReviewDialog({
 
   return (
     <SafeCloudFormDrawerFrame open={open} onOpenChange={onOpenChange}>
-        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>Nueva revisión trimestral PESV</DialogTitle>
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/75 px-6 py-4 pr-12">
+          <div className="flex min-w-0 items-start gap-3">
+            <FormDialogIcon icon="meeting" tone="blue" />
+            <div className="min-w-0">
+              <DialogTitle>Nueva revisión trimestral PESV</DialogTitle>
+              <p className="mt-1 text-sm text-slate-600">Documenta el análisis, las revisiones y las decisiones del periodo.</p>
+            </div>
+          </div>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-5">
-            <div className="grid gap-4 md:grid-cols-2">
+          <div className="min-h-0 flex-1 space-y-5 overflow-x-hidden overflow-y-auto bg-slate-50/40 px-6 py-5">
+            <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="meeting" title="Periodo de revisión" />
+            <div className="grid gap-4 sm:grid-cols-2">
               <Label className="grid gap-2">
                 Trimestre
-                <select
+                <PesvSelect
+                  ariaLabel="Trimestre"
                   value={form.quarter}
-                  onChange={(event) => setForm((current) => ({ ...current, quarter: event.target.value as QuarterlyReview["quarter"] }))}
-                  className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                >
-                  <option value="Q1">Primer trimestre</option>
-                  <option value="Q2">Segundo trimestre</option>
-                  <option value="Q3">Tercer trimestre</option>
-                  <option value="Q4">Cuarto trimestre</option>
-                </select>
+                  onValueChange={(value) => setForm((current) => ({ ...current, quarter: value as QuarterlyReview["quarter"] }))}
+                  options={[
+                    { value: "Q1", label: "Primer trimestre" },
+                    { value: "Q2", label: "Segundo trimestre" },
+                    { value: "Q3", label: "Tercer trimestre" },
+                    { value: "Q4", label: "Cuarto trimestre" },
+                  ]}
+                />
               </Label>
               <Label className="grid gap-2">
                 Fecha de revisión
                 <Input type="date" value={form.reviewDate} onChange={(event) => setForm((current) => ({ ...current, reviewDate: event.target.value }))} />
               </Label>
             </div>
+            </section>
+            <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <FormSectionTitle icon="analytics" title="Análisis y seguimiento" />
             <Label className="grid gap-2">
               Seguimiento, análisis y evaluación de siniestralidad vial
               <Textarea value={form.roadAccidentAnalysis} onChange={(event) => setForm((current) => ({ ...current, roadAccidentAnalysis: event.target.value }))} rows={3} />
@@ -539,10 +561,14 @@ function ReviewDialog({
               Revisión de implementación del PESV
               <Textarea value={form.implementationReview} onChange={(event) => setForm((current) => ({ ...current, implementationReview: event.target.value }))} rows={3} />
             </Label>
+            </section>
+            <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <FormSectionTitle icon="prevention" title="Decisiones y mejora" />
             <Label className="grid gap-2">
               Decisiones para la mejora de la seguridad vial
               <Textarea value={form.decisions} onChange={(event) => setForm((current) => ({ ...current, decisions: event.target.value }))} rows={3} />
             </Label>
+            </section>
           </div>
 
           <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
@@ -719,14 +745,7 @@ export default function PesvCommitteePage() {
 
   return (
     <main className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Comité de Seguridad Vial</h1>
-          <p className="text-muted-foreground">
-            Conforma el CSV, define objetivo, visión y alcance del PESV, y documenta sus revisiones trimestrales.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
+      <PesvModuleHeader title="Comité de Seguridad Vial" description="Conforma el CSV, define objetivo, visión y alcance del PESV, y documenta sus revisiones trimestrales." icon={UsersRound} actions={<>
           <Button className="gap-2" onClick={() => setCommitteeDialogOpen(true)} disabled={loading}>
             <UsersRound className="h-4 w-4" />
             {committee ? "Gestionar comité" : "Crear comité"}
@@ -735,8 +754,7 @@ export default function PesvCommitteePage() {
             <Plus className="h-4 w-4" />
             Revisión trimestral
           </Button>
-        </div>
-      </div>
+        </>} />
 
       {loading ? (
         <div className="flex min-h-[260px] items-center justify-center">
@@ -744,12 +762,12 @@ export default function PesvCommitteePage() {
         </div>
       ) : (
         <>
-          <section className="grid gap-4 md:grid-cols-4">
-            <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Integrantes</p><p className="mt-2 text-2xl font-bold text-foreground">{committee?.members.length ?? 0}</p></CardContent></Card>
-            <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Con decisión</p><p className="mt-2 text-2xl font-bold text-foreground">{decisionMembers}</p></CardContent></Card>
-            <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Revisiones</p><p className="mt-2 text-2xl font-bold text-foreground">{quarterlyReviews}</p></CardContent></Card>
-            <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Líder PESV</p><p className="mt-2 truncate text-base font-semibold text-foreground">{pesvLeader?.employeeName ?? "No asignado"}</p></CardContent></Card>
-          </section>
+          <KpiStrip items={[
+            { title: "Integrantes", value: committee?.members.length ?? 0, description: "Miembros del comité", icon: "users", tone: "blue" },
+            { title: "Con decisión", value: decisionMembers, description: "Participación habilitada", icon: "active", tone: "green" },
+            { title: "Revisiones", value: quarterlyReviews, description: "Cortes documentados", icon: "meeting", tone: "cyan" },
+            { title: "Líder PESV", value: pesvLeader?.employeeName ?? "No asignado", description: "Responsable designado", icon: "job", tone: pesvLeader ? "slate" : "amber" },
+          ]} />
 
           {!committee ? (
             <Card className="border-dashed border-border bg-card">

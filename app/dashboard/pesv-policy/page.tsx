@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import {
   DropdownMenu,
@@ -33,6 +34,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { PesvModuleHeader } from "@/components/pesv/module-experience"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 
 type PolicyEvidence = {
   id: string
@@ -347,17 +350,20 @@ function PolicyDialog({
 
   return (
     <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>{editing ? "Actualizar política de seguridad vial" : "Nueva política de seguridad vial"}</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            Primero crea la política. Después descarga el PDF para firma y carga la evidencia firmada desde los 3 puntos.
-          </p>
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/75 px-6 py-4 pr-12">
+          <div className="flex min-w-0 items-start gap-3">
+            <FormDialogIcon icon="document" tone="blue" />
+            <div className="min-w-0">
+              <DialogTitle>{editing ? "Actualizar política de seguridad vial" : "Nueva política de seguridad vial"}</DialogTitle>
+              <p className="mt-1 text-sm text-slate-600">Primero crea la política. Después descarga el PDF para firma y carga la evidencia firmada desde los 3 puntos.</p>
+            </div>
+          </div>
         </DialogHeader>
 
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Datos del documento</h3>
+          <div className="min-h-0 flex-1 space-y-5 overflow-x-hidden overflow-y-auto bg-slate-50/40 px-6 py-5">
+            <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="document" title="Datos del documento" />
               <div className="grid gap-4 md:grid-cols-2">
                 <Label className="grid gap-2 md:col-span-2">
                   Nombre de la política
@@ -386,8 +392,8 @@ function PolicyDialog({
               </div>
             </section>
 
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Contenido de la política</h3>
+            <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="prevention" title="Contenido de la política" />
               <div className="grid gap-4">
                 <Label className="grid gap-2">
                   Alcance
@@ -416,8 +422,8 @@ function PolicyDialog({
               </div>
             </section>
 
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Socialización y accesibilidad</h3>
+            <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="meeting" title="Socialización y accesibilidad" />
               <div className="grid gap-4 md:grid-cols-2">
                 <Label className="grid gap-2">
                   Medio de socialización
@@ -724,15 +730,9 @@ export default function PesvPolicyPage() {
 
   return (
     <main className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Política de Seguridad Vial</h1>
-          <p className="text-muted-foreground">
-            Documenta la política del PESV, su revisión trianual, socialización y evidencia firmada por la dirección.
-          </p>
-        </div>
+      <PesvModuleHeader title="Política de Seguridad Vial" description="Documenta la política del PESV, su revisión trianual, socialización y evidencia firmada por la dirección." icon={FileText} actions={
         <Button
-          className="gap-2"
+          className="w-full gap-2 sm:w-auto"
           onClick={() => {
             setEditingPolicy(null)
             setDialogOpen(true)
@@ -741,34 +741,14 @@ export default function PesvPolicyPage() {
           <Plus className="h-4 w-4" />
           Nueva política
         </Button>
-      </div>
+      } />
 
-      <section className="grid gap-3 md:grid-cols-4">
-        <Card className="border-border bg-card">
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground">Políticas</p>
-            <p className="mt-2 text-2xl font-bold text-foreground">{stats.total}</p>
-          </CardContent>
-        </Card>
-        <Card className="border-border bg-card">
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground">Vigentes</p>
-            <p className="mt-2 text-2xl font-bold text-emerald-700">{stats.active}</p>
-          </CardContent>
-        </Card>
-        <Card className="border-border bg-card">
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground">Pendientes de firma</p>
-            <p className="mt-2 text-2xl font-bold text-amber-600">{stats.pendingEvidence}</p>
-          </CardContent>
-        </Card>
-        <Card className="border-border bg-card">
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground">Revisión vencida</p>
-            <p className="mt-2 text-2xl font-bold text-destructive">{stats.expiredReview}</p>
-          </CardContent>
-        </Card>
-      </section>
+      <KpiStrip items={[
+        { title: "Políticas", value: stats.total, description: "Versiones registradas", icon: "document", tone: "blue" },
+        { title: "Vigentes", value: stats.active, description: "Aplicación actual", icon: "active", tone: "green" },
+        { title: "Pendientes de firma", value: stats.pendingEvidence, description: "Sin soporte firmado", icon: "pending", tone: "amber" },
+        { title: "Revisión vencida", value: stats.expiredReview, description: "Requieren actualización", icon: "overdue", tone: "red" },
+      ]} />
 
       <Card className="border-border bg-card">
         <CardContent className="space-y-4 p-4">

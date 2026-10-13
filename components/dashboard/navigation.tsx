@@ -9,7 +9,6 @@ import {
   FileSearch,
   TriangleAlert,
   UserCircle,
-  UserCheck,
   ShieldCheck,
   BrickWallIcon,
   CalendarDays,
@@ -33,14 +32,11 @@ import {
   Recycle,
   FlaskConical,
   HeartPulse,
-  FileSignature,
-  Handshake,
-  Route,
-  Car,
   MessageSquare,
   ScrollText,
 } from "lucide-react"
 import type { ModuleNode } from "@/store/auth.store"
+import { isPesvModuleAllowed, pesvModuleCatalog, pesvModuleCodes } from "@/lib/pesv/module-catalog"
 
 export type SubNavigationItem = {
   code?: string
@@ -169,66 +165,6 @@ export const navigation: NavigationItem[] = [
       { code: "HEALTHY_LIFESTYLES", name: "Estilos de Vida Saludable", href: "/dashboard/healthy-lifestyles", icon: HeartPulse },
     ],
   },
-  /* {
-    code: "PESV",
-    name: "PESV",
-    icon: ShieldCheck,
-    subItems: [
-      {
-        code: "PESV_RESPONSIBLE",
-        name: "Responsable PESV",
-        href: "/dashboard/pesv-responsible",
-        icon: UserCheck,
-      },
-      {
-        code: "PESV_COMMITTEE",
-        name: "Comité de Seguridad Vial",
-        href: "/dashboard/pesv-committee",
-        icon: UsersRound,
-      },
-      {
-        code: "PESV_POLICY",
-        name: "Política de Seguridad Vial",
-        href: "/dashboard/pesv-policy",
-        icon: FileSignature,
-      },
-      {
-        code: "PESV_LEADERSHIP",
-        name: "Liderazgo Directivo",
-        href: "/dashboard/pesv-leadership",
-        icon: Handshake,
-      },
-      {
-        code: "PESV_DIAGNOSIS",
-        name: "Diagnóstico PESV",
-        href: "/dashboard/pesv-diagnosis",
-        icon: ClipboardList,
-      },
-      {
-        code: "PESV_RISKS",
-        name: "Riesgos Viales",
-        href: "/dashboard/pesv-risks",
-        icon: TriangleAlert,
-      },
-      { code: "PESV_OBJECTIVES", name: "Objetivos y metas", href: "/dashboard/pesv-objectives", icon: Target },
-      { code: "PESV_PROGRAMS", name: "Programas de riesgos críticos", href: "/dashboard/pesv-programs", icon: ShieldPlus },
-      { code: "PESV_WORK_PLAN", name: "Plan anual de trabajo", href: "/dashboard/pesv-work-plan", icon: ClipboardCheck },
-      { code: "PESV_TRAINING", name: "Competencia y formación", href: "/dashboard/pesv-training", icon: GraduationCap },
-      { code: "PESV_BEHAVIOR", name: "Comportamiento seguro", href: "/dashboard/pesv-behavior", icon: UserCheck },
-      { code: "PESV_EMERGENCIES", name: "Emergencias Viales", href: "/dashboard/pesv-emergencies", icon: FlameKindling },
-      { code: "PESV_INVESTIGATIONS", name: "Investigación de Siniestros", href: "/dashboard/pesv-investigations", icon: FileSearch },
-      { code: "PESV_MANAGED_ROADS", name: "Vías administradas", href: "/dashboard/pesv-managed-roads", icon: Route },
-      { code: "PESV_JOURNEYS", name: "Desplazamientos laborales", href: "/dashboard/pesv-journeys", icon: Route },
-      { code: "PESV_VEHICLE_INSPECTIONS", name: "Inspección de vehículos", href: "/dashboard/pesv-vehicle-inspections", icon: Car },
-      { code: "PESV_CHANGE_CONTRACTORS", name: "Cambios y contratistas", href: "/dashboard/pesv-change-contractors", icon: Handshake },
-      { code: "PESV_DOCUMENT_RETENTION", name: "Archivo documental", href: "/dashboard/pesv-document-retention", icon: Archive },
-      { code: "PESV_INDICATORS", name: "Indicadores y autogestión", href: "/dashboard/pesv-indicators", icon: BarChart3 },
-      { code: "PESV_STATISTICS", name: "Estadísticas de siniestros", href: "/dashboard/pesv-statistics", icon: BarChart3 },
-      { code: "PESV_AUDITS", name: "Auditoría anual", href: "/dashboard/pesv-audits", icon: ClipboardCheck },
-      { code: "PESV_IMPROVEMENT", name: "Mejora continua · ACPM", href: "/dashboard/pesv-improvement", icon: FileCheck2 },
-      { code: "PESV_COMMUNICATIONS", name: "Comunicación y participación", href: "/dashboard/pesv-communications", icon: Users },
-    ],
-  }, */
   {
     code: "RISKS",
     name: "Riesgos",
@@ -361,6 +297,20 @@ export const navigation: NavigationItem[] = [
       },
     ],
   },
+  {
+    code: "PESV",
+    name: "PESV",
+    icon: ShieldCheck,
+    subItems: [
+      { code: "PESV", name: "Vista general", href: "/dashboard/pesv", icon: LayoutDashboard },
+      ...pesvModuleCatalog.map((module) => ({
+        code: module.code,
+        name: module.name,
+        href: module.href,
+        icon: module.icon,
+      })),
+    ],
+  },
   /* {
     code: "DATA_PROCESSING",
     name: "Tratamiento de Datos",
@@ -395,30 +345,6 @@ function collectModuleCodes(modules: ModuleNode[]): Set<string> {
 const alwaysVisibleCodes = new Set<string>([
   "DATA_PROCESSING",
   "DATA_AUTHORIZATIONS",
-  "PESV",
-  "PESV_RESPONSIBLE",
-  "PESV_COMMITTEE",
-  "PESV_POLICY",
-  "PESV_LEADERSHIP",
-  "PESV_DIAGNOSIS",
-  "PESV_RISKS",
-  "PESV_OBJECTIVES",
-  "PESV_PROGRAMS",
-  "PESV_WORK_PLAN",
-  "PESV_TRAINING",
-  "PESV_BEHAVIOR",
-  "PESV_EMERGENCIES",
-  "PESV_INVESTIGATIONS",
-  "PESV_MANAGED_ROADS",
-  "PESV_JOURNEYS",
-  "PESV_VEHICLE_INSPECTIONS",
-  "PESV_CHANGE_CONTRACTORS",
-  "PESV_DOCUMENT_RETENTION",
-  "PESV_INDICATORS",
-  "PESV_STATISTICS",
-  "PESV_AUDITS",
-  "PESV_IMPROVEMENT",
-  "PESV_COMMUNICATIONS",
 ])
 
 const moduleCodeAliases: Record<string, string[]> = {
@@ -436,6 +362,7 @@ const moduleCodeAliases: Record<string, string[]> = {
 
 function isCodeAllowed(code: string, allowedCodes: Set<string>) {
   if (alwaysVisibleCodes.has(code)) return true
+  if (code === "PESV" || pesvModuleCodes.includes(code)) return isPesvModuleAllowed(code, allowedCodes)
 
   const aliases = moduleCodeAliases[code] ?? [code]
   return aliases.some((alias) => allowedCodes.has(alias))
@@ -478,6 +405,7 @@ function isSubItemAllowed(
   if (!subItem.code) return true
   if (alwaysVisibleCodes.has(subItem.code)) return true
   if (!parentCode) return isCodeAllowed(subItem.code, allowedCodes)
+  if (subItem.code === parentCode) return isCodeAllowed(parentCode, allowedCodes)
   if (subItem.code === "INVESTIGATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "SPECIAL_RISK" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "CUSTODY" && isCodeAllowed(parentCode, allowedCodes)) return true
@@ -496,20 +424,6 @@ function isSubItemAllowed(
   if (subItem.code === "HAZARDOUS_SUBSTANCES" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "ENVIRONMENTAL_MEASUREMENTS" && isCodeAllowed(parentCode, allowedCodes)) return true
   if (subItem.code === "INSPECTIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "PESV_RESPONSIBLE" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "PESV_COMMITTEE" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "PESV_POLICY" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "PESV_LEADERSHIP" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "PESV_DIAGNOSIS" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "PESV_RISKS" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "PESV_OBJECTIVES" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "PESV_PROGRAMS" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "PESV_WORK_PLAN" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "PESV_TRAINING" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "PESV_BEHAVIOR" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "PESV_EMERGENCIES" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "PESV_INVESTIGATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
-
   const parentChildCodes = getDirectChildCodesByParentCode(modules, parentCode)
 
   if (parentChildCodes.size === 0) {
@@ -559,6 +473,15 @@ export function getFirstAllowedNavigationHref(modules: ModuleNode[]): string {
 export function isDashboardPathAllowed(pathname: string, modules: ModuleNode[]): boolean {
   if (pathname === "/dashboard" || pathname.startsWith("/dashboard/settings")) {
     return true
+  }
+
+  const allowedCodes = collectModuleCodes(modules)
+  const pesvModule = pesvModuleCatalog.find(
+    (module) => pathname === module.href || pathname.startsWith(`${module.href}/`),
+  )
+
+  if (pesvModule) {
+    return isCodeAllowed(pesvModule.code, allowedCodes)
   }
 
   const items = filterNavigationByModules(navigation, modules)

@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import {
   DropdownMenu,
@@ -35,6 +36,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { PesvModuleHeader } from "@/components/pesv/module-experience"
+import { KpiStrip } from "@/components/dashboard/kpi-strip"
 
 type DiagnosisEvidence = {
   id: string
@@ -478,18 +481,21 @@ function DiagnosisDialog({
 
   return (
     <SafeCloudFormDrawerFrame open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 pr-12">
-          <DialogTitle>{editing ? "Actualizar diagnóstico PESV" : "Nuevo diagnóstico PESV"}</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            Registra el diagnóstico anual. La evidencia documental se carga después desde los 3 puntos.
-          </p>
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/75 px-6 py-4 pr-12">
+          <div className="flex min-w-0 items-start gap-3">
+            <FormDialogIcon icon="analytics" tone="blue" />
+            <div className="min-w-0">
+              <DialogTitle>{editing ? "Actualizar diagnóstico PESV" : "Nuevo diagnóstico PESV"}</DialogTitle>
+              <p className="mt-1 text-sm text-slate-600">Registra el diagnóstico anual. La evidencia documental se carga después desde los 3 puntos.</p>
+            </div>
+          </div>
         </DialogHeader>
 
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Organización</h3>
-              <div className="grid gap-4 md:grid-cols-3">
+          <div className="min-h-0 flex-1 space-y-5 overflow-x-hidden overflow-y-auto bg-slate-50/40 px-6 py-5">
+            <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="area" title="Organización" />
+              <div className="grid gap-4 sm:grid-cols-2">
                 <Label className="grid gap-2">
                   Año
                   <Input type="number" value={form.year} onChange={(event) => setForm((current) => ({ ...current, year: Number(event.target.value) }))} />
@@ -502,16 +508,16 @@ function DiagnosisDialog({
                   Cantidad de sedes
                   <Input type="number" value={form.sitesCount} onChange={(event) => setForm((current) => ({ ...current, sitesCount: Number(event.target.value) }))} />
                 </Label>
-                <Label className="grid gap-2 md:col-span-3">
+                <Label className="grid gap-2 sm:col-span-2">
                   Servicios que presta la organización
                   <Textarea value={form.servicesDescription} onChange={(event) => setForm((current) => ({ ...current, servicesDescription: event.target.value }))} rows={3} />
                 </Label>
               </div>
             </section>
 
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Contratistas, terceros y flotas</h3>
-              <div className="grid gap-4 md:grid-cols-3">
+            <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="employee" title="Contratistas, terceros y flotas" />
+              <div className="grid gap-4 sm:grid-cols-2">
                 <Label className="grid gap-2">
                   Contratistas permanentes
                   <Input type="number" value={form.permanentContractors} onChange={(event) => setForm((current) => ({ ...current, permanentContractors: Number(event.target.value) }))} />
@@ -532,15 +538,15 @@ function DiagnosisDialog({
                   Flotas ocasionales
                   <Input type="number" value={form.occasionalFleets} onChange={(event) => setForm((current) => ({ ...current, occasionalFleets: Number(event.target.value) }))} />
                 </Label>
-                <Label className="grid gap-2 md:col-span-3">
+                <Label className="grid gap-2 sm:col-span-2">
                   Descripción
                   <Textarea value={form.contractorsDescription} onChange={(event) => setForm((current) => ({ ...current, contractorsDescription: event.target.value }))} rows={3} />
                 </Label>
               </div>
             </section>
 
-            <section className="rounded-md border border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Plan de emergencias viales</h3>
+            <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="emergency" title="Plan de emergencias viales" />
               <div className="grid gap-4 md:grid-cols-2">
                 <Label className="grid gap-2">
                   Colaboradores capacitados
@@ -557,10 +563,13 @@ function DiagnosisDialog({
               </div>
             </section>
 
-            <Label className="grid gap-2">
-              Hallazgos del diagnóstico
-              <Textarea value={form.findings} onChange={(event) => setForm((current) => ({ ...current, findings: event.target.value }))} rows={4} />
-            </Label>
+            <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <FormSectionTitle icon="details" title="Hallazgos del diagnóstico" />
+              <Label className="grid gap-2">
+                Hallazgos del diagnóstico
+                <Textarea value={form.findings} onChange={(event) => setForm((current) => ({ ...current, findings: event.target.value }))} rows={4} />
+              </Label>
+            </section>
 
             <section className="rounded-md border border-primary/20 bg-primary/5 p-4">
               <div className="flex items-start gap-3">
@@ -848,15 +857,9 @@ export default function PesvDiagnosisPage() {
 
   return (
     <main className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Diagnóstico PESV</h1>
-          <p className="text-muted-foreground">
-            Documenta anualmente problemas de seguridad vial, perfiles de colaboradores, hoja de vida vehicular, rutas y emergencias.
-          </p>
-        </div>
+      <PesvModuleHeader title="Diagnóstico PESV" description="Documenta anualmente problemas de seguridad vial, perfiles de colaboradores, hoja de vida vehicular, rutas y emergencias." icon={FileText} actions={
         <Button
-          className="gap-2"
+          className="w-full gap-2 sm:w-auto"
           onClick={() => {
             setEditingDiagnosis(null)
             setDialogOpen(true)
@@ -865,15 +868,16 @@ export default function PesvDiagnosisPage() {
           <Plus className="h-4 w-4" />
           Nuevo diagnóstico
         </Button>
-      </div>
+      } />
+      {diagnoses.some(diagnosis => diagnosis.id === "pesv-diagnosis-1") && <div className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900"><strong>Información demostrativa.</strong> La caracterización inicial es un ejemplo y no representa información real de la empresa.</div>}
 
-      <section className="grid gap-3 md:grid-cols-5">
-        <Card className="border-border bg-card"><CardContent className="p-4"><p className="text-sm text-muted-foreground">Diagnósticos</p><p className="mt-2 text-2xl font-bold text-foreground">{stats.total}</p></CardContent></Card>
-        <Card className="border-border bg-card"><CardContent className="p-4"><p className="text-sm text-muted-foreground">Colaboradores</p><p className="mt-2 text-2xl font-bold text-primary">{stats.collaborators}</p></CardContent></Card>
-        <Card className="border-border bg-card"><CardContent className="p-4"><p className="text-sm text-muted-foreground">Vehículos</p><p className="mt-2 text-2xl font-bold text-primary">{stats.vehicles}</p></CardContent></Card>
-        <Card className="border-border bg-card"><CardContent className="p-4"><p className="text-sm text-muted-foreground">Rutas</p><p className="mt-2 text-2xl font-bold text-primary">{stats.routes}</p></CardContent></Card>
-        <Card className="border-border bg-card"><CardContent className="p-4"><p className="text-sm text-muted-foreground">Pendientes evidencia</p><p className="mt-2 text-2xl font-bold text-amber-600">{stats.pendingEvidence}</p></CardContent></Card>
-      </section>
+      <KpiStrip items={[
+        { title: "Diagnósticos", value: stats.total, description: "Vigencias documentadas", icon: "total", tone: "blue" },
+        { title: "Colaboradores", value: stats.collaborators, description: "Perfiles caracterizados", icon: "users", tone: "cyan" },
+        { title: "Vehículos", value: stats.vehicles, description: "Flota relacionada", icon: "internal", tone: "slate" },
+        { title: "Rutas", value: stats.routes, description: "Recorridos identificados", icon: "analysis", tone: "blue" },
+        { title: "Pendientes evidencia", value: stats.pendingEvidence, description: "Soporte por cargar", icon: "evidence", tone: "amber" },
+      ]} />
 
       <Card className="border-border bg-card">
         <CardContent className="space-y-4 p-4">

@@ -86,6 +86,13 @@ export function Sidebar() {
       });
   }, [accessToken, loggingOut, modules.length, setModules]);
 
+  useEffect(() => {
+    const activeGroup = visibleNavigation.find((item) =>
+      item.subItems?.some((subItem) => pathname === subItem.href || pathname.startsWith(`${subItem.href}/`)),
+    );
+    if (activeGroup?.subItems) setOpenDropdown(activeGroup.name);
+  }, [pathname, visibleNavigation]);
+
   const toggleDropdown = (name: string) => {
     setOpenDropdown(openDropdown === name ? null : name);
   };
@@ -111,7 +118,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "sticky top-0 flex h-svh min-h-svh shrink-0 flex-col overflow-hidden bg-sidebar border-r border-sidebar-border transition-all duration-300",
+        "flex h-full min-h-0 shrink-0 flex-col overflow-hidden bg-sidebar border-r border-sidebar-border transition-all duration-300",
         "hidden md:flex",
         collapsed ? "w-16" : "w-64"
       )}
@@ -150,6 +157,9 @@ export function Sidebar() {
         {visibleNavigation.map((item) => {
           // Comprobar si el ítem tiene subItems (menú desplegable)
           if (item.subItems) {
+            const isGroupActive = item.subItems.some(
+              (subItem) => pathname === subItem.href || pathname.startsWith(`${subItem.href}/`),
+            );
             return (
               <div key={item.name}>
                 <button
@@ -159,7 +169,7 @@ export function Sidebar() {
                   }}
                   className={cn(
                     "flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                    openDropdown === item.name
+                    openDropdown === item.name || isGroupActive
                       ? "bg-sidebar-primary text-sidebar-primary-foreground"
                       : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   )}
@@ -304,6 +314,13 @@ export function MobileSidebar({
       });
   }, [accessToken, modules.length, setModules]);
 
+  useEffect(() => {
+    const activeGroup = visibleNavigation.find((item) =>
+      item.subItems?.some((subItem) => pathname === subItem.href || pathname.startsWith(`${subItem.href}/`)),
+    );
+    if (activeGroup?.subItems) setOpenDropdown(activeGroup.name);
+  }, [pathname, visibleNavigation]);
+
   const closeMenu = () => onOpenChange(false);
 
   return (
@@ -323,6 +340,9 @@ export function MobileSidebar({
             {visibleNavigation.map((item) => {
               if (item.subItems) {
                 const isOpen = openDropdown === item.name;
+                const isGroupActive = item.subItems.some(
+                  (subItem) => pathname === subItem.href || pathname.startsWith(`${subItem.href}/`),
+                );
 
                 return (
                   <div key={item.name}>
@@ -331,7 +351,7 @@ export function MobileSidebar({
                       onClick={() => setOpenDropdown(isOpen ? null : item.name)}
                       className={cn(
                         "flex w-full items-center justify-between gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium transition-colors",
-                        isOpen
+                        isOpen || isGroupActive
                           ? "bg-sidebar-primary text-sidebar-primary-foreground"
                           : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                       )}

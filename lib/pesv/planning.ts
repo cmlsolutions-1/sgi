@@ -188,7 +188,7 @@ export const configs: Record<PesvModule, ModuleConfig> = {
     ],
   },
   behavior: {
-    title: "Responsabilidad y comportamiento seguro", subtitle: "Paso 11 · Aplicable al nivel avanzado",
+    title: "Responsabilidad y comportamiento seguro", subtitle: "Aplicable al nivel avanzado",
     kinds: [
       { id: "procedure", title: "Procedimientos y responsabilidades", singular: "procedimiento", annualReview: true, diffusion: true,
         columns: ["name", "version", "responsibleId", "nextReviewDate"], fields: [

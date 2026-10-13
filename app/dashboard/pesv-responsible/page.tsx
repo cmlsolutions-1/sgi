@@ -7,13 +7,15 @@ import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@/components/ui/dialog"
+import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
 import type { Employee } from "@/types/manager/employee"
+import { PesvModuleHeader } from "@/components/pesv/module-experience"
 
 type PesvResponsibleRecord = {
   id: string
@@ -273,12 +275,21 @@ function PesvResponsibleDialog({
 
   return (
     <SafeCloudFormDrawerFrame open={open} onOpenChange={onOpenChange}>
-        <DialogHeader>
-          <DialogTitle>{record ? "Actualizar responsable PESV" : "Asignar responsable PESV"}</DialogTitle>
+        <DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/75 px-6 py-4 pr-12">
+          <div className="flex min-w-0 items-start gap-3">
+            <FormDialogIcon icon="job" tone="blue" />
+            <div className="min-w-0">
+              <h2 className="text-lg font-semibold text-slate-950">{record ? "Actualizar responsable PESV" : "Asignar responsable PESV"}</h2>
+              <p className="mt-1 text-sm text-slate-600">Selecciona el líder y conserva el soporte de su designación.</p>
+            </div>
+          </div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <section className="grid gap-4 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 space-y-5 overflow-x-hidden overflow-y-auto bg-slate-50/40 px-6 py-5">
+          <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <FormSectionTitle icon="employee" title="Responsable designado" description="Consulta y selecciona el funcionario que liderará el PESV." />
+            <div className="grid min-w-0 gap-4 sm:grid-cols-2">
             <div className="grid gap-2 md:col-span-2">
               <span className="text-sm font-medium text-foreground">Funcionario líder</span>
               <div className="overflow-hidden rounded-md border border-input bg-background">
@@ -330,21 +341,25 @@ function PesvResponsibleDialog({
                 onChange={(event) => setForm((current) => ({ ...current, signatureDate: event.target.value }))}
               />
             </Label>
+            </div>
           </section>
 
-          <Label className="grid gap-2">
-            Rol dentro del PESV
-            <Textarea
-              value={form.roleDescription}
-              onChange={(event) => setForm((current) => ({ ...current, roleDescription: event.target.value }))}
-              rows={3}
-              placeholder="Describe el rol del líder PESV"
-            />
-          </Label>
+          <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <FormSectionTitle icon="accountability" title="Responsabilidad dentro del PESV" />
+            <Label className="grid gap-2">
+              Rol dentro del PESV
+              <Textarea
+                value={form.roleDescription}
+                onChange={(event) => setForm((current) => ({ ...current, roleDescription: event.target.value }))}
+                rows={3}
+                placeholder="Describe el rol del líder PESV"
+              />
+            </Label>
+          </section>
 
-          <section className="rounded-md border border-border p-4">
-            <h3 className="mb-3 text-sm font-semibold text-foreground">Soporte de designación</h3>
-            <div className="grid gap-4 md:grid-cols-2">
+          <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <FormSectionTitle icon="document" title="Soporte de designación" description="Adjunta y describe el documento que respalda la asignación." />
+            <div className="grid min-w-0 gap-4 sm:grid-cols-2">
               <Label className="grid gap-2">
                 Archivo soporte
                 <Input
@@ -373,8 +388,9 @@ function PesvResponsibleDialog({
               </Label>
             </div>
           </section>
+          </div>
 
-          <DialogFooter>
+          <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
@@ -453,18 +469,12 @@ export default function PesvResponsiblePage() {
 
   return (
     <main className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Responsable PESV</h1>
-          <p className="text-muted-foreground">
-            Designa el líder del diseño e implementación del Plan Estratégico de Seguridad Vial.
-          </p>
-        </div>
-        <Button className="gap-2" disabled={loading || employees.length === 0} onClick={() => setDialogOpen(true)}>
+      <PesvModuleHeader title="Responsable PESV" description="Designa el líder del diseño e implementación del Plan Estratégico de Seguridad Vial." icon={UserCheck} actions={
+        <Button className="w-full gap-2 sm:w-auto" disabled={loading || employees.length === 0} onClick={() => setDialogOpen(true)}>
           <UserCheck className="h-4 w-4" />
           {record ? "Gestionar Responsable PESV" : "Asignar Responsable PESV"}
         </Button>
-      </div>
+      } />
 
       {loading ? (
         <div className="flex min-h-[260px] items-center justify-center">
