@@ -7,7 +7,7 @@ import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { FormDialogIcon, FormSectionTitle } from "@/components/ui/form-dialog-visuals"
 import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { Input } from "@/components/ui/input"
@@ -279,7 +279,9 @@ function PesvResponsibleDialog({
           <div className="flex min-w-0 items-start gap-3">
             <FormDialogIcon icon="job" tone="blue" />
             <div className="min-w-0">
-              <h2 className="text-lg font-semibold text-slate-950">{record ? "Actualizar responsable PESV" : "Asignar responsable PESV"}</h2>
+              <DialogTitle className="text-lg font-semibold text-slate-950">
+                {record ? "Actualizar responsable PESV" : "Asignar responsable PESV"}
+              </DialogTitle>
               <p className="mt-1 text-sm text-slate-600">Selecciona el líder y conserva el soporte de su designación.</p>
             </div>
           </div>

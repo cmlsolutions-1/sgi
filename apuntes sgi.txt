@@ -36,13 +36,16 @@ wilson@alfonsilla.com
 
 #163947
 
-SGI
+
+SGI / produccion
 cmlsolutions3@gmail.com
+Admin123*
+
 
 administrador super admin
 admin@safecloud.com
 123456
-"userId": "900529e5-e0c2-4a2e-9524-b941f6a954e6"
+"userId": "2b236f82-ece0-4190-a357-173a22df9c84"
 
 (todos los modulos completos)
 alfonso@alfonso.com
@@ -89,21 +92,7 @@ notificacionesdating@gmail.com
 Colombia1234
 
 
-------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+---------------
 
 
 
