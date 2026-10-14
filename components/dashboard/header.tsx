@@ -43,6 +43,7 @@ import {
   markNotificationAsRead,
 } from "@/services/notificationService"
 import { getUserById } from "@/services/userService"
+import { getCompanyById } from "@/services/companyService"
 import type { NotificationItem, NotificationReferenceType, NotificationType } from "@/types/manager/notification"
 import { MobileSidebar } from "@/components/dashboard/sidebar"
 
@@ -108,6 +109,8 @@ export function Header() {
   const router = useRouter()
   const accessToken = useAuthStore((state) => state.accessToken)
   const hasHydrated = useAuthStore((state) => state.hasHydrated)
+  const sessionCompany = useAuthStore((state) => state.company)
+  const setCompany = useAuthStore((state) => state.setCompany)
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<NotificationItem[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
@@ -152,6 +155,14 @@ export function Header() {
           email: user.email,
           roleLabel,
         })
+
+        if (!sessionCompany && user.companyId) {
+          void getCompanyById(user.companyId)
+            .then((company) => {
+              if (mounted) setCompany({ id: company.id, name: company.name, nit: company.nit })
+            })
+            .catch(() => undefined)
+        }
       })
       .catch(() => {
         if (!mounted) return
@@ -165,7 +176,7 @@ export function Header() {
     return () => {
       mounted = false
     }
-  }, [accessToken, hasHydrated])
+  }, [accessToken, hasHydrated, sessionCompany, setCompany])
 
   const refreshNotifications = useCallback(async (showLoading = true) => {
     if (!hasHydrated || !accessToken) return

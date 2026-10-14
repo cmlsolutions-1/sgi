@@ -13,7 +13,6 @@ import {
   Upload,
   UsersRound,
 } from "lucide-react"
-import jsPDF from "jspdf"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -35,6 +34,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
 import type { Employee } from "@/types/manager/employee"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
+import { createSafeCloudPdf } from "@/lib/pdf/safecloud-pdf-style"
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { PesvSelect } from "@/components/pesv/pesv-select"
@@ -253,8 +253,8 @@ function buildMembers(employees: Employee[], memberIds: string[], pesvLeader: Pe
 }
 
 function downloadCommitteePdf(record: PesvCommitteeRecord) {
-  const doc = new jsPDF("p", "mm", "a4")
-  const margin = 16
+  const doc = createSafeCloudPdf()
+  const margin = 14
   const pageWidth = doc.internal.pageSize.getWidth()
   const contentWidth = pageWidth - margin * 2
   let y = 18

@@ -10,8 +10,8 @@ import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer";
 import { Label } from "@/components/ui/label";
 import { Plus, Calendar, User, Building, FileText, Download, CheckCircle, CircleDashed, Upload } from "lucide-react";
 import { Employee } from "@/lib/mock-data";
-import jsPDF from "jspdf";
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf";
+import { createSafeCloudPdf, SAFE_CLOUD_PDF_STYLE, setSafeCloudPdfBody, setSafeCloudPdfTitle } from "@/lib/pdf/safecloud-pdf-style";
 
 type MedicalEvaluationType = 'preoccupational' | 'periodic' | 'postoccupational' | 'other';
 
@@ -106,26 +106,27 @@ export function MedicalEvaluationTab({ employee, onAddEvaluation }: MedicalEvalu
   };
 
   const downloadEvaluation = (evaluation: MedicalEvaluation) => {
-    const doc = new jsPDF();
+    const doc = createSafeCloudPdf();
+    const margin = SAFE_CLOUD_PDF_STYLE.marginX;
     
-    doc.setFontSize(16);
+    setSafeCloudPdfTitle(doc);
     doc.text(`Evaluación Médico-Ocupacional`, 105, 20, { align: 'center' });
     
-    doc.setFontSize(12);
-    doc.text(`Empleado: ${employee.name} ${employee.lastName}`, 20, 40);
-    doc.text(`Tipo: ${getTypeLabel(evaluation.type)}`, 20, 50);
-    doc.text(`Fecha: ${evaluation.date}`, 20, 60);
-    doc.text(`Resultado: ${evaluation.result === 'apt' ? 'Apto' : evaluation.result === 'not_apt' ? 'No Apto' : 'Condicionalmente Apto'}`, 20, 70);
-    doc.text(`Profesional Médico: ${evaluation.medicalProfessional || 'N/A'}`, 20, 80);
-    doc.text(`Entidad: ${evaluation.entity || 'N/A'}`, 20, 90);
+    setSafeCloudPdfBody(doc);
+    doc.text(`Empleado: ${employee.name} ${employee.lastName}`, margin, 40);
+    doc.text(`Tipo: ${getTypeLabel(evaluation.type)}`, margin, 50);
+    doc.text(`Fecha: ${evaluation.date}`, margin, 60);
+    doc.text(`Resultado: ${evaluation.result === 'apt' ? 'Apto' : evaluation.result === 'not_apt' ? 'No Apto' : 'Condicionalmente Apto'}`, margin, 70);
+    doc.text(`Profesional Médico: ${evaluation.medicalProfessional || 'N/A'}`, margin, 80);
+    doc.text(`Entidad: ${evaluation.entity || 'N/A'}`, margin, 90);
     
     if (evaluation.nextEvaluationDate) {
-      doc.text(`Próxima Evaluación: ${evaluation.nextEvaluationDate}`, 20, 100);
+      doc.text(`Próxima Evaluación: ${evaluation.nextEvaluationDate}`, margin, 100);
     }
     
-    doc.text('Observaciones:', 20, 110);
-    const obsLines = doc.splitTextToSize(evaluation.observations, 170);
-    doc.text(obsLines, 20, 120);
+    doc.text('Observaciones:', margin, 110);
+    const obsLines = doc.splitTextToSize(evaluation.observations, doc.internal.pageSize.getWidth() - margin * 2);
+    doc.text(obsLines, margin, 120);
     
     void saveCorporatePdf(doc, { documentName: "Evaluación Médico-Ocupacional" }, `evaluacion-medica-${employee.id}-${evaluation.id}.pdf`);
   };

@@ -2,7 +2,6 @@
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
 import { Calendar, Download, FileCheck2, Loader2, Search, ShieldCheck, Upload, UserCheck, Users } from "lucide-react"
-import jsPDF from "jspdf"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -17,6 +16,7 @@ import { listEmployees } from "@/services/employeeService"
 import type { Employee } from "@/types/manager/employee"
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
+import { createSafeCloudPdf } from "@/lib/pdf/safecloud-pdf-style"
 
 type PesvResponsibleRecord = {
   id: string
@@ -147,8 +147,8 @@ function writeStoredResponsible(record: PesvResponsibleRecord) {
 }
 
 function downloadDesignationPdf(record: PesvResponsibleRecord) {
-  const doc = new jsPDF("p", "mm", "a4")
-  const margin = 16
+  const doc = createSafeCloudPdf()
+  const margin = 14
   const pageWidth = doc.internal.pageSize.getWidth()
   const contentWidth = pageWidth - margin * 2
 

@@ -1,6 +1,7 @@
 import { apiFetch } from "@/lib/apiClient"
 import { listEmployees } from "@/services/employeeService"
 import { downloadCorporatePdfBlob } from "@/lib/pdf/safecloud-corporate-pdf"
+import { applySafeCloudPdfDefaults } from "@/lib/pdf/safecloud-pdf-style"
 import type { Employee } from "@/types/manager/employee"
 import type {
   DataAuthorizationStatus,
@@ -465,10 +466,10 @@ export async function downloadConsentCertificate(consent: EmployeeDataConsent) {
   ])
   const signatureDataUrl = await blobToDataUrl(signatureEvidence.blob)
   const logoDataUrl = await loadPublicImageDataUrl("/SGI-nube.png").catch(() => null)
-  const doc = new jsPDF({ unit: "mm", format: "letter" })
+  const doc = applySafeCloudPdfDefaults(new jsPDF({ unit: "mm", format: "letter", putOnlyUsedFonts: true, compress: true }))
   const pageWidth = doc.internal.pageSize.getWidth()
   const pageHeight = doc.internal.pageSize.getHeight()
-  const margin = 16
+  const margin = 14
   const contentWidth = pageWidth - margin * 2
   let y = margin
 
@@ -584,19 +585,6 @@ export async function downloadConsentCertificate(consent: EmployeeDataConsent) {
   doc.setFontSize(8)
   doc.setTextColor(71, 85, 105)
   doc.text("Firma electrónica manuscrita del titular", pageWidth / 2, y + 10, { align: "center" })
-
-  const pageCount = doc.internal.getNumberOfPages()
-  for (let page = 1; page <= pageCount; page += 1) {
-    doc.setPage(page)
-    doc.setFont("helvetica", "normal")
-    doc.setFontSize(7.5)
-    doc.setTextColor(100, 116, 139)
-    doc.text(
-      `Documento generado por SafeCloud. Página ${page} de ${pageCount}. Fecha de generación: ${formatCertificateDateTime(new Date().toISOString())}`,
-      margin,
-      pageHeight - 8,
-    )
-  }
 
   const blob = doc.output("blob")
   const filename = certificateFilename(consent)

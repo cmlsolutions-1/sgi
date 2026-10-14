@@ -3,7 +3,6 @@
 import { use, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Download, Edit, ExternalLink, Eye, FileText, Loader2, Plus, Trash2, Upload, Users } from "lucide-react"
-import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
 
@@ -24,6 +23,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
+import { createSafeCloudPdf } from "@/lib/pdf/safecloud-pdf-style"
 import { listEmployees } from "@/services/employeeService"
 import {
   createTrainingAttendance,
@@ -572,7 +572,7 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
   function handleDownloadActa() {
     if (!training) return
 
-    const doc = new jsPDF("p", "mm", "a4")
+    const doc = createSafeCloudPdf()
     const pageWidth = doc.internal.pageSize.getWidth()
     const pageHeight = doc.internal.pageSize.getHeight()
     const margin = 14
@@ -588,22 +588,6 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
     const primaryColor: [number, number, number] = [31, 92, 77]
     const softColor: [number, number, number] = [235, 244, 241]
     let y = 16
-
-    function addFooter() {
-      const pageCount =
-        (doc as unknown as { getNumberOfPages?: () => number }).getNumberOfPages?.() ??
-        Math.max(1, ((doc.internal as unknown as { pages?: unknown[] }).pages?.length ?? 2) - 1)
-      for (let pageNumber = 1; pageNumber <= pageCount; pageNumber += 1) {
-        doc.setPage(pageNumber)
-        doc.setDrawColor(220, 226, 224)
-        doc.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14)
-        doc.setFont("helvetica", "normal")
-        doc.setFontSize(8)
-        doc.setTextColor(100, 116, 139)
-        doc.text("Documento generado desde el Sistema de Gestion SG-SST", margin, pageHeight - 8)
-        doc.text(`Pagina ${pageNumber} de ${pageCount}`, pageWidth - margin, pageHeight - 8, { align: "right" })
-      }
-    }
 
     function ensureSpace(requiredHeight: number) {
       if (y + requiredHeight <= pageHeight - 22) return
@@ -750,8 +734,6 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
     doc.setFont("helvetica", "normal")
     doc.text(getEmployeeFullName(responsibleEmployee), leftX, y + 30)
     doc.text("Nombre y firma", rightX, y + 30)
-
-    addFooter()
 
     void saveCorporatePdf(doc, { documentName: "Acta de capacitación" }, `Acta_Capacitacion_${formatDate(training.date)}_${topicName.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
   }

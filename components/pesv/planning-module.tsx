@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "re
 import Link from "next/link"
 import { Download, Edit, Eye, FileCheck2, MoreHorizontal, Plus, Search, Trash2, Upload } from "lucide-react"
 import { toast } from "sonner"
-import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -30,6 +29,7 @@ import { PesvEmptyState, PesvModuleHeader } from "@/components/pesv/module-exper
 import { pesvModuleCatalog } from "@/lib/pesv/module-catalog"
 import { PesvSelect } from "@/components/pesv/pesv-select"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
+import { createSafeCloudPdf, SAFE_CLOUD_PDF_STYLE, setSafeCloudPdfCaption, setSafeCloudPdfSection, setSafeCloudPdfTitle } from "@/lib/pdf/safecloud-pdf-style"
 
 export { PesvSelect } from "@/components/pesv/pesv-select"
 
@@ -340,14 +340,14 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
   }
   function download(record?: RecordItem) {
     const exported = record ? [record] : visible
-    const doc = new jsPDF({ orientation: "landscape" })
-    doc.setFontSize(16); doc.setTextColor(30, 64, 175); doc.text(config.title, 14, 18)
-    doc.setFontSize(9); doc.setTextColor(60); doc.text(`Vigencia: ${year || "Todas"} · Fecha de generación: ${dateToday()}`, 14, 26)
+    const doc = createSafeCloudPdf({ orientation: "landscape" })
+    setSafeCloudPdfTitle(doc); doc.text(config.title, 14, 18)
+    setSafeCloudPdfCaption(doc); doc.text(`Vigencia: ${year || "Todas"} · Fecha de generación: ${dateToday()}`, 14, 26)
     if (!record) {
       autoTable(doc, { startY: 32, head: [[...kind.columns.map(key => kind.fields.find(f => f.key === key)?.label ?? key), "Estado / avance"]], body: exported.map(i => [...kind.columns.map(key => displayValue(kind.fields.find(f => f.key === key)!, i, catalogs)), `${itemStatus(i)}${kind.tracking ? ` · ${completion(i)}%` : ""}`]), headStyles: { fillColor: [37, 99, 235] }, styles: { fontSize: 8 } })
       if (module === "work-plan" || kind.id === "training-activity") {
         for (const item of exported) {
-          doc.addPage(); doc.setFontSize(13); doc.setTextColor(30, 64, 175)
+          doc.addPage(); setSafeCloudPdfSection(doc)
           doc.text(doc.splitTextToSize(text(item.values.name), 260), 14, 18)
           autoTable(doc, { startY: 35, head: [["Campo", "Información de la actividad"]], body: visibleFields(kind, item.values).map(f => [f.label, displayValue(f, item, catalogs)]), columnStyles: { 0: { cellWidth: 75 } }, headStyles: { fillColor: [37, 99, 235] }, styles: { fontSize: 9 } })
         }
@@ -365,10 +365,8 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
       }
       if (record.evidence.length) autoTable(doc, { head: [["Evidencia", "Fecha de carga"]], body: record.evidence.map(e => [e.name, e.uploadedAt.slice(0, 10)]), styles: { fontSize: 8 } })
     }
-    doc.addPage(); doc.setFontSize(12); doc.text("Revisión y aprobación", 14, 22)
-    doc.setFontSize(10); doc.text("Nombre: ________________________________________", 14, 42); doc.text("Cargo: __________________________________________", 14, 60); doc.text("Firma: __________________________________________", 14, 78); doc.text("Fecha: __________________________________________", 14, 96)
-    const pageCount = doc.internal.pages.length - 1
-    for (let i = 1; i <= pageCount; i++) { doc.setPage(i); doc.setFontSize(8); doc.setTextColor(100); doc.text(`SafeCloud · PESV · Página ${i} de ${pageCount}`, 14, 203) }
+    doc.addPage(); setSafeCloudPdfSection(doc); doc.text("Revisión y aprobación", 14, 22)
+    setSafeCloudPdfCaption(doc); doc.text("Nombre: ________________________________________", 14, 42); doc.text("Cargo: __________________________________________", 14, 60); doc.text("Firma: __________________________________________", 14, 78); doc.text("Fecha: __________________________________________", 14, 96)
     void saveCorporatePdf(doc, { documentName: record ? text(record.values.name) : config.title }, `pesv-${module}-${record ? text(record.values.year) : year || "todos"}.pdf`)
   }
   const formFields = visibleFields(kind, values)

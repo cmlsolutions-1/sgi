@@ -20,7 +20,6 @@ import {
   Upload,
   UserRound,
 } from "lucide-react"
-import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
 
@@ -29,6 +28,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
+import { createSafeCloudPdf } from "@/lib/pdf/safecloud-pdf-style"
 import {
   Dialog,
   DialogContent,
@@ -189,13 +189,6 @@ function getVisualStatusClassName(acpm: Acpm, evidences: AcpmClosureEvidence[] =
   if (acpm.currentCompletionPercentage >= 100) return "bg-amber-500 text-white border-transparent"
   if (acpm.currentCompletionPercentage > 0) return "bg-blue-600 text-white border-transparent"
   return "bg-warning/10 text-warning border-warning/20"
-}
-
-function getPdfPageCount(doc: jsPDF) {
-  return (
-    (doc as unknown as { getNumberOfPages?: () => number }).getNumberOfPages?.() ??
-    Math.max(1, ((doc.internal as unknown as { pages?: unknown[] }).pages?.length ?? 2) - 1)
-  )
 }
 
 function isLateUpload(acpm: Acpm, followUp?: AcpmFollowUp | null) {
@@ -1092,7 +1085,7 @@ export default function AcpmPage() {
 
   async function generateDocument(acpm: Acpm) {
     const followUps = followUpsByAcpm[acpm.id] ?? (await loadFollowUps(acpm.id))
-    const doc = new jsPDF("p", "mm", "a4")
+    const doc = createSafeCloudPdf()
     const pageWidth = doc.internal.pageSize.getWidth()
     const pageHeight = doc.internal.pageSize.getHeight()
     const margin = 14
@@ -1127,20 +1120,6 @@ export default function AcpmPage() {
       doc.setTextColor(30, 41, 59)
       doc.text(lines, margin, y)
       y += lines.length * 5 + 3
-    }
-
-    function addFooter() {
-      const pageCount = getPdfPageCount(doc)
-      for (let pageNumber = 1; pageNumber <= pageCount; pageNumber += 1) {
-        doc.setPage(pageNumber)
-        doc.setDrawColor(220, 226, 224)
-        doc.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14)
-        doc.setFont("helvetica", "normal")
-        doc.setFontSize(8)
-        doc.setTextColor(100, 116, 139)
-        doc.text("Documento generado desde el Sistema de Gestion SG-SST", margin, pageHeight - 8)
-        doc.text(`Pagina ${pageNumber} de ${pageCount}`, pageWidth - margin, pageHeight - 8, { align: "right" })
-      }
     }
 
     doc.setFillColor(...primaryColor)
@@ -1234,7 +1213,6 @@ export default function AcpmPage() {
     doc.text("Responsable", margin, y + 24)
     doc.text("Aprobacion / cierre", pageWidth - margin - 78, y + 24)
 
-    addFooter()
     void saveCorporatePdf(doc, { documentName: "Acción Correctiva, Preventiva o de Mejora (ACPM)" }, `ACPM_${acpm.year}_${acpm.name.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
   }
 

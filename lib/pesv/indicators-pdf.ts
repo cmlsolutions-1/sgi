@@ -3,31 +3,32 @@ import autoTable from "jspdf-autotable"
 import { text, type Evidence } from "./planning"
 import { aggregate, definitions, evidenceDate, formulaLabel, periodLabel, quarterEnd, reportWarnings, stepNames, type AnnualReport, type CsvReview, type IndicatorDefinition, type IndicatorsState, type Level, type Measurement } from "./indicators"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
+import { createSafeCloudPdf, SAFE_CLOUD_PDF_STYLE, setSafeCloudPdfCaption, setSafeCloudPdfSection, setSafeCloudPdfTitle } from "@/lib/pdf/safecloud-pdf-style"
 
 export function resultLabel(result: number | null, definition: IndicatorDefinition) {
   if (result === null) return "Sin base de cálculo"
   return definition.formula === "COST" ? new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(result) : `${new Intl.NumberFormat("es-CO", { maximumFractionDigits: 2 }).format(result)} ${definition.unit}`
 }
 function document(title: string, subtitle: string) {
-  const doc = new jsPDF()
+  const doc = createSafeCloudPdf()
   const header = () => {
     doc.setFillColor(30, 64, 175); doc.rect(0, 0, 210, 9, "F")
-    doc.setTextColor(30, 64, 175); doc.setFont("helvetica", "bold"); doc.setFontSize(13)
+    setSafeCloudPdfTitle(doc)
     doc.text(doc.splitTextToSize(title, 180), 14, 19)
-    doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(80)
+    setSafeCloudPdfCaption(doc)
     doc.text(subtitle, 14, 32)
   }
   const table = (head: string[], body: string[][]) => {
     const previous = (doc as jsPDF & { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY
     let startY = previous ? previous + 7 : 40
     if (startY > 247) { doc.addPage(); startY = 40 }
-    autoTable(doc, { head: [head], body: body.length ? body : [head.map((_, index) => index === 0 ? "Sin registros disponibles" : "")], margin: { top: 40, bottom: 20 }, startY, headStyles: { fillColor: [30, 64, 175] }, styles: { fontSize: 8, cellPadding: 3, overflow: "linebreak" }, rowPageBreak: "avoid" })
+    autoTable(doc, { head: [head], body: body.length ? body : [head.map((_, index) => index === 0 ? "Sin registros disponibles" : "")], margin: { top: 40, bottom: 20 }, startY, styles: { fontSize: SAFE_CLOUD_PDF_STYLE.captionSize }, rowPageBreak: "avoid" })
   }
   const files = (evidence: Evidence[]) => { if (evidence.length) table(["Soporte", "Fecha de carga"], evidence.map(e => [e.name, evidenceDate(e.uploadedAt)])) }
   const finish = (name: string, signature = true) => {
-    if (signature) { doc.addPage(); doc.setTextColor(80); doc.setFontSize(11); doc.text("Revisión y firma", 14, 48); doc.setFontSize(10); doc.text("Nombre: ______________________________________", 14, 66); doc.text("Cargo: ________________________________________", 14, 84); doc.text("Firma: ________________________________________", 14, 102); doc.text("Fecha: ________________________________________", 14, 120) }
+    if (signature) { doc.addPage(); setSafeCloudPdfSection(doc); doc.text("Revisión y firma", 14, 48); setSafeCloudPdfCaption(doc); doc.text("Nombre: ______________________________________", 14, 66); doc.text("Cargo: ________________________________________", 14, 84); doc.text("Firma: ________________________________________", 14, 102); doc.text("Fecha: ________________________________________", 14, 120) }
     const pages = doc.internal.pages.length - 1
-    for (let page = 1; page <= pages; page++) { doc.setPage(page); header(); doc.setTextColor(100); doc.setFontSize(8); doc.line(14, 280, 196, 280); doc.text(`SafeCloud · PESV · Página ${page} de ${pages}`, 14, 287) }
+    for (let page = 1; page <= pages; page++) { doc.setPage(page); header() }
     void saveCorporatePdf(doc, { documentName: title }, name)
   }
   return { doc, table, files, finish }

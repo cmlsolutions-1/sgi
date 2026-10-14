@@ -17,7 +17,6 @@ import {
   Upload,
   UsersRound,
 } from "lucide-react"
-import jsPDF from "jspdf"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -35,6 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
+import { createSafeCloudPdf } from "@/lib/pdf/safecloud-pdf-style"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
@@ -339,8 +339,8 @@ Cargado: ${formatDateTime(evidence.uploadedAt)}
 }
 
 function downloadDiagnosisPdf(diagnosis: PesvDiagnosis) {
-  const doc = new jsPDF("p", "mm", "a4")
-  const margin = 16
+  const doc = createSafeCloudPdf()
+  const margin = 14
   const pageWidth = doc.internal.pageSize.getWidth()
   const contentWidth = pageWidth - margin * 2
   let y = 18

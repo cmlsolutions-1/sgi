@@ -3,7 +3,7 @@
 import type jsPDF from "jspdf"
 import { PDFDocument, StandardFonts, rgb, type PDFEmbeddedPage, type PDFImage, type PDFFont, type PDFPage } from "pdf-lib"
 import { decodeJwt } from "@/lib/jwt"
-import { getCurrentCompany } from "@/services/companyService"
+import { getCompanyById, getCurrentCompany, listCompanies } from "@/services/companyService"
 import { getUserById } from "@/services/userService"
 import { useAuthStore } from "@/store/auth.store"
 
@@ -40,6 +40,11 @@ const COMPANY_CLAIMS = new Set([
 ])
 const USER_CLAIMS = new Set(["sub", "userid", "user_id", "id", "_id"])
 const NESTED_TOKEN_CONTAINERS = new Set(["user", "account", "context", "session", "data", "claims", "auth"])
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
+function validCompanyId(value: string) {
+  return UUID_PATTERN.test(value) ? value : ""
+}
 
 function identifierFromValue(value: unknown): string {
   if (typeof value === "string" && value.trim()) return value.trim()
@@ -73,47 +78,118 @@ function claimValue(payload: Record<string, unknown> | null, claims: Set<string>
   return ""
 }
 
-function companyText(company: unknown, keys: string[]) {
+function normalizeCompanyKey(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "")
+}
+
+function companyText(company: unknown, keys: string[], depth = 0): string {
   if (!company || typeof company !== "object") return ""
   const values = company as Record<string, unknown>
-  for (const key of keys) {
-    const value = values[key]
+  const normalizedKeys = new Set(keys.map(normalizeCompanyKey))
+
+  for (const [key, value] of Object.entries(values)) {
+    if (!normalizedKeys.has(normalizeCompanyKey(key))) continue
     if (typeof value === "string" && value.trim()) return value.trim()
+    if (typeof value === "number" && Number.isFinite(value)) return String(value)
+  }
+
+  if (depth >= 3) return ""
+  for (const value of Object.values(values)) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) continue
+    const nestedValue: string = companyText(value, keys, depth + 1)
+    if (nestedValue) return nestedValue
   }
   return ""
 }
 
+function identityFromCompany(company: unknown): CompanyIdentity | null {
+  const name = companyText(company, ["name", "companyName", "businessName", "legalName", "razonSocial", "razon_social"])
+  const nit = companyText(company, [
+    "nit",
+    "taxId",
+    "taxIdentification",
+    "taxIdentificationNumber",
+    "documentNumber",
+    "identificationNumber",
+    "numeroDocumento",
+    "numeroIdentificacion",
+    "companyNit",
+  ])
+  if (!name && !nit) return null
+  return { name, nit }
+}
+
 async function resolveCompanyIdentity(): Promise<CompanyIdentity> {
-  const { accessToken, refreshToken } = useAuthStore.getState()
-  const sessionKey = `${accessToken ?? ""}:${refreshToken ?? ""}`
+  const { accessToken, refreshToken, company: sessionCompany, setCompany } = useAuthStore.getState()
+  const sessionKey = `${accessToken ?? ""}:${refreshToken ?? ""}:${sessionCompany?.id ?? ""}:${sessionCompany?.nit ?? ""}`
   if (companyIdentityCache?.sessionKey === sessionKey) return companyIdentityCache.promise
 
   const promise = (async () => {
-    try {
-      const accessPayload = accessToken ? decodeJwt(accessToken) : null
-      const refreshPayload = refreshToken ? decodeJwt(refreshToken) : null
-      let companyId = claimValue(accessPayload, COMPANY_CLAIMS) || claimValue(refreshPayload, COMPANY_CLAIMS)
+    const accessPayload = accessToken ? decodeJwt(accessToken) : null
+    const refreshPayload = refreshToken ? decodeJwt(refreshToken) : null
+    const resolved: Partial<CompanyIdentity> = {}
+    const mergeIdentity = (identity: CompanyIdentity | null) => {
+      if (identity?.name) resolved.name = identity.name
+      if (identity?.nit) resolved.nit = identity.nit
+    }
 
+    mergeIdentity(identityFromCompany(sessionCompany))
+    if (sessionCompany?.id && (!resolved.name || !resolved.nit)) {
+      try {
+        const company = await getCompanyById(sessionCompany.id)
+        mergeIdentity(identityFromCompany(company))
+        setCompany({ id: company.id, name: company.name, nit: company.nit })
+      } catch (error) {
+        console.warn("No se pudo completar la empresa guardada para el PDF:", error)
+      }
+    }
+    if (resolved.name && resolved.nit) return resolved as CompanyIdentity
+
+    try {
+      const currentCompany = identityFromCompany(await getCurrentCompany())
+      mergeIdentity(currentCompany)
+      if (resolved.name && resolved.nit) return resolved as CompanyIdentity
+    } catch (error) {
+      console.warn("No se pudo cargar la empresa actual para el PDF:", error)
+    }
+
+    try {
+      let companyId = validCompanyId(claimValue(accessPayload, COMPANY_CLAIMS)) || validCompanyId(claimValue(refreshPayload, COMPANY_CLAIMS))
       if (!companyId) {
         const userId = claimValue(accessPayload, USER_CLAIMS) || claimValue(refreshPayload, USER_CLAIMS)
-        if (userId) companyId = (await getUserById(userId)).companyId
+        if (userId) companyId = validCompanyId((await getUserById(userId)).companyId)
       }
-
-      if (!companyId) return DEFAULT_IDENTITY
-      const company = await getCurrentCompany()
-      return {
-        name: companyText(company, ["name", "companyName", "businessName", "legalName", "razonSocial"]) || DEFAULT_IDENTITY.name,
-        nit: companyText(company, ["nit", "taxId", "taxIdentification", "documentNumber"]) || DEFAULT_IDENTITY.nit,
+      if (companyId) {
+        const company = identityFromCompany(await getCompanyById(companyId))
+        mergeIdentity(company)
+        if (resolved.name && resolved.nit) return resolved as CompanyIdentity
       }
     } catch (error) {
-      console.warn("No se pudo cargar la identidad corporativa para el PDF:", error)
-      return DEFAULT_IDENTITY
+      console.warn("No se pudo cargar la empresa por identificador para el PDF:", error)
+    }
+
+    try {
+      const companies = await listCompanies()
+      if (companies.length === 1) mergeIdentity(identityFromCompany(companies[0]))
+    } catch (error) {
+      console.warn("No se pudo cargar la empresa disponible para el PDF:", error)
+    }
+
+    mergeIdentity(identityFromCompany(accessPayload))
+    mergeIdentity(identityFromCompany(refreshPayload))
+    return {
+      name: resolved.name || DEFAULT_IDENTITY.name,
+      nit: resolved.nit || DEFAULT_IDENTITY.nit,
     }
   })()
 
   companyIdentityCache = { sessionKey, promise }
   void promise.then(identity => {
-    if (identity === DEFAULT_IDENTITY && companyIdentityCache?.sessionKey === sessionKey) {
+    if (
+      identity.name === DEFAULT_IDENTITY.name &&
+      identity.nit === DEFAULT_IDENTITY.nit &&
+      companyIdentityCache?.sessionKey === sessionKey
+    ) {
       companyIdentityCache = null
     }
   })
@@ -292,13 +368,16 @@ export async function applySafeCloudCorporateTemplate(source: Blob | ArrayBuffer
     const templateArtworkApplied = Boolean(corporateTemplate && isPortrait)
     if (corporateTemplate && isPortrait) page.drawPage(corporateTemplate, { x: 0, y: 0, width, height })
     const embedded = await outputPdf.embedPage(sourcePage)
-    const contentBox = { x: 28, y: 50, width: width - 56, height: height - 188 }
-    const scale = Math.min(contentBox.width / sourceSize.width, contentBox.height / sourceSize.height)
+    const horizontalInset = 28
+    const verticalInset = isPortrait ? 36 : 22
+    const contentWidth = width - horizontalInset * 2
+    const contentHeight = height - verticalInset * 2
+    const scale = Math.min(contentWidth / sourceSize.width, contentHeight / sourceSize.height)
     const renderedWidth = sourceSize.width * scale
     const renderedHeight = sourceSize.height * scale
     page.drawPage(embedded, {
-      x: contentBox.x + (contentBox.width - renderedWidth) / 2,
-      y: contentBox.y + (contentBox.height - renderedHeight) / 2,
+      x: (width - renderedWidth) / 2,
+      y: (height - renderedHeight) / 2,
       width: renderedWidth,
       height: renderedHeight,
     })

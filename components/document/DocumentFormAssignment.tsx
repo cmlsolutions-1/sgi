@@ -7,10 +7,9 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DocumentPreviewAssignment } from "@/components/document/DocumentPreviewAssignment"
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
 import { ASSIGNMENT_RESPONSIBILITIES } from "@/lib/assignmentResponsibilities"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
+import { createSafeCloudPdf, SAFE_CLOUD_PDF_STYLE, setSafeCloudPdfBody, setSafeCloudPdfSection, setSafeCloudPdfTitle } from "@/lib/pdf/safecloud-pdf-style"
 
 interface DocumentField {
   id: string
@@ -163,7 +162,11 @@ export default function DocumentFormAssignment({
   }
 
   const generatePDF = () => {
-    const doc = new jsPDF()
+    const doc = createSafeCloudPdf()
+    const margin = SAFE_CLOUD_PDF_STYLE.marginX
+    const pageWidth = doc.internal.pageSize.width - margin * 2
+    const secondSignatureX = doc.internal.pageSize.width / 2 + 5
+    const signatureWidth = doc.internal.pageSize.width / 2 - margin - 10
     
     // Crear el contenido completo del documento
     let fullContent = SGSST_TEMPLATE.templateText
@@ -177,12 +180,11 @@ export default function DocumentFormAssignment({
     })
     
     // Agregar título
-    doc.setFontSize(16)
+    setSafeCloudPdfTitle(doc)
     doc.text(SGSST_TEMPLATE.title, 105, 20, { align: 'center' })
     
     // Configurar el contenido principal
-    doc.setFontSize(12)
-    const pageWidth = doc.internal.pageSize.width - 40 // Margen izquierdo y derecho
+    setSafeCloudPdfBody(doc)
     const splitText = doc.splitTextToSize(fullContent, pageWidth)
     
     // Posición inicial para el contenido
@@ -196,8 +198,8 @@ export default function DocumentFormAssignment({
           currentY = 20
         }
         
-        doc.text(line, 20, currentY)
-        currentY += 7
+        doc.text(line, margin, currentY)
+        currentY += 5.5
       })
     
     // Añadir espacio antes de las firmas
@@ -209,22 +211,22 @@ export default function DocumentFormAssignment({
     }
     
     // Agregar sección de firmas en la última página
-    doc.setFontSize(14)
-    doc.text("FIRMAS:", 20, currentY)
+    setSafeCloudPdfSection(doc)
+    doc.text("FIRMAS:", margin, currentY)
     currentY += 15
     
     // Línea de firma del responsable
-    doc.setFontSize(12)
-    doc.line(20, currentY, 100, currentY) // Línea de firma
-    doc.text(formData.responsible_signature_name || "_________________________", 20, currentY + 10)
-    doc.text("Responsable SGSST", 20, currentY + 20)
-    doc.text(`Fecha: ${formData.responsible_signature_date || "_____________"}`, 20, currentY + 30)
+    setSafeCloudPdfBody(doc)
+    doc.line(margin, currentY, margin + signatureWidth, currentY)
+    doc.text(formData.responsible_signature_name || "_________________________", margin, currentY + 10)
+    doc.text("Responsable SGSST", margin, currentY + 20)
+    doc.text(`Fecha: ${formData.responsible_signature_date || "_____________"}`, margin, currentY + 30)
     
     // Línea de firma del representante legal
-    doc.line(120, currentY, 200, currentY) // Línea de firma
-    doc.text(formData.legal_representative_name || "_________________________", 120, currentY + 10)
-    doc.text("Representante Legal", 120, currentY + 20)
-    doc.text(`Fecha: ${formData.legal_representative_date || "_____________"}`, 120, currentY + 30)
+    doc.line(secondSignatureX, currentY, secondSignatureX + signatureWidth, currentY)
+    doc.text(formData.legal_representative_name || "_________________________", secondSignatureX, currentY + 10)
+    doc.text("Representante Legal", secondSignatureX, currentY + 20)
+    doc.text(`Fecha: ${formData.legal_representative_date || "_____________"}`, secondSignatureX, currentY + 30)
     
     // Guardar el PDF
     void saveCorporatePdf(doc, { documentName: SGSST_TEMPLATE.title }, `${SGSST_TEMPLATE.title}.pdf`)

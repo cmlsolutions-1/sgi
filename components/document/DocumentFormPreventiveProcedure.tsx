@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import jsPDF from "jspdf"
 import { upsertUserDocument } from "@/lib/documents-storage"
 import type { StoredDocument } from "@/lib/documents-storage"
 import { departments, mockCompany } from "@/lib/mock-data"
@@ -18,6 +17,7 @@ import {
   type PreventiveProcedureFilled,
 } from "@/lib/preventive-procedure-storage"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
+import { createSafeCloudPdf, setSafeCloudPdfBody, setSafeCloudPdfSection, setSafeCloudPdfTitle } from "@/lib/pdf/safecloud-pdf-style"
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -84,12 +84,12 @@ export default function DocumentFormPreventiveProcedure({
   }
 
   const generatePDF = async () => {
-    const doc = new jsPDF()
+    const doc = createSafeCloudPdf()
 
-    doc.setFontSize(16)
+    setSafeCloudPdfTitle(doc)
     doc.text("PROCEDIMIENTO - MEDIDAS DE PREVENCIÓN", 105, 18, { align: "center" })
 
-    doc.setFontSize(11)
+    setSafeCloudPdfBody(doc)
     let y = 30
 
     const line = (label: string, value: string) => {
@@ -103,33 +103,33 @@ export default function DocumentFormPreventiveProcedure({
     line("Área de trabajo", formData.workArea)
     y += 4
 
-    doc.setFontSize(12)
+    setSafeCloudPdfSection(doc)
     doc.text("Objetivo:", 15, y); y += 6
-    doc.setFontSize(11)
+    setSafeCloudPdfBody(doc)
     const obj = doc.splitTextToSize(formData.objective, 180)
     doc.text(obj, 15, y); y += obj.length * 6 + 4
 
-    doc.setFontSize(12)
+    setSafeCloudPdfSection(doc)
     doc.text("Actividades / Pasos:", 15, y); y += 6
-    doc.setFontSize(11)
+    setSafeCloudPdfBody(doc)
     const act = doc.splitTextToSize(formData.activities, 180)
     doc.text(act, 15, y); y += act.length * 6 + 4
 
-    doc.setFontSize(12)
+    setSafeCloudPdfSection(doc)
     doc.text("Recursos / Evidencias esperadas:", 15, y); y += 6
-    doc.setFontSize(11)
+    setSafeCloudPdfBody(doc)
     const res = doc.splitTextToSize(formData.resources || "—", 180)
     doc.text(res, 15, y); y += res.length * 6 + 10
 
     // responsable
-    doc.setFontSize(12)
+    setSafeCloudPdfSection(doc)
     doc.text("Responsable:", 15, y); y += 7
-    doc.setFontSize(11)
+    setSafeCloudPdfBody(doc)
     doc.text(`${formData.responsibleName} ${formData.responsibleRole ? `- ${formData.responsibleRole}` : ""}`, 15, y)
     y += 12
 
     // firma
-    doc.setFontSize(12)
+    setSafeCloudPdfSection(doc)
     doc.text("Firma:", 15, y)
     y += 5
 

@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react"
 import { Download, ExternalLink, Eye, FileText, Loader2, Trash2, Upload } from "lucide-react"
 import { toast } from "sonner"
-import jsPDF from "jspdf"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
+import { createSafeCloudPdf } from "@/lib/pdf/safecloud-pdf-style"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -221,7 +221,7 @@ export function SgiResponsibleFormDialog({
     window.localStorage.setItem("sgiResponsibleCompanyName", companyName.trim())
     window.localStorage.setItem("sgiResponsibleLegalRepresentativeName", legalRepresentativeName.trim())
 
-    const doc = new jsPDF("p", "mm", "a4")
+    const doc = createSafeCloudPdf()
     const marginX = 22
     const pageWidth = doc.internal.pageSize.getWidth()
     const pageHeight = doc.internal.pageSize.getHeight()

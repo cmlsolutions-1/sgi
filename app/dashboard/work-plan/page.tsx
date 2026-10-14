@@ -17,10 +17,10 @@ import {
   Upload,
   UserRound,
 } from "lucide-react"
-import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
 import { downloadCorporatePdfBlob, saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
+import { createSafeCloudPdf } from "@/lib/pdf/safecloud-pdf-style"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -52,7 +52,6 @@ import {
   approveWorkPlan,
   createWorkPlanItem,
   downloadWorkPlanFile,
-  generateWorkPlanDocument,
   getWorkPlanItem,
   listWorkPlanItems,
 } from "@/services/workPlanService"
@@ -203,13 +202,6 @@ function statusClassName(status: WorkPlanStatus) {
   return status === "APPROVED"
     ? "bg-accentActivd text-accentActivd-foreground border-transparent"
     : "bg-warning/10 text-warning border-warning/20"
-}
-
-function getPdfPageCount(doc: jsPDF) {
-  return (
-    (doc as unknown as { getNumberOfPages?: () => number }).getNumberOfPages?.() ??
-    Math.max(1, ((doc.internal as unknown as { pages?: unknown[] }).pages?.length ?? 2) - 1)
-  )
 }
 
 function WorkPlanDialog({
@@ -700,24 +692,7 @@ export default function WorkPlanPage() {
     }
 
     const year = yearFilter === "all" ? currentYear : Number(yearFilter)
-    try {
-      const generated = await generateWorkPlanDocument({
-        year,
-        workPlanItemIds: itemsToApprove.map((item) => item.id),
-      })
-      const blob = await downloadWorkPlanFile(generated.downloadUrl)
-      await downloadCorporatePdfBlob(
-        blob,
-        { documentName: "Plan de Trabajo SG-SST" },
-        generated.fileName || `Plan_Trabajo_${year}_Pendiente_Aprobacion.pdf`,
-      )
-      toast.success("Documento generado para firma del jefe")
-      return
-    } catch (error) {
-      toast.info("El generador del backend aún no está disponible; se generará el documento localmente.")
-    }
-
-    const doc = new jsPDF("p", "mm", "a4")
+    const doc = createSafeCloudPdf()
     const pageWidth = doc.internal.pageSize.getWidth()
     const pageHeight = doc.internal.pageSize.getHeight()
     const margin = 14
@@ -752,20 +727,6 @@ export default function WorkPlanPage() {
       doc.setTextColor(30, 41, 59)
       doc.text(lines, margin, y)
       y += lines.length * 5 + 3
-    }
-
-    function addFooter() {
-      const pageCount = getPdfPageCount(doc)
-      for (let pageNumber = 1; pageNumber <= pageCount; pageNumber += 1) {
-        doc.setPage(pageNumber)
-        doc.setDrawColor(220, 226, 224)
-        doc.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14)
-        doc.setFont("helvetica", "normal")
-        doc.setFontSize(8)
-        doc.setTextColor(100, 116, 139)
-        doc.text("Documento generado desde el Sistema de Gestion SG-SST", margin, pageHeight - 8)
-        doc.text(`Pagina ${pageNumber} de ${pageCount}`, pageWidth - margin, pageHeight - 8, { align: "right" })
-      }
     }
 
     doc.setFillColor(...primaryColor)
@@ -833,7 +794,6 @@ export default function WorkPlanPage() {
     doc.text("Nombre y firma del jefe", margin, y + 24)
     doc.text("Fecha de aprobacion", pageWidth - margin - 78, y + 24)
 
-    addFooter()
     void saveCorporatePdf(doc, { documentName: "Plan de Trabajo SG-SST" }, `Plan_Trabajo_${year}_Pendiente_Aprobacion.pdf`)
     toast.success("Documento generado para firma del jefe")
   }

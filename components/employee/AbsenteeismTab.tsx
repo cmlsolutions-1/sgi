@@ -12,8 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer"
 import { Label } from "@/components/ui/label"
 import { Calendar, Download, FileText, Plus, Trash2, Upload } from "lucide-react"
-import jsPDF from "jspdf"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
+import { createSafeCloudPdf, SAFE_CLOUD_PDF_STYLE, setSafeCloudPdfBody, setSafeCloudPdfTitle } from "@/lib/pdf/safecloud-pdf-style"
 import { cn } from "@/lib/utils"
 import { Pencil } from "lucide-react"
 
@@ -229,21 +229,22 @@ export function AbsenteeismTab({ employee }: { employee: Employee }) {
   }
 
   const downloadRecordPDF = (r: AbsenteeismRecord) => {
-    const doc = new jsPDF()
-    doc.setFontSize(16)
+    const doc = createSafeCloudPdf()
+    const margin = SAFE_CLOUD_PDF_STYLE.marginX
+    setSafeCloudPdfTitle(doc)
     doc.text("Registro de Ausentismo Laboral", 105, 18, { align: "center" })
 
-    doc.setFontSize(12)
-    doc.text(`Empleado: ${employee.name} ${employee.lastName}`, 20, 35)
-    doc.text(`Tipo: ${r.type}`, 20, 45)
-    doc.text(`Subtipo: ${r.subType}`, 20, 55)
-    doc.text(`Inicio: ${r.startDate}`, 20, 65)
-    doc.text(`Fin: ${r.endDate}`, 20, 75)
-    doc.text(`Días: ${daysBetween(r.startDate, r.endDate)}`, 20, 85)
+    setSafeCloudPdfBody(doc)
+    doc.text(`Empleado: ${employee.name} ${employee.lastName}`, margin, 35)
+    doc.text(`Tipo: ${r.type}`, margin, 45)
+    doc.text(`Subtipo: ${r.subType}`, margin, 55)
+    doc.text(`Inicio: ${r.startDate}`, margin, 65)
+    doc.text(`Fin: ${r.endDate}`, margin, 75)
+    doc.text(`Días: ${daysBetween(r.startDate, r.endDate)}`, margin, 85)
 
-    doc.text("Observaciones:", 20, 97)
-    const obs = doc.splitTextToSize(r.notes || "—", 170)
-    doc.text(obs, 20, 107)
+    doc.text("Observaciones:", margin, 97)
+    const obs = doc.splitTextToSize(r.notes || "—", doc.internal.pageSize.getWidth() - margin * 2)
+    doc.text(obs, margin, 107)
 
     void saveCorporatePdf(doc, { documentName: "Registro de Ausentismo Laboral" }, `ausentismo-${employee.id}-${r.id}.pdf`)
   }

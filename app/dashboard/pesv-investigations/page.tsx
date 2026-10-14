@@ -3,7 +3,6 @@
 import { type FormEvent, useEffect, useState } from "react"
 import Link from "next/link"
 import { Check, Download, Edit, Eye, FileCheck2, FileSearch, MoreHorizontal, Plus, Search, Trash2, Upload } from "lucide-react"
-import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -24,6 +23,7 @@ import {
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
+import { createSafeCloudPdf, setSafeCloudPdfCaption, setSafeCloudPdfTitle } from "@/lib/pdf/safecloud-pdf-style"
 
 const emptyStore: InvestigationStore = { procedures: [], cases: [], sequences: {} }
 const today = dateToday
@@ -187,9 +187,9 @@ export default function RoadInvestigationsPage() {
   async function downloadCase(record: RoadCase, lessonsOnly = false) {
     const lessons = record.stages.find(s => s.key === "LESSONS")
     if (lessonsOnly && !lessons) { toast.error("Registra primero las lecciones aprendidas."); return }
-    const doc = new jsPDF()
-    doc.setFontSize(15); doc.setTextColor(30, 64, 175); doc.text(lessonsOnly ? "Lecciones aprendidas por siniestro vial" : "Investigación interna de siniestro vial", 14, 18)
-    doc.setFontSize(9); doc.setTextColor(60); doc.text(`SafeCloud · PESV · ${record.consecutive}`, 14, 26)
+    const doc = createSafeCloudPdf()
+    setSafeCloudPdfTitle(doc); doc.text(lessonsOnly ? "Lecciones aprendidas por siniestro vial" : "Investigación interna de siniestro vial", 14, 18)
+    setSafeCloudPdfCaption(doc); doc.text(`SafeCloud · PESV · ${record.consecutive}`, 14, 26)
     const basic = [["Fecha y hora", `${text(record.values.occurrenceDate)} ${text(record.values.occurrenceTime)}`], ["Lugar", text(record.values.place)], ["Evento", text(record.values.name)], ["Estado", caseStatus(record)], ["Equipo investigador", `${ids(record.values.investigatorIds).map(id => personName(id, record)).join(", ")}${record.externalInvestigators.length ? ` · ${record.externalInvestigators.map(p => `${p.name} (${p.organization})`).join(", ")}` : ""}`]]
     autoTable(doc, { startY: 32, head: [["Registro", "Información"]], body: basic, styles: { fontSize: 9 }, headStyles: { fillColor: [37, 99, 235] }, columnStyles: { 0: { cellWidth: 45 } } })
     if (lessonsOnly) {
@@ -218,14 +218,21 @@ export default function RoadInvestigationsPage() {
         doc.addImage(canvas.toDataURL("image/jpeg"), "JPEG", 14, 32, img.naturalWidth * scale, img.naturalHeight * scale)
       } catch { toast.error(`No se pudo incluir la imagen ${photo.name} en el PDF.`) }
     }
-    const count = doc.internal.pages.length - 1
-    for (let page = 1; page <= count; page++) { doc.setPage(page); doc.setFontSize(8); doc.setTextColor(100); doc.text(`SafeCloud · ${record.consecutive} · Página ${page} de ${count}`, 14, 289) }
     const documentName = lessonsOnly ? "Lecciones aprendidas del siniestro vial" : "Investigación de siniestro vial"
     void saveCorporatePdf(doc, { documentName }, `${lessonsOnly ? "lecciones-aprendidas" : "investigacion"}-${record.consecutive}.pdf`)
   }
   function downloadProcedure(record: RecordItem) {
-    const doc = new jsPDF(); doc.setFontSize(15); doc.text("Procedimiento de investigación vial", 14, 18)
-    autoTable(doc, { startY: 26, head: [["Campo", "Información"]], body: referenceLabels(procedureKind, record.values, record.links), headStyles: { fillColor: [37, 99, 235] }, styles: { fontSize: 9 } }); void saveCorporatePdf(doc, { documentName: "Procedimiento de investigación vial" }, "procedimiento-investigacion-vial.pdf")
+    const doc = createSafeCloudPdf()
+    setSafeCloudPdfTitle(doc)
+    doc.text("Procedimiento de investigación vial", 14, 18)
+    autoTable(doc, {
+      startY: 26,
+      head: [["Campo", "Información"]],
+      body: referenceLabels(procedureKind, record.values, record.links),
+      headStyles: { fillColor: [37, 99, 235] },
+      styles: { fontSize: 9 },
+    })
+    void saveCorporatePdf(doc, { documentName: "Procedimiento de investigación vial" }, "procedimiento-investigacion-vial.pdf")
   }
   const visibleCases = store.cases.filter(r => `${r.consecutive} ${text(r.values.name)} ${text(r.values.place)}`.toLowerCase().includes(search.toLowerCase()) && (!filter || (filter === "closed" ? Boolean(r.closedAt) : !r.closedAt)))
   const visibleProcedures = store.procedures.filter(p => text(p.values.name).toLowerCase().includes(search.toLowerCase()))
