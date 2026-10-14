@@ -34,6 +34,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
 
@@ -279,7 +280,7 @@ function downloadPolicyPdf(policy: PesvPolicy) {
   doc.setTextColor(100, 116, 139)
   doc.text("Documento generado desde SafeCloud", margin, pageHeight - 8)
 
-  doc.save(`politica-seguridad-vial-v${policy.version.replace(/\s+/g, "_")}.pdf`)
+  void saveCorporatePdf(doc, { documentName: "Política de Seguridad Vial", version: policy.version }, `politica-seguridad-vial-v${policy.version.replace(/\s+/g, "_")}.pdf`)
 }
 
 function PolicyDialog({

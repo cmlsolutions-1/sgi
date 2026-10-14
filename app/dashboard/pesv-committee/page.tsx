@@ -34,6 +34,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
 import type { Employee } from "@/types/manager/employee"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { PesvSelect } from "@/components/pesv/pesv-select"
@@ -315,7 +316,7 @@ function downloadCommitteePdf(record: PesvCommitteeRecord) {
     y += 12
   })
 
-  doc.save("comite-seguridad-vial-pesv.pdf")
+  void saveCorporatePdf(doc, { documentName: "Comité de Seguridad Vial PESV" }, "comite-seguridad-vial-pesv.pdf")
 }
 
 function CommitteeDialog({

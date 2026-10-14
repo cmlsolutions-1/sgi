@@ -34,6 +34,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
@@ -416,7 +417,7 @@ function downloadDiagnosisPdf(diagnosis: PesvDiagnosis) {
     y += 8
   })
 
-  doc.save(`diagnostico-pesv-${diagnosis.year}.pdf`)
+  void saveCorporatePdf(doc, { documentName: "Diagnóstico PESV" }, `diagnostico-pesv-${diagnosis.year}.pdf`)
 }
 
 function DiagnosisDialog({

@@ -20,6 +20,7 @@ import {
   UserRound,
 } from "lucide-react"
 import { toast } from "sonner"
+import { downloadCorporatePdfBlob } from "@/lib/pdf/safecloud-corporate-pdf"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -833,7 +834,7 @@ export default function HealthyLifestylesPage() {
     setBusyRecordId(record.id)
     try {
       const blob = await exportHealthyLifestyle(record.id)
-      downloadBlob(blob, `estilos-vida-saludable-${record.name.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
+      await downloadCorporatePdfBlob(blob, { documentName: "Estilos de Vida Saludable" }, `estilos-vida-saludable-${record.name.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo descargar el programa")
     } finally {

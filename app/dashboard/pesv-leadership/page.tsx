@@ -34,6 +34,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
 
@@ -323,7 +324,7 @@ function downloadLeadershipPdf(record: PesvLeadershipRecord) {
   doc.text("Firma alta dirección", margin, y + 6)
   doc.text("Firma responsable PESV", pageWidth - margin - 78, y + 6)
 
-  doc.save(`liderazgo-directivo-pesv-${record.year}.pdf`)
+  void saveCorporatePdf(doc, { documentName: "Liderazgo Directivo PESV" }, `liderazgo-directivo-pesv-${record.year}.pdf`)
 }
 
 function LeadershipDialog({

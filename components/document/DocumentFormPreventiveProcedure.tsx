@@ -17,6 +17,7 @@ import {
   upsertPreventiveProcedureFilled,
   type PreventiveProcedureFilled,
 } from "@/lib/preventive-procedure-storage"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -140,7 +141,7 @@ export default function DocumentFormPreventiveProcedure({
       doc.text("(No fue posible incrustar la firma)", 15, y + 10)
     }
 
-    return doc.output("datauristring")
+    return doc
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -219,12 +220,8 @@ export default function DocumentFormPreventiveProcedure({
     upsertUserDocument(storedDoc)
 
     //  4) Generar PDF y descargar (NO guardarlo en localStorage)
-    const pdfDataUrl = await generatePDF()
-
-    const a = document.createElement("a")
-    a.href = pdfDataUrl
-    a.download = `${formData.documentName}.pdf`
-    a.click()
+    const pdf = await generatePDF()
+    await saveCorporatePdf(pdf, { documentName: formData.documentName }, `${formData.documentName}.pdf`)
 
     // 5) Avisar al modal que ya se creó (para cerrar + refrescar)
     onCreated?.()

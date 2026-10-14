@@ -10,6 +10,7 @@ import { DocumentPreviewAssignment } from "@/components/document/DocumentPreview
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import { ASSIGNMENT_RESPONSIBILITIES } from "@/lib/assignmentResponsibilities"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 
 interface DocumentField {
   id: string
@@ -226,7 +227,7 @@ export default function DocumentFormAssignment({
     doc.text(`Fecha: ${formData.legal_representative_date || "_____________"}`, 120, currentY + 30)
     
     // Guardar el PDF
-    doc.save(`${SGSST_TEMPLATE.title}.pdf`)
+    void saveCorporatePdf(doc, { documentName: SGSST_TEMPLATE.title }, `${SGSST_TEMPLATE.title}.pdf`)
   }
 
   const handleSubmit = (e: React.FormEvent) => {

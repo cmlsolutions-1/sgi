@@ -28,6 +28,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 import {
   Dialog,
   DialogContent,
@@ -1234,7 +1235,7 @@ export default function AcpmPage() {
     doc.text("Aprobacion / cierre", pageWidth - margin - 78, y + 24)
 
     addFooter()
-    doc.save(`ACPM_${acpm.year}_${acpm.name.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
+    void saveCorporatePdf(doc, { documentName: "Acción Correctiva, Preventiva o de Mejora (ACPM)" }, `ACPM_${acpm.year}_${acpm.name.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
   }
 
   const stats = useMemo(() => {

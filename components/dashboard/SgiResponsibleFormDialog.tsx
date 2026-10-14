@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Download, ExternalLink, Eye, FileText, Loader2, Trash2, Upload } from "lucide-react"
 import { toast } from "sonner"
 import jsPDF from "jspdf"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -305,7 +306,7 @@ export function SgiResponsibleFormDialog({
     doc.text("REPRESENTANTE LEGAL", leftX, y)
     doc.text(getEmployeePosition(selectedEmployee).toUpperCase(), rightX, y)
 
-    doc.save(`designacion-responsable-sgi-${safeFilename(responsibleName || "responsable")}.pdf`)
+    void saveCorporatePdf(doc, { documentName: "Designación de Responsable del SGI" }, `designacion-responsable-sgi-${safeFilename(responsibleName || "responsable")}.pdf`)
     toast.success("Documento de designacion generado")
   }
 

@@ -31,6 +31,11 @@ export async function getCompanyById(id: string): Promise<CompanyLite> {
   return parseOrThrow<CompanyLite>(res, "No se pudo cargar la compañía");
 }
 
+export async function getCurrentCompany(): Promise<CompanyLite> {
+  const res = await apiFetch("/api/company/me", { method: "GET" });
+  return parseOrThrow<CompanyLite>(res, "No se pudo cargar la empresa de la sesión");
+}
+
 export async function createCompany(dto: CreateCompanyDto): Promise<CompanyLite> {
   const res = await apiFetch("/api/company", {
     method: "POST",

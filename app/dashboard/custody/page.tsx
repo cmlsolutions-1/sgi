@@ -17,6 +17,7 @@ import {
   Upload,
 } from "lucide-react"
 import { toast } from "sonner"
+import { downloadCorporatePdfBlob } from "@/lib/pdf/safecloud-corporate-pdf"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -520,12 +521,7 @@ export default function CustodyPage() {
   async function downloadCommitment(record: CustodyRecord) {
     try {
       const blob = await downloadCustodyCommitment(record.id)
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement("a")
-      link.href = url
-      link.download = `compromiso-confidencialidad-${record.responsiblePerson.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`
-      link.click()
-      URL.revokeObjectURL(url)
+      await downloadCorporatePdfBlob(blob, { documentName: "Compromiso de Confidencialidad y Custodia" }, `compromiso-confidencialidad-${record.responsiblePerson.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo descargar el compromiso")
     }

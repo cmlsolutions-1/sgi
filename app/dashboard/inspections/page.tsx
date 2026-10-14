@@ -18,6 +18,7 @@ import {
   UserRound,
 } from "lucide-react"
 import { toast } from "sonner"
+import { downloadCorporatePdfBlob } from "@/lib/pdf/safecloud-corporate-pdf"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -685,7 +686,11 @@ export default function InspectionsPage() {
   async function downloadInspectionPdf(record: InspectionRecord) {
     try {
       const blob = await exportInspection(record.id)
-      saveBlob(blob, `${record.elementName.toLowerCase().replace(/\s+/g, "-")}.pdf`)
+      await downloadCorporatePdfBlob(
+        blob,
+        { documentName: `Inspección - ${record.elementName}` },
+        `${record.elementName.toLowerCase().replace(/\s+/g, "-")}.pdf`,
+      )
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo exportar la inspección")
     }

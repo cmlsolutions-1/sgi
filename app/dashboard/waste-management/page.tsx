@@ -18,6 +18,7 @@ import {
   UserRound,
 } from "lucide-react"
 import { toast } from "sonner"
+import { downloadCorporatePdfBlob } from "@/lib/pdf/safecloud-corporate-pdf"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -812,7 +813,11 @@ export default function WasteManagementPage() {
     try {
       const blob = await exportWasteManagement(record.id)
       const safeName = recordTitle(record).replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ_-]+/g, "-")
-      saveBlob(blob, `${safeName || "manejo-residuos"}.pdf`)
+      await downloadCorporatePdfBlob(
+        blob,
+        { documentName: recordTitle(record) },
+        `${safeName || "manejo-residuos"}.pdf`,
+      )
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo descargar el registro")
     }

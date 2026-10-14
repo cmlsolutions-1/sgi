@@ -15,6 +15,7 @@ import {
   Upload,
 } from "lucide-react"
 import { toast } from "sonner"
+import { downloadCorporatePdfBlob } from "@/lib/pdf/safecloud-corporate-pdf"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -915,12 +916,7 @@ export default function AuditsPage() {
     setExportingId(audit.id)
     try {
       const blob = await exportSstAudit(audit.id)
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement("a")
-      link.href = url
-      link.download = `auditoria-sst-${audit.year}-${audit.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`
-      link.click()
-      URL.revokeObjectURL(url)
+      await downloadCorporatePdfBlob(blob, { documentName: "Auditoría SST" }, `auditoria-sst-${audit.year}-${audit.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo descargar el plan de auditoría.")
     } finally {

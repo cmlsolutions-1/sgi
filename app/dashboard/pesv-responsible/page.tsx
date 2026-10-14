@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
 import type { Employee } from "@/types/manager/employee"
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 
 type PesvResponsibleRecord = {
   id: string
@@ -213,7 +214,7 @@ function downloadDesignationPdf(record: PesvResponsibleRecord) {
   doc.setTextColor(100, 116, 139)
   doc.text("Documento generado desde SafeCloud", margin, 286)
 
-  doc.save(`responsable-pesv-${record.employeeName.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
+  void saveCorporatePdf(doc, { documentName: "Designación del Responsable PESV" }, `responsable-pesv-${record.employeeName.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
 }
 
 function PesvResponsibleDialog({

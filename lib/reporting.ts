@@ -1,5 +1,6 @@
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 
 export type DateRangeMode = "all" | "bimester" | "quarter" | "custom"
 
@@ -175,5 +176,5 @@ export function buildReportPdf<T>({
     margin: { left: 8, right: 8 },
   })
 
-  doc.save(filename)
+  void saveCorporatePdf(doc, { documentName: title }, filename)
 }

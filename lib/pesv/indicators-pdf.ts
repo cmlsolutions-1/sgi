@@ -2,6 +2,7 @@ import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import { text, type Evidence } from "./planning"
 import { aggregate, definitions, evidenceDate, formulaLabel, periodLabel, quarterEnd, reportWarnings, stepNames, type AnnualReport, type CsvReview, type IndicatorDefinition, type IndicatorsState, type Level, type Measurement } from "./indicators"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 
 export function resultLabel(result: number | null, definition: IndicatorDefinition) {
   if (result === null) return "Sin base de cálculo"
@@ -27,7 +28,7 @@ function document(title: string, subtitle: string) {
     if (signature) { doc.addPage(); doc.setTextColor(80); doc.setFontSize(11); doc.text("Revisión y firma", 14, 48); doc.setFontSize(10); doc.text("Nombre: ______________________________________", 14, 66); doc.text("Cargo: ________________________________________", 14, 84); doc.text("Firma: ________________________________________", 14, 102); doc.text("Fecha: ________________________________________", 14, 120) }
     const pages = doc.internal.pages.length - 1
     for (let page = 1; page <= pages; page++) { doc.setPage(page); header(); doc.setTextColor(100); doc.setFontSize(8); doc.line(14, 280, 196, 280); doc.text(`SafeCloud · PESV · Página ${page} de ${pages}`, 14, 287) }
-    doc.save(name)
+    void saveCorporatePdf(doc, { documentName: title }, name)
   }
   return { doc, table, files, finish }
 }

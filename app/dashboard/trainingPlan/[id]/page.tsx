@@ -23,6 +23,7 @@ import { SafeCloudFormDrawerAdapter } from "@/components/ui/safecloud-form-drawe
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 import { listEmployees } from "@/services/employeeService"
 import {
   createTrainingAttendance,
@@ -752,7 +753,7 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
 
     addFooter()
 
-    doc.save(`Acta_Capacitacion_${formatDate(training.date)}_${topicName.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
+    void saveCorporatePdf(doc, { documentName: "Acta de capacitación" }, `Acta_Capacitacion_${formatDate(training.date)}_${topicName.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
   }
 
   if (loading) {

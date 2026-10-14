@@ -18,6 +18,7 @@ import {
   UserRound,
 } from "lucide-react"
 import { toast } from "sonner"
+import { downloadCorporatePdfBlob } from "@/lib/pdf/safecloud-corporate-pdf"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -897,7 +898,11 @@ export default function EnvironmentalMeasurementsPage() {
   async function downloadRecordPdf(record: EnvironmentalRecord) {
     try {
       const blob = await exportEnvironmentalMeasurement(record.id)
-      saveBlob(blob, `${recordTitle(record).toLowerCase().replace(/\s+/g, "-")}.pdf`)
+      await downloadCorporatePdfBlob(
+        blob,
+        { documentName: `Medición Ambiental - ${recordTitle(record)}` },
+        `${recordTitle(record).toLowerCase().replace(/\s+/g, "-")}.pdf`,
+      )
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo exportar el registro")
     }

@@ -20,6 +20,7 @@ import {
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
+import { downloadCorporatePdfBlob, saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -705,7 +706,11 @@ export default function WorkPlanPage() {
         workPlanItemIds: itemsToApprove.map((item) => item.id),
       })
       const blob = await downloadWorkPlanFile(generated.downloadUrl)
-      saveBlob(blob, generated.fileName || `Plan_Trabajo_${year}_Pendiente_Aprobacion.pdf`)
+      await downloadCorporatePdfBlob(
+        blob,
+        { documentName: "Plan de Trabajo SG-SST" },
+        generated.fileName || `Plan_Trabajo_${year}_Pendiente_Aprobacion.pdf`,
+      )
       toast.success("Documento generado para firma del jefe")
       return
     } catch (error) {
@@ -829,7 +834,7 @@ export default function WorkPlanPage() {
     doc.text("Fecha de aprobacion", pageWidth - margin - 78, y + 24)
 
     addFooter()
-    doc.save(`Plan_Trabajo_${year}_Pendiente_Aprobacion.pdf`)
+    void saveCorporatePdf(doc, { documentName: "Plan de Trabajo SG-SST" }, `Plan_Trabajo_${year}_Pendiente_Aprobacion.pdf`)
     toast.success("Documento generado para firma del jefe")
   }
 

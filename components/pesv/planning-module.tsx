@@ -29,6 +29,7 @@ import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { PesvEmptyState, PesvModuleHeader } from "@/components/pesv/module-experience"
 import { pesvModuleCatalog } from "@/lib/pesv/module-catalog"
 import { PesvSelect } from "@/components/pesv/pesv-select"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 
 export { PesvSelect } from "@/components/pesv/pesv-select"
 
@@ -368,7 +369,7 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
     doc.setFontSize(10); doc.text("Nombre: ________________________________________", 14, 42); doc.text("Cargo: __________________________________________", 14, 60); doc.text("Firma: __________________________________________", 14, 78); doc.text("Fecha: __________________________________________", 14, 96)
     const pageCount = doc.internal.pages.length - 1
     for (let i = 1; i <= pageCount; i++) { doc.setPage(i); doc.setFontSize(8); doc.setTextColor(100); doc.text(`SafeCloud · PESV · Página ${i} de ${pageCount}`, 14, 203) }
-    doc.save(`pesv-${module}-${record ? text(record.values.year) : year || "todos"}.pdf`)
+    void saveCorporatePdf(doc, { documentName: record ? text(record.values.name) : config.title }, `pesv-${module}-${record ? text(record.values.year) : year || "todos"}.pdf`)
   }
   const formFields = visibleFields(kind, values)
   const sections = [...new Set(formFields.map(f => f.section))]

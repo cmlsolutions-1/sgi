@@ -23,6 +23,7 @@ import {
 } from "@/lib/pesv/road-investigations"
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 
 const emptyStore: InvestigationStore = { procedures: [], cases: [], sequences: {} }
 const today = dateToday
@@ -219,11 +220,12 @@ export default function RoadInvestigationsPage() {
     }
     const count = doc.internal.pages.length - 1
     for (let page = 1; page <= count; page++) { doc.setPage(page); doc.setFontSize(8); doc.setTextColor(100); doc.text(`SafeCloud · ${record.consecutive} · Página ${page} de ${count}`, 14, 289) }
-    doc.save(`${lessonsOnly ? "lecciones-aprendidas" : "investigacion"}-${record.consecutive}.pdf`)
+    const documentName = lessonsOnly ? "Lecciones aprendidas del siniestro vial" : "Investigación de siniestro vial"
+    void saveCorporatePdf(doc, { documentName }, `${lessonsOnly ? "lecciones-aprendidas" : "investigacion"}-${record.consecutive}.pdf`)
   }
   function downloadProcedure(record: RecordItem) {
     const doc = new jsPDF(); doc.setFontSize(15); doc.text("Procedimiento de investigación vial", 14, 18)
-    autoTable(doc, { startY: 26, head: [["Campo", "Información"]], body: referenceLabels(procedureKind, record.values, record.links), headStyles: { fillColor: [37, 99, 235] }, styles: { fontSize: 9 } }); doc.save("procedimiento-investigacion-vial.pdf")
+    autoTable(doc, { startY: 26, head: [["Campo", "Información"]], body: referenceLabels(procedureKind, record.values, record.links), headStyles: { fillColor: [37, 99, 235] }, styles: { fontSize: 9 } }); void saveCorporatePdf(doc, { documentName: "Procedimiento de investigación vial" }, "procedimiento-investigacion-vial.pdf")
   }
   const visibleCases = store.cases.filter(r => `${r.consecutive} ${text(r.values.name)} ${text(r.values.place)}`.toLowerCase().includes(search.toLowerCase()) && (!filter || (filter === "closed" ? Boolean(r.closedAt) : !r.closedAt)))
   const visibleProcedures = store.procedures.filter(p => text(p.values.name).toLowerCase().includes(search.toLowerCase()))

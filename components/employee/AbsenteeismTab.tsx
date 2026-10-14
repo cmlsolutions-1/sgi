@@ -13,6 +13,7 @@ import { SafeCloudFormDrawer } from "@/components/ui/safecloud-form-drawer"
 import { Label } from "@/components/ui/label"
 import { Calendar, Download, FileText, Plus, Trash2, Upload } from "lucide-react"
 import jsPDF from "jspdf"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 import { cn } from "@/lib/utils"
 import { Pencil } from "lucide-react"
 
@@ -244,7 +245,7 @@ export function AbsenteeismTab({ employee }: { employee: Employee }) {
     const obs = doc.splitTextToSize(r.notes || "—", 170)
     doc.text(obs, 20, 107)
 
-    doc.save(`ausentismo-${employee.id}-${r.id}.pdf`)
+    void saveCorporatePdf(doc, { documentName: "Registro de Ausentismo Laboral" }, `ausentismo-${employee.id}-${r.id}.pdf`)
   }
 
   return (

@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Plus, Calendar, User, Building, FileText, Download, CheckCircle, CircleDashed, Upload } from "lucide-react";
 import { Employee } from "@/lib/mock-data";
 import jsPDF from "jspdf";
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf";
 
 type MedicalEvaluationType = 'preoccupational' | 'periodic' | 'postoccupational' | 'other';
 
@@ -126,7 +127,7 @@ export function MedicalEvaluationTab({ employee, onAddEvaluation }: MedicalEvalu
     const obsLines = doc.splitTextToSize(evaluation.observations, 170);
     doc.text(obsLines, 20, 120);
     
-    doc.save(`evaluacion-medica-${employee.id}-${evaluation.id}.pdf`);
+    void saveCorporatePdf(doc, { documentName: "Evaluación Médico-Ocupacional" }, `evaluacion-medica-${employee.id}-${evaluation.id}.pdf`);
   };
 
   return (

@@ -19,6 +19,7 @@ import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
 
 type Level = 1 | 2 | 3
 type Status = "PENDIENTE" | "EN_EJECUCION" | "CONTROLADO"
@@ -117,7 +118,7 @@ export default function PesvRisksPage() {
     doc.setFontSize(16); doc.text("PESV · Matriz de riesgos viales", 14, 18)
     doc.setFontSize(9); doc.text(`Fecha: ${today()} | Exposición × Probabilidad | Bajo: 1-2 · Moderado: 3-4 · Crítico: 6-9`, 14, 26)
     autoTable(doc, { startY: 32, head: [["Riesgo / actividad", "Relación", "Causas / consecuencias", "Controles actuales", "Inicial", "Actual", "Tratamiento / acción", "Responsable / plazo", "Estado"]], body: visible.map(item => [ `${item.name}\n${item.activity}`, item.sourceLabel || item.journey, `${item.causes}\n${item.consequences}`, item.existingControls || "Sin controles", `${item.exposure * item.probability}`, `${currentValue(item).score} · ${currentValue(item).label}`, `${item.treatment}\n${item.action}`, `${item.responsible}\n${item.dueDate}`, statusLabels[item.status] ]), styles: { fontSize: 8, cellPadding: 3 }, headStyles: { fillColor: [37, 99, 235] } })
-    doc.save(`matriz-riesgos-viales-${today()}.pdf`)
+    void saveCorporatePdf(doc, { documentName: "Matriz de riesgos viales" }, `matriz-riesgos-viales-${today()}.pdf`)
   }
   async function upload(event: FormEvent) {
     event.preventDefault()

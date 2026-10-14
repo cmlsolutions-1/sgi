@@ -24,6 +24,7 @@ import {
   UsersRound,
 } from "lucide-react"
 import { toast } from "sonner"
+import { downloadCorporatePdfBlob } from "@/lib/pdf/safecloud-corporate-pdf"
 
 import { Badge } from "@/components/ui/badge"
 import {
@@ -689,12 +690,7 @@ export default function AccountabilityPage() {
   async function downloadPdf(record: AccountabilityRecord) {
     try {
       const blob = await downloadAccountabilityReportPdf(record.id)
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement("a")
-      link.href = url
-      link.download = `rendicion-cuentas-sg-sst-${record.year}.pdf`
-      link.click()
-      URL.revokeObjectURL(url)
+      await downloadCorporatePdfBlob(blob, { documentName: "Rendición de Cuentas SG-SST" }, `rendicion-cuentas-sg-sst-${record.year}.pdf`)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo descargar el PDF")
     }
