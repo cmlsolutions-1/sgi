@@ -344,24 +344,24 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
     setSafeCloudPdfTitle(doc); doc.text(config.title, 14, 18)
     setSafeCloudPdfCaption(doc); doc.text(`Vigencia: ${year || "Todas"} · Fecha de generación: ${dateToday()}`, 14, 26)
     if (!record) {
-      autoTable(doc, { startY: 32, head: [[...kind.columns.map(key => kind.fields.find(f => f.key === key)?.label ?? key), "Estado / avance"]], body: exported.map(i => [...kind.columns.map(key => displayValue(kind.fields.find(f => f.key === key)!, i, catalogs)), `${itemStatus(i)}${kind.tracking ? ` · ${completion(i)}%` : ""}`]), headStyles: { fillColor: [37, 99, 235] }, styles: { fontSize: 8 } })
+      autoTable(doc, { startY: 32, head: [[...kind.columns.map(key => kind.fields.find(f => f.key === key)?.label ?? key), "Estado / avance"]], body: exported.map(i => [...kind.columns.map(key => displayValue(kind.fields.find(f => f.key === key)!, i, catalogs)), `${itemStatus(i)}${kind.tracking ? ` · ${completion(i)}%` : ""}`]), headStyles: { fillColor: SAFE_CLOUD_PDF_STYLE.tableHeaderColor }, styles: { fontSize: 8 } })
       if (module === "work-plan" || kind.id === "training-activity") {
         for (const item of exported) {
           doc.addPage(); setSafeCloudPdfSection(doc)
           doc.text(doc.splitTextToSize(text(item.values.name), 260), 14, 18)
-          autoTable(doc, { startY: 35, head: [["Campo", "Información de la actividad"]], body: visibleFields(kind, item.values).map(f => [f.label, displayValue(f, item, catalogs)]), columnStyles: { 0: { cellWidth: 75 } }, headStyles: { fillColor: [37, 99, 235] }, styles: { fontSize: 9 } })
+          autoTable(doc, { startY: 35, head: [["Campo", "Información de la actividad"]], body: visibleFields(kind, item.values).map(f => [f.label, displayValue(f, item, catalogs)]), columnStyles: { 0: { cellWidth: 75 } }, headStyles: { fillColor: SAFE_CLOUD_PDF_STYLE.tableHeaderColor }, styles: { fontSize: 9 } })
         }
       }
     } else {
       const recordKind = config.kinds.find(k => k.id === record.kind)!
-      autoTable(doc, { startY: 32, head: [["Campo", "Información"]], body: visibleFields(recordKind, record.values).map(f => [f.label, displayValue(f, record, catalogs)]), columnStyles: { 0: { cellWidth: 75 } }, headStyles: { fillColor: [37, 99, 235] }, styles: { fontSize: 9 } })
+      autoTable(doc, { startY: 32, head: [["Campo", "Información"]], body: visibleFields(recordKind, record.values).map(f => [f.label, displayValue(f, record, catalogs)]), columnStyles: { 0: { cellWidth: 75 } }, headStyles: { fillColor: SAFE_CLOUD_PDF_STYLE.tableHeaderColor }, styles: { fontSize: 9 } })
       if (record.activities.length) autoTable(doc, { head: [["Actividad", "Responsable", "Inicio", "Fin", "Presupuesto"]], body: record.activities.map(a => [a.name, a.responsible, a.startDate, a.endDate, money(a.budget)]), styles: { fontSize: 8 } })
       if (record.entries.length) autoTable(doc, { head: [["Fecha", "Registro", "Resultado", "Observaciones"]], body: record.entries.map(e => [e.date, entryTitle(e.kind), e.kind === "FOLLOW_UP" ? record.kind === "objective" ? `Medición: ${e.measuredValue}` : `${e.progress}%` : e.conclusion || `${e.medium} · ${e.audience}`, e.observations]), styles: { fontSize: 8 } })
       if (record.values.inventorySnapshot) autoTable(doc, { head: [["Indicadores del inventario al registrar la revisión"]], body: [[text(record.values.inventorySnapshot)]], styles: { fontSize: 9 } })
       if (record.kind === "archive-record") autoTable(doc, { head: [["Conservación mínima"]], body: [[`${archiveYears(record.values)} año(s), al menos hasta ${retentionUntil([text(record.values.recordDate), ...record.evidence.map(e => e.uploadedAt.slice(0, 10))].sort().at(-1)!, archiveYears(record.values))}`]], styles: { fontSize: 9 } })
       if (record.kind === "vehicle-profile") {
         const related = items.filter(i => i.values.vehicleProfileId === record.id)
-        if (related.length) autoTable(doc, { head: [["Registro", "Fecha", "Estado", "Repuestos / equipos", "Responsable"]], body: related.map(i => [text(i.values.name), text(i.values.inspectionDate) || `${text(i.values.startDate)} — ${text(i.values.endDate)}`, itemStatus(i), `${text(i.values.parts)} ${text(i.values.equipment)}`, catalogs.people.find(p => p.value === (i.values.responsibleId || i.values.inspectorId))?.label || "Sin registrar"]), styles: { fontSize: 8 }, headStyles: { fillColor: [37, 99, 235] } })
+        if (related.length) autoTable(doc, { head: [["Registro", "Fecha", "Estado", "Repuestos / equipos", "Responsable"]], body: related.map(i => [text(i.values.name), text(i.values.inspectionDate) || `${text(i.values.startDate)} — ${text(i.values.endDate)}`, itemStatus(i), `${text(i.values.parts)} ${text(i.values.equipment)}`, catalogs.people.find(p => p.value === (i.values.responsibleId || i.values.inspectorId))?.label || "Sin registrar"]), styles: { fontSize: 8 }, headStyles: { fillColor: SAFE_CLOUD_PDF_STYLE.tableHeaderColor } })
       }
       if (record.evidence.length) autoTable(doc, { head: [["Evidencia", "Fecha de carga"]], body: record.evidence.map(e => [e.name, e.uploadedAt.slice(0, 10)]), styles: { fontSize: 8 } })
     }

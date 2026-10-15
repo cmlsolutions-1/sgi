@@ -1,6 +1,6 @@
 import autoTable from "jspdf-autotable"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
-import { createSafeCloudPdf, SAFE_CLOUD_PDF_STYLE, setSafeCloudPdfCaption, setSafeCloudPdfTitle } from "@/lib/pdf/safecloud-pdf-style"
+import { addSafeCloudPdfHeading, createSafeCloudPdf, SAFE_CLOUD_PDF_STYLE } from "@/lib/pdf/safecloud-pdf-style"
 
 export type DateRangeMode = "all" | "bimester" | "quarter" | "custom"
 
@@ -141,17 +141,7 @@ export function buildReportPdf<T>({
   columns: Array<PdfTableColumn<T>>
 }) {
   const doc = createSafeCloudPdf({ format: "letter" })
-  let y = 16
-
-  setSafeCloudPdfTitle(doc)
-  doc.text(title, 14, y)
-  y += 7
-
-  if (subtitle) {
-    setSafeCloudPdfCaption(doc)
-    doc.text(subtitle, 14, y)
-    y += 8
-  }
+  let y = addSafeCloudPdfHeading(doc, title, subtitle)
 
   if (summary?.length) {
     autoTable(doc, {

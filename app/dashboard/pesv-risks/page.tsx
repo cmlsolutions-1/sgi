@@ -19,7 +19,7 @@ import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
-import { createSafeCloudPdf, setSafeCloudPdfCaption, setSafeCloudPdfTitle } from "@/lib/pdf/safecloud-pdf-style"
+import { createSafeCloudPdf, SAFE_CLOUD_PDF_STYLE, setSafeCloudPdfCaption, setSafeCloudPdfTitle } from "@/lib/pdf/safecloud-pdf-style"
 
 type Level = 1 | 2 | 3
 type Status = "PENDIENTE" | "EN_EJECUCION" | "CONTROLADO"
@@ -117,7 +117,7 @@ export default function PesvRisksPage() {
     const doc = createSafeCloudPdf({ orientation: "landscape" })
     setSafeCloudPdfTitle(doc); doc.text("PESV · Matriz de riesgos viales", 14, 18)
     setSafeCloudPdfCaption(doc); doc.text(`Fecha: ${today()} | Exposición × Probabilidad | Bajo: 1-2 · Moderado: 3-4 · Crítico: 6-9`, 14, 26)
-    autoTable(doc, { startY: 32, head: [["Riesgo / actividad", "Relación", "Causas / consecuencias", "Controles actuales", "Inicial", "Actual", "Tratamiento / acción", "Responsable / plazo", "Estado"]], body: visible.map(item => [ `${item.name}\n${item.activity}`, item.sourceLabel || item.journey, `${item.causes}\n${item.consequences}`, item.existingControls || "Sin controles", `${item.exposure * item.probability}`, `${currentValue(item).score} · ${currentValue(item).label}`, `${item.treatment}\n${item.action}`, `${item.responsible}\n${item.dueDate}`, statusLabels[item.status] ]), styles: { fontSize: 8, cellPadding: 3 }, headStyles: { fillColor: [37, 99, 235] } })
+    autoTable(doc, { startY: 32, head: [["Riesgo / actividad", "Relación", "Causas / consecuencias", "Controles actuales", "Inicial", "Actual", "Tratamiento / acción", "Responsable / plazo", "Estado"]], body: visible.map(item => [ `${item.name}\n${item.activity}`, item.sourceLabel || item.journey, `${item.causes}\n${item.consequences}`, item.existingControls || "Sin controles", `${item.exposure * item.probability}`, `${currentValue(item).score} · ${currentValue(item).label}`, `${item.treatment}\n${item.action}`, `${item.responsible}\n${item.dueDate}`, statusLabels[item.status] ]), styles: { fontSize: 8, cellPadding: 3 }, headStyles: { fillColor: SAFE_CLOUD_PDF_STYLE.tableHeaderColor } })
     void saveCorporatePdf(doc, { documentName: "Matriz de riesgos viales" }, `matriz-riesgos-viales-${today()}.pdf`)
   }
   async function upload(event: FormEvent) {

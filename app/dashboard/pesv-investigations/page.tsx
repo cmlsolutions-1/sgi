@@ -23,7 +23,7 @@ import {
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
-import { createSafeCloudPdf, setSafeCloudPdfCaption, setSafeCloudPdfTitle } from "@/lib/pdf/safecloud-pdf-style"
+import { addSafeCloudPdfPhoto, createSafeCloudPdf, SAFE_CLOUD_PDF_STYLE, setSafeCloudPdfCaption, setSafeCloudPdfTitle } from "@/lib/pdf/safecloud-pdf-style"
 
 const emptyStore: InvestigationStore = { procedures: [], cases: [], sequences: {} }
 const today = dateToday
@@ -191,10 +191,10 @@ export default function RoadInvestigationsPage() {
     setSafeCloudPdfTitle(doc); doc.text(lessonsOnly ? "Lecciones aprendidas por siniestro vial" : "Investigación interna de siniestro vial", 14, 18)
     setSafeCloudPdfCaption(doc); doc.text(`SafeCloud · PESV · ${record.consecutive}`, 14, 26)
     const basic = [["Fecha y hora", `${text(record.values.occurrenceDate)} ${text(record.values.occurrenceTime)}`], ["Lugar", text(record.values.place)], ["Evento", text(record.values.name)], ["Estado", caseStatus(record)], ["Equipo investigador", `${ids(record.values.investigatorIds).map(id => personName(id, record)).join(", ")}${record.externalInvestigators.length ? ` · ${record.externalInvestigators.map(p => `${p.name} (${p.organization})`).join(", ")}` : ""}`]]
-    autoTable(doc, { startY: 32, head: [["Registro", "Información"]], body: basic, styles: { fontSize: 9 }, headStyles: { fillColor: [37, 99, 235] }, columnStyles: { 0: { cellWidth: 45 } } })
+    autoTable(doc, { startY: 32, head: [["Registro", "Información"]], body: basic, styles: { fontSize: 9 }, headStyles: { fillColor: SAFE_CLOUD_PDF_STYLE.tableHeaderColor }, columnStyles: { 0: { cellWidth: 45 } } })
     if (lessonsOnly) {
       const causes = record.stages.find(s => s.key === "CAUSES"), root = record.stages.find(s => s.key === "ROOT")
-      autoTable(doc, { head: [["Contenido", "Lección / análisis"]], body: [["¿Qué ocurrió?", text(lessons!.details.whatHappened)], ["Causas inmediatas", causes ? `${causes.notes}\n${Object.entries(causes.details).map(([k, v]) => `${factorLabels[k] ?? k}: ${text(v)}`).join("\n")}` : "Sin registrar"], ["Causa raíz", root ? `${root.notes}\n${text(root.details.analysis)}` : "Sin registrar"], ["Principales lecciones", lessons!.notes], ["Conclusiones / recomendaciones", text(lessons!.details.recommendations)]], styles: { fontSize: 9 }, headStyles: { fillColor: [37, 99, 235] }, columnStyles: { 0: { cellWidth: 45 } } })
+      autoTable(doc, { head: [["Contenido", "Lección / análisis"]], body: [["¿Qué ocurrió?", text(lessons!.details.whatHappened)], ["Causas inmediatas", causes ? `${causes.notes}\n${Object.entries(causes.details).map(([k, v]) => `${factorLabels[k] ?? k}: ${text(v)}`).join("\n")}` : "Sin registrar"], ["Causa raíz", root ? `${root.notes}\n${text(root.details.analysis)}` : "Sin registrar"], ["Principales lecciones", lessons!.notes], ["Conclusiones / recomendaciones", text(lessons!.details.recommendations)]], styles: { fontSize: 9 }, headStyles: { fillColor: SAFE_CLOUD_PDF_STYLE.tableHeaderColor }, columnStyles: { 0: { cellWidth: 45 } } })
     } else {
       autoTable(doc, { head: [["Campo", "Reporte del siniestro"]], body: referenceLabels(reportKind, record.values, record.links), styles: { fontSize: 9 }, columnStyles: { 0: { cellWidth: 55 } } })
       autoTable(doc, { head: [["Campo", "Procedimiento aplicado"]], body: referenceLabels(procedureKind, record.procedureSnapshot, record.links), styles: { fontSize: 9 } })
@@ -213,9 +213,8 @@ export default function RoadInvestigationsPage() {
       try {
         const img = await new Promise<HTMLImageElement>((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = photo.url })
         const canvas = document.createElement("canvas"); canvas.width = img.naturalWidth; canvas.height = img.naturalHeight; canvas.getContext("2d")!.drawImage(img, 0, 0)
-        const scale = Math.min(180 / img.naturalWidth, 225 / img.naturalHeight)
-        doc.addPage(); doc.setFontSize(11); doc.text(doc.splitTextToSize(photo.name, 180), 14, 18)
-        doc.addImage(canvas.toDataURL("image/jpeg"), "JPEG", 14, 32, img.naturalWidth * scale, img.naturalHeight * scale)
+        doc.addPage()
+        addSafeCloudPdfPhoto(doc, { dataUrl: canvas.toDataURL("image/jpeg"), format: "JPEG", sourceWidth: img.naturalWidth, sourceHeight: img.naturalHeight, caption: photo.name, y: 18 })
       } catch { toast.error(`No se pudo incluir la imagen ${photo.name} en el PDF.`) }
     }
     const documentName = lessonsOnly ? "Lecciones aprendidas del siniestro vial" : "Investigación de siniestro vial"
@@ -229,7 +228,7 @@ export default function RoadInvestigationsPage() {
       startY: 26,
       head: [["Campo", "Información"]],
       body: referenceLabels(procedureKind, record.values, record.links),
-      headStyles: { fillColor: [37, 99, 235] },
+      headStyles: { fillColor: SAFE_CLOUD_PDF_STYLE.tableHeaderColor },
       styles: { fontSize: 9 },
     })
     void saveCorporatePdf(doc, { documentName: "Procedimiento de investigación vial" }, "procedimiento-investigacion-vial.pdf")

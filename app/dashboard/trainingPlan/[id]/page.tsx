@@ -23,7 +23,15 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
-import { createSafeCloudPdf } from "@/lib/pdf/safecloud-pdf-style"
+import {
+  addSafeCloudPdfHeading,
+  addSafeCloudPdfParagraph,
+  addSafeCloudPdfSection,
+  addSafeCloudPdfSignatures,
+  createSafeCloudPdf,
+  SAFE_CLOUD_PDF_COLORS,
+  SAFE_CLOUD_PDF_STYLE,
+} from "@/lib/pdf/safecloud-pdf-style"
 import { listEmployees } from "@/services/employeeService"
 import {
   createTrainingAttendance,
@@ -574,8 +582,7 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
 
     const doc = createSafeCloudPdf()
     const pageWidth = doc.internal.pageSize.getWidth()
-    const pageHeight = doc.internal.pageSize.getHeight()
-    const margin = 14
+    const margin = SAFE_CLOUD_PDF_STYLE.marginX
     const contentWidth = pageWidth - margin * 2
     const topicName = training.topic?.name ?? "Tema no registrado"
     const topicDescription =
@@ -585,36 +592,19 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
     const responsibleEmployee = training.responsibleEmployeeId
       ? employees.find((employee) => employee.id === training.responsibleEmployeeId)
       : null
-    const primaryColor: [number, number, number] = [31, 92, 77]
-    const softColor: [number, number, number] = [235, 244, 241]
-    let y = 16
-
-    function ensureSpace(requiredHeight: number) {
-      if (y + requiredHeight <= pageHeight - 22) return
-      doc.addPage()
-      y = 18
-    }
+    const primaryColor = SAFE_CLOUD_PDF_STYLE.tableHeaderColor
+    let y = addSafeCloudPdfHeading(
+      doc,
+      "Acta de capacitación SG-SST",
+      `Registro de ejecución, asistencia y firma de participantes · Generada el ${formatDate(new Date().toISOString())}`,
+    )
 
     function sectionTitle(title: string) {
-      ensureSpace(12)
-      doc.setFillColor(...softColor)
-      doc.setDrawColor(210, 226, 220)
-      doc.roundedRect(margin, y, contentWidth, 9, 2, 2, "FD")
-      doc.setFont("helvetica", "bold")
-      doc.setFontSize(10)
-      doc.setTextColor(...primaryColor)
-      doc.text(title.toUpperCase(), margin + 3, y + 6)
-      y += 14
+      y = addSafeCloudPdfSection(doc, title, y)
     }
 
     function addParagraph(text: string) {
-      const lines = doc.splitTextToSize(text, contentWidth)
-      ensureSpace(lines.length * 5 + 2)
-      doc.setFont("helvetica", "normal")
-      doc.setFontSize(9)
-      doc.setTextColor(30, 41, 59)
-      doc.text(lines, margin, y)
-      y += lines.length * 5 + 3
+      y = addSafeCloudPdfParagraph(doc, text, y)
     }
 
     function detailsTable(rows: Array<[string, string]>) {
@@ -624,34 +614,20 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
         margin: { left: margin, right: margin },
         styles: {
           font: "helvetica",
-          fontSize: 8.5,
+          fontSize: SAFE_CLOUD_PDF_STYLE.bodySize,
           cellPadding: 2.5,
-          lineColor: [220, 226, 224],
+          lineColor: SAFE_CLOUD_PDF_STYLE.tableBorderColor,
           lineWidth: 0.1,
-          textColor: [30, 41, 59],
+          textColor: SAFE_CLOUD_PDF_STYLE.textColor,
         },
         columnStyles: {
-          0: { fontStyle: "bold", fillColor: [248, 250, 252], cellWidth: 52 },
+          0: { fontStyle: "bold", fillColor: SAFE_CLOUD_PDF_COLORS.softBackground, cellWidth: 52 },
           1: { cellWidth: contentWidth - 52 },
         },
         body: rows,
       })
       y = ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? y) + 8
     }
-
-    doc.setFillColor(...primaryColor)
-    doc.roundedRect(margin, y, contentWidth, 24, 3, 3, "F")
-    doc.setTextColor(255, 255, 255)
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(15)
-    doc.text("ACTA DE CAPACITACION SG-SST", margin + 5, y + 9)
-    doc.setFont("helvetica", "normal")
-    doc.setFontSize(9)
-    doc.text("Registro de ejecucion, asistencia y firma de participantes", margin + 5, y + 16)
-    doc.text(`Fecha de generacion: ${formatDate(new Date().toISOString())}`, pageWidth - margin - 5, y + 16, {
-      align: "right",
-    })
-    y += 32
 
     sectionTitle("Datos generales de la capacitacion")
     detailsTable([
@@ -700,10 +676,10 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
         fontSize: 8,
         cellPadding: 2.4,
         minCellHeight: 11,
-        lineColor: [220, 226, 224],
+        lineColor: SAFE_CLOUD_PDF_STYLE.tableBorderColor,
         lineWidth: 0.1,
       },
-      headStyles: { fillColor: primaryColor, textColor: 255, fontStyle: "bold" },
+      headStyles: { fillColor: primaryColor, textColor: SAFE_CLOUD_PDF_COLORS.white, fontStyle: "bold" },
       columnStyles: {
         0: { cellWidth: 12, halign: "center" },
         1: { cellWidth: 48 },
@@ -719,21 +695,10 @@ export default function TrainingDetailPage({ params }: { params: Promise<{ id: s
       "Los participantes relacionados declaran haber recibido la informacion correspondiente y firman como evidencia de asistencia y participacion en la actividad.",
     )
 
-    ensureSpace(34)
-    const signatureWidth = 70
-    const leftX = margin
-    const rightX = pageWidth - margin - signatureWidth
-    doc.setDrawColor(120, 130, 140)
-    doc.line(leftX, y + 18, leftX + signatureWidth, y + 18)
-    doc.line(rightX, y + 18, rightX + signatureWidth, y + 18)
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(8.5)
-    doc.setTextColor(30, 41, 59)
-    doc.text("Responsable de la actividad", leftX, y + 24)
-    doc.text("Representante de la empresa", rightX, y + 24)
-    doc.setFont("helvetica", "normal")
-    doc.text(getEmployeeFullName(responsibleEmployee), leftX, y + 30)
-    doc.text("Nombre y firma", rightX, y + 30)
+    addSafeCloudPdfSignatures(doc, [
+      { label: "Responsable de la actividad", detail: getEmployeeFullName(responsibleEmployee) },
+      { label: "Representante de la empresa", detail: "Nombre y firma" },
+    ], y)
 
     void saveCorporatePdf(doc, { documentName: "Acta de capacitación" }, `Acta_Capacitacion_${formatDate(training.date)}_${topicName.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
   }

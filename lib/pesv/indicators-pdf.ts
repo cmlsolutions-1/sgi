@@ -3,7 +3,7 @@ import autoTable from "jspdf-autotable"
 import { text, type Evidence } from "./planning"
 import { aggregate, definitions, evidenceDate, formulaLabel, periodLabel, quarterEnd, reportWarnings, stepNames, type AnnualReport, type CsvReview, type IndicatorDefinition, type IndicatorsState, type Level, type Measurement } from "./indicators"
 import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
-import { createSafeCloudPdf, SAFE_CLOUD_PDF_STYLE, setSafeCloudPdfCaption, setSafeCloudPdfSection, setSafeCloudPdfTitle } from "@/lib/pdf/safecloud-pdf-style"
+import { addSafeCloudPdfHeading, addSafeCloudPdfSignatures, createSafeCloudPdf, SAFE_CLOUD_PDF_STYLE } from "@/lib/pdf/safecloud-pdf-style"
 
 export function resultLabel(result: number | null, definition: IndicatorDefinition) {
   if (result === null) return "Sin base de cálculo"
@@ -12,11 +12,7 @@ export function resultLabel(result: number | null, definition: IndicatorDefiniti
 function document(title: string, subtitle: string) {
   const doc = createSafeCloudPdf()
   const header = () => {
-    doc.setFillColor(30, 64, 175); doc.rect(0, 0, 210, 9, "F")
-    setSafeCloudPdfTitle(doc)
-    doc.text(doc.splitTextToSize(title, 180), 14, 19)
-    setSafeCloudPdfCaption(doc)
-    doc.text(subtitle, 14, 32)
+    addSafeCloudPdfHeading(doc, title, subtitle)
   }
   const table = (head: string[], body: string[][]) => {
     const previous = (doc as jsPDF & { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY
@@ -26,7 +22,7 @@ function document(title: string, subtitle: string) {
   }
   const files = (evidence: Evidence[]) => { if (evidence.length) table(["Soporte", "Fecha de carga"], evidence.map(e => [e.name, evidenceDate(e.uploadedAt)])) }
   const finish = (name: string, signature = true) => {
-    if (signature) { doc.addPage(); setSafeCloudPdfSection(doc); doc.text("Revisión y firma", 14, 48); setSafeCloudPdfCaption(doc); doc.text("Nombre: ______________________________________", 14, 66); doc.text("Cargo: ________________________________________", 14, 84); doc.text("Firma: ________________________________________", 14, 102); doc.text("Fecha: ________________________________________", 14, 120) }
+    if (signature) { doc.addPage(); addSafeCloudPdfHeading(doc, "Revisión y firma"); addSafeCloudPdfSignatures(doc, [{ label: "Nombre y firma", detail: "Responsable de la revisión" }, { label: "Cargo y fecha", detail: "Control de aprobación" }], 54) }
     const pages = doc.internal.pages.length - 1
     for (let page = 1; page <= pages; page++) { doc.setPage(page); header() }
     void saveCorporatePdf(doc, { documentName: title }, name)

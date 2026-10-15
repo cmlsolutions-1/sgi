@@ -17,14 +17,19 @@ export type CorporatePdfMetadata = {
 }
 
 type CompanyIdentity = { name: string; nit: string }
+type PageBox = { x: number; y: number; width: number; height: number }
 
 const DEFAULT_IDENTITY: CompanyIdentity = {
   name: "Empresa no identificada",
   nit: "NIT no disponible",
 }
 
+const LETTER_PORTRAIT: [number, number] = [612, 792]
+const LETTER_LANDSCAPE: [number, number] = [792, 612]
+const DOCUMENT_MARGIN = 72
+const SOURCE_CROP = 22
+
 let logoBytesPromise: Promise<ArrayBuffer> | null = null
-let corporateTemplateBytesPromise: Promise<ArrayBuffer> | null = null
 let companyIdentityCache: { sessionKey: string; promise: Promise<CompanyIdentity> } | null = null
 
 const COMPANY_CLAIMS = new Set([
@@ -96,7 +101,7 @@ function companyText(company: unknown, keys: string[], depth = 0): string {
   if (depth >= 3) return ""
   for (const value of Object.values(values)) {
     if (!value || typeof value !== "object" || Array.isArray(value)) continue
-    const nestedValue: string = companyText(value, keys, depth + 1)
+    const nestedValue = companyText(value, keys, depth + 1)
     if (nestedValue) return nestedValue
   }
   return ""
@@ -119,7 +124,11 @@ function identityFromCompany(company: unknown): CompanyIdentity | null {
   return { name, nit }
 }
 
-async function resolveCompanyIdentity(): Promise<CompanyIdentity> {
+async function resolveCompanyIdentity(metadata: CorporatePdfMetadata): Promise<CompanyIdentity> {
+  if (metadata.companyName?.trim() && metadata.nit?.trim()) {
+    return { name: metadata.companyName.trim(), nit: metadata.nit.trim() }
+  }
+
   const { accessToken, refreshToken, company: sessionCompany, setCompany } = useAuthStore.getState()
   const sessionKey = `${accessToken ?? ""}:${refreshToken ?? ""}:${sessionCompany?.id ?? ""}:${sessionCompany?.nit ?? ""}`
   if (companyIdentityCache?.sessionKey === sessionKey) return companyIdentityCache.promise
@@ -146,8 +155,7 @@ async function resolveCompanyIdentity(): Promise<CompanyIdentity> {
     if (resolved.name && resolved.nit) return resolved as CompanyIdentity
 
     try {
-      const currentCompany = identityFromCompany(await getCurrentCompany())
-      mergeIdentity(currentCompany)
+      mergeIdentity(identityFromCompany(await getCurrentCompany()))
       if (resolved.name && resolved.nit) return resolved as CompanyIdentity
     } catch (error) {
       console.warn("No se pudo cargar la empresa actual para el PDF:", error)
@@ -160,8 +168,7 @@ async function resolveCompanyIdentity(): Promise<CompanyIdentity> {
         if (userId) companyId = validCompanyId((await getUserById(userId)).companyId)
       }
       if (companyId) {
-        const company = identityFromCompany(await getCompanyById(companyId))
-        mergeIdentity(company)
+        mergeIdentity(identityFromCompany(await getCompanyById(companyId)))
         if (resolved.name && resolved.nit) return resolved as CompanyIdentity
       }
     } catch (error) {
@@ -178,18 +185,14 @@ async function resolveCompanyIdentity(): Promise<CompanyIdentity> {
     mergeIdentity(identityFromCompany(accessPayload))
     mergeIdentity(identityFromCompany(refreshPayload))
     return {
-      name: resolved.name || DEFAULT_IDENTITY.name,
-      nit: resolved.nit || DEFAULT_IDENTITY.nit,
+      name: resolved.name || metadata.companyName?.trim() || DEFAULT_IDENTITY.name,
+      nit: resolved.nit || metadata.nit?.trim() || DEFAULT_IDENTITY.nit,
     }
   })()
 
   companyIdentityCache = { sessionKey, promise }
   void promise.then(identity => {
-    if (
-      identity.name === DEFAULT_IDENTITY.name &&
-      identity.nit === DEFAULT_IDENTITY.nit &&
-      companyIdentityCache?.sessionKey === sessionKey
-    ) {
+    if (identity.name === DEFAULT_IDENTITY.name && identity.nit === DEFAULT_IDENTITY.nit && companyIdentityCache?.sessionKey === sessionKey) {
       companyIdentityCache = null
     }
   })
@@ -206,37 +209,72 @@ async function loadLogoBytes() {
   return logoBytesPromise
 }
 
-async function loadCorporateTemplateBytes() {
-  if (!corporateTemplateBytesPromise) {
-    corporateTemplateBytesPromise = fetch("/safecloud-corporate-template.pdf").then(async response => {
-      if (!response.ok) throw new Error("No se pudo cargar la plantilla corporativa de SafeCloud")
-      return response.arrayBuffer()
-    })
-  }
-  return corporateTemplateBytesPromise
-}
-
 function formatDate(date?: string) {
-  if (date) {
-    const parsed = new Date(date)
-    if (!Number.isNaN(parsed.getTime())) return new Intl.DateTimeFormat("es-CO", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "America/Bogota" }).format(parsed)
-  }
-  return new Intl.DateTimeFormat("es-CO", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "America/Bogota" }).format(new Date())
+  const parsed = date ? new Date(date) : new Date()
+  const safeDate = Number.isNaN(parsed.getTime()) ? new Date() : parsed
+  return new Intl.DateTimeFormat("es-CO", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "America/Bogota" }).format(safeDate)
 }
 
-function fitText(text: string, font: PDFFont, maxWidth: number, preferredSize: number, minimumSize = 6) {
+function fitText(text: string, font: PDFFont, maxWidth: number, preferredSize: number, minimumSize = 6.5) {
   let size = preferredSize
   while (size > minimumSize && font.widthOfTextAtSize(text, size) > maxWidth) size -= 0.25
   return size
 }
 
-function centeredText(page: PDFPage, value: string, font: PDFFont, size: number, x: number, y: number, width: number, color = rgb(0.08, 0.2, 0.36)) {
-  const safeSize = fitText(value, font, width - 10, size)
-  const textWidth = font.widthOfTextAtSize(value, safeSize)
-  page.drawText(value, { x: x + Math.max(5, (width - textWidth) / 2), y, size: safeSize, font, color })
+function wrapText(value: string, font: PDFFont, size: number, maxWidth: number, maxLines = 2) {
+  const words = value.trim().split(/\s+/).filter(Boolean)
+  const lines: string[] = []
+  let current = ""
+  for (const word of words) {
+    const candidate = current ? `${current} ${word}` : word
+    if (font.widthOfTextAtSize(candidate, size) <= maxWidth || !current) {
+      current = candidate
+      continue
+    }
+    lines.push(current)
+    current = word
+    if (lines.length === maxLines - 1) break
+  }
+  const consumed = lines.join(" ").split(/\s+/).filter(Boolean).length
+  const remaining = words.slice(consumed).join(" ")
+  if (remaining) lines.push(remaining)
+  else if (current && lines.length < maxLines) lines.push(current)
+  return lines.slice(0, maxLines)
 }
 
-function drawTemplate({
+function drawCenteredText(page: PDFPage, value: string, font: PDFFont, size: number, box: PageBox, color = rgb(0.08, 0.2, 0.36), maxLines = 1) {
+  let safeSize = size
+  let lines = wrapText(value || "-", font, safeSize, box.width - 10, maxLines)
+  while (safeSize > 6.5 && lines.some(line => font.widthOfTextAtSize(line, safeSize) > box.width - 10)) {
+    safeSize -= 0.25
+    lines = wrapText(value || "-", font, safeSize, box.width - 10, maxLines)
+  }
+  const lineHeight = safeSize * 1.18
+  const firstBaseline = box.y + (box.height + (lines.length - 1) * lineHeight) / 2 - safeSize * 0.35
+  lines.forEach((line, index) => {
+    const width = font.widthOfTextAtSize(line, safeSize)
+    page.drawText(line, { x: box.x + Math.max(5, (box.width - width) / 2), y: firstBaseline - index * lineHeight, size: safeSize, font, color })
+  })
+}
+
+function documentLayout(width: number, height: number, isPortrait: boolean) {
+  const headerTop = isPortrait ? height - 50 : height - 62
+  const headerBottom = isPortrait ? height - 104 : height - 118
+  const contentTop = Math.min(headerBottom - 14, height - 142)
+  return {
+    headerTop,
+    headerBottom,
+    footerLineY: 35,
+    body: {
+      x: DOCUMENT_MARGIN,
+      y: 50,
+      width: width - DOCUMENT_MARGIN * 2,
+      height: contentTop - 50,
+    } satisfies PageBox,
+  }
+}
+
+function drawHeaderAndFooter({
   page,
   logo,
   regular,
@@ -245,7 +283,7 @@ function drawTemplate({
   metadata,
   pageNumber,
   pageCount,
-  templateArtworkApplied,
+  isPortrait,
 }: {
   page: PDFPage
   logo: PDFImage | null
@@ -255,7 +293,7 @@ function drawTemplate({
   metadata: CorporatePdfMetadata
   pageNumber: number
   pageCount: number
-  templateArtworkApplied: boolean
+  isPortrait: boolean
 }) {
   const { width, height } = page.getSize()
   const navy = rgb(0.07, 0.24, 0.42)
@@ -263,31 +301,25 @@ function drawTemplate({
   const blue = rgb(0.23, 0.48, 0.76)
   const gray = rgb(0.38, 0.43, 0.5)
   const border = rgb(0.08, 0.08, 0.08)
-  const margin = Math.max(24, width * 0.055)
-  const tableX = templateArtworkApplied ? width * 0.0915 : margin + width * 0.045
-  const tableWidth = templateArtworkApplied ? width - tableX * 2 : width - tableX - margin
-  const headerLineY = height - 55
+  const layout = documentLayout(width, height, isPortrait)
+  const tableX = isPortrait ? 56 : DOCUMENT_MARGIN
+  const tableWidth = width - tableX * 2
 
-  if (!templateArtworkApplied) {
-    page.drawRectangle({ x: 0, y: height - 132, width, height: 132, color: rgb(1, 1, 1) })
-    page.drawRectangle({ x: 0, y: 0, width, height: 48, color: rgb(1, 1, 1) })
-
-    if (logo) {
-      const ratio = logo.width / logo.height
-      const logoHeight = Math.min(34, width * 0.045)
-      page.drawImage(logo, { x: margin, y: height - 48, width: logoHeight * ratio, height: logoHeight })
-    } else {
-      page.drawText("SafeCloud", { x: margin, y: height - 38, size: 16, font: bold, color: navy })
-    }
-
-    const systemTitle = "SISTEMA DE GESTIÓN INTEGRAL"
-    const systemSize = fitText(systemTitle, bold, width * 0.36, 11)
-    page.drawText(systemTitle, { x: width - margin - bold.widthOfTextAtSize(systemTitle, systemSize), y: height - 34, size: systemSize, font: bold, color: navy })
-    page.drawLine({ start: { x: margin, y: headerLineY }, end: { x: width - margin, y: headerLineY }, thickness: 1.4, color: blue })
+  page.drawRectangle({ x: 0, y: height - 132, width, height: 132, color: rgb(1, 1, 1) })
+  page.drawRectangle({ x: 0, y: 0, width, height: 48, color: rgb(1, 1, 1) })
+  if (logo) {
+    const logoHeight = isPortrait ? 34 : 28
+    page.drawImage(logo, { x: tableX, y: height - 48, width: logoHeight * (logo.width / logo.height), height: logoHeight })
+  } else {
+    page.drawText("SafeCloud", { x: tableX, y: height - 38, size: 16, font: bold, color: navy })
   }
+  const systemTitle = "SISTEMA DE GESTIÓN INTEGRAL"
+  const systemSize = fitText(systemTitle, bold, width * 0.36, 11)
+  page.drawText(systemTitle, { x: width - tableX - bold.widthOfTextAtSize(systemTitle, systemSize), y: height - 34, size: systemSize, font: bold, color: navy })
+  page.drawLine({ start: { x: tableX, y: height - 55 }, end: { x: width - tableX, y: height - 55 }, thickness: 1.4, color: blue })
 
-  const tableTop = templateArtworkApplied ? height - 50 : height - 62
-  const tableBottom = templateArtworkApplied ? height - 104 : height - 122
+  const tableTop = layout.headerTop
+  const tableBottom = layout.headerBottom
   const companyWidth = tableWidth * 0.33
   const documentWidth = tableWidth * 0.34
   const controlX = tableX + companyWidth + documentWidth
@@ -301,41 +333,50 @@ function drawTemplate({
   page.drawLine({ start: { x: controlX + labelWidth, y: tableBottom }, end: { x: controlX + labelWidth, y: tableTop }, thickness: 0.8, color: border })
   for (let row = 1; row < 4; row += 1) page.drawLine({ start: { x: controlX, y: tableTop - row * rowHeight }, end: { x: tableX + tableWidth, y: tableTop - row * rowHeight }, thickness: 0.8, color: border })
 
-  centeredText(page, metadata.companyName?.trim() || identity.name, bold, 9, tableX, tableBottom + 36, companyWidth, navy)
-  centeredText(page, metadata.nit?.trim() || identity.nit, bold, 8, tableX, tableBottom + 22, companyWidth, gray)
-  centeredText(page, metadata.documentName, bold, 9, tableX + companyWidth, tableBottom + 27, documentWidth, navy)
+  const companyName = metadata.companyName?.trim() || identity.name
+  const companyNit = metadata.nit?.trim() || identity.nit
+  drawCenteredText(page, companyName, bold, 8.5, { x: tableX, y: tableBottom + 22, width: companyWidth, height: tableTop - tableBottom - 22 }, navy, 2)
+  drawCenteredText(page, companyNit, regular, 7.5, { x: tableX, y: tableBottom + 3, width: companyWidth, height: 18 }, gray)
+  drawCenteredText(page, metadata.documentName, bold, 8.5, { x: tableX + companyWidth, y: tableBottom, width: documentWidth, height: tableTop - tableBottom }, navy, 2)
 
   const controlRows = [
-    ["Código:", metadata.code || "-"],
-    ["Fecha:", formatDate(metadata.date)],
-    ["Versión:", metadata.version || "1"],
+    ["Código:", metadata.code?.trim() || "-"],
+    [metadata.date ? "Fecha:" : "Generado:", formatDate(metadata.date)],
+    ["Versión:", metadata.version?.trim() || "-"],
     ["Página:", `${pageNumber} de ${pageCount}`],
   ]
   controlRows.forEach(([label, value], index) => {
     const rowY = tableTop - (index + 1) * rowHeight
-    page.drawText(label, { x: controlX + 5, y: rowY + 4, size: 7.2, font: bold, color: navy })
-    centeredText(page, value, index === 0 ? regular : bold, 7.2, controlX + labelWidth, rowY + 4, controlWidth - labelWidth, navy)
+    page.drawText(label, { x: controlX + 5, y: rowY + 4, size: 7.1, font: bold, color: navy })
+    drawCenteredText(page, value, regular, 7.1, { x: controlX + labelWidth, y: rowY, width: controlWidth - labelWidth, height: rowHeight }, navy)
   })
 
-  if (!templateArtworkApplied) {
-    page.drawLine({ start: { x: tableX, y: 35 }, end: { x: width - margin, y: 35 }, thickness: 1.2, color: cyan })
-    const footerY = 20
-    const leftFooter = "Plataforma SafeCloud"
-    const middleFooter = "Desarrollado por CML Solutions"
-    const contactFooter = "cmlsolutions.co · WhatsApp +57 321 890 0642"
-    const footerSize = Math.min(7.5, width / 85)
-    const combinedWidth = regular.widthOfTextAtSize(`${leftFooter}  |  ${middleFooter}`, footerSize)
-    const footerX = Math.max(margin, (width - combinedWidth) / 2)
-    page.drawText(leftFooter, { x: footerX, y: footerY, size: footerSize, font: regular, color: navy })
-    page.drawText("  |  ", { x: footerX + regular.widthOfTextAtSize(leftFooter, footerSize), y: footerY, size: footerSize, font: regular, color: gray })
-    page.drawText(middleFooter, { x: footerX + regular.widthOfTextAtSize(`${leftFooter}  |  `, footerSize), y: footerY, size: footerSize, font: regular, color: gray })
-    centeredText(page, contactFooter, regular, footerSize, margin, 9, width - margin * 2, cyan)
-  }
+  page.drawLine({ start: { x: tableX, y: layout.footerLineY }, end: { x: width - tableX, y: layout.footerLineY }, thickness: 1.2, color: cyan })
+  drawCenteredText(page, "Plataforma SafeCloud  |  Desarrollado por CML Solutions", regular, 7.2, { x: tableX, y: 17, width: tableWidth, height: 15 }, gray)
+  drawCenteredText(page, "cmlsolutions.co · WhatsApp +57 321 890 0642", regular, 7.2, { x: tableX, y: 5, width: tableWidth, height: 14 }, cyan)
+}
+
+function sourceCropBox(width: number, height: number) {
+  const cropX = Math.min(SOURCE_CROP, width * 0.06)
+  const cropY = Math.min(SOURCE_CROP, height * 0.04)
+  return { left: cropX, bottom: cropY, right: width - cropX, top: height - cropY }
+}
+
+function placeContent(page: PDFPage, embedded: PDFEmbeddedPage, body: PageBox) {
+  const scale = Math.min(body.width / embedded.width, body.height / embedded.height)
+  const width = embedded.width * scale
+  const height = embedded.height * scale
+  page.drawPage(embedded, {
+    x: body.x + (body.width - width) / 2,
+    y: body.y + (body.height - height) / 2,
+    width,
+    height,
+  })
 }
 
 export async function applySafeCloudCorporateTemplate(source: Blob | ArrayBuffer, metadata: CorporatePdfMetadata) {
   const sourceBytes = source instanceof Blob ? await source.arrayBuffer() : source
-  const [sourcePdf, identity] = await Promise.all([PDFDocument.load(sourceBytes), resolveCompanyIdentity()])
+  const [sourcePdf, identity] = await Promise.all([PDFDocument.load(sourceBytes), resolveCompanyIdentity(metadata)])
   const outputPdf = await PDFDocument.create()
   const [regular, bold] = await Promise.all([
     outputPdf.embedFont(StandardFonts.Helvetica),
@@ -349,45 +390,25 @@ export async function applySafeCloudCorporateTemplate(source: Blob | ArrayBuffer
     console.warn("No se pudo incorporar el logo al PDF:", error)
   }
 
-  let corporateTemplate: PDFEmbeddedPage | null = null
-  try {
-    const templatePdf = await PDFDocument.load(await loadCorporateTemplateBytes())
-    corporateTemplate = await outputPdf.embedPage(templatePdf.getPage(0))
-  } catch (error) {
-    console.warn("No se pudo incorporar la plantilla corporativa al PDF:", error)
-  }
-
   const sourcePages = sourcePdf.getPages()
   for (let index = 0; index < sourcePages.length; index += 1) {
     const sourcePage = sourcePages[index]
     const sourceSize = sourcePage.getSize()
     const isPortrait = sourceSize.height >= sourceSize.width
-    const width = isPortrait ? 612 : 792
-    const height = isPortrait ? 792 : 612
+    const [width, height] = isPortrait ? LETTER_PORTRAIT : LETTER_LANDSCAPE
     const page = outputPdf.addPage([width, height])
-    const templateArtworkApplied = Boolean(corporateTemplate && isPortrait)
-    if (corporateTemplate && isPortrait) page.drawPage(corporateTemplate, { x: 0, y: 0, width, height })
-    const embedded = await outputPdf.embedPage(sourcePage)
-    const horizontalInset = 28
-    const verticalInset = isPortrait ? 36 : 22
-    const contentWidth = width - horizontalInset * 2
-    const contentHeight = height - verticalInset * 2
-    const scale = Math.min(contentWidth / sourceSize.width, contentHeight / sourceSize.height)
-    const renderedWidth = sourceSize.width * scale
-    const renderedHeight = sourceSize.height * scale
-    page.drawPage(embedded, {
-      x: (width - renderedWidth) / 2,
-      y: (height - renderedHeight) / 2,
-      width: renderedWidth,
-      height: renderedHeight,
-    })
-    drawTemplate({ page, logo, regular, bold, identity, metadata, pageNumber: index + 1, pageCount: sourcePages.length, templateArtworkApplied })
+    const embedded = await outputPdf.embedPage(sourcePage, sourceCropBox(sourceSize.width, sourceSize.height))
+    placeContent(page, embedded, documentLayout(width, height, isPortrait).body)
+    drawHeaderAndFooter({ page, logo, regular, bold, identity, metadata, pageNumber: index + 1, pageCount: sourcePages.length, isPortrait })
   }
 
   outputPdf.setTitle(metadata.documentName)
   outputPdf.setAuthor("SafeCloud - Sistema de Gestión Integral")
+  outputPdf.setSubject(`Documento generado por SafeCloud: ${metadata.documentName}`)
   outputPdf.setCreator("SafeCloud")
   outputPdf.setProducer("SafeCloud")
+  outputPdf.setCreationDate(new Date())
+  outputPdf.setModificationDate(new Date())
   const bytes = await outputPdf.save()
   const arrayBuffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer
   return new Blob([arrayBuffer], { type: "application/pdf" })
@@ -416,4 +437,3 @@ export async function downloadCorporatePdfBlob(blob: Blob, metadata: CorporatePd
 export async function saveCorporatePdf(doc: jsPDF, metadata: CorporatePdfMetadata, filename: string) {
   await downloadCorporatePdfBlob(doc.output("blob"), metadata, filename)
 }
-
