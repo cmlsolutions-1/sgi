@@ -4,6 +4,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+import { headers } from "next/headers"
 import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
@@ -22,11 +23,13 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // Request rendering is required so Next can nonce its scripts from the CSP header.
+  await headers()
   return (
     <html lang="es" className="dark h-full overflow-hidden">
       <body className="h-full overflow-hidden font-sans antialiased">

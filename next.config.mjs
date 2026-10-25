@@ -1,10 +1,16 @@
+import { securityHeaders } from "./lib/security-headers.mjs";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   images: {
     unoptimized: true,
+  },
+  poweredByHeader: false,
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders() }];
   },
   async rewrites() {
     if (!process.env.API_URL) {

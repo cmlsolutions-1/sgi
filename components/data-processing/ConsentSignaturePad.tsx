@@ -22,7 +22,7 @@ export function ConsentSignaturePad({ onChange, disabled, className }: ConsentSi
     const canvas = canvasRef.current
     if (!canvas) return
 
-    function resize() {
+    const resize = () => {
       const rect = canvas.getBoundingClientRect()
       const ratio = window.devicePixelRatio || 1
       const currentImage = signedRef.current ? canvas.toDataURL("image/png") : null

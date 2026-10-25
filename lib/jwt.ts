@@ -11,6 +11,7 @@ function base64UrlDecode(input: string) {
   );
 }
 
+// UI display/refresh hints only. Authorization requires verifySessionJwt on the server.
 export function decodeJwt(token: string): JwtPayload | null {
   try {
     const parts = token.split(".");
@@ -44,7 +45,7 @@ export function isTokenExpired(token: string | null): boolean {
   const payload = decodeJwt(token);
   const exp = typeof payload?.exp === "number" ? payload.exp : null;
 
-  if (!exp) return false;
+  if (!exp || !Number.isFinite(exp)) return true;
 
   return exp * 1000 <= Date.now();
 }
