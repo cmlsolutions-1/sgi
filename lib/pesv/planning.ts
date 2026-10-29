@@ -29,6 +29,7 @@ export type Entry = {
   responseMinutes?: number
 }
 export type RecordItem = {
+  remoteVersion?: number; remoteStatus?: string
   id: string; kind: string; values: Values; activities: Activity[]; entries: Entry[]
   evidence: Evidence[]; createdAt: string; updatedAt: string
   history: { at: string; action: string; snapshot?: Values; activities?: Activity[] }[]
@@ -302,6 +303,7 @@ export function completion(item: RecordItem) {
   return item.entries.filter(e => e.kind === "FOLLOW_UP").at(-1)?.progress ?? 0
 }
 export function itemStatus(item: RecordItem) {
+  if (item.remoteStatus) return ({ PENDING: "Pendiente", IN_PROGRESS: "En ejecución", COMPLETED: "Cumplido", OVERDUE: "Vencido", ARCHIVED: "Archivado" } as Record<string, string>)[item.remoteStatus] ?? item.remoteStatus
   const assurance = assuranceStatus(item, dateToday())
   if (assurance) return assurance
   const operational = operationalStatus(item, dateToday())

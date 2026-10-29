@@ -1,5 +1,7 @@
 "use client"
 
+import { loadPesv, pesvVersion, savePesv, deletePesv, uploadPesvDocument, pesvBlob, pesvDocumentUrl, downloadPesv, pesvPath, pesvRequest } from "@/services/pesvService"
+
 import { type FormEvent, useEffect, useMemo, useState } from "react"
 import {
   CalendarDays,
@@ -33,8 +35,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
-import { createSafeCloudPdf } from "@/lib/pdf/safecloud-pdf-style"
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
 
@@ -82,7 +82,6 @@ type EvidencePreview = {
   generated: boolean
 }
 
-const STORAGE_KEY = "safecloud:pesv-policy"
 
 const defaultPolicyForm: PolicyForm = {
   name: "Política de Seguridad Vial de la Organización",
@@ -106,33 +105,10 @@ const defaultPolicyForm: PolicyForm = {
   accessibilityLocation: "Repositorio documental SafeCloud y medios internos de consulta.",
 }
 
-const initialPolicies: PesvPolicy[] = [
-  {
-    id: "pesv-policy-1",
-    ...defaultPolicyForm,
-    legalRepresentative: "Representante Legal",
-    status: "ACTIVE",
-    evidence: {
-      id: "pesv-policy-evidence-1",
-      fileName: "politica-seguridad-vial-firmada.pdf",
-      description: "Documento firmado por representante legal y socializado a la organización.",
-      uploadedAt: "2026-09-12T09:00:00",
-      mimeType: "application/pdf",
-    },
-    createdAt: "2026-09-12T08:00:00",
-    updatedAt: "2026-09-12T09:00:00",
-  },
-]
-
 const statusLabels: Record<PesvPolicy["status"], string> = {
   DRAFT: "Borrador",
   ACTIVE: "Vigente",
   UNDER_REVIEW: "En revisión",
-}
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return `${prefix}-${crypto.randomUUID()}`
-  return `${prefix}-${Date.now()}`
 }
 
 function formatDate(value?: string | null) {
@@ -149,21 +125,6 @@ function formatDateTime(value?: string | null) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date)
-}
-
-function readPolicies() {
-  if (typeof window === "undefined") return initialPolicies
-
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as PesvPolicy[]) : initialPolicies
-  } catch {
-    return initialPolicies
-  }
-}
-
-function writePolicies(policies: PesvPolicy[]) {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(policies))
 }
 
 function isReviewExpired(policy: PesvPolicy) {
@@ -185,104 +146,6 @@ function canEmbed(mimeType?: string) {
   return Boolean(mimeType?.startsWith("image/") || mimeType === "application/pdf" || mimeType?.startsWith("text/"))
 }
 
-function buildEvidenceText(policy: PesvPolicy, evidence: PolicyEvidence) {
-  return `Politica de Seguridad Vial PESV
-Politica: ${policy.name}
-Version: ${policy.version}
-Fecha: ${formatDate(policy.issueDate)}
-Representante legal: ${policy.legalRepresentative}
-Proxima revision: ${formatDate(policy.nextReviewDate)}
-
-Documento: ${evidence.fileName}
-Descripcion: ${evidence.description || "Sin descripcion"}
-Cargado: ${formatDateTime(evidence.uploadedAt)}
-`
-}
-
-function downloadPolicyPdf(policy: PesvPolicy) {
-  const doc = createSafeCloudPdf()
-  const margin = 14
-  const pageWidth = doc.internal.pageSize.getWidth()
-  const pageHeight = doc.internal.pageSize.getHeight()
-  const contentWidth = pageWidth - margin * 2
-  let y = 18
-
-  function addWrapped(title: string, content: string) {
-    if (y > 245) {
-      doc.addPage()
-      y = 18
-    }
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(10)
-    doc.setTextColor(30, 41, 59)
-    doc.text(title, margin, y)
-    y += 6
-    doc.setFont("helvetica", "normal")
-    doc.setFontSize(9)
-    const lines = doc.splitTextToSize(content || "No registrado", contentWidth)
-    doc.text(lines, margin, y)
-    y += lines.length * 5 + 7
-  }
-
-  doc.setFillColor(31, 92, 77)
-  doc.roundedRect(margin, 12, contentWidth, 26, 3, 3, "F")
-  doc.setTextColor(255, 255, 255)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(13)
-  doc.text("POLÍTICA DE SEGURIDAD VIAL", margin + 5, 24)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(8)
-  doc.text(`PESV · Versión ${policy.version} · Fecha ${formatDate(policy.issueDate)}`, margin + 5, 31)
-
-  y = 50
-  const metadata = [
-    ["Representante legal", policy.legalRepresentative || "Pendiente de firma"],
-    ["Alcance", policy.scope],
-    ["Próxima revisión", formatDate(policy.nextReviewDate)],
-    ["Accesibilidad", policy.accessibilityLocation],
-  ]
-
-  metadata.forEach(([label, value]) => {
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(9)
-    doc.setTextColor(30, 41, 59)
-    doc.text(`${label}:`, margin, y)
-    doc.setFont("helvetica", "normal")
-    doc.text(doc.splitTextToSize(value, contentWidth - 44), margin + 44, y)
-    y += 10
-  })
-
-  addWrapped("Compromiso de la alta dirección", policy.commitments)
-  addWrapped("Adecuación a la organización y sus riesgos", policy.riskFit)
-  addWrapped("Marco para objetivos de seguridad vial", policy.objectiveFramework)
-  addWrapped("Cumplimiento legal aplicable", policy.legalCompliance)
-  addWrapped("Mejora continua del PESV", policy.continuousImprovement)
-  addWrapped("Socialización y disponibilidad", policy.socializationMeans)
-
-  y = Math.max(y + 16, 232)
-  if (y > 250) {
-    doc.addPage()
-    y = 220
-  }
-  doc.setDrawColor(120, 130, 140)
-  doc.line(margin, y, margin + 78, y)
-  doc.line(pageWidth - margin - 78, y, pageWidth - margin, y)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(8)
-  doc.setTextColor(30, 41, 59)
-  doc.text("Firma representante legal", margin, y + 6)
-  doc.text("Fecha de aprobación", pageWidth - margin - 78, y + 6)
-
-  doc.setDrawColor(220, 226, 224)
-  doc.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(7)
-  doc.setTextColor(100, 116, 139)
-  doc.text("Documento generado desde SafeCloud", margin, pageHeight - 8)
-
-  void saveCorporatePdf(doc, { documentName: "Política de Seguridad Vial", version: policy.version }, `politica-seguridad-vial-v${policy.version.replace(/\s+/g, "_")}.pdf`)
-}
-
 function PolicyDialog({
   open,
   policy,
@@ -292,7 +155,7 @@ function PolicyDialog({
   open: boolean
   policy: PesvPolicy | null
   onClose: () => void
-  onSave: (form: PolicyForm, policyId?: string) => void
+  onSave: (form: PolicyForm, policyId?: string) => Promise<boolean>
 }) {
   const [form, setForm] = useState<PolicyForm>(defaultPolicyForm)
   const editing = Boolean(policy)
@@ -316,7 +179,7 @@ function PolicyDialog({
     } : defaultPolicyForm)
   }, [open, policy])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     if (!form.name.trim()) return toast.error("Ingresa el nombre de la política")
@@ -329,7 +192,7 @@ function PolicyDialog({
     if (!form.legalCompliance.trim()) return toast.error("Incluye el compromiso de cumplimiento legal")
     if (!form.continuousImprovement.trim()) return toast.error("Incluye el compromiso de mejora continua")
 
-    onSave(
+    const saved = await onSave(
       {
         ...form,
         name: form.name.trim(),
@@ -346,7 +209,7 @@ function PolicyDialog({
       },
       policy?.id,
     )
-    onClose()
+    if (saved) onClose()
   }
 
   return (
@@ -468,7 +331,7 @@ function EvidenceDialog({
 }: {
   policy: PesvPolicy | null
   onClose: () => void
-  onSave: (policyId: string, form: EvidenceForm, file: File | null) => void
+  onSave: (policyId: string, form: EvidenceForm, file: File | null) => Promise<boolean>
 }) {
   const [form, setForm] = useState<EvidenceForm>({ fileName: "", description: "" })
   const [file, setFile] = useState<File | null>(null)
@@ -482,13 +345,13 @@ function EvidenceDialog({
     setFile(null)
   }, [policy])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!policy) return
     if (!form.fileName.trim() && !file) return toast.error("Selecciona o registra el documento firmado")
 
-    onSave(policy.id, form, file)
-    onClose()
+    const saved = await onSave(policy.id, form, file)
+    if (saved) onClose()
   }
 
   return (
@@ -590,16 +453,22 @@ function EvidencePreviewDialog({
 }
 
 export default function PesvPolicyPage() {
-  const [policies, setPolicies] = useState<PesvPolicy[]>(initialPolicies)
+  const [policies, setPolicies] = useState<PesvPolicy[]>([])
   const [search, setSearch] = useState("")
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingPolicy, setEditingPolicy] = useState<PesvPolicy | null>(null)
   const [evidencePolicy, setEvidencePolicy] = useState<PesvPolicy | null>(null)
   const [preview, setPreview] = useState<EvidencePreview | null>(null)
 
-  useEffect(() => {
-    setPolicies(readPolicies())
-  }, [])
+  const [loadError, setLoadError] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  async function reload() {
+    const result = await loadPesv<PesvPolicy>("policies")
+    setPolicies(result)
+    setLoadError("")
+  }
+  useEffect(() => { let active = true; loadPesv<PesvPolicy>("policies").then(result => { if (active) setPolicies(result) }).catch(error => { if (active) setLoadError(error.message) }).finally(() => { if (active) setLoading(false) }); return () => { active = false } }, [])
 
   const stats = useMemo(() => {
     return {
@@ -618,119 +487,47 @@ export default function PesvPolicyPage() {
     )
   }, [policies, search])
 
-  function persist(nextPolicies: PesvPolicy[]) {
-    setPolicies(nextPolicies)
-    writePolicies(nextPolicies)
+  async function savePolicy(form: PolicyForm, id?: string): Promise<boolean> {
+    if (saving) return false
+    setSaving(true)
+    try {
+      await savePesv("policies", { ...form, ...pesvVersion(policies.find(item => item.id === id)) }, id)
+      await reload().catch(error => { toast.error("Cambios guardados, pero no se pudo actualizar la vista: " + error.message) })
+      toast.success(id ? "Registro actualizado" : "Registro creado")
+      return true
+    } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo guardar"); return false }
+    finally { setSaving(false) }
   }
-
-  function savePolicy(form: PolicyForm, policyId?: string) {
-    const now = new Date().toISOString()
-
-    if (policyId) {
-      persist(
-        policies.map((policy) =>
-          policy.id === policyId
-            ? {
-                ...policy,
-                ...form,
-                status: policy.evidence ? "ACTIVE" : "DRAFT",
-                updatedAt: now,
-              }
-            : policy,
-        ),
-      )
-      toast.success("Política de Seguridad Vial actualizada")
-      return
-    }
-
-    persist([
-      {
-        id: createId("pesv-policy"),
-        ...form,
-        status: "DRAFT",
-        createdAt: now,
-        updatedAt: now,
-      },
-      ...policies,
-    ])
-    toast.success("Política creada. Ahora puedes descargarla para firma y cargar la evidencia.")
+  async function saveEvidence(id: string, form: EvidenceForm, file: File | null): Promise<boolean> {
+    if (!file) { toast.error("Selecciona el archivo que deseas cargar"); return false }
+    if (saving) return false
+    setSaving(true)
+    try { await uploadPesvDocument("policies", id, file, form.description); await reload().catch(error => { toast.error("Cambios guardados, pero no se pudo actualizar la vista: " + error.message) }); toast.success("Evidencia cargada"); return true }
+    catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo cargar"); return false }
+    finally { setSaving(false) }
   }
-
-  function saveEvidence(policyId: string, form: EvidenceForm, file: File | null) {
-    const evidence: PolicyEvidence = {
-      id: createId("pesv-policy-evidence"),
-      fileName: form.fileName.trim() || file?.name || "politica-seguridad-vial-firmada.pdf",
-      description: form.description.trim(),
-      uploadedAt: new Date().toISOString(),
-      mimeType: file?.type || "text/plain",
-      url: file ? URL.createObjectURL(file) : undefined,
-    }
-
-    const nextPolicies = policies.map((policy) =>
-      policy.id === policyId ? { ...policy, evidence, status: "ACTIVE" as const, updatedAt: evidence.uploadedAt } : policy,
-    )
-
-    persist(nextPolicies)
-    setEvidencePolicy((current) => (current?.id === policyId ? { ...current, evidence, status: "ACTIVE" } : current))
-    toast.success("Evidencia firmada cargada")
+  async function deletePolicy(policy: PesvPolicy) {
+    if (saving || !window.confirm("¿Eliminar este registro?")) return
+    setSaving(true)
+    try { await deletePesv("policies", policy.id); await reload().catch(error => { toast.error("Cambios guardados, pero no se pudo actualizar la vista: " + error.message) }); toast.success("Registro eliminado") }
+    catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo eliminar") }
+    finally { setSaving(false) }
   }
-
-  function deletePolicy(policy: PesvPolicy) {
-    if (!window.confirm(`Eliminar la política ${policy.name}?`)) return
-    persist(policies.filter((current) => current.id !== policy.id))
-    toast.success("Política eliminada")
+  async function viewEvidence(policy: PesvPolicy) {
+    if (!policy.evidence) return
+    try { const blob = await pesvBlob(pesvDocumentUrl("policies", policy.id, policy.evidence.id), policy.evidence.mimeType); setPreview({ title: policy.evidence.fileName, url: URL.createObjectURL(blob), mimeType: blob.type || policy.evidence.mimeType || "application/octet-stream", generated: true }) }
+    catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo abrir el documento") }
   }
-
-  function viewEvidence(policy: PesvPolicy) {
-    if (!policy.evidence) {
-      toast.error("Esta política no tiene documento firmado cargado")
-      return
-    }
-
-    if (policy.evidence.url) {
-      setPreview({
-        title: policy.evidence.fileName,
-        url: policy.evidence.url,
-        mimeType: policy.evidence.mimeType || "application/octet-stream",
-        generated: false,
-      })
-      return
-    }
-
-    const blob = new Blob([buildEvidenceText(policy, policy.evidence)], { type: "text/plain;charset=utf-8" })
-    setPreview({
-      title: policy.evidence.fileName,
-      url: URL.createObjectURL(blob),
-      mimeType: "text/plain",
-      generated: true,
-    })
-  }
-
-  function closePreview() {
-    if (preview?.generated) URL.revokeObjectURL(preview.url)
-    setPreview(null)
-  }
-
+  function closePreview() { if (preview) URL.revokeObjectURL(preview.url); setPreview(null) }
   function downloadEvidence(policy: PesvPolicy) {
-    if (!policy.evidence) {
-      toast.error("Esta política no tiene documento firmado cargado")
-      return
-    }
-
-    const url =
-      policy.evidence.url ??
-      URL.createObjectURL(new Blob([buildEvidenceText(policy, policy.evidence)], { type: "text/plain;charset=utf-8" }))
-
-    const link = document.createElement("a")
-    link.href = url
-    link.download = policy.evidence.fileName
-    link.click()
-
-    if (!policy.evidence.url) URL.revokeObjectURL(url)
+    if (!policy.evidence) return
+    void downloadPesv(pesvDocumentUrl("policies", policy.id, policy.evidence.id), policy.evidence.fileName).catch(error => toast.error(error.message))
   }
 
   return (
     <main className="space-y-6">
+      {loading && <p role="status">Cargando registros…</p>}
+      {loadError && <div role="alert" className="border-l-2 border-red-500 p-3 text-sm text-red-700">{loadError}<Button variant="outline" onClick={() => { void reload().catch(error => setLoadError(error.message)) }}>Reintentar</Button></div>}
       <PesvModuleHeader title="Política de Seguridad Vial" description="Documenta la política del PESV, su revisión trianual, socialización y evidencia firmada por la dirección." icon={FileText} actions={
         <Button
           className="w-full gap-2 sm:w-auto"
@@ -815,7 +612,7 @@ export default function PesvPolicyPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-60">
-                          <DropdownMenuItem onSelect={() => downloadPolicyPdf(policy)}>
+                          <DropdownMenuItem onSelect={() => { void downloadPesv(`${pesvPath("policies", policy.id)}/export`, "pesv-policies.pdf").catch(error => toast.error(error.message)) }}>
                             <Download className="h-4 w-4" />
                             Descargar PDF para firma
                           </DropdownMenuItem>

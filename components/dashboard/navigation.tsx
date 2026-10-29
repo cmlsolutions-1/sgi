@@ -36,7 +36,7 @@ import {
   ScrollText,
 } from "lucide-react"
 import type { ModuleNode } from "@/store/auth.store"
-import { isPesvModuleAllowed, pesvModuleCatalog, pesvModuleCodes } from "@/lib/pesv/module-catalog"
+import { isPesvModuleAllowed, pesvIntegratedCodes, pesvModuleCatalog, pesvModuleCodes } from "@/lib/pesv/module-catalog"
 
 export type SubNavigationItem = {
   code?: string
@@ -297,20 +297,21 @@ export const navigation: NavigationItem[] = [
       },
     ],
   },
-  /* {
+  {
     code: "PESV",
     name: "PESV",
     icon: ShieldCheck,
     subItems: [
       { code: "PESV", name: "Vista general", href: "/dashboard/pesv", icon: LayoutDashboard },
-      ...pesvModuleCatalog.map((module) => ({
+      // Los demás submódulos permanecen deshabilitados hasta integrar su API.
+      ...pesvModuleCatalog.filter(module => pesvIntegratedCodes.has(module.code)).map((module) => ({
         code: module.code,
         name: module.name,
         href: module.href,
         icon: module.icon,
       })),
     ],
-  }, */
+  },
   /* {
     code: "DATA_PROCESSING",
     name: "Tratamiento de Datos",

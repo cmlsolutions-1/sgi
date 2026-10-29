@@ -84,17 +84,13 @@ export const pesvModuleCatalog: PesvModuleCatalogItem[] = [
 ]
 
 export const pesvModuleCodes = pesvModuleCatalog.map((module) => module.code)
+export const pesvIntegratedCodes = new Set([
+  "PESV_RESPONSIBLE", "PESV_COMMITTEE", "PESV_POLICY",
+  "PESV_LEADERSHIP", "PESV_DIAGNOSIS", "PESV_OBJECTIVES",
+])
 
 export function isPesvModuleAllowed(code: string, allowedCodes: ReadonlySet<string>) {
-  const hasConfiguredPesvPermissions = allowedCodes.has("PESV")
-    || pesvModuleCodes.some((pesvCode) => allowedCodes.has(pesvCode))
-
-  // PESV currently runs as a frontend-managed suite in installations whose
-  // backend has not registered its module codes yet. Preserve that existing
-  // access until granular PESV permissions are available from the API.
-  if (!hasConfiguredPesvPermissions) return true
-  if (allowedCodes.has("PESV")) return true
-  if (code === "PESV") return pesvModuleCodes.some((pesvCode) => allowedCodes.has(pesvCode))
-  return allowedCodes.has(code)
+  if (code === "PESV") return [...pesvIntegratedCodes].some(child => allowedCodes.has(child))
+  return pesvIntegratedCodes.has(code) && allowedCodes.has(code)
 }
 

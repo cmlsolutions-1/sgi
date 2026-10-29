@@ -1,5 +1,7 @@
 "use client"
 
+import { loadPesv, pesvVersion, savePesv, deletePesv, uploadPesvDocument, pesvBlob, pesvDocumentUrl, downloadPesv, pesvPath, pesvRequest } from "@/services/pesvService"
+
 import { type FormEvent, useEffect, useMemo, useState } from "react"
 import {
   CalendarDays,
@@ -33,8 +35,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
-import { createSafeCloudPdf } from "@/lib/pdf/safecloud-pdf-style"
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
 
@@ -93,7 +93,6 @@ type EvidencePreview = {
   generated: boolean
 }
 
-const STORAGE_KEY = "safecloud:pesv-leadership"
 
 const commitmentLabels: Array<{ key: CommitmentKey; label: string }> = [
   {
@@ -161,28 +160,10 @@ const defaultForm: LeadershipForm = {
   commitments: emptyCommitments,
 }
 
-const initialRecords: PesvLeadershipRecord[] = [
-  {
-    id: "pesv-leadership-1",
-    ...defaultForm,
-    directorName: "Gerencia General",
-    committeeMeetingDate: "2026-09-10",
-    observations: "Compromiso directivo documentado y pendiente de cargar acta firmada de respaldo.",
-    status: "IN_PROGRESS",
-    createdAt: "2026-09-10T08:00:00",
-    updatedAt: "2026-09-10T08:00:00",
-  },
-]
-
 const statusLabels: Record<PesvLeadershipRecord["status"], string> = {
   PENDING: "Pendiente",
   IN_PROGRESS: "En ejecución",
   COMPLETED: "Cumplido",
-}
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return `${prefix}-${crypto.randomUUID()}`
-  return `${prefix}-${Date.now()}`
 }
 
 function formatDate(value?: string | null) {
@@ -199,21 +180,6 @@ function formatDateTime(value?: string | null) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date)
-}
-
-function readRecords() {
-  if (typeof window === "undefined") return initialRecords
-
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as PesvLeadershipRecord[]) : initialRecords
-  } catch {
-    return initialRecords
-  }
-}
-
-function writeRecords(records: PesvLeadershipRecord[]) {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(records))
 }
 
 function completionPercentage(record: Pick<PesvLeadershipRecord, "commitments">) {
@@ -237,96 +203,6 @@ function canEmbed(mimeType?: string) {
   return Boolean(mimeType?.startsWith("image/") || mimeType === "application/pdf" || mimeType?.startsWith("text/"))
 }
 
-function buildEvidenceText(record: PesvLeadershipRecord, evidence: LeadershipEvidence) {
-  return `Liderazgo, compromiso y corresponsabilidad PESV
-Año: ${record.year}
-Directivo: ${record.directorName}
-Cargo: ${record.directorRole}
-Fecha de revisión: ${formatDate(record.reviewDate)}
-Cumplimiento: ${completionPercentage(record)}%
-Estado: ${statusLabels[record.status]}
-
-Documento: ${evidence.fileName}
-Descripcion: ${evidence.description || "Sin descripcion"}
-Cargado: ${formatDateTime(evidence.uploadedAt)}
-`
-}
-
-function downloadLeadershipPdf(record: PesvLeadershipRecord) {
-  const doc = createSafeCloudPdf()
-  const margin = 14
-  const pageWidth = doc.internal.pageSize.getWidth()
-  const contentWidth = pageWidth - margin * 2
-  let y = 18
-
-  function addSection(title: string, content: string) {
-    if (y > 248) {
-      doc.addPage()
-      y = 18
-    }
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(10)
-    doc.setTextColor(30, 41, 59)
-    doc.text(title, margin, y)
-    y += 6
-    doc.setFont("helvetica", "normal")
-    doc.setFontSize(9)
-    const lines = doc.splitTextToSize(content || "No registrado", contentWidth)
-    doc.text(lines, margin, y)
-    y += lines.length * 5 + 7
-  }
-
-  doc.setFillColor(31, 92, 77)
-  doc.roundedRect(margin, 12, contentWidth, 26, 3, 3, "F")
-  doc.setTextColor(255, 255, 255)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(12)
-  doc.text("LIDERAZGO Y COMPROMISO DIRECTIVO PESV", margin + 5, 24)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(8)
-  doc.text(`Año ${record.year} · Revisión ${formatDate(record.reviewDate)} · Cumplimiento ${completionPercentage(record)}%`, margin + 5, 31)
-
-  y = 50
-  addSection("Directivo responsable", `${record.directorName} - ${record.directorRole}`)
-  addSection("Alineación estratégica", record.strategicAlignment)
-  addSection("Recursos asignados", record.resourcesAssigned)
-  addSection("Seguimiento a terceros", record.contractorFollowUp)
-  addSection("Seguimiento al plan anual PESV", record.annualPlanFollowUp)
-  addSection("Gestión ante entidades verificadoras", record.verificationManagement)
-
-  if (y > 230) {
-    doc.addPage()
-    y = 18
-  }
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(10)
-  doc.text("Verificación de compromisos", margin, y)
-  y += 7
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(8.5)
-  commitmentLabels.forEach((item) => {
-    const mark = record.commitments[item.key] ? "Cumple" : "Pendiente"
-    const lines = doc.splitTextToSize(`${mark}: ${item.label}`, contentWidth)
-    doc.text(lines, margin, y)
-    y += lines.length * 4.5 + 3
-  })
-
-  y = Math.max(y + 16, 242)
-  if (y > 260) {
-    doc.addPage()
-    y = 230
-  }
-  doc.setDrawColor(120, 130, 140)
-  doc.line(margin, y, margin + 78, y)
-  doc.line(pageWidth - margin - 78, y, pageWidth - margin, y)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(8)
-  doc.text("Firma alta dirección", margin, y + 6)
-  doc.text("Firma responsable PESV", pageWidth - margin - 78, y + 6)
-
-  void saveCorporatePdf(doc, { documentName: "Liderazgo Directivo PESV" }, `liderazgo-directivo-pesv-${record.year}.pdf`)
-}
-
 function LeadershipDialog({
   open,
   record,
@@ -336,7 +212,7 @@ function LeadershipDialog({
   open: boolean
   record: PesvLeadershipRecord | null
   onClose: () => void
-  onSave: (form: LeadershipForm, recordId?: string) => void
+  onSave: (form: LeadershipForm, recordId?: string) => Promise<boolean>
 }) {
   const [form, setForm] = useState<LeadershipForm>(defaultForm)
   const editing = Boolean(record)
@@ -363,7 +239,7 @@ function LeadershipDialog({
     )
   }, [open, record])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!form.year) return toast.error("Ingresa el año")
     if (!form.directorName.trim()) return toast.error("Ingresa el directivo responsable")
@@ -372,7 +248,7 @@ function LeadershipDialog({
     if (!form.strategicAlignment.trim()) return toast.error("Registra la alineación estratégica")
     if (!form.resourcesAssigned.trim()) return toast.error("Registra los recursos asignados")
 
-    onSave(
+    const saved = await onSave(
       {
         ...form,
         directorName: form.directorName.trim(),
@@ -386,7 +262,7 @@ function LeadershipDialog({
       },
       record?.id,
     )
-    onClose()
+    if (saved) onClose()
   }
 
   return (
@@ -534,7 +410,7 @@ function EvidenceDialog({
 }: {
   record: PesvLeadershipRecord | null
   onClose: () => void
-  onSave: (recordId: string, form: EvidenceForm, file: File | null) => void
+  onSave: (recordId: string, form: EvidenceForm, file: File | null) => Promise<boolean>
 }) {
   const [form, setForm] = useState<EvidenceForm>({ fileName: "", description: "" })
   const [file, setFile] = useState<File | null>(null)
@@ -548,13 +424,13 @@ function EvidenceDialog({
     setFile(null)
   }, [record])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!record) return
     if (!form.fileName.trim() && !file) return toast.error("Selecciona o registra el nombre de la evidencia")
 
-    onSave(record.id, form, file)
-    onClose()
+    const saved = await onSave(record.id, form, file)
+    if (saved) onClose()
   }
 
   return (
@@ -652,16 +528,22 @@ function EvidencePreviewDialog({
 }
 
 export default function PesvLeadershipPage() {
-  const [records, setRecords] = useState<PesvLeadershipRecord[]>(initialRecords)
+  const [records, setRecords] = useState<PesvLeadershipRecord[]>([])
   const [search, setSearch] = useState("")
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingRecord, setEditingRecord] = useState<PesvLeadershipRecord | null>(null)
   const [evidenceRecord, setEvidenceRecord] = useState<PesvLeadershipRecord | null>(null)
   const [preview, setPreview] = useState<EvidencePreview | null>(null)
 
-  useEffect(() => {
-    setRecords(readRecords())
-  }, [])
+  const [loadError, setLoadError] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  async function reload() {
+    const result = await loadPesv<PesvLeadershipRecord>("leadership")
+    setRecords(result)
+    setLoadError("")
+  }
+  useEffect(() => { let active = true; loadPesv<PesvLeadershipRecord>("leadership").then(result => { if (active) setRecords(result) }).catch(error => { if (active) setLoadError(error.message) }).finally(() => { if (active) setLoading(false) }); return () => { active = false } }, [])
 
   const stats = useMemo(() => {
     return {
@@ -682,114 +564,47 @@ export default function PesvLeadershipPage() {
     )
   }, [records, search])
 
-  function persist(nextRecords: PesvLeadershipRecord[]) {
-    setRecords(nextRecords)
-    writeRecords(nextRecords)
+  async function saveRecord(form: LeadershipForm, id?: string): Promise<boolean> {
+    if (saving) return false
+    setSaving(true)
+    try {
+      await savePesv("leadership", { ...form, ...pesvVersion(records.find(item => item.id === id)) }, id)
+      await reload().catch(error => { toast.error("Cambios guardados, pero no se pudo actualizar la vista: " + error.message) })
+      toast.success(id ? "Registro actualizado" : "Registro creado")
+      return true
+    } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo guardar"); return false }
+    finally { setSaving(false) }
   }
-
-  function saveRecord(form: LeadershipForm, recordId?: string) {
-    const now = new Date().toISOString()
-
-    if (recordId) {
-      persist(
-        records.map((record) => {
-          if (record.id !== recordId) return record
-          const nextRecord = { ...record, ...form, updatedAt: now }
-          return { ...nextRecord, status: resolveStatus(nextRecord) }
-        }),
-      )
-      toast.success("Registro de liderazgo actualizado")
-      return
-    }
-
-    const newRecord: PesvLeadershipRecord = {
-      id: createId("pesv-leadership"),
-      ...form,
-      status: resolveStatus({ commitments: form.commitments }),
-      createdAt: now,
-      updatedAt: now,
-    }
-
-    persist([newRecord, ...records])
-    toast.success("Registro creado. Ahora puedes descargarlo para firma y cargar la evidencia.")
+  async function saveEvidence(id: string, form: EvidenceForm, file: File | null): Promise<boolean> {
+    if (!file) { toast.error("Selecciona el archivo que deseas cargar"); return false }
+    if (saving) return false
+    setSaving(true)
+    try { await uploadPesvDocument("leadership", id, file, form.description); await reload().catch(error => { toast.error("Cambios guardados, pero no se pudo actualizar la vista: " + error.message) }); toast.success("Evidencia cargada"); return true }
+    catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo cargar"); return false }
+    finally { setSaving(false) }
   }
-
-  function saveEvidence(recordId: string, form: EvidenceForm, file: File | null) {
-    const evidence: LeadershipEvidence = {
-      id: createId("pesv-leadership-evidence"),
-      fileName: form.fileName.trim() || file?.name || "acta-liderazgo-pesv.pdf",
-      description: form.description.trim(),
-      uploadedAt: new Date().toISOString(),
-      mimeType: file?.type || "text/plain",
-      url: file ? URL.createObjectURL(file) : undefined,
-    }
-
-    const nextRecords = records.map((record) => {
-      if (record.id !== recordId) return record
-      const nextRecord = { ...record, evidence, updatedAt: evidence.uploadedAt }
-      return { ...nextRecord, status: resolveStatus(nextRecord) }
-    })
-
-    persist(nextRecords)
-    toast.success("Evidencia cargada")
+  async function deleteRecord(record: PesvLeadershipRecord) {
+    if (saving || !window.confirm("¿Eliminar este registro?")) return
+    setSaving(true)
+    try { await deletePesv("leadership", record.id); await reload().catch(error => { toast.error("Cambios guardados, pero no se pudo actualizar la vista: " + error.message) }); toast.success("Registro eliminado") }
+    catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo eliminar") }
+    finally { setSaving(false) }
   }
-
-  function deleteRecord(record: PesvLeadershipRecord) {
-    if (!window.confirm(`Eliminar el registro de liderazgo ${record.year}?`)) return
-    persist(records.filter((current) => current.id !== record.id))
-    toast.success("Registro eliminado")
+  async function viewEvidence(record: PesvLeadershipRecord) {
+    if (!record.evidence) return
+    try { const blob = await pesvBlob(pesvDocumentUrl("leadership", record.id, record.evidence.id), record.evidence.mimeType); setPreview({ title: record.evidence.fileName, url: URL.createObjectURL(blob), mimeType: blob.type || record.evidence.mimeType || "application/octet-stream", generated: true }) }
+    catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo abrir el documento") }
   }
-
-  function viewEvidence(record: PesvLeadershipRecord) {
-    if (!record.evidence) {
-      toast.error("Este registro no tiene evidencia cargada")
-      return
-    }
-
-    if (record.evidence.url) {
-      setPreview({
-        title: record.evidence.fileName,
-        url: record.evidence.url,
-        mimeType: record.evidence.mimeType || "application/octet-stream",
-        generated: false,
-      })
-      return
-    }
-
-    const blob = new Blob([buildEvidenceText(record, record.evidence)], { type: "text/plain;charset=utf-8" })
-    setPreview({
-      title: record.evidence.fileName,
-      url: URL.createObjectURL(blob),
-      mimeType: "text/plain",
-      generated: true,
-    })
-  }
-
-  function closePreview() {
-    if (preview?.generated) URL.revokeObjectURL(preview.url)
-    setPreview(null)
-  }
-
+  function closePreview() { if (preview) URL.revokeObjectURL(preview.url); setPreview(null) }
   function downloadEvidence(record: PesvLeadershipRecord) {
-    if (!record.evidence) {
-      toast.error("Este registro no tiene evidencia cargada")
-      return
-    }
-
-    const url =
-      record.evidence.url ??
-      URL.createObjectURL(new Blob([buildEvidenceText(record, record.evidence)], { type: "text/plain;charset=utf-8" }))
-
-    const link = document.createElement("a")
-    link.href = url
-    link.download = record.evidence.fileName
-    link.click()
-
-    if (!record.evidence.url) URL.revokeObjectURL(url)
+    if (!record.evidence) return
+    void downloadPesv(pesvDocumentUrl("leadership", record.id, record.evidence.id), record.evidence.fileName).catch(error => toast.error(error.message))
   }
 
   return (
     <main className="space-y-6">
+      {loading && <p role="status">Cargando registros…</p>}
+      {loadError && <div role="alert" className="border-l-2 border-red-500 p-3 text-sm text-red-700">{loadError}<Button variant="outline" onClick={() => { void reload().catch(error => setLoadError(error.message)) }}>Reintentar</Button></div>}
       <PesvModuleHeader title="Liderazgo Directivo" description="Evidencia el liderazgo, compromiso y corresponsabilidad de la alta dirección frente al PESV." icon={Handshake} actions={
         <Button
           className="w-full gap-2 sm:w-auto"
@@ -883,7 +698,7 @@ export default function PesvLeadershipPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-60">
-                          <DropdownMenuItem onSelect={() => downloadLeadershipPdf(record)}>
+                          <DropdownMenuItem onSelect={() => { void downloadPesv(`${pesvPath("leadership", record.id)}/export`, "pesv-leadership.pdf").catch(error => toast.error(error.message)) }}>
                             <Download className="h-4 w-4" />
                             Descargar documento
                           </DropdownMenuItem>

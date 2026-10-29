@@ -1,5 +1,9 @@
 "use client"
 
+import { loadPesv, savePesv, listPesv, pesvPath, pesvRequest, downloadPesv, pesvVersion } from "@/services/pesvService"
+import { PesvApiDocuments } from "@/components/pesv/api-documents"
+import { Modal } from "@/components/pesv/planning-module"
+
 import { type FormEvent, useEffect, useMemo, useState } from "react"
 import {
   CalendarDays,
@@ -33,23 +37,13 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
 import type { Employee } from "@/types/manager/employee"
-import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
-import { createSafeCloudPdf } from "@/lib/pdf/safecloud-pdf-style"
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { PesvSelect } from "@/components/pesv/pesv-select"
 
 type PesvResponsibleRecord = {
-  id: string
   employeeId: string
   employeeName: string
-  employeeEmail: string
-  employeePhone: string
-  signatureDate: string
-  roleDescription: string
-  supportFileName: string
-  supportDescription: string
-  updatedAt: string
 }
 
 type CommitteeMember = {
@@ -106,8 +100,6 @@ type ReviewForm = {
   decisions: string
 }
 
-const COMMITTEE_STORAGE_KEY = "safecloud:pesv-committee"
-const RESPONSIBLE_STORAGE_KEY = "safecloud:pesv-responsible"
 
 const defaultCommitteeForm: CommitteeForm = {
   objective: "Definir, implementar y hacer seguimiento a las acciones del Plan Estratégico de Seguridad Vial.",
@@ -136,94 +128,13 @@ const quarterLabels: Record<QuarterlyReview["quarter"], string> = {
   Q4: "Cuarto trimestre",
 }
 
-const PESV_MOCK_EMPLOYEES: Employee[] = [
-  {
-    id: "pesv-mock-employee-1",
-    name: "Diana",
-    lastName: "Mendoza",
-    phone: "3000000001",
-    email: "diana.mendoza@safecloud.local",
-    address: "No registrada",
-    birthDate: "1990-01-15",
-    companyId: "pesv-mock-company",
-    workAreaId: "pesv-mock-area",
-    jobId: "pesv-mock-job-1",
-    status: true,
-  },
-  {
-    id: "pesv-mock-employee-2",
-    name: "Carlos",
-    lastName: "Ramírez",
-    phone: "3000000002",
-    email: "carlos.ramirez@safecloud.local",
-    address: "No registrada",
-    birthDate: "1988-05-20",
-    companyId: "pesv-mock-company",
-    workAreaId: "pesv-mock-area",
-    jobId: "pesv-mock-job-2",
-    status: true,
-  },
-  {
-    id: "pesv-mock-employee-3",
-    name: "Valentina",
-    lastName: "Suárez",
-    phone: "3000000003",
-    email: "valentina.suarez@safecloud.local",
-    address: "No registrada",
-    birthDate: "1992-11-08",
-    companyId: "pesv-mock-company",
-    workAreaId: "pesv-mock-area",
-    jobId: "pesv-mock-job-3",
-    status: true,
-  },
-  {
-    id: "pesv-mock-employee-4",
-    name: "Andrés",
-    lastName: "Torres",
-    phone: "3000000004",
-    email: "andres.torres@safecloud.local",
-    address: "No registrada",
-    birthDate: "1985-09-12",
-    companyId: "pesv-mock-company",
-    workAreaId: "pesv-mock-area",
-    jobId: "pesv-mock-job-4",
-    status: true,
-  },
-]
-
-function withPesvMockEmployees(employees: Employee[]) {
-  if (employees.length >= 3) return employees
-  const existingIds = new Set(employees.map((employee) => employee.id))
-  return [...employees, ...PESV_MOCK_EMPLOYEES.filter((employee) => !existingIds.has(employee.id))]
-}
-
 function formatDate(value?: string | null) {
   if (!value) return "No registrada"
   return value.slice(0, 10)
 }
 
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return `${prefix}-${crypto.randomUUID()}`
-  return `${prefix}-${Date.now()}`
-}
-
 function employeeFullName(employee: Employee) {
   return `${employee.name ?? ""} ${employee.lastName ?? ""}`.trim() || employee.email || "Funcionario sin nombre"
-}
-
-function readStorage<T>(key: string): T | null {
-  if (typeof window === "undefined") return null
-
-  try {
-    const raw = window.localStorage.getItem(key)
-    return raw ? (JSON.parse(raw) as T) : null
-  } catch {
-    return null
-  }
-}
-
-function writeStorage<T>(key: string, value: T) {
-  window.localStorage.setItem(key, JSON.stringify(value))
 }
 
 function toggleId(ids: string[], id: string) {
@@ -252,73 +163,6 @@ function buildMembers(employees: Employee[], memberIds: string[], pesvLeader: Pe
     .filter(Boolean) as CommitteeMember[]
 }
 
-function downloadCommitteePdf(record: PesvCommitteeRecord) {
-  const doc = createSafeCloudPdf()
-  const margin = 14
-  const pageWidth = doc.internal.pageSize.getWidth()
-  const contentWidth = pageWidth - margin * 2
-  let y = 18
-
-  doc.setFillColor(31, 92, 77)
-  doc.roundedRect(margin, 12, contentWidth, 24, 3, 3, "F")
-  doc.setTextColor(255, 255, 255)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(13)
-  doc.text("COMITÉ DE SEGURIDAD VIAL", margin + 5, 23)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(8)
-  doc.text(`PESV · Fecha de conformación: ${formatDate(record.formationDate)}`, margin + 5, 30)
-
-  y = 48
-  doc.setTextColor(30, 41, 59)
-  const sections = [
-    ["Objetivo general", record.objective],
-    ["Visión", record.vision],
-    ["Alcance", record.scope],
-  ]
-
-  sections.forEach(([title, content]) => {
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(10)
-    doc.text(title, margin, y)
-    y += 6
-    doc.setFont("helvetica", "normal")
-    doc.setFontSize(9)
-    const lines = doc.splitTextToSize(content, contentWidth)
-    doc.text(lines, margin, y)
-    y += lines.length * 5 + 6
-  })
-
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(10)
-  doc.text("Integrantes con poder de decisión", margin, y)
-  y += 7
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(9)
-  record.members.forEach((member, index) => {
-    doc.text(`${index + 1}. ${member.employeeName} - ${member.role}`, margin, y)
-    y += 6
-  })
-
-  y += 6
-  doc.setFont("helvetica", "bold")
-  doc.text("Revisiones trimestrales documentadas", margin, y)
-  y += 7
-  doc.setFont("helvetica", "normal")
-  record.reviews.slice(0, 4).forEach((review) => {
-    if (y > 260) {
-      doc.addPage()
-      y = 18
-    }
-    doc.text(`${quarterLabels[review.quarter]} · ${formatDate(review.reviewDate)}`, margin, y)
-    y += 5
-    doc.text(doc.splitTextToSize(`Decisiones: ${review.decisions || "Sin decisiones registradas"}`, contentWidth), margin, y)
-    y += 12
-  })
-
-  void saveCorporatePdf(doc, { documentName: "Comité de Seguridad Vial PESV" }, "comite-seguridad-vial-pesv.pdf")
-}
-
 function CommitteeDialog({
   open,
   employees,
@@ -332,7 +176,7 @@ function CommitteeDialog({
   record: PesvCommitteeRecord | null
   pesvLeader: PesvResponsibleRecord | null
   onOpenChange: (open: boolean) => void
-  onSave: (form: CommitteeForm) => void
+  onSave: (form: CommitteeForm) => Promise<boolean>
 }) {
   const [form, setForm] = useState<CommitteeForm>(defaultCommitteeForm)
   const [query, setQuery] = useState("")
@@ -361,7 +205,7 @@ function CommitteeDialog({
     return employees.filter((employee) => `${employeeFullName(employee)} ${employee.email ?? ""}`.toLowerCase().includes(term))
   }, [employees, query])
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const members = buildMembers(employees, form.memberIds, pesvLeader)
 
@@ -374,14 +218,14 @@ function CommitteeDialog({
       return toast.error("El líder PESV debe hacer parte del Comité de Seguridad Vial")
     }
 
-    onSave({
+    const saved = await onSave({
       objective: form.objective.trim(),
       vision: form.vision.trim(),
       scope: form.scope.trim(),
       formationDate: form.formationDate,
       memberIds: form.memberIds,
     })
-    onOpenChange(false)
+    if (saved) onOpenChange(false)
   }
 
   return (
@@ -472,7 +316,7 @@ function ReviewDialog({
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSave: (form: ReviewForm) => void
+  onSave: (form: ReviewForm) => Promise<boolean>
 }) {
   const [form, setForm] = useState<ReviewForm>(defaultReviewForm)
 
@@ -480,14 +324,14 @@ function ReviewDialog({
     if (open) setForm(defaultReviewForm)
   }, [open])
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!form.reviewDate) return toast.error("Selecciona la fecha de revisión")
     if (!form.roadAccidentAnalysis.trim()) return toast.error("Registra el análisis de siniestralidad vial")
     if (!form.indicatorsAnalysis.trim()) return toast.error("Registra el análisis de indicadores")
     if (!form.decisions.trim()) return toast.error("Registra las decisiones tomadas")
 
-    onSave({
+    const saved = await onSave({
       ...form,
       roadAccidentAnalysis: form.roadAccidentAnalysis.trim(),
       indicatorsAnalysis: form.indicatorsAnalysis.trim(),
@@ -497,7 +341,7 @@ function ReviewDialog({
       implementationReview: form.implementationReview.trim(),
       decisions: form.decisions.trim(),
     })
-    onOpenChange(false)
+    if (saved) onOpenChange(false)
   }
 
   return (
@@ -581,73 +425,6 @@ function ReviewDialog({
   )
 }
 
-function ReviewEvidenceDialog({
-  open,
-  review,
-  onOpenChange,
-  onSave,
-}: {
-  open: boolean
-  review: QuarterlyReview | null
-  onOpenChange: (open: boolean) => void
-  onSave: (reviewId: string, evidenceFileName: string) => void
-}) {
-  const [fileName, setFileName] = useState("")
-
-  useEffect(() => {
-    if (open) setFileName(review?.evidenceFileName ?? "")
-  }, [open, review])
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    if (!review) return
-    if (!fileName.trim()) return toast.error("Selecciona o registra el nombre de la evidencia")
-
-    onSave(review.id, fileName.trim())
-    onOpenChange(false)
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl bg-card">
-        <DialogHeader>
-          <DialogTitle>Cargar evidencia de revisión</DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="rounded-md border border-border bg-secondary/40 p-3 text-sm text-muted-foreground">
-            {review ? `${quarterLabels[review.quarter]} · ${formatDate(review.reviewDate)}` : "Revisión trimestral"}
-          </div>
-
-          <Label className="grid gap-2">
-            Evidencia o acta de revisión
-            <Input
-              type="file"
-              onChange={(event) => setFileName(event.target.files?.[0]?.name ?? fileName)}
-            />
-          </Label>
-
-          <Label className="grid gap-2">
-            Nombre del archivo
-            <Input
-              value={fileName}
-              onChange={(event) => setFileName(event.target.value)}
-              placeholder="acta-revision-trimestral-pesv.pdf"
-            />
-          </Label>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit">Guardar evidencia</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
 export default function PesvCommitteePage() {
   const [employees, setEmployees] = useState<Employee[]>([])
   const [pesvLeader, setPesvLeader] = useState<PesvResponsibleRecord | null>(null)
@@ -656,96 +433,55 @@ export default function PesvCommitteePage() {
   const [committeeDialogOpen, setCommitteeDialogOpen] = useState(false)
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false)
   const [selectedReviewForEvidence, setSelectedReviewForEvidence] = useState<QuarterlyReview | null>(null)
+  const [documentsOpen, setDocumentsOpen] = useState(false)
 
+  const [saving, setSaving] = useState(false)
+  const [loadError, setLoadError] = useState("")
+  async function readCommittee() {
+    const records = await loadPesv<PesvCommitteeRecord & { documents?: import("@/services/pesvService").PesvDocument[] }>("committee")
+    const current = records[0] ?? null
+    if (current) {
+      current.members ??= []
+      current.reviews = await listPesv<QuarterlyReview>(`${pesvPath("committee", current.id)}/reviews`)
+      current.reviews = current.reviews.map(review => ({ ...review, evidenceFileName: current.documents?.find(document => document.targetId === review.id)?.fileName ?? "" }))
+    }
+    return current
+  }
+  async function reload() { setCommittee(await readCommittee()) }
   useEffect(() => {
-    let mounted = true
-    async function loadData() {
-      setLoading(true)
-      try {
-        const employeeList = await listEmployees()
-        if (!mounted) return
-        setEmployees(withPesvMockEmployees(employeeList))
-        setPesvLeader(readStorage<PesvResponsibleRecord>(RESPONSIBLE_STORAGE_KEY))
-        setCommittee(readStorage<PesvCommitteeRecord>(COMMITTEE_STORAGE_KEY))
-      } catch {
-        if (mounted) {
-          setEmployees(PESV_MOCK_EMPLOYEES)
-          setPesvLeader(readStorage<PesvResponsibleRecord>(RESPONSIBLE_STORAGE_KEY))
-          setCommittee(readStorage<PesvCommitteeRecord>(COMMITTEE_STORAGE_KEY))
-          toast.info("Usando funcionarios mock para el Comité PESV mientras se conecta el backend.")
-        }
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    }
-
-    loadData()
-    return () => {
-      mounted = false
-    }
+    let active = true
+    Promise.allSettled([listEmployees(), loadPesv<PesvResponsibleRecord & { id: string }>("responsible"), readCommittee()]).then(([employeeResult, leadersResult, committeeResult]) => {
+      if (!active) return
+      if (employeeResult.status === "fulfilled") setEmployees(employeeResult.value.filter(employee => employee.status !== false))
+      else toast.error("No se pudo cargar el catálogo de funcionarios: " + employeeResult.reason.message)
+      if (committeeResult.status === "fulfilled") {
+        setCommittee(committeeResult.value)
+        const member = committeeResult.value?.members.find(member => member.isPesvLeader)
+        setPesvLeader(leadersResult.status === "fulfilled" ? leadersResult.value[0] ?? member ?? null : member ?? null)
+      } else setLoadError(committeeResult.reason.message)
+    }).finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
   }, [])
-
-  const decisionMembers = committee?.members.filter((member) => member.hasDecisionPower).length ?? 0
+  const decisionMembers = committee?.members.filter(member => member.hasDecisionPower).length ?? 0
   const quarterlyReviews = committee?.reviews.length ?? 0
-
-  function handleSaveCommittee(form: CommitteeForm) {
-    const members = buildMembers(employees, form.memberIds, pesvLeader)
-    const nextRecord: PesvCommitteeRecord = {
-      id: committee?.id ?? createId("pesv-committee"),
-      objective: form.objective,
-      vision: form.vision,
-      scope: form.scope,
-      formationDate: form.formationDate,
-      members,
-      reviews: committee?.reviews ?? [],
-      updatedAt: new Date().toISOString(),
-    }
-
-    writeStorage(COMMITTEE_STORAGE_KEY, nextRecord)
-    setCommittee(nextRecord)
-    toast.success(committee ? "Comité de Seguridad Vial actualizado" : "Comité de Seguridad Vial creado")
+  async function handleSaveCommittee(form: CommitteeForm): Promise<boolean> {
+    if (saving) return false
+    setSaving(true)
+    try { await savePesv("committee", { ...form, ...pesvVersion(committee) }, committee?.id); await reload().catch(error => { toast.error("Cambios guardados, pero no se pudo actualizar la vista: " + error.message) }); toast.success("Comité guardado"); return true }
+    catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo guardar el comité"); return false }
+    finally { setSaving(false) }
   }
-
-  function handleSaveReview(form: ReviewForm) {
-    if (!committee) {
-      toast.error("Primero crea el Comité de Seguridad Vial")
-      return
-    }
-
-    const review: QuarterlyReview = {
-      id: createId("pesv-review"),
-      ...form,
-      evidenceFileName: "",
-      createdAt: new Date().toISOString(),
-    }
-    const nextRecord = {
-      ...committee,
-      reviews: [review, ...committee.reviews],
-      updatedAt: new Date().toISOString(),
-    }
-
-    writeStorage(COMMITTEE_STORAGE_KEY, nextRecord)
-    setCommittee(nextRecord)
-    toast.success("Revisión trimestral registrada")
-  }
-
-  function handleSaveReviewEvidence(reviewId: string, evidenceFileName: string) {
-    if (!committee) return
-
-    const nextRecord = {
-      ...committee,
-      reviews: committee.reviews.map((review) => (review.id === reviewId ? { ...review, evidenceFileName } : review)),
-      updatedAt: new Date().toISOString(),
-    }
-
-    writeStorage(COMMITTEE_STORAGE_KEY, nextRecord)
-    setCommittee(nextRecord)
-    setSelectedReviewForEvidence(null)
-    toast.success("Evidencia de revisión cargada")
+  async function handleSaveReview(form: ReviewForm): Promise<boolean> {
+    if (!committee || saving) return false
+    setSaving(true)
+    try { await pesvRequest(`${pesvPath("committee", committee.id)}/reviews`, "POST", form); await reload().catch(error => { toast.error("Cambios guardados, pero no se pudo actualizar la vista: " + error.message) }); toast.success("Revisión trimestral registrada"); return true }
+    catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo registrar la revisión"); return false }
+    finally { setSaving(false) }
   }
 
   return (
     <main className="space-y-6">
+      {loadError && <p role="alert" className="text-sm text-red-600">{loadError}</p>}
       <PesvModuleHeader title="Comité de Seguridad Vial" description="Conforma el CSV, define objetivo, visión y alcance del PESV, y documenta sus revisiones trimestrales." icon={UsersRound} actions={<>
           <Button className="gap-2" onClick={() => setCommitteeDialogOpen(true)} disabled={loading}>
             <UsersRound className="h-4 w-4" />
@@ -755,6 +491,7 @@ export default function PesvCommitteePage() {
             <Plus className="h-4 w-4" />
             Revisión trimestral
           </Button>
+          <Button variant="outline" disabled={!committee} onClick={() => setDocumentsOpen(true)}><Upload className="mr-2 h-4 w-4" />Documentos del comité</Button>
         </>} />
 
       {loading ? (
@@ -789,7 +526,7 @@ export default function PesvCommitteePage() {
               <Card className="bg-card border-border">
                 <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <CardTitle className="text-base">Marco del PESV definido por el comité</CardTitle>
-                  <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => downloadCommitteePdf(committee)}>
+                  <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => { void downloadPesv(`${pesvPath("committee", committee.id)}/export`, "comite-seguridad-vial.pdf").catch(error => toast.error(error.message)) }}>
                     <Download className="h-4 w-4" />
                     PDF
                   </Button>
@@ -887,7 +624,7 @@ export default function PesvCommitteePage() {
                                     <Upload className="h-4 w-4" />
                                     {review.evidenceFileName ? "Actualizar evidencia" : "Cargar evidencia"}
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem onSelect={() => toast.info("La visualización de evidencias quedará conectada cuando exista contrato backend.")}>Ver detalle</DropdownMenuItem>
+                                  <DropdownMenuItem onSelect={() => setSelectedReviewForEvidence(review)}>Ver detalle</DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </td>
@@ -903,6 +640,7 @@ export default function PesvCommitteePage() {
         </>
       )}
 
+      <Modal open={documentsOpen} onOpenChange={setDocumentsOpen} title="Documentos del Comité de Seguridad Vial">{committee && <PesvApiDocuments resource="committee" id={committee.id} onChanged={() => { void reload().catch(error => toast.error(error.message)) }} />}</Modal>
       <CommitteeDialog
         open={committeeDialogOpen}
         employees={employees}
@@ -912,14 +650,7 @@ export default function PesvCommitteePage() {
         onSave={handleSaveCommittee}
       />
       <ReviewDialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen} onSave={handleSaveReview} />
-      <ReviewEvidenceDialog
-        open={Boolean(selectedReviewForEvidence)}
-        review={selectedReviewForEvidence}
-        onOpenChange={(open) => {
-          if (!open) setSelectedReviewForEvidence(null)
-        }}
-        onSave={handleSaveReviewEvidence}
-      />
+      <Modal open={!!selectedReviewForEvidence} onOpenChange={open => !open && setSelectedReviewForEvidence(null)} title="Documentos de revisión trimestral">{committee && selectedReviewForEvidence && <PesvApiDocuments resource="committee" id={committee.id} targetId={selectedReviewForEvidence.id} onChanged={() => { void reload().catch(error => toast.error(error.message)) }} />}</Modal>
     </main>
   )
 }

@@ -1,5 +1,9 @@
 "use client"
 
+import { loadPesv, savePesv, pesvVersion, downloadPesv, pesvResources } from "@/services/pesvService"
+import { PesvApiDocuments } from "@/components/pesv/api-documents"
+import { Modal } from "@/components/pesv/planning-module"
+
 import { type FormEvent, useEffect, useMemo, useState } from "react"
 import { Calendar, Download, FileCheck2, Loader2, Search, ShieldCheck, Upload, UserCheck, Users } from "lucide-react"
 import { toast } from "sonner"
@@ -15,8 +19,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { listEmployees } from "@/services/employeeService"
 import type { Employee } from "@/types/manager/employee"
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
-import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
-import { createSafeCloudPdf } from "@/lib/pdf/safecloud-pdf-style"
 
 type PesvResponsibleRecord = {
   id: string
@@ -39,7 +41,6 @@ type PesvResponsibleForm = {
   supportDescription: string
 }
 
-const STORAGE_KEY = "safecloud:pesv-responsible"
 
 const defaultForm: PesvResponsibleForm = {
   employeeId: "",
@@ -56,165 +57,13 @@ const pesvLeaderResponsibilities = [
   "Articular el PESV con la gestión de seguridad, talento humano y operación.",
 ]
 
-const PESV_MOCK_EMPLOYEES: Employee[] = [
-  {
-    id: "pesv-mock-employee-1",
-    name: "Diana",
-    lastName: "Mendoza",
-    phone: "3000000001",
-    email: "diana.mendoza@safecloud.local",
-    address: "No registrada",
-    birthDate: "1990-01-15",
-    companyId: "pesv-mock-company",
-    workAreaId: "pesv-mock-area",
-    jobId: "pesv-mock-job-1",
-    status: true,
-  },
-  {
-    id: "pesv-mock-employee-2",
-    name: "Carlos",
-    lastName: "Ramírez",
-    phone: "3000000002",
-    email: "carlos.ramirez@safecloud.local",
-    address: "No registrada",
-    birthDate: "1988-05-20",
-    companyId: "pesv-mock-company",
-    workAreaId: "pesv-mock-area",
-    jobId: "pesv-mock-job-2",
-    status: true,
-  },
-  {
-    id: "pesv-mock-employee-3",
-    name: "Valentina",
-    lastName: "Suárez",
-    phone: "3000000003",
-    email: "valentina.suarez@safecloud.local",
-    address: "No registrada",
-    birthDate: "1992-11-08",
-    companyId: "pesv-mock-company",
-    workAreaId: "pesv-mock-area",
-    jobId: "pesv-mock-job-3",
-    status: true,
-  },
-  {
-    id: "pesv-mock-employee-4",
-    name: "Andrés",
-    lastName: "Torres",
-    phone: "3000000004",
-    email: "andres.torres@safecloud.local",
-    address: "No registrada",
-    birthDate: "1985-09-12",
-    companyId: "pesv-mock-company",
-    workAreaId: "pesv-mock-area",
-    jobId: "pesv-mock-job-4",
-    status: true,
-  },
-]
-
-function withPesvMockEmployees(employees: Employee[]) {
-  if (employees.length >= 3) return employees
-  const existingIds = new Set(employees.map((employee) => employee.id))
-  return [...employees, ...PESV_MOCK_EMPLOYEES.filter((employee) => !existingIds.has(employee.id))]
-}
-
 function formatDate(value?: string | null) {
   if (!value) return "No registrada"
   return value.slice(0, 10)
 }
 
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return `${prefix}-${crypto.randomUUID()}`
-  return `${prefix}-${Date.now()}`
-}
-
 function employeeFullName(employee: Employee) {
   return `${employee.name ?? ""} ${employee.lastName ?? ""}`.trim() || employee.email || "Funcionario sin nombre"
-}
-
-function readStoredResponsible() {
-  if (typeof window === "undefined") return null
-
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as PesvResponsibleRecord) : null
-  } catch {
-    return null
-  }
-}
-
-function writeStoredResponsible(record: PesvResponsibleRecord) {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(record))
-}
-
-function downloadDesignationPdf(record: PesvResponsibleRecord) {
-  const doc = createSafeCloudPdf()
-  const margin = 14
-  const pageWidth = doc.internal.pageSize.getWidth()
-  const contentWidth = pageWidth - margin * 2
-
-  doc.setFillColor(31, 92, 77)
-  doc.roundedRect(margin, 12, contentWidth, 24, 3, 3, "F")
-  doc.setTextColor(255, 255, 255)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(13)
-  doc.text("ACTA DE DESIGNACIÓN RESPONSABLE PESV", margin + 5, 23)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(8)
-  doc.text("Plan Estratégico de Seguridad Vial", margin + 5, 30)
-
-  doc.setTextColor(30, 41, 59)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(10)
-  const intro = [
-    "Por medio del presente documento se deja constancia de la designación del líder responsable del diseño e implementación del PESV.",
-    "La persona designada coordinará las acciones necesarias para la planeación, ejecución, seguimiento y conservación de evidencias del plan.",
-  ].join(" ")
-  doc.text(doc.splitTextToSize(intro, contentWidth), margin, 50)
-
-  let y = 72
-  const rows = [
-    ["Responsable", record.employeeName],
-    ["Correo", record.employeeEmail || "No registrado"],
-    ["Teléfono", record.employeePhone || "No registrado"],
-    ["Rol", record.roleDescription],
-    ["Fecha de designación", formatDate(record.signatureDate)],
-  ]
-
-  rows.forEach(([label, value]) => {
-    doc.setFont("helvetica", "bold")
-    doc.text(`${label}:`, margin, y)
-    doc.setFont("helvetica", "normal")
-    doc.text(doc.splitTextToSize(value, contentWidth - 48), margin + 48, y)
-    y += 10
-  })
-
-  y += 6
-  doc.setFont("helvetica", "bold")
-  doc.text("Responsabilidades principales", margin, y)
-  y += 8
-  doc.setFont("helvetica", "normal")
-  pesvLeaderResponsibilities.forEach((responsibility, index) => {
-    doc.text(doc.splitTextToSize(`${index + 1}. ${responsibility}`, contentWidth), margin, y)
-    y += 10
-  })
-
-  y = Math.max(y + 14, 210)
-  doc.setDrawColor(120, 130, 140)
-  doc.line(margin, y, margin + 78, y)
-  doc.line(pageWidth - margin - 78, y, pageWidth - margin, y)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(8)
-  doc.text("Firma responsable PESV", margin, y + 6)
-  doc.text("Representante legal", pageWidth - margin - 78, y + 6)
-
-  doc.setDrawColor(220, 226, 224)
-  doc.line(margin, 280, pageWidth - margin, 280)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(7)
-  doc.setTextColor(100, 116, 139)
-  doc.text("Documento generado desde SafeCloud", margin, 286)
-
-  void saveCorporatePdf(doc, { documentName: "Designación del Responsable PESV" }, `responsable-pesv-${record.employeeName.replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
 }
 
 function PesvResponsibleDialog({
@@ -228,7 +77,7 @@ function PesvResponsibleDialog({
   employees: Employee[]
   record: PesvResponsibleRecord | null
   onOpenChange: (open: boolean) => void
-  onSave: (form: PesvResponsibleForm) => void
+  onSave: (form: PesvResponsibleForm) => Promise<boolean>
 }) {
   const [form, setForm] = useState<PesvResponsibleForm>(defaultForm)
   const [employeeQuery, setEmployeeQuery] = useState("")
@@ -258,20 +107,20 @@ function PesvResponsibleDialog({
     )
   }, [employeeQuery, employees])
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     if (!form.employeeId) return toast.error("Selecciona el líder responsable del PESV")
     if (!form.signatureDate) return toast.error("Selecciona la fecha de designación")
     if (!form.roleDescription.trim()) return toast.error("Describe el rol del responsable PESV")
 
-    onSave({
+    const saved = await onSave({
       ...form,
       roleDescription: form.roleDescription.trim(),
       supportFileName: form.supportFileName.trim(),
       supportDescription: form.supportDescription.trim(),
     })
-    onOpenChange(false)
+    if (saved) onOpenChange(false)
   }
 
   return (
@@ -360,37 +209,7 @@ function PesvResponsibleDialog({
             </Label>
           </section>
 
-          <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <FormSectionTitle icon="document" title="Soporte de designación" description="Adjunta y describe el documento que respalda la asignación." />
-            <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-              <Label className="grid gap-2">
-                Archivo soporte
-                <Input
-                  type="file"
-                  onChange={(event) =>
-                    setForm((current) => ({ ...current, supportFileName: event.target.files?.[0]?.name ?? current.supportFileName }))
-                  }
-                />
-              </Label>
-              <Label className="grid gap-2">
-                Nombre del archivo
-                <Input
-                  value={form.supportFileName}
-                  onChange={(event) => setForm((current) => ({ ...current, supportFileName: event.target.value }))}
-                  placeholder="acta-designacion-responsable-pesv.pdf"
-                />
-              </Label>
-              <Label className="grid gap-2 md:col-span-2">
-                Descripción del soporte
-                <Textarea
-                  value={form.supportDescription}
-                  onChange={(event) => setForm((current) => ({ ...current, supportDescription: event.target.value }))}
-                  rows={3}
-                  placeholder="Acta firmada, comunicación interna o soporte de designación."
-                />
-              </Label>
-            </div>
-          </section>
+          <p className="text-sm text-muted-foreground">El soporte de designación se carga después de guardar el responsable.</p>
           </div>
 
           <DialogFooter className="shrink-0 border-t border-border bg-card px-6 py-4">
@@ -416,62 +235,39 @@ export default function PesvResponsiblePage() {
   )
   const currentResponsibleName = record?.employeeName ?? (selectedEmployee ? employeeFullName(selectedEmployee) : "No asignado")
 
+  const [supportOpen, setSupportOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [loadError, setLoadError] = useState("")
+  async function reload() {
+    const records = await loadPesv<PesvResponsibleRecord>("responsible")
+    setRecord(records[0] ?? null)
+  }
   useEffect(() => {
-    let mounted = true
-
-    async function loadData() {
-      setLoading(true)
-      try {
-        const employeeList = await listEmployees()
-        if (!mounted) return
-        setEmployees(withPesvMockEmployees(employeeList))
-        setRecord(readStoredResponsible())
-      } catch {
-        if (mounted) {
-          setEmployees(PESV_MOCK_EMPLOYEES)
-          setRecord(readStoredResponsible())
-          toast.info("Usando funcionarios mock para PESV mientras se conecta el backend.")
-        }
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    }
-
-    loadData()
-
-    return () => {
-      mounted = false
-    }
+    let active = true
+    Promise.allSettled([listEmployees(), loadPesv<PesvResponsibleRecord>("responsible")]).then(([employeeResult, recordsResult]) => {
+      if (!active) return
+      if (employeeResult.status === "fulfilled") setEmployees(employeeResult.value.filter(employee => employee.status !== false))
+      else toast.error("No se pudo cargar el catálogo de funcionarios: " + employeeResult.reason.message)
+      if (recordsResult.status === "fulfilled") setRecord(recordsResult.value[0] ?? null)
+      else setLoadError(recordsResult.reason.message)
+    }).finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
   }, [])
-
-  function handleSave(form: PesvResponsibleForm) {
-    const employee = employees.find((item) => item.id === form.employeeId)
-
-    if (!employee) {
-      toast.error("No se encontró el funcionario seleccionado")
-      return
-    }
-
-    const nextRecord: PesvResponsibleRecord = {
-      id: record?.id ?? createId("pesv-responsible"),
-      employeeId: employee.id,
-      employeeName: employeeFullName(employee),
-      employeeEmail: employee.email ?? "",
-      employeePhone: employee.phone ?? "",
-      signatureDate: form.signatureDate,
-      roleDescription: form.roleDescription,
-      supportFileName: form.supportFileName,
-      supportDescription: form.supportDescription,
-      updatedAt: new Date().toISOString(),
-    }
-
-    writeStoredResponsible(nextRecord)
-    setRecord(nextRecord)
-    toast.success(record ? "Responsable PESV actualizado" : "Responsable PESV asignado")
+  async function handleSave(form: PesvResponsibleForm): Promise<boolean> {
+    if (saving) return false
+    setSaving(true)
+    try {
+      await savePesv("responsible", { employeeId: form.employeeId, signatureDate: form.signatureDate, roleDescription: form.roleDescription, ...pesvVersion(record) }, record?.id)
+      await reload().catch(error => { toast.error("Cambios guardados, pero no se pudo actualizar la vista: " + error.message) })
+      toast.success("Responsable PESV guardado")
+      return true
+    } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo guardar el responsable"); return false }
+    finally { setSaving(false) }
   }
 
   return (
     <main className="space-y-6">
+      {loadError && <p role="alert" className="text-sm text-red-600">{loadError}</p>}
       <PesvModuleHeader title="Responsable PESV" description="Designa el líder del diseño e implementación del Plan Estratégico de Seguridad Vial." icon={UserCheck} actions={
         <Button className="w-full gap-2 sm:w-auto" disabled={loading || employees.length === 0} onClick={() => setDialogOpen(true)}>
           <UserCheck className="h-4 w-4" />
@@ -560,12 +356,12 @@ export default function PesvResponsiblePage() {
                   variant="outline"
                   className="w-full gap-2"
                   disabled={!record}
-                  onClick={() => record && downloadDesignationPdf(record)}
+                  onClick={() => { void downloadPesv(`${pesvResources.responsible}/designation.pdf`, "designacion-responsable-pesv.pdf").catch(error => toast.error(error.message)) }}
                 >
                   <Download className="h-4 w-4" />
                   Descargar acta
                 </Button>
-                <Button type="button" variant="outline" className="w-full gap-2" disabled={!record} onClick={() => setDialogOpen(true)}>
+                <Button type="button" variant="outline" className="w-full gap-2" disabled={!record} onClick={() => setSupportOpen(true)}>
                   <Upload className="h-4 w-4" />
                   Cargar soporte
                 </Button>
@@ -575,6 +371,7 @@ export default function PesvResponsiblePage() {
         </div>
       )}
 
+      <Modal open={supportOpen} onOpenChange={setSupportOpen} title="Soporte de designación">{record && <PesvApiDocuments resource="responsible" id={record.id} onChanged={() => { void reload().catch(error => toast.error(error.message)) }} />}</Modal>
       <PesvResponsibleDialog
         open={dialogOpen}
         employees={employees}
