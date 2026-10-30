@@ -12,6 +12,31 @@ Las rutas, tipos documentales y versiones de concurrencia se contrastaron con
 | Liderazgo Directivo | PESV_LEADERSHIP | /api/pesv/leadership |
 | Diagnostico PESV | PESV_DIAGNOSIS | /api/pesv/diagnoses |
 | Objetivos y metas | PESV_OBJECTIVES | /api/pesv/objectives/objectives |
+| Programas de riesgos criticos | PESV_PROGRAMS | /api/pesv/programs/programs |
+| Plan anual de trabajo | PESV_WORK_PLAN | /api/pesv/work-plan/work-activities |
+| Riesgos viales | PESV_RISKS | /api/pesv/road-risks |
+| Competencia y formacion | PESV_TRAINING | /api/pesv/training/competencies y training-activities |
+| Comportamiento seguro | PESV_BEHAVIOR | /api/pesv/behavior/procedures y behavior-evaluations |
+
+Las cinco ultimas integraciones se contrastaron con el OpenAPI local el 29 de
+octubre de 2026. Conservan sus pestañas y procesos; los catalogos relacionales se
+recuperan de los endpoints del propio modulo. Comportamiento seguro mantiene la
+version documental `version` separada del control de concurrencia `recordVersion`.
+Los seguimientos del plan de trabajo envian el avance porcentual tanto en
+`progress` como en `measuredValue`, obligatorios en su DTO.
+
+### Pendiente del backend: presupuesto del cronograma
+
+El frontend conserva el presupuesto por actividad de los programas. El OpenAPI
+actual no incluye `budget` en `PesvProgramActivityInputDto` ni en
+`PesvProgramActivityResponseDto`. Se necesita agregarlo como numero COP >= 0,
+persistirlo y devolverlo en POST/PUT/GET, historial y PDF. No es el presupuesto
+total del programa.
+
+Hasta que se publique ese ajuste, el frontend impide guardar cronogramas con
+presupuestos individuales distintos de cero para no perder el dato silenciosamente.
+El resto de integraciones no depende de ese ajuste. El selector de responsable del
+cronograma conserva nombre visible y envia el `responsibleId` del catalogo.
 
 - Servicios autenticados mediante `apiFetch`, sin cambios al JWT ni a la URL base.
 - Listados paginados completos y detalle del servidor; sin respaldo local/demo.

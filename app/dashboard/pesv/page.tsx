@@ -47,10 +47,14 @@ function collectCodes(modules: ModuleNode[]) {
   return codes
 }
 
-const moduleEndpoints: Record<string, string> = {
+const moduleEndpoints: Record<string, string | string[]> = {
   PESV_RESPONSIBLE: pesvResources.responsible, PESV_COMMITTEE: pesvResources.committee,
   PESV_POLICY: pesvResources.policies, PESV_LEADERSHIP: pesvResources.leadership,
   PESV_DIAGNOSIS: pesvResources.diagnoses, PESV_OBJECTIVES: pesvResources.objectives,
+  PESV_PROGRAMS: pesvResources.programs, PESV_WORK_PLAN: pesvResources.workActivities,
+  PESV_RISKS: pesvResources.roadRisks,
+  PESV_TRAINING: [pesvResources.competencies, pesvResources.trainingActivities],
+  PESV_BEHAVIOR: [pesvResources.behaviorProcedures, pesvResources.behaviorEvaluations],
 }
 const stateLabel: Record<ModuleState, string> = {
   unavailable: "No disponible",
@@ -79,7 +83,7 @@ export default function PesvPage() {
   useEffect(() => {
     let active = true
     Promise.all(allowedModules.map(async module => {
-      try { const records = await listPesv<{ id: string }>(moduleEndpoints[module.code]); return [module.code, records.length ? "records" : "empty"] as const }
+      try { const records = (await Promise.all([moduleEndpoints[module.code]].flat().map(endpoint => listPesv<{ id: string }>(endpoint)))).flat(); return [module.code, records.length ? "records" : "empty"] as const }
       catch { return [module.code, "unavailable"] as const }
     })).then(states => { if (active) setModuleStates(Object.fromEntries(states)) })
     return () => { active = false }

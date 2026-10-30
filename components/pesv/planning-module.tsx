@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react"
-import { objectiveCatalogs, objectivePayload, objectiveRecords } from "@/lib/pesv/objectives-api"
+import { isPlanningApiModule, planningCatalogs, planningEntryPayload, planningPayload, planningRecords, planningResource } from "@/lib/pesv/planning-api"
 import { deletePesv, downloadPesv, pesvBlob, pesvPath, pesvRequest, savePesv, uploadPesvDocument } from "@/services/pesvService"
 import Link from "next/link"
 import { Download, Edit, Eye, FileCheck2, MoreHorizontal, Plus, Search, Trash2, Upload } from "lucide-react"
@@ -154,12 +154,6 @@ function createDemo(kind: Kind, catalogs: Catalogs, records: RecordItem[] = []):
   const p = catalogs.people[0]?.value ?? ""
   const policyId = catalogs.policies[0]?.value ?? ""
   const patches: Record<string, Values> = {
-    program: { ...base, name: "Conducción sin distracciones", type: "Prevención de la distracción", riskIds: catalogs.risks.filter(r => r.eligible).slice(0, 1).map(r => r.value), objectiveIds: catalogs.objectives.slice(0, 1).map(o => o.value), scope: "Conductores en desplazamientos laborales.", objective: "Reducir la distracción durante la conducción.", goal: "Formar al 100% de los conductores.", baseline: "40% de conductores formados", indicator: "Cobertura de formación", measurement: "Conductores formados / conductores convocados × 100", performanceFactors: "Control del uso de celulares y elementos distractores.", budget: "1500000", responsibleIds: [p], evaluationFrequency: "Trimestral", trackingMechanism: "Inspecciones y seguimiento a reportes de conducción.", controlMechanism: "Observación de hábitos y reportes de supervisores.", distractions: "Celular y manipulación de dispositivos; detención segura antes de usarlos.", breachProcedure: "Retroalimentación, refuerzo y revisión de casos reiterativos.", communication: "Campañas y charla trimestral." },
-    "work-activity": { ...base, name: "Renovar dos vehículos de la flota", policyId, objectiveIds: catalogs.objectives.slice(0, 1).map(o => o.value), programIds: [], description: "Adquirir dos vehículos con mejores especificaciones de seguridad.", nationalPlanAlignment: "Fortalecer el componente de vehículos seguros.", sstArticulation: "Articulación con compras y mantenimiento preventivo.", responsibleId: p, budget: "160000000", resources: "Equipo de compras y mantenimiento.", deliverable: "Facturas, actas de entrega y registros de los vehículos.", goal: "Dos vehículos incorporados a la operación." },
-    competency: { ...base, name: "Perfil de competencia del líder PESV", role: "Líder PESV", personId: p, educationRequired: "Profesional o tecnólogo afín a la gestión de seguridad vial.", trainingRequired: "Formación en diseño e implementación del PESV.", experienceRequired: "Experiencia coordinando procesos de seguridad vial.", actualEducation: "Profesional", actualTraining: "Formación en seguridad vial registrada en diagnóstico.", actualExperience: "Dos años de coordinación de procesos.", evaluationDate: dateToday(), evaluatorId: catalogs.people[1]?.value ?? p, result: "Requiere formación", gaps: "Actualización en análisis de riesgos viales." },
-    "training-activity": { ...base, name: "Prevención de la distracción", topic: "Conducción segura y uso de dispositivos", competencyIds: catalogs.competencies.slice(0, 1).map(c => c.value), participantIds: catalogs.people.map(o => o.value), objective: "Fortalecer hábitos de conducción sin distracciones.", trainerId: p, durationHours: "2", modality: "Presencial", budget: "350000", evaluationMethod: "Prueba de conocimientos y observación de hábitos." },
-    procedure: { ...base, name: "Responsabilidades y comportamiento vial seguro", version: "1.0", responsibleId: p, contractRequirements: "Pruebas teóricas y prácticas y verificación de aptitud médica para el rol.", accidentReporting: "Reportar oportunamente los siniestros en desplazamientos laborales.", trainingParticipation: "Asistir a las actividades de formación programadas.", legalCommitment: "Cumplir las normas de tránsito y lineamientos internos.", healthReporting: "Informar oportunamente las condiciones que afectan la conducción segura.", evaluationProcedure: "Evaluación anual de siniestros, infracciones, quejas y formación; definir refuerzos.", safeHabitsStrategy: "Promover autocuidado, conducción preventiva y protección de los demás actores viales." },
-    "behavior-evaluation": { ...base, name: "Evaluación anual de comportamiento vial", personId: p, procedureId: catalogs.procedures[0]?.value ?? "", evaluationDate: dateToday(), periodStart: `${year}-01-01`, periodEnd: dateToday(), evaluatorId: catalogs.people[1]?.value ?? p, accidents: "0", infractions: "1", complaints: "0", trainings: "Inducción de seguridad vial.", findings: "Una infracción de tránsito; requiere fortalecer el cumplimiento de límites.", result: "Requiere refuerzo", reinforcement: "Capacitación en velocidad segura.", trainingIds: [], communication: "Retroalimentación individual con el colaborador." },
     "emergency-plan": { ...base, name: "PPRAEV de desplazamientos laborales", version: "1.0", responsibleId: p, scope: "Colaboradores y contratistas durante desplazamientos laborales.", routeIds: catalogs.routes.map(r => r.value), riskIds: catalogs.risks.slice(0, 1).map(r => r.value), routeRisks: "Cruces urbanos, tráfico mixto y distracción durante recorridos frecuentes.", accidentReporting: "Registrar ubicación, hora y descripción del evento y activar la cadena de llamado.", callChain: "Primer respondiente → coordinador operativo → líder PESV → gerencia. Directorio por completar.", emergencyNumber: "123", externalContacts: "Organismos de socorro de la zona: directorio por completar.", medicalCenters: "Centro médico de referencia: nombre, ubicación, teléfono y acceso por completar.", responderIds: [p], responderProtocol: "Activar el plan de respuesta y coordinar con los organismos de socorro.", pasProtect: "Protección de la zona conforme al protocolo de la organización.", pasAlert: "Activación de la cadena de llamado y reporte de ubicación del evento.", pasAssist: "Atención dentro de las competencias del primer respondiente y coordinación con personal capacitado.", equipment: "Botiquines, extintores, chalecos reflectivos y conos. Inventario y ubicación por completar.", trainingProtocol: "Formación y evaluación de protocolos de atención, reporte y PAS.", trainingIds: catalogs.trainingActivities.slice(0, 1).map(r => r.value), drillStrategy: "Un simulacro vial anual con evaluación de tiempos y roles.", communityCoordination: "Invitar a organismos de socorro, comité y comunidad de las rutas cuando sea posible." },
     "road-drill": { ...base, name: "Simulacro anual de respuesta vial", planId: catalogs.emergencyPlans[0]?.value ?? "", scenario: "Siniestro vial durante un desplazamiento laboral.", place: "Zona controlada de la organización", responsibleId: p, startDate: dateToday(), endDate: dateToday(), participantIds: catalogs.people.map(r => r.value), externalParticipants: "Participación de organismos de socorro sujeta a coordinación.", objective: "Evaluar la cadena de llamado, roles y protocolo de respuesta.", equipment: "Botiquín, extintores y señalización del escenario.", expectedResponseMinutes: "10", evaluationCriteria: "Tiempo de respuesta, comunicaciones, roles y oportunidades de mejora." },
   }
@@ -175,6 +169,7 @@ function createDemo(kind: Kind, catalogs: Catalogs, records: RecordItem[] = []):
 
 export default function PesvPlanningModule({ module }: { module: PesvModule }) {
   const config = configs[module]
+  const apiModule = isPlanningApiModule(module)
   const [kindId, setKindId] = useState(config.kinds[0].id)
   const kind = config.kinds.find(k => k.id === kindId)!
   const [items, setItems] = useState<RecordItem[]>([])
@@ -195,7 +190,7 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
   const [preview, setPreview] = useState<Evidence | null>(null)
   useEffect(() => () => { if (preview?.url.startsWith("blob:")) URL.revokeObjectURL(preview.url) }, [preview])
   async function previewEvidence(evidence: Evidence) {
-    if (module !== "objectives") { setPreview(evidence); return }
+    if (!apiModule) { setPreview(evidence); return }
     try { const blob = await pesvBlob(evidence.url, evidence.mime); setPreview({ ...evidence, url: URL.createObjectURL(blob), mime: blob.type || evidence.mime }) }
     catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo abrir la evidencia") }
   }
@@ -207,15 +202,16 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
   const [inventoryOpen, setInventoryOpen] = useState(false)
   const [loadError, setLoadError] = useState("")
   const [mutating, setMutating] = useState(false)
-  async function reloadObjectives() {
-    const [records, remoteCatalogs] = await Promise.all([objectiveRecords(), objectiveCatalogs(emptyCatalogs)])
+  async function reloadRemote() {
+    const remoteCatalogs = await planningCatalogs(module, emptyCatalogs)
+    const records = await planningRecords(module, remoteCatalogs)
     setItems(records); setCatalogs(remoteCatalogs); setLoadError("")
   }
-  function refresh() { if (module === "objectives") return; setCatalogs(loadCatalogs()); if (module === "document-retention") setInventory(loadInventory()) }
+  function refresh() { if (apiModule) return; setCatalogs(loadCatalogs()); if (module === "document-retention") setInventory(loadInventory()) }
   useEffect(() => {
-    if (module === "objectives") {
+    if (apiModule) {
       let active = true
-      Promise.all([objectiveRecords(), objectiveCatalogs(emptyCatalogs)]).then(([records, remoteCatalogs]) => { if (active) { setItems(records); setCatalogs(remoteCatalogs); setLoadError("") } }).catch(error => { if (active) setLoadError(error.message) }).finally(() => { if (active) setReady(true) })
+      void (async () => { try { const remoteCatalogs = await planningCatalogs(module, emptyCatalogs); const records = await planningRecords(module, remoteCatalogs); if (active) { setItems(records); setCatalogs(remoteCatalogs); setLoadError("") } } catch (error) { if (active) setLoadError(error instanceof Error ? error.message : "No se pudo cargar el módulo") } finally { if (active) setReady(true) } })()
       return () => { active = false }
     }
     const catalogs = loadCatalogs()
@@ -241,7 +237,7 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
     return () => { window.removeEventListener("focus", refresh); window.removeEventListener("storage", refresh) }
   }, [module, config])
   function persist(next: RecordItem[]) {
-    if (module === "objectives") return false
+    if (apiModule) return false
     try { localStorage.setItem(storageKey(module), JSON.stringify(next)); setItems(next); refresh(); return true }
     catch { toast.error("No se pudo guardar en el navegador. Reduce el tamaño del archivo o libera espacio."); return false }
   }
@@ -273,7 +269,7 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
   async function save(event: FormEvent) {
     event.preventDefault()
     if (mutating) return
-    const currentCatalogs = module === "objectives" ? catalogs : loadCatalogs()
+    const currentCatalogs = apiModule ? catalogs : loadCatalogs()
     const existing = items.find(i => i.id === editingId)
     if (existing?.kind === "pesv-feedback" && existing.evidence.some(e => e.targetId === "RESPONSE")) { toast.error("La respuesta ya está documentada. Crea un nuevo registro para conservar su trazabilidad."); return }
     const derived = deriveAssurance(kind.id, values, items)
@@ -297,10 +293,10 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
     const links: Record<string, Option[]> = {}
     for (const f of kind.fields.filter(f => f.reference)) links[f.key] = ids(activeValues[f.key]).map(id => currentCatalogs[f.reference!].find(o => o.value === id) ?? existing?.links[f.key]?.find(o => o.value === id)).filter((o): o is Option => Boolean(o))
     const at = new Date().toISOString()
-    if (module === "objectives") {
+    if (apiModule) {
       setMutating(true)
-      try { await savePesv("objectives", objectivePayload(activeValues, existing?.remoteVersion), existing?.id); await reloadObjectives(); setYear(text(activeValues.year)); setFormOpen(false); toast.success("Registro guardado") }
-      catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo guardar el objetivo") }
+      try { await savePesv(planningResource(kind.id), planningPayload(kind, activeValues, activities, currentCatalogs, existing?.remoteVersion), existing?.id); await reloadRemote(); setYear(text(activeValues.year)); setFormOpen(false); toast.success("Registro guardado") }
+      catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo guardar el registro") }
       finally { setMutating(false) }
       return
     }
@@ -333,11 +329,11 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
       entry.observations += `\nTiempo de respuesta: ${measuredValue} minutos.\nEvaluación: ${evaluationOutcome.trim()}`
     }
     const at = new Date().toISOString()
-    if (module === "objectives") {
+    if (apiModule) {
       if (mutating) return
       setMutating(true)
-      const { id: ignored, ...payload } = entry
-      try { await pesvRequest(`${pesvPath("objectives", entryItem.id)}/entries`, "POST", payload); await reloadObjectives(); setEntryTarget(null); toast.success("Registro guardado; ya puedes cargar su evidencia.") }
+      const payload = planningEntryPayload(entryItem.kind, entry)
+      try { await pesvRequest(`${pesvPath(planningResource(entryItem.kind), entryItem.id)}/entries`, "POST", payload); await reloadRemote(); setEntryTarget(null); toast.success("Registro guardado; ya puedes cargar su evidencia.") }
       catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo guardar el seguimiento") }
       finally { setMutating(false) }
       return
@@ -358,9 +354,9 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
     if (owner?.kind === "pesv-audit" && file.type !== "application/pdf") { toast.error("El informe de auditoría debe cargarse en PDF."); return }
     setUploading(true)
     try {
-      if (module === "objectives") {
-        await uploadPesvDocument("objectives", uploadTarget.itemId, file, "", uploadTarget.targetId)
-        await reloadObjectives(); setUploadTarget(null); toast.success("Evidencia cargada")
+      if (apiModule) {
+        await uploadPesvDocument(planningResource(owner?.kind ?? kind.id), uploadTarget.itemId, file, "", uploadTarget.targetId)
+        await reloadRemote(); setUploadTarget(null); toast.success("Evidencia cargada")
         return
       }
       const url = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result)); reader.onerror = reject; reader.readAsDataURL(file) })
@@ -380,10 +376,10 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
     } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo leer el archivo") } finally { setUploading(false) }
   }
   function download(record?: RecordItem) {
-    if (module === "objectives" && !record) {
+    if (apiModule && !record) {
       const serverStatus = ({ Pendiente: "PENDING", "En ejecución": "IN_PROGRESS", Cumplido: "COMPLETED", Vencido: "OVERDUE", Archivado: "ARCHIVED" } as Record<string, string>)[status] ?? status
       const params = new URLSearchParams({ ...(year ? { year } : {}), ...(search ? { search } : {}), ...(serverStatus ? { status: serverStatus } : {}) })
-      void downloadPesv(`${pesvPath("objectives")}/export?${params}`, "objetivos-pesv.pdf").catch(error => toast.error(error.message))
+      void downloadPesv(`${pesvPath(planningResource(kind.id))}/export?${params}`, `pesv-${module}.pdf`).catch(error => toast.error(error.message))
       return
     }
     const exported = record ? [record] : visible
@@ -422,7 +418,7 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
   const catalogModule = pesvModuleCatalog.find(item => item.href === `/dashboard/pesv-${module}`)
   const ModuleIcon = catalogModule?.icon ?? FileCheck2
   return <div className="space-y-5">
-    {loadError && <div role="alert" className="border-l-2 border-red-500 p-3 text-sm text-red-700">{loadError}<Button variant="outline" onClick={() => { void reloadObjectives().catch(error => setLoadError(error.message)) }}>Reintentar</Button></div>}
+    {loadError && <div role="alert" className="border-l-2 border-red-500 p-3 text-sm text-red-700">{loadError}<Button variant="outline" onClick={() => { void reloadRemote().catch(error => setLoadError(error.message)) }}>Reintentar</Button></div>}
     <PesvModuleHeader
       title={catalogModule?.name ?? config.title}
       description={catalogModule?.description ?? config.subtitle}
@@ -448,7 +444,7 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
     <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="border-b border-slate-200 px-4 py-3 sm:px-5"><h2 className="font-semibold">{kind.title}</h2><p className="text-xs text-muted-foreground">Consulta el estado, vigencia y acciones disponibles para cada registro.</p></div><div className="overflow-x-auto"><table className="w-full text-sm"><thead className="border-b border-border bg-[var(--secondary)] text-left text-xs font-medium uppercase text-muted-foreground"><tr>{kind.columns.map(key => <th key={key} className="whitespace-nowrap px-4 py-3 font-medium">{kind.fields.find(f => f.key === key)?.label}</th>)}<th className="px-4 py-3 font-medium">Estado</th>{kind.annualReview && <th className="whitespace-nowrap px-4 py-3 font-medium">Revisión anual</th>}<th className="px-4 py-3"><span className="sr-only">Acciones</span></th></tr></thead><tbody>{visible.map(item => <tr key={item.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/70">{kind.columns.map(key => <td key={key} className={`px-4 py-3 ${key === "name" ? "min-w-52 font-medium" : "min-w-28"} ${["soatExpiry", "technicalExpiry", "nextInspectionDate", "nextVerificationDate"].includes(key) && text(item.values[key]) && text(item.values[key]) < dateToday() ? "text-red-600 font-medium" : ""}`}>{displayValue(kind.fields.find(f => f.key === key)!, item, catalogs)}</td>)}<td className="px-4 py-3"><Badge variant="outline" className={`whitespace-nowrap ${statusColors(itemStatus(item))}`}>{itemStatus(item)}</Badge>{kind.tracking && <p className="mt-1 text-xs text-muted-foreground">{completion(item)}%</p>}{kind.tracking && text(item.values.endDate) < dateToday() && completion(item) < 100 && <p className="mt-1 text-xs text-red-600">Plazo vencido</p>}</td>{kind.annualReview && <td className="px-4 py-3 whitespace-nowrap">{nextReview(item)}{nextReview(item) < dateToday() && <p className="text-xs text-red-600">Revisión vencida</p>}</td>}<td className="px-2"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Acciones de ${text(item.values.name)}`}><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onSelect={() => { refresh(); setDetailId(item.id) }}><Eye className="mr-2 h-4 w-4" />Ver detalle y evidencias</DropdownMenuItem><DropdownMenuItem onSelect={() => openForm(item)}><Edit className="mr-2 h-4 w-4" />Editar</DropdownMenuItem>{kind.tracking && <DropdownMenuItem onSelect={() => openEntry(item, "FOLLOW_UP")}><Plus className="mr-2 h-4 w-4" />Registrar seguimiento</DropdownMenuItem>}{kind.annualReview && <DropdownMenuItem onSelect={() => openEntry(item, "ANNUAL_REVIEW")}><FileCheck2 className="mr-2 h-4 w-4" />Revisión anual</DropdownMenuItem>}{kind.diffusion && <DropdownMenuItem onSelect={() => openEntry(item, "DIFFUSION")}><Plus className="mr-2 h-4 w-4" />Registrar divulgación</DropdownMenuItem>}<DropdownMenuItem onSelect={() => openUpload(item.id)}><Upload className="mr-2 h-4 w-4" />Cargar evidencia</DropdownMenuItem><DropdownMenuItem onSelect={() => download(item)}><Download className="mr-2 h-4 w-4" />Descargar documento</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem className="text-red-600" onSelect={() => setDeleteId(item.id)}><Trash2 className="mr-2 h-4 w-4" />Eliminar</DropdownMenuItem></DropdownMenuContent></DropdownMenu></td></tr>)}</tbody></table></div>{!visible.length && <PesvEmptyState title={search || status || year ? "No encontramos registros" : `Aún no hay ${kind.title.toLowerCase()}`} description={search || status || year ? "Ajusta los filtros para consultar otros registros." : `Utiliza la acción principal para registrar ${kind.singular} y comenzar su gestión.`} action={!search && !status && !year ? <Button onClick={() => openForm()}><Plus className="mr-2 h-4 w-4" />Registrar {kind.singular}</Button> : undefined} />}</section>
     <FormDrawer icon={moduleFormIcons[module]} wide={["programs", "emergencies", "statistics", "audits", "change-contractors"].includes(module)} open={formOpen} onOpenChange={setFormOpen} title={`${editingId ? "Editar" : "Registrar"} ${kind.singular}`} footer={<><Button variant="outline" onClick={() => setFormOpen(false)}>Cancelar</Button><Button disabled={mutating} type="submit" form="pesv-record-form">Guardar</Button></>}>
       <form id="pesv-record-form" onSubmit={save} className="space-y-6">{sections.map(section => <section key={section} className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon={sectionVisualIcon(section)} title={section} /><div className="grid gap-x-5 gap-y-4 md:grid-cols-2">{formFields.filter(f => f.section === section).map(f => <div key={f.key} className={f.wide ? "min-w-0 md:col-span-2" : "min-w-0"}><FormField label={`${f.label}${f.required ? " *" : " (opcional)"}`}><FieldInput field={f} value={values[f.key] ?? (f.multiple ? [] : "")} catalogs={catalogs} onChange={value => updateField(f.key, value)} /></FormField></div>)}</div></section>)}
-        {kind.activities && <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><div className="flex items-start justify-between gap-3"><FormSectionTitle icon="tracking" title="Actividades y cronograma" /><Button variant="outline" type="button" onClick={() => setActivities(prev => [...prev, { id: crypto.randomUUID(), name: "", responsible: "", startDate: text(values.startDate), endDate: text(values.startDate), budget: "0" }])}><Plus className="mr-2 h-4 w-4" />Actividad</Button></div>{activities.map((activity, index) => <div className="space-y-3 rounded-xl border border-slate-200 p-4" key={activity.id}><div className="flex justify-between"><p className="text-sm font-medium">Actividad {index + 1}</p><Button type="button" variant="ghost" size="icon" aria-label={`Eliminar actividad ${index + 1}`} onClick={() => setActivities(prev => prev.filter(a => a.id !== activity.id))}><Trash2 className="h-4 w-4" /></Button></div><div className="grid gap-3 sm:grid-cols-2">{(["name", "responsible", "startDate", "endDate", "budget"] as const).map(key => <FormField key={key} label={{ name: "Actividad", responsible: "Responsable", startDate: "Inicio", endDate: "Fin", budget: "Presupuesto (COP)" }[key]}><Input aria-label={`Actividad ${index + 1}: ${key}`} required type={key.includes("Date") ? "date" : key === "budget" ? "number" : "text"} min={key === "budget" ? 0 : undefined} value={activity[key]} onChange={e => setActivities(prev => prev.map(a => a.id === activity.id ? { ...a, [key]: e.target.value } : a))} /></FormField>)}</div></div>)}{text(values.startDate) && text(values.endDate) && <p className="text-sm text-muted-foreground">Duración del programa: {Math.max(0, Math.round((Date.parse(text(values.endDate)) - Date.parse(text(values.startDate))) / 86400000) + 1)} días.</p>}</section>}
+        {kind.activities && <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><div className="flex items-start justify-between gap-3"><FormSectionTitle icon="tracking" title="Actividades y cronograma" /><Button variant="outline" type="button" onClick={() => setActivities(prev => [...prev, { id: crypto.randomUUID(), name: "", responsible: "", startDate: text(values.startDate), endDate: text(values.startDate), budget: "0" }])}><Plus className="mr-2 h-4 w-4" />Actividad</Button></div>{activities.map((activity, index) => <div className="space-y-3 rounded-xl border border-slate-200 p-4" key={activity.id}><div className="flex justify-between"><p className="text-sm font-medium">Actividad {index + 1}</p><Button type="button" variant="ghost" size="icon" aria-label={`Eliminar actividad ${index + 1}`} onClick={() => setActivities(prev => prev.filter(a => a.id !== activity.id))}><Trash2 className="h-4 w-4" /></Button></div><div className="grid gap-3 sm:grid-cols-2">{(["name", "responsible", "startDate", "endDate", "budget"] as const).map(key => <FormField key={key} label={{ name: "Actividad", responsible: "Responsable", startDate: "Inicio", endDate: "Fin", budget: "Presupuesto (COP)" }[key]}>{apiModule && key === "responsible" ? <PesvSelect ariaLabel={`Actividad ${index + 1}: responsible`} value={activity.responsibleId ?? ""} options={catalogs.people} onValueChange={value => setActivities(prev => prev.map(a => a.id === activity.id ? { ...a, responsibleId: value, responsible: catalogs.people.find(person => person.value === value)?.label ?? "" } : a))} /> : <Input aria-label={`Actividad ${index + 1}: ${key}`} required type={key.includes("Date") ? "date" : key === "budget" ? "number" : "text"} min={key === "budget" ? 0 : undefined} value={activity[key]} onChange={e => setActivities(prev => prev.map(a => a.id === activity.id ? { ...a, [key]: e.target.value } : a))} />}</FormField>)}</div></div>)}{text(values.startDate) && text(values.endDate) && <p className="text-sm text-muted-foreground">Duración del programa: {Math.max(0, Math.round((Date.parse(text(values.endDate)) - Date.parse(text(values.startDate))) / 86400000) + 1)} días.</p>}</section>}
       </form>
     </FormDrawer>
     <Modal open={!!detail} onOpenChange={open => !open && setDetailId(null)} title={detail ? text(detail.values.name) : "Detalle"}>
@@ -481,11 +477,11 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
     <Modal open={inventoryOpen} onOpenChange={setInventoryOpen} title="Inventario documental PESV"><ArchiveTable inventory={inventory} onPreview={previewEvidence} /></Modal>
     <Modal open={!!preview} onOpenChange={open => !open && setPreview(null)} title={preview?.name ?? "Documento"} footer={preview && <Button asChild><a href={preview.url} download={preview.name}><Download className="mr-2 h-4 w-4" />Descargar</a></Button>}>{preview && <div className="h-[65dvh]">{preview.mime.startsWith("image/") ? <img src={preview.url} alt={preview.name} className="h-full w-full object-contain" /> : <iframe src={preview.url} title={preview.name} className="h-full w-full" />}</div>}</Modal>
     <Modal open={!!deleteId} onOpenChange={open => !open && setDeleteId(null)} title="Eliminar registro" footer={<><Button variant="outline" onClick={() => setDeleteId(null)}>Cancelar</Button><Button variant="destructive" onClick={async () => {
-      if (module === "objectives") {
+      if (apiModule) {
         if (!deleteId || mutating) return
         setMutating(true)
-        try { await deletePesv("objectives", deleteId); await reloadObjectives(); setDeleteId(null); toast.success("Registro eliminado") }
-        catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo eliminar el objetivo") }
+        try { await deletePesv(planningResource(items.find(item => item.id === deleteId)?.kind ?? kind.id), deleteId); await reloadRemote(); setDeleteId(null); toast.success("Registro eliminado") }
+        catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo eliminar el registro") }
         finally { setMutating(false) }
         return
       }

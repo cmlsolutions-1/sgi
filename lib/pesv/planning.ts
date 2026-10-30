@@ -19,9 +19,10 @@ export type Kind = {
   columns: string[]; tracking?: boolean; annualReview?: boolean; diffusion?: boolean; activities?: boolean
 }
 export type ModuleConfig = { title: string; subtitle: string; kinds: Kind[] }
-export type Activity = { id: string; name: string; responsible: string; startDate: string; endDate: string; budget: string }
+export type Activity = { id: string; name: string; responsible: string; responsibleId?: string; startDate: string; endDate: string; budget: string; status?: string; observations?: string }
 export type Evidence = { id: string; name: string; mime: string; url: string; uploadedAt: string; targetId?: string }
 export type Entry = {
+  createdAt?: string
   id: string; kind: "FOLLOW_UP" | "ANNUAL_REVIEW" | "DIFFUSION"; date: string
   observations: string; progress?: number; measuredValue?: number; medium?: string; audience?: string
   conclusion?: string; nextReviewDate?: string
@@ -29,7 +30,7 @@ export type Entry = {
   responseMinutes?: number
 }
 export type RecordItem = {
-  remoteVersion?: number; remoteStatus?: string
+  remoteVersion?: number; remoteStatus?: string; remoteProgress?: number
   id: string; kind: string; values: Values; activities: Activity[]; entries: Entry[]
   evidence: Evidence[]; createdAt: string; updatedAt: string
   history: { at: string; action: string; snapshot?: Values; activities?: Activity[] }[]
@@ -291,6 +292,7 @@ export function loadCatalogs(): Catalogs {
   }
 }
 export function completion(item: RecordItem) {
+  if (item.remoteProgress !== undefined) return item.remoteProgress
   if (item.kind === "objective") {
     const value = item.entries.filter(e => e.kind === "FOLLOW_UP").at(-1)?.measuredValue
     if (value === undefined) return 0

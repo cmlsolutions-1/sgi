@@ -49,6 +49,8 @@ async function main() {
   assert.equal(mapped[0].targetId, 'review-id'); assert.equal(mapped[1].targetId, undefined)
   respond = () => new Response('image-bytes', { headers: { 'Content-Type': 'application/octet-stream' } })
   assert.equal((await api.pesvBlob('/api/pesv/committee/id/documents/doc', 'image/png')).type, 'image/png')
+  respond = () => response({ id: 'road-proof' })
+  await api.uploadPesvDocument('roadRisks', 'risk-id', new File([new Uint8Array(3 * 1024 * 1024 + 1)], 'evidencia.png', { type: 'image/png' }))
   await assert.rejects(() => api.uploadPesvDocument('policies', 'id', new File(['x'], 'script.html', { type: 'text/html' })), /PDF/)
   respond = url => response(url.endsWith('documents?page=1&limit=100') ? [{ id: 'doc', originalName: 'firma.pdf', createdAt: '2026-10-28', mimeType: 'application/pdf' }] : url.includes('?') ? [{ id: 'record' }] : { id: 'record', name: 'Servidor' })
   const records = await api.loadPesv('policies'); assert.equal(records[0].evidence.fileName, 'firma.pdf'); assert.equal(records[0].name, 'Servidor')
@@ -57,7 +59,7 @@ async function main() {
   const child = code => ({ id: code, code, name: code, route: '', index: 1, parentId: 'parent' })
   assert.ok(!nav.filterNavigationByModules(nav.navigation, []).some(i => i.code === 'PESV'))
   assert.ok(!nav.filterNavigationByModules(nav.navigation, parent([])).some(i => i.code === 'PESV'))
-  const enabled = parent([child('PESV_RESPONSIBLE'), child('PESV_RISKS')])
+  const enabled = parent([child('PESV_RESPONSIBLE'), child('PESV_AUDITS')])
   const pesv = nav.filterNavigationByModules(nav.navigation, enabled).find(i => i.code === 'PESV')
   assert.deepEqual(pesv.subItems.map(i => i.code), ['PESV', 'PESV_RESPONSIBLE'])
   assert.equal(nav.isDashboardPathAllowed('/dashboard/pesv-policy', enabled), false)
@@ -69,6 +71,29 @@ async function main() {
   }
   const objective = load('lib/pesv/objectives-api.ts')
   assert.deepEqual(objective.objectivePayload({ year: '2026', baseline: '0', target: '100', name: 'Prueba' }, 2), { year: 2026, baseline: 0, target: 100, name: 'Prueba', version: 2 })
-  console.log('PESV API tests passed: six CRUD routes, pagination, errors, multipart evidence, mapping, permission navigation, no demo persistence and numeric objectives')
+  const planning = load('lib/pesv/planning-api.ts'), domain = load('lib/pesv/planning.ts')
+  assert.equal(planning.planningResource('program'), 'programs')
+  assert.equal(planning.planningResource('work-activity'), 'workActivities')
+  assert.equal(planning.planningResource('competency'), 'competencies')
+  assert.equal(planning.planningResource('training-activity'), 'trainingActivities')
+  assert.equal(planning.planningResource('procedure'), 'behaviorProcedures')
+  assert.equal(planning.planningResource('behavior-evaluation'), 'behaviorEvaluations')
+  const procedure = domain.configs.behavior.kinds[0]
+  const procedurePayload = planning.planningPayload(procedure, { ...domain.initialValues(procedure), name: 'Procedimiento', version: '2.0' }, [], {}, 7)
+  assert.equal(procedurePayload.version, '2.0'); assert.equal(procedurePayload.recordVersion, 7)
+  assert.equal(planning.planningEntryPayload('work-activity', { id: 'do-not-send', kind: 'FOLLOW_UP', progress: 75, date: '2026-10-29', observations: 'Avance' }).measuredValue, 75)
+  const program = domain.configs.programs.kinds[0]
+  const activity = { id: 'client-only', name: 'Actividad', responsibleId: 'person-id', responsible: 'Ana', startDate: '2026-01-01', endDate: '2026-12-31', budget: '0' }
+  const catalogs = { people: [{ value: 'person-id', label: 'Ana' }] }
+  const programPayload = planning.planningPayload(program, domain.initialValues(program), [activity], catalogs)
+  assert.equal(programPayload.activities[0].responsibleId, 'person-id'); assert.equal(programPayload.activities[0].id, undefined)
+  assert.throws(() => planning.planningPayload(program, domain.initialValues(program), [{ ...activity, budget: '100' }], catalogs), /presupuesto/)
+  const risk = load('lib/pesv/road-risks-api.ts')
+  const riskPayload = risk.roadRiskPayload({ name: 'Riesgo', diagnosisId: '', sourceId: '', sourceLabel: 'server-only', exposure: 3, probability: 2, history: ['do-not-send'] }, 2)
+  assert.equal(riskPayload.version, 2); assert.equal(riskPayload.sourceLabel, undefined); assert.equal(riskPayload.history, undefined); assert.equal(riskPayload.diagnosisId, undefined)
+  const integrated = ['PESV_PROGRAMS', 'PESV_WORK_PLAN', 'PESV_RISKS', 'PESV_TRAINING', 'PESV_BEHAVIOR']
+  for (const code of integrated) assert.ok(nav.filterNavigationByModules(nav.navigation, parent([child(code)])).find(i => i.code === 'PESV').subItems.some(i => i.code === code))
+  assert.ok(!/localStorage|FileReader/.test(fs.readFileSync(path.join(root, 'app/dashboard/pesv-risks/page.tsx'), 'utf8')))
+  console.log('PESV API tests passed: CRUD routes, pagination, permissions, five new integrations, concurrency, evidence and safe DTO payloads')
 }
 main().catch(error => { console.error(error); process.exitCode = 1 })

@@ -1,9 +1,11 @@
 "use client"
 
+import { roadRiskCatalogs, roadRiskPayload, roadRiskRecords, type Level, type Status, type RiskEvidence as Evidence, type RiskReview as Review, type RiskDiagnosis as Diagnosis, type RiskForm, type RoadRisk as Risk } from "@/lib/pesv/road-risks-api"
+import { deletePesv, downloadPesv, pesvBlob, pesvPath, pesvRequest, savePesv, uploadPesvDocument } from "@/services/pesvService"
+
 import { useEffect, useState, type FormEvent, type ReactNode } from "react"
 import Link from "next/link"
 import { Download, Edit, Eye, HelpCircle, MoreHorizontal, Plus, Search, Trash2, TriangleAlert, Upload } from "lucide-react"
-import autoTable from "jspdf-autotable"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,27 +20,7 @@ import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
-import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
-import { createSafeCloudPdf, SAFE_CLOUD_PDF_STYLE, setSafeCloudPdfCaption, setSafeCloudPdfTitle } from "@/lib/pdf/safecloud-pdf-style"
 
-type Level = 1 | 2 | 3
-type Status = "PENDIENTE" | "EN_EJECUCION" | "CONTROLADO"
-type Evidence = { id: string; name: string; url: string; mime: string; date: string }
-type Review = { id: string; date: string; observations: string; exposure: Level; probability: Level; status: Status }
-type Diagnosis = {
-  id: string; year: number; updateDate: string
-  collaborators: { id: string; name: string }[]
-  vehicles: { id: string; plate: string; vehicleType: string }[]
-  routes: { id: string; origin: string; destination: string }[]
-}
-type RiskForm = {
-  name: string; activity: string; roadUser: string; journey: string; diagnosisId: string
-  sourceId: string; sourceLabel: string; sourceType: string; causes: string; consequences: string
-  existingControls: string; exposure: Level; probability: Level; treatment: string
-  action: string; responsible: string; dueDate: string
-}
-type Risk = RiskForm & { id: string; createdAt: string; status: Status; reviews: Review[]; evidence: Evidence[]; history: { date: string; text: string }[] }
-const KEY = "safecloud:pesv-risks"
 const treatments = ["Evitar el riesgo", "Aceptar el riesgo", "Eliminar la fuente", "Modificar la exposición", "Modificar la probabilidad"]
 const statuses: Status[] = ["PENDIENTE", "EN_EJECUCION", "CONTROLADO"]
 const statusLabels = { PENDIENTE: "Pendiente", EN_EJECUCION: "En ejecución", CONTROLADO: "Controlado" }
@@ -52,7 +34,7 @@ function valuation(exposure: Level, probability: Level) {
 }
 function currentValue(risk: Risk) {
   const last = risk.reviews.at(-1)
-  return valuation(last?.exposure ?? risk.exposure, last?.probability ?? risk.probability)
+  return valuation(risk.currentExposure ?? last?.exposure ?? risk.exposure, risk.currentProbability ?? last?.probability ?? risk.probability)
 }
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return <label className="grid min-w-0 gap-2 text-sm"><span className="font-medium">{label}</span>{children}</label>
@@ -86,62 +68,61 @@ export default function PesvRisksPage() {
   const [reviewId, setReviewId] = useState<string | null>(null)
   const [review, setReview] = useState({ date: today(), observations: "", exposure: 1 as Level, probability: 1 as Level, status: "EN_EJECUCION" as Status })
   const [deleteId, setDeleteId] = useState<string | null>(null)
-  function loadDiagnoses() {
-    try { setDiagnoses(JSON.parse(localStorage.getItem("safecloud:pesv-diagnosis") ?? "[]")) } catch { setDiagnoses([]) }
-  }
+  const [loadError, setLoadError] = useState("")
+  const [saving, setSaving] = useState(false)
+  async function reload() { setRisks(await roadRiskRecords()); setLoadError("") }
+  function loadDiagnoses() { void roadRiskCatalogs().then(setDiagnoses).catch(error => toast.error(error.message)) }
   useEffect(() => {
-    try { setRisks(JSON.parse(localStorage.getItem(KEY) ?? "[]")) } catch { setRisks([]) }
-    loadDiagnoses(); setReady(true)
-    window.addEventListener("focus", loadDiagnoses)
-    window.addEventListener("storage", loadDiagnoses)
-    return () => { window.removeEventListener("focus", loadDiagnoses); window.removeEventListener("storage", loadDiagnoses) }
+    let active = true
+    Promise.all([roadRiskRecords(), roadRiskCatalogs()]).then(([records, catalogs]) => { if (active) { setRisks(records); setDiagnoses(catalogs) } }).catch(error => { if (active) setLoadError(error.message) }).finally(() => { if (active) setReady(true) })
+    return () => { active = false }
   }, [])
-  function persist(next: Risk[]) {
-    try { localStorage.setItem(KEY, JSON.stringify(next)); setRisks(next); return true }
-    catch { toast.error("No se pudo guardar. El almacenamiento del navegador está lleno; intenta con un archivo más pequeño."); return false }
+  useEffect(() => () => { if (preview) URL.revokeObjectURL(preview.url) }, [preview])
+  async function viewEvidence(evidence: Evidence) {
+    try { const blob = await pesvBlob(evidence.url, evidence.mime); setPreview({ ...evidence, url: URL.createObjectURL(blob), mime: blob.type || evidence.mime }) }
+    catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo abrir el documento") }
   }
   function change<K extends keyof RiskForm>(key: K, value: RiskForm[K]) { setForm(prev => ({ ...prev, [key]: value })) }
   const diagnosis = diagnoses.find(item => item.id === form.diagnosisId)
   const sources = diagnosis ? form.sourceType === "vehicles" ? diagnosis.vehicles.map(item => ({ id: item.id, label: `${item.plate} · ${item.vehicleType}` })) : form.sourceType === "collaborators" ? diagnosis.collaborators.map(item => ({ id: item.id, label: item.name })) : diagnosis.routes.map(item => ({ id: item.id, label: `${item.origin} → ${item.destination}` })) : []
   const selected = risks.find(item => item.id === detailId)
   const visible = risks.filter(item => `${item.name} ${item.activity} ${item.responsible} ${item.sourceLabel}`.toLowerCase().includes(search.toLowerCase()) && (!filter || currentValue(item).label === filter))
-  function save(event: FormEvent) {
+  async function save(event: FormEvent) {
     event.preventDefault()
+    if (saving) return
     if (form.diagnosisId && !form.sourceId) { toast.error("Selecciona la ruta, vehículo o colaborador del diagnóstico."); return }
-    const date = new Date().toISOString()
-    const existing = risks.find(item => item.id === editing)
-    const record: Risk = { ...form, id: existing?.id ?? crypto.randomUUID(), createdAt: existing?.createdAt ?? date, status: existing?.status ?? "PENDIENTE", evidence: existing?.evidence ?? [], reviews: existing?.reviews ?? [], history: [...(existing?.history ?? []), { date, text: existing ? "Identificación, análisis o tratamiento actualizado." : `Riesgo registrado: NR ${form.exposure * form.probability}.` }] }
-    if (persist(existing ? risks.map(item => item.id === existing.id ? record : item) : [...risks, record])) { setFormOpen(false); toast.success("Riesgo guardado") }
+    setSaving(true)
+    try {
+      await savePesv("roadRisks", roadRiskPayload(form, risks.find(risk => risk.id === editing)?.version), editing ?? undefined)
+      await reload(); setFormOpen(false); toast.success("Riesgo guardado")
+    } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo guardar el riesgo") }
+    finally { setSaving(false) }
   }
   function exportMatrix() {
-    const doc = createSafeCloudPdf({ orientation: "landscape" })
-    setSafeCloudPdfTitle(doc); doc.text("PESV · Matriz de riesgos viales", 14, 18)
-    setSafeCloudPdfCaption(doc); doc.text(`Fecha: ${today()} | Exposición × Probabilidad | Bajo: 1-2 · Moderado: 3-4 · Crítico: 6-9`, 14, 26)
-    autoTable(doc, { startY: 32, head: [["Riesgo / actividad", "Relación", "Causas / consecuencias", "Controles actuales", "Inicial", "Actual", "Tratamiento / acción", "Responsable / plazo", "Estado"]], body: visible.map(item => [ `${item.name}\n${item.activity}`, item.sourceLabel || item.journey, `${item.causes}\n${item.consequences}`, item.existingControls || "Sin controles", `${item.exposure * item.probability}`, `${currentValue(item).score} · ${currentValue(item).label}`, `${item.treatment}\n${item.action}`, `${item.responsible}\n${item.dueDate}`, statusLabels[item.status] ]), styles: { fontSize: 8, cellPadding: 3 }, headStyles: { fillColor: SAFE_CLOUD_PDF_STYLE.tableHeaderColor } })
-    void saveCorporatePdf(doc, { documentName: "Matriz de riesgos viales" }, `matriz-riesgos-viales-${today()}.pdf`)
+    const params = new URLSearchParams({ ...(search ? { search } : {}), ...(filter ? { level: filter } : {}) })
+    void downloadPesv(`${pesvPath("roadRisks")}/export?${params}`, "matriz-riesgos-viales.pdf").catch(error => toast.error(error.message))
   }
   async function upload(event: FormEvent) {
     event.preventDefault()
-    if (!file || !uploadId) return
-    if (file.size > 4 * 1024 * 1024) { toast.error("Selecciona un archivo de hasta 4 MB."); return }
+    if (!file || !uploadId || uploading) return
     setUploading(true)
-    try {
-      const url = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result)); reader.onerror = reject; reader.readAsDataURL(file) })
-      const date = new Date().toISOString()
-      const evidence: Evidence = { id: crypto.randomUUID(), name: file.name, url, mime: file.type, date }
-      if (persist(risks.map(item => item.id === uploadId ? { ...item, evidence: [...item.evidence, evidence], history: [...item.history, { date, text: `Evidencia cargada: ${file.name}` }] } : item))) { setUploadId(null); setFile(null); toast.success("Evidencia cargada") }
-    } catch { toast.error("No se pudo cargar el archivo") } finally { setUploading(false) }
+    try { await uploadPesvDocument("roadRisks", uploadId, file); await reload(); setUploadId(null); setFile(null); toast.success("Evidencia cargada") }
+    catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo cargar el archivo") }
+    finally { setUploading(false) }
   }
-  function saveReview(event: FormEvent) {
+  async function saveReview(event: FormEvent) {
     event.preventDefault()
     const risk = risks.find(item => item.id === reviewId)
-    if (!risk) return
+    if (!risk || saving) return
     if (review.date < risk.createdAt.slice(0, 10)) { toast.error("El seguimiento no puede ser anterior al registro del riesgo."); return }
     if (risk.reviews.at(-1) && review.date < risk.reviews.at(-1)!.date) { toast.error("La fecha no puede ser anterior al último seguimiento."); return }
-    const date = new Date().toISOString()
-    if (persist(risks.map(item => item.id === reviewId ? { ...item, status: review.status, reviews: [...item.reviews, { ...review, id: crypto.randomUUID() }], history: [...item.history, { date, text: `Seguimiento: ${statusLabels[review.status]}. NR residual ${review.exposure * review.probability}. ${review.observations}` }] } : item))) { setReviewId(null); toast.success("Seguimiento registrado") }
+    setSaving(true)
+    try { await pesvRequest(`${pesvPath("roadRisks", risk.id)}/reviews`, "POST", review); await reload(); setReviewId(null); toast.success("Seguimiento registrado") }
+    catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo guardar el seguimiento") }
+    finally { setSaving(false) }
   }
   return <TooltipProvider><div className="space-y-6">
+    {loadError && <div role="alert" className="text-sm text-red-600">{loadError}<Button variant="outline" onClick={() => { void reload().catch(error => setLoadError(error.message)) }}>Reintentar</Button></div>}
     <Breadcrumb><BreadcrumbList><BreadcrumbItem><BreadcrumbLink asChild><Link href="/dashboard">Dashboard</Link></BreadcrumbLink></BreadcrumbItem><BreadcrumbSeparator /><BreadcrumbItem><BreadcrumbLink asChild><Link href="/dashboard/pesv">PESV</Link></BreadcrumbLink></BreadcrumbItem><BreadcrumbSeparator /><BreadcrumbItem><BreadcrumbPage>Riesgos Viales</BreadcrumbPage></BreadcrumbItem></BreadcrumbList></Breadcrumb>
     <header className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6"><div className="flex min-w-0 items-start gap-4"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700"><TriangleAlert className="h-5 w-5" /></div><div><h1 className="text-2xl font-bold tracking-tight">Riesgos Viales</h1><p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">Identifica, valora y controla los riesgos asociados a la operación y los desplazamientos viales.</p></div></div><Button className="w-full sm:w-auto" disabled={!ready} onClick={() => { loadDiagnoses(); setEditing(null); setForm(freshForm()); setFormOpen(true) }}><Plus className="mr-2 h-4 w-4" />Nuevo riesgo</Button></header>
     <KpiStrip items={[{ title: "Riesgos registrados", value: risks.length, description: "Total de la matriz", icon: "total", tone: "blue" }, { title: "Nivel crítico", value: risks.filter(item => currentValue(item).label === "Crítico").length, description: "Requieren prioridad", icon: "risk", tone: "red" }, { title: "Tratamientos vencidos", value: risks.filter(item => item.status !== "CONTROLADO" && item.dueDate < today()).length, description: "Fecha límite superada", icon: "overdue", tone: "amber" }, { title: "Controlados", value: risks.filter(item => item.status === "CONTROLADO").length, description: "Tratamiento verificado", icon: "completed", tone: "green" }]} />
@@ -152,11 +133,11 @@ export default function PesvRisksPage() {
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="analytics" title="2. Análisis del riesgo" description="Documenta las causas, consecuencias y controles existentes." tone="cyan" /><div className="grid gap-4 sm:grid-cols-2"><Field label="Causas / factores de riesgo"><Textarea required value={form.causes} onChange={e => change("causes", e.target.value)} /></Field><Field label="Consecuencias posibles"><Textarea required value={form.consequences} onChange={e => change("consequences", e.target.value)} /></Field><div className="sm:col-span-2"><Field label="Controles existentes"><Textarea value={form.existingControls} onChange={e => change("existingControls", e.target.value)} /></Field></div></div></section>
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="tracking" title={<>3. Valoración del riesgo{editing && " inicial"}</>} description="Selecciona exposición y probabilidad para obtener el nivel de riesgo." tone="amber" /><Rating exposure={form.exposure} probability={form.probability} onChange={change} /><div className="mt-4 overflow-x-auto"><table className="w-full text-center text-sm"><caption className="mb-2 text-left text-muted-foreground">Matriz de valoración · Exposición × Probabilidad</caption><thead><tr><th className="p-2 text-left">Exposición / Probabilidad</th>{[1, 2, 3].map(n => <th key={n} className="p-2">{n}</th>)}</tr></thead><tbody>{([3, 2, 1] as Level[]).map(e => <tr key={e}><th className="p-2 text-left">{["Esporádica", "Ocasional", "Frecuente"][e - 1]} · {e}</th>{([1, 2, 3] as Level[]).map(p => <td key={p} className={`border p-2 ${valuation(e, p).style} ${e === form.exposure && p === form.probability ? "font-bold ring-2 ring-inset ring-blue-600" : ""}`}>{e * p} · {valuation(e, p).label}</td>)}</tr>)}</tbody></table></div></section>
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><FormSectionTitle icon="prevention" title="4. Tratamiento del riesgo" description="Define la respuesta, el responsable, el plan de acción y su fecha límite." tone="emerald" /><div className="grid gap-4 sm:grid-cols-2"><Field label="Acción frente al riesgo"><select className={selectClass} value={form.treatment} onChange={e => change("treatment", e.target.value)}>{treatments.map(item => <option key={item}>{item}</option>)}</select></Field><Field label="Responsable"><Input required list="pesv-risk-people" value={form.responsible} onChange={e => change("responsible", e.target.value)} /><datalist id="pesv-risk-people">{Array.from(new Set(diagnoses.flatMap(item => item.collaborators.map(person => person.name)))).map(name => <option key={name} value={name} />)}</datalist></Field><Field label={form.treatment === "Aceptar el riesgo" ? "Justificación y medidas de seguimiento" : "Medidas / plan de acción"}><Textarea required value={form.action} onChange={e => change("action", e.target.value)} /></Field><Field label="Fecha límite"><Input required type="date" value={form.dueDate} onChange={e => change("dueDate", e.target.value)} /></Field></div></section>
-    </div><DialogFooter className="shrink-0 border-t px-6 py-4"><Button type="button" variant="outline" onClick={() => setFormOpen(false)}>Cancelar</Button><Button type="submit">Guardar riesgo</Button></DialogFooter></form></SafeCloudFormDrawerFrame>
-    <Dialog open={!!selected} onOpenChange={open => !open && setDetailId(null)}><DialogContent className="record-detail-dialog !max-w-4xl"><DialogHeader><DetailDialogHeading icon="details" tone="amber" title="Detalle del riesgo vial" description="Consulta la valoración, el tratamiento, los seguimientos y las evidencias del riesgo." /></DialogHeader>{selected && <div className="record-detail-body space-y-5"><h3 className="text-lg font-semibold">{selected.name}</h3><Badge className={currentValue(selected).style}>{currentValue(selected).label} · NR {currentValue(selected).score}</Badge><dl className="grid gap-4 sm:grid-cols-2">{[["Actividad", selected.activity], ["Actor vial", selected.roadUser], ["Desplazamiento", selected.journey], ["Relación con diagnóstico", selected.sourceLabel || "Sin vinculación"], ["Causas", selected.causes], ["Consecuencias", selected.consequences], ["Controles existentes", selected.existingControls || "Sin controles registrados"], ["Valoración inicial", `Exposición ${selected.exposure} × Probabilidad ${selected.probability} = ${selected.exposure * selected.probability}`], ["Tratamiento", selected.treatment], ["Plan de acción", selected.action], ["Responsable", selected.responsible], ["Fecha límite", selected.dueDate], ["Estado", statusLabels[selected.status]]].map(([label, value]) => <div key={label}><dt className="text-sm text-muted-foreground">{label}</dt><dd className="whitespace-pre-wrap break-words text-sm">{value}</dd></div>)}</dl><h4 className="border-t pt-4 font-semibold">Seguimientos y valoración residual</h4>{selected.reviews.length ? selected.reviews.map(item => <div className="border-l-2 border-primary pl-4" key={item.id}><p className="text-sm font-medium">{item.date} · {statusLabels[item.status]} · NR {item.exposure * item.probability}</p><p className="whitespace-pre-wrap text-sm">{item.observations}</p></div>) : <p className="text-sm text-muted-foreground">Sin seguimientos registrados.</p>}<h4 className="border-t pt-4 font-semibold">Evidencias</h4>{selected.evidence.map(item => <div className="flex flex-wrap items-center justify-between gap-2 border-b py-2" key={item.id}><span className="min-w-0 break-all text-sm">{item.name}</span><div className="flex gap-1"><Button size="icon" variant="ghost" aria-label={`Ver ${item.name}`} onClick={() => setPreview(item)}><Eye className="h-4 w-4" /></Button><Button size="icon" variant="ghost" asChild><a href={item.url} download={item.name} aria-label={`Descargar ${item.name}`}><Download className="h-4 w-4" /></a></Button></div></div>)}{!selected.evidence.length && <p className="text-sm text-muted-foreground">Sin evidencias cargadas.</p>}<h4 className="border-t pt-4 font-semibold">Historial</h4>{selected.history.map((item, i) => <div key={i} className="text-sm"><p className="text-xs text-muted-foreground">{new Date(item.date).toLocaleString("es-CO", { timeZone: "America/Bogota" })}</p><p>{item.text}</p></div>)}</div>}</DialogContent></Dialog>
-    <SafeCloudFormDrawerFrame open={!!reviewId} onOpenChange={open => !open && setReviewId(null)}><DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/75 px-6 py-4 pr-14"><div className="flex items-start gap-3 text-left"><FormDialogIcon icon="tracking" tone="blue" /><div><DialogTitle>Seguimiento del tratamiento</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Verifica los controles aplicados y registra la valoración residual.</p></div></div></DialogHeader><form className="flex min-h-0 flex-1 flex-col" onSubmit={saveReview}><div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50/40 px-6 py-5"><section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><Field label="Fecha del seguimiento"><Input type="date" required min={risks.find(item => item.id === reviewId)?.createdAt.slice(0, 10)} max={today()} value={review.date} onChange={e => setReview(prev => ({ ...prev, date: e.target.value }))} /></Field><Field label="Controles aplicados / verificación de eficacia"><Textarea required value={review.observations} onChange={e => setReview(prev => ({ ...prev, observations: e.target.value }))} /></Field><Rating exposure={review.exposure} probability={review.probability} onChange={(key, value) => setReview(prev => ({ ...prev, [key]: value }))} /><Field label="Estado del tratamiento"><select className={selectClass} value={review.status} onChange={e => setReview(prev => ({ ...prev, status: e.target.value as Status }))}>{statuses.map(item => <option key={item} value={item}>{statusLabels[item]}</option>)}</select></Field></section></div><DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4"><Button type="button" variant="outline" onClick={() => setReviewId(null)}>Cancelar</Button><Button type="submit">Guardar seguimiento</Button></DialogFooter></form></SafeCloudFormDrawerFrame>
+    </div><DialogFooter className="shrink-0 border-t px-6 py-4"><Button type="button" variant="outline" onClick={() => setFormOpen(false)}>Cancelar</Button><Button disabled={saving} type="submit">Guardar riesgo</Button></DialogFooter></form></SafeCloudFormDrawerFrame>
+    <Dialog open={!!selected} onOpenChange={open => !open && setDetailId(null)}><DialogContent className="record-detail-dialog !max-w-4xl"><DialogHeader><DetailDialogHeading icon="details" tone="amber" title="Detalle del riesgo vial" description="Consulta la valoración, el tratamiento, los seguimientos y las evidencias del riesgo." /></DialogHeader>{selected && <div className="record-detail-body space-y-5"><h3 className="text-lg font-semibold">{selected.name}</h3><Badge className={currentValue(selected).style}>{currentValue(selected).label} · NR {currentValue(selected).score}</Badge><dl className="grid gap-4 sm:grid-cols-2">{[["Actividad", selected.activity], ["Actor vial", selected.roadUser], ["Desplazamiento", selected.journey], ["Relación con diagnóstico", selected.sourceLabel || "Sin vinculación"], ["Causas", selected.causes], ["Consecuencias", selected.consequences], ["Controles existentes", selected.existingControls || "Sin controles registrados"], ["Valoración inicial", `Exposición ${selected.exposure} × Probabilidad ${selected.probability} = ${selected.exposure * selected.probability}`], ["Tratamiento", selected.treatment], ["Plan de acción", selected.action], ["Responsable", selected.responsible], ["Fecha límite", selected.dueDate], ["Estado", statusLabels[selected.status]]].map(([label, value]) => <div key={label}><dt className="text-sm text-muted-foreground">{label}</dt><dd className="whitespace-pre-wrap break-words text-sm">{value}</dd></div>)}</dl><h4 className="border-t pt-4 font-semibold">Seguimientos y valoración residual</h4>{selected.reviews.length ? selected.reviews.map(item => <div className="border-l-2 border-primary pl-4" key={item.id}><p className="text-sm font-medium">{item.date} · {statusLabels[item.status]} · NR {item.exposure * item.probability}</p><p className="whitespace-pre-wrap text-sm">{item.observations}</p></div>) : <p className="text-sm text-muted-foreground">Sin seguimientos registrados.</p>}<h4 className="border-t pt-4 font-semibold">Evidencias</h4>{selected.evidence.map(item => <div className="flex flex-wrap items-center justify-between gap-2 border-b py-2" key={item.id}><span className="min-w-0 break-all text-sm">{item.name}</span><div className="flex gap-1"><Button size="icon" variant="ghost" aria-label={`Ver ${item.name}`} onClick={() => { void viewEvidence(item) }}><Eye className="h-4 w-4" /></Button><Button size="icon" variant="ghost" asChild><a href={item.url} download={item.name} aria-label={`Descargar ${item.name}`} onClick={event => { event.preventDefault(); void downloadPesv(item.url, item.name).catch(error => toast.error(error.message)) }}><Download className="h-4 w-4" /></a></Button></div></div>)}{!selected.evidence.length && <p className="text-sm text-muted-foreground">Sin evidencias cargadas.</p>}<h4 className="border-t pt-4 font-semibold">Historial</h4>{selected.history.map((item, i) => <div key={i} className="text-sm"><p className="text-xs text-muted-foreground">{new Date(item.date).toLocaleString("es-CO", { timeZone: "America/Bogota" })}</p><p>{item.text}</p>{item.snapshot && <details><summary>Datos de esta versión</summary><pre className="whitespace-pre-wrap break-words text-xs">{JSON.stringify(item.snapshot, null, 2)}</pre></details>}</div>)}</div>}</DialogContent></Dialog>
+    <SafeCloudFormDrawerFrame open={!!reviewId} onOpenChange={open => !open && setReviewId(null)}><DialogHeader className="shrink-0 border-b border-slate-200 bg-slate-50/75 px-6 py-4 pr-14"><div className="flex items-start gap-3 text-left"><FormDialogIcon icon="tracking" tone="blue" /><div><DialogTitle>Seguimiento del tratamiento</DialogTitle><p className="mt-1 text-sm text-muted-foreground">Verifica los controles aplicados y registra la valoración residual.</p></div></div></DialogHeader><form className="flex min-h-0 flex-1 flex-col" onSubmit={saveReview}><div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50/40 px-6 py-5"><section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><Field label="Fecha del seguimiento"><Input type="date" required min={risks.find(item => item.id === reviewId)?.createdAt.slice(0, 10)} max={today()} value={review.date} onChange={e => setReview(prev => ({ ...prev, date: e.target.value }))} /></Field><Field label="Controles aplicados / verificación de eficacia"><Textarea required value={review.observations} onChange={e => setReview(prev => ({ ...prev, observations: e.target.value }))} /></Field><Rating exposure={review.exposure} probability={review.probability} onChange={(key, value) => setReview(prev => ({ ...prev, [key]: value }))} /><Field label="Estado del tratamiento"><select className={selectClass} value={review.status} onChange={e => setReview(prev => ({ ...prev, status: e.target.value as Status }))}>{statuses.map(item => <option key={item} value={item}>{statusLabels[item]}</option>)}</select></Field></section></div><DialogFooter className="shrink-0 border-t border-slate-200 bg-white px-6 py-4"><Button type="button" variant="outline" onClick={() => setReviewId(null)}>Cancelar</Button><Button disabled={saving} type="submit">Guardar seguimiento</Button></DialogFooter></form></SafeCloudFormDrawerFrame>
     <Dialog open={!!uploadId} onOpenChange={open => !uploading && !open && setUploadId(null)}><DialogContent><DialogHeader><DialogTitle>Cargar evidencia del riesgo vial</DialogTitle></DialogHeader><form onSubmit={upload} className="space-y-4"><Field label="Seleccionar archivo"><Input required type="file" accept="image/*,application/pdf" onChange={e => setFile(e.target.files?.[0] ?? null)} /></Field><DialogFooter><Button disabled={!file || uploading} type="submit">{uploading ? "Cargando…" : "Cargar evidencia"}</Button></DialogFooter></form></DialogContent></Dialog>
     <Dialog open={!!preview} onOpenChange={open => !open && setPreview(null)}><DialogContent className="!flex h-[85dvh] !max-w-5xl flex-col"><DialogHeader><DialogTitle className="break-all pr-6">{preview?.name}</DialogTitle></DialogHeader>{preview && <><div className="min-h-0 flex-1 overflow-auto">{preview.mime.startsWith("image/") ? <img src={preview.url} alt={preview.name} className="h-full w-full object-contain" /> : preview.mime === "application/pdf" ? <iframe title={preview.name} src={preview.url} className="h-full w-full" /> : <p className="text-sm">Vista previa no disponible para este archivo.</p>}</div><DialogFooter><Button asChild><a href={preview.url} download={preview.name}><Download className="mr-2 h-4 w-4" />Descargar</a></Button></DialogFooter></>}</DialogContent></Dialog>
-    <Dialog open={!!deleteId} onOpenChange={open => !open && setDeleteId(null)}><DialogContent><DialogHeader><DialogTitle>Eliminar riesgo vial</DialogTitle></DialogHeader><p className="text-sm">Se eliminarán el riesgo, sus seguimientos y evidencias. Esta acción no se puede deshacer.</p><DialogFooter><Button variant="outline" onClick={() => setDeleteId(null)}>Cancelar</Button><Button variant="destructive" onClick={() => { if (persist(risks.filter(item => item.id !== deleteId))) setDeleteId(null) }}>Eliminar</Button></DialogFooter></DialogContent></Dialog>
+    <Dialog open={!!deleteId} onOpenChange={open => !open && setDeleteId(null)}><DialogContent><DialogHeader><DialogTitle>Eliminar riesgo vial</DialogTitle></DialogHeader><p className="text-sm">Se eliminarán el riesgo, sus seguimientos y evidencias. Esta acción no se puede deshacer.</p><DialogFooter><Button variant="outline" onClick={() => setDeleteId(null)}>Cancelar</Button><Button variant="destructive" disabled={saving} onClick={async () => { if (!deleteId || saving) return; setSaving(true); try { await deletePesv("roadRisks", deleteId); await reload(); setDeleteId(null); toast.success("Riesgo eliminado") } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo eliminar") } finally { setSaving(false) } }}>Eliminar</Button></DialogFooter></DialogContent></Dialog>
   </div></TooltipProvider>
 }
