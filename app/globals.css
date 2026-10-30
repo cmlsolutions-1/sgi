@@ -1,8 +1,6 @@
 /* src/app/globals.css */
 
 @import "tailwindcss";
-@import "tw-animate-css";
-
 @custom-variant dark (&:is(.dark *));
 
 /* === TEMA CLARO PARA TODO EL PROYECTO === */
