@@ -72,6 +72,9 @@ async function main() {
   }
   const docker = fs.readFileSync(path.resolve(__dirname, '../Dockerfile'), 'utf8')
   assert.ok(docker.includes('USER node')); assert.ok(docker.includes('npm ci')); assert.ok(!docker.includes('else npm install'))
-  console.log('Security checks passed: HS256/RS256 signatures, tampering, expiry, claims, fail-closed, CSP, lockfile and Docker')
+  const loginPage = fs.readFileSync(path.resolve(__dirname, '../app/(auth)/login/page.tsx'), 'utf8')
+  assert.ok(!loginPage.includes('console.log("LOGIN DATA:"'))
+  assert.ok(!loginPage.includes('console.log("LOGIN RESPONSE:"'))
+  console.log('Security checks passed: HS256/RS256 signatures, tampering, expiry, claims, fail-closed, CSP, lockfile, Docker and sensitive login logging')
 }
 main().catch(error => { console.error(error); process.exitCode = 1 })

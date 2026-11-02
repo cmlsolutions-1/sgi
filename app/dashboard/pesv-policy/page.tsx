@@ -1,6 +1,6 @@
 "use client"
 
-import { loadPesv, pesvVersion, savePesv, deletePesv, uploadPesvDocument, pesvBlob, pesvDocumentUrl, downloadPesv, pesvPath, pesvRequest } from "@/services/pesvService"
+import { loadPesv, pesvVersion, savePesv, deletePesv, uploadPesvDocument, pesvBlob, pesvDocumentUrl, downloadPesv, pesvPath, changePesvPolicyStatus } from "@/services/pesvService"
 
 import { type FormEvent, useEffect, useMemo, useState } from "react"
 import {
@@ -502,8 +502,28 @@ export default function PesvPolicyPage() {
     if (!file) { toast.error("Selecciona el archivo que deseas cargar"); return false }
     if (saving) return false
     setSaving(true)
-    try { await uploadPesvDocument("policies", id, file, form.description); await reload().catch(error => { toast.error("Cambios guardados, pero no se pudo actualizar la vista: " + error.message) }); toast.success("Evidencia cargada"); return true }
+    try {
+      await uploadPesvDocument("policies", id, file, form.description)
+      try {
+        await changePesvPolicyStatus(id, "ACTIVE")
+        toast.success("Evidencia cargada y política activada")
+      } catch (error) {
+        toast.warning("La evidencia quedó guardada, pero no se pudo activar la política: " + (error instanceof Error ? error.message : "Intenta activar desde las acciones"))
+      }
+      await reload().catch(error => { toast.error("Cambios guardados, pero no se pudo actualizar la vista: " + error.message) })
+      return true
+    }
     catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo cargar"); return false }
+    finally { setSaving(false) }
+  }
+  async function changeStatus(policy: PesvPolicy, status: "ACTIVE" | "UNDER_REVIEW") {
+    if (saving) return
+    setSaving(true)
+    try {
+      await changePesvPolicyStatus(policy.id, status)
+      toast.success(status === "ACTIVE" ? "Política activada" : "Política en revisión")
+      await reload().catch(error => toast.error("Estado guardado, pero no se pudo actualizar la vista: " + error.message))
+    } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo cambiar el estado") }
     finally { setSaving(false) }
   }
   async function deletePolicy(policy: PesvPolicy) {
@@ -629,6 +649,18 @@ export default function PesvPolicyPage() {
                             <Upload className="h-4 w-4" />
                             {policy.evidence ? "Actualizar evidencia" : "Cargar evidencia"}
                           </DropdownMenuItem>
+                          {policy.status !== "ACTIVE" && (
+                            <DropdownMenuItem disabled={saving || !policy.evidence || isReviewExpired(policy)} onSelect={() => { void changeStatus(policy, "ACTIVE") }}>
+                              <ShieldCheck className="h-4 w-4" />
+                              Activar política
+                            </DropdownMenuItem>
+                          )}
+                          {policy.status === "ACTIVE" && (
+                            <DropdownMenuItem disabled={saving} onSelect={() => { void changeStatus(policy, "UNDER_REVIEW") }}>
+                              <CalendarDays className="h-4 w-4" />
+                              Pasar a revisión
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem
                             onSelect={() => {
                               setEditingPolicy(policy)

@@ -57,6 +57,13 @@ export async function getPesv<T>(resource: PesvResource, id: string): Promise<T>
   const record = await pesvRequest<T>(pesvPath(resource, id))
   return record
 }
+export async function changePesvPolicyStatus(id: string, status: "ACTIVE" | "UNDER_REVIEW") {
+  // Uploads can advance the lock version; read it again before transitioning.
+  const current = await getPesv<{ status: string; lockVersion: number }>("policies", id)
+  if (current.status === status) return
+  if (!Number.isInteger(current.lockVersion) || current.lockVersion < 1) throw new Error("No se pudo obtener la versión actual de la política. Actualiza la página e intenta de nuevo.")
+  await pesvRequest(`${pesvPath("policies", id)}/status`, "PUT", { status, lockVersion: current.lockVersion })
+}
 export async function loadPesv<T extends { id: string }>(resource: PesvResource): Promise<T[]> {
   const records = await listPesv<T>(`${pesvPath(resource)}${resource === "responsible" || resource === "committee" ? "?status=CURRENT" : ""}`)
   return Promise.all(records.map(async record => {

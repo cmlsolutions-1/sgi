@@ -88,8 +88,6 @@ export default function LoginPage() {
   setLoading(true);
   setError("");
 
-  console.log("LOGIN DATA:", { email, userId, companyId, password });
-
   try {
     const res = await fetch("/api/auth/login", {
       method: "POST",
@@ -97,9 +95,7 @@ export default function LoginPage() {
       body: JSON.stringify({ userId, password }),
     });
 
-    // leer JSON UNA SOLA VEZ
     const json = await res.json().catch(() => ({}));
-    console.log("LOGIN RESPONSE:", res.status, json);
 
     if (!res.ok) {
       setError(json?.error ?? json?.message ?? "Credenciales incorrectas");
