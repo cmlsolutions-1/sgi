@@ -1,16 +1,22 @@
-import { getPesv, listPesv, listPesvDocuments, pesvDocumentUrl, pesvPath, pesvRequest, type PesvResource } from "@/services/pesvService"
-import { configs, visibleFields, type Activity, type Catalogs, type Entry, type Kind, type Option, type PesvModule, type RecordItem, type Values } from "./planning"
+import { getPesv, listPesv, listPesvDocuments, pesvDocumentUrl, pesvPath, pesvRequest, savePesv, type PesvResource } from "@/services/pesvService"
+import { configs, text, visibleFields, type Activity, type Catalogs, type Entry, type Kind, type Option, type PesvModule, type RecordItem, type Values } from "./planning"
 import { objectiveCatalogs, objectivePayload, objectiveRecords } from "./objectives-api"
 
-const resources: Record<string, PesvResource> = { objective: "objectives", program: "programs", "work-activity": "workActivities", competency: "competencies", "training-activity": "trainingActivities", procedure: "behaviorProcedures", "behavior-evaluation": "behaviorEvaluations" }
-export function isPlanningApiModule(module: PesvModule) { return ["objectives", "programs", "work-plan", "training", "behavior"].includes(module) }
+const resources: Record<string, PesvResource> = {
+  objective: "objectives", program: "programs", "work-activity": "workActivities", competency: "competencies",
+  "training-activity": "trainingActivities", procedure: "behaviorProcedures", "behavior-evaluation": "behaviorEvaluations",
+  "emergency-plan": "emergencyPlans", "road-drill": "roadDrills",
+  "road-protocol": "roadProtocols", "managed-road": "managedRoads", "road-action": "roadActions",
+  "road-inspection": "roadInspections", "road-maintenance": "roadMaintenance", "road-incident": "roadIncidents",
+}
+export function isPlanningApiModule(module: PesvModule) { return ["objectives", "programs", "work-plan", "training", "behavior", "emergencies", "managed-roads"].includes(module) }
 export function planningResource(kind: string): PesvResource {
   const resource = resources[kind]
   if (!resource) throw new Error("Tipo de registro PESV no integrado")
   return resource
 }
-function valuesOf(record: Record<string, unknown>, kind: Kind): Values {
-  return Object.fromEntries(kind.fields.map(field => [field.key, Array.isArray(record[field.key]) ? (record[field.key] as unknown[]).map(String) : record[field.key] == null ? "" : String(record[field.key])]))
+export function valuesOf(record: Record<string, unknown>, kind: Kind): Values {
+  return Object.fromEntries(kind.fields.map(field => [field.key, Array.isArray(record[field.key]) ? (record[field.key] as unknown[]).map(String) : record[field.key] == null ? (field.multiple ? [] : "") : String(record[field.key])]))
 }
 export function catalogOptions(value: unknown): Option[] {
   if (!Array.isArray(value)) return []
@@ -23,10 +29,11 @@ export async function planningCatalogs(module: PesvModule, empty: Catalogs): Pro
   return Object.fromEntries(Object.keys(empty).map(key => [key, catalogOptions(remote[key])])) as Catalogs
 }
 function referenceLinks(record: Record<string, unknown>, kind: Kind, catalogs: Catalogs): Record<string, Option[]> {
-  const aliases: Record<string, string[]> = { riskIds: ["risks"], objectiveIds: ["relatedObjectives", "objectives"], responsibleIds: ["responsibles"], policyId: ["policy"], programIds: ["programs"], responsibleId: ["responsible"], personId: ["person"], evaluatorId: ["evaluator"], trainerId: ["trainer"] }
+  const aliases: Record<string, string[]> = { riskIds: ["risks"], objectiveIds: ["relatedObjectives", "objectives"], responsibleIds: ["responsibles"], policyId: ["policy"], programIds: ["programs"], responsibleId: ["responsible"], personId: ["person"], evaluatorId: ["evaluator"], trainerId: ["trainer"], routeIds: ["routes"], responderIds: ["responders"], trainingIds: ["trainingActivities"], participantIds: ["participants"], planId: ["plan"], protocolId: ["protocol"], roadId: ["road"], workActivityId: ["workActivity"], inspectorId: ["inspector"], affectedIds: ["affectedPeople"], investigationId: ["investigation"] }
+  const links = (record.links ?? {}) as Record<string, unknown>
   return Object.fromEntries(kind.fields.filter(field => field.reference).map(field => {
     const raw = record[field.key], ids = Array.isArray(raw) ? raw.map(String) : raw ? [String(raw)] : []
-    const related = aliases[field.key]?.map(key => record[key]).find(Boolean)
+    const related = aliases[field.key]?.map(key => links[key] ?? record[key]).find(Boolean)
     const snapshots = catalogOptions(Array.isArray(related) ? related : related ? [related] : [])
     return [field.key, ids.map(id => snapshots.find(option => option.value === id) ?? catalogs[field.reference!].find(option => option.value === id) ?? { value: id, label: String(record[field.key.replace(/Id$/, "Name")] ?? id) })]
   }))
@@ -35,10 +42,11 @@ export async function planningRecords(module: PesvModule, catalogs: Catalogs): P
   if (module === "objectives") return objectiveRecords()
   const results = await Promise.all(configs[module].kinds.map(async kind => {
     const resource = planningResource(kind.id)
-    const records = await listPesv<{ id: string }>(pesvPath(resource))
-    return Promise.all(records.map(async item => {
+    const records = await listPesv<{ id: string; status?: string }>(pesvPath(resource))
+    const visible = module === "emergencies" || module === "managed-roads" ? records.filter(record => record.status !== "ARCHIVED") : records
+    return Promise.all(visible.map(async item => {
       const record = await getPesv<Record<string, unknown> & { id: string }>(resource, item.id)
-      const [documents, entries] = await Promise.all([listPesvDocuments(resource, item.id), listPesv<Entry>(`${pesvPath(resource, item.id)}/entries`)])
+      const [documents, entries] = await Promise.all([listPesvDocuments(resource, item.id), kind.tracking || kind.annualReview || kind.diffusion ? listPesv<Entry>(`${pesvPath(resource, item.id)}/entries`) : []])
       const activities = Array.isArray(record.activities) ? record.activities as Record<string, unknown>[] : []
       const history = Array.isArray(record.history) ? record.history as Record<string, unknown>[] : []
       return {
@@ -57,7 +65,15 @@ export async function planningRecords(module: PesvModule, catalogs: Catalogs): P
 export function planningPayload(kind: Kind, values: Values, activities: Activity[], catalogs: Catalogs, version?: number) {
   if (kind.id === "objective") return objectivePayload(values, version)
   const payload: Record<string, unknown> = Object.fromEntries(visibleFields(kind, values).map(field => [field.key, ["number", "year", "money"].includes(field.type ?? "") && values[field.key] !== "" ? Number(values[field.key]) : values[field.key]]))
-  if (version !== undefined) payload[kind.id === "procedure" || kind.id === "behavior-evaluation" ? "recordVersion" : "version"] = version
+  const operational = ["emergencyPlans", "roadDrills", "roadProtocols", "managedRoads", "roadActions", "roadInspections", "roadMaintenance", "roadIncidents"].includes(resources[kind.id])
+  if (operational) for (const field of kind.fields) {
+    if (field.multiple && !Array.isArray(payload[field.key])) payload[field.key] = []
+    if (field.reference && !field.multiple && !field.required && payload[field.key] === "") {
+      if (version === undefined) delete payload[field.key]
+      else payload[field.key] = null
+    }
+  }
+  if (version !== undefined) payload[operational || kind.id === "procedure" || kind.id === "behavior-evaluation" ? "recordVersion" : "version"] = version
   if (kind.activities) payload.activities = activities.map(activity => {
     if (Number(activity.budget) !== 0) throw new Error("El backend aún no admite presupuesto por actividad del cronograma. No se guardará descartando ese dato; solicita agregar budget al contrato de actividades.")
     const matches = catalogs.people.filter(person => person.value === activity.responsible || person.label === activity.responsible)
@@ -70,4 +86,14 @@ export function planningPayload(kind: Kind, values: Values, activities: Activity
 export function planningEntryPayload(kind: string, entry: Entry) {
   const { id: ignored, ...payload } = entry
   return kind === "work-activity" && entry.kind === "FOLLOW_UP" ? { ...payload, measuredValue: entry.progress } : payload
+}
+export async function syncManagedRoadInspection(inspection: RecordItem) {
+  const roadId = text(inspection.values.roadId)
+  const nextInspectionDate = text(inspection.values.nextInspectionDate)
+  if (!roadId || !nextInspectionDate) return
+  const road = await getPesv<{ recordVersion: number; nextInspectionDate: string }>("managedRoads", roadId)
+  if (road.nextInspectionDate === nextInspectionDate) return
+  const inspections = await listPesv<{ id: string; roadId: string; inspectionDate: string; evidenceCount: number; status: string }>(pesvPath("roadInspections"))
+  if (inspections.some(item => item.id !== inspection.id && item.roadId === roadId && item.status !== "ARCHIVED" && item.evidenceCount > 0 && item.inspectionDate > text(inspection.values.inspectionDate))) return
+  await savePesv("managedRoads", { nextInspectionDate, recordVersion: road.recordVersion }, roadId)
 }

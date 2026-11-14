@@ -88,6 +88,7 @@ export const pesvIntegratedCodes = new Set([
   "PESV_RESPONSIBLE", "PESV_COMMITTEE", "PESV_POLICY",
   "PESV_LEADERSHIP", "PESV_DIAGNOSIS", "PESV_OBJECTIVES",
   "PESV_PROGRAMS", "PESV_WORK_PLAN", "PESV_RISKS", "PESV_TRAINING", "PESV_BEHAVIOR",
+  "PESV_EMERGENCIES", "PESV_INVESTIGATIONS", "PESV_MANAGED_ROADS",
 ])
 
 export function isPesvModuleAllowed(code: string, allowedCodes: ReadonlySet<string>) {

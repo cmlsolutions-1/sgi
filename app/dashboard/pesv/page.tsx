@@ -55,6 +55,9 @@ const moduleEndpoints: Record<string, string | string[]> = {
   PESV_RISKS: pesvResources.roadRisks,
   PESV_TRAINING: [pesvResources.competencies, pesvResources.trainingActivities],
   PESV_BEHAVIOR: [pesvResources.behaviorProcedures, pesvResources.behaviorEvaluations],
+  PESV_EMERGENCIES: [pesvResources.emergencyPlans, pesvResources.roadDrills],
+  PESV_INVESTIGATIONS: [pesvResources.roadInvestigations, pesvResources.investigationProcedures],
+  PESV_MANAGED_ROADS: [pesvResources.roadProtocols, pesvResources.managedRoads, pesvResources.roadActions, pesvResources.roadInspections, pesvResources.roadMaintenance, pesvResources.roadIncidents],
 }
 const stateLabel: Record<ModuleState, string> = {
   unavailable: "No disponible",

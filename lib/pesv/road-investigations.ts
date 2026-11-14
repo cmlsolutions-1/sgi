@@ -1,6 +1,5 @@
-import { dateToday, ids, initialValues, readStore, text, validateRecord, type Catalogs, type Evidence, type Field, type Kind, type Option, type RecordItem, type Values } from "@/lib/pesv/planning"
+import { dateToday, ids, text, validateRecord, type Catalogs, type Evidence, type Field, type Kind, type Option, type RecordItem, type Values } from "@/lib/pesv/planning"
 
-export const ROAD_INVESTIGATIONS_KEY = "safecloud:pesv-road-investigations"
 export const methodologies = ["Árbol de causas", "Cinco porqués", "Ishikawa", "Otra"]
 const f = (key: string, label: string, section: string, type: Field["type"] = "text", extra: Partial<Field> = {}): Field => ({ key, label, section, type, required: true, ...extra })
 export const procedureKind: Kind = {
@@ -52,21 +51,20 @@ export const stageDefinitions = [
   { key: "LESSONS", title: "Lecciones aprendidas", role: "Comité de Seguridad Vial", label: "Principales lecciones aprendidas" },
 ] as const
 export type StageKey = typeof stageDefinitions[number]["key"]
-export type Stage = { id: string; key: StageKey; date: string; notes: string; details: Values; authorId: string; recordedAt: string }
+export type Stage = { id: string; key: StageKey; date: string; notes: string; details: Values; authorId: string; recordedAt: string; version?: number }
 export type ActionFollowUp = { id: string; date: string; progress: number; notes: string; recordedAt: string }
 export type ActionEvaluation = { id: string; followUpId: string; date: string; result: "EFICAZ" | "NO_EFICAZ"; observations: string; evaluatorId: string; recordedAt: string }
 export type CorrectiveAction = { id: string; type: "Correctiva" | "Preventiva" | "Mejora"; description: string; responsibleId: string; dueDate: string; workActivityId: string; followUps: ActionFollowUp[]; evaluations: ActionEvaluation[] }
 export type Diffusion = { id: string; date: string; medium: string; audience: string; csvResponsibleId: string; observations: string; recordedAt: string }
 export type RoadCase = {
   id: string; consecutive: string; values: Values; procedureId: string; procedureSnapshot: Values
-  externalInvestigators: { id: string; name: string; organization: string }[]
+  externalInvestigators: { id: string; name: string; organization: string; role?: string }[]
   links: Record<string, Option[]>; stages: Stage[]; actions: CorrectiveAction[]; diffusions: Diffusion[]; evidence: Evidence[]
-  createdAt: string; updatedAt: string; closedAt?: string
+  createdAt: string; updatedAt: string; closedAt?: string; version?: number
   history: { at: string; event: string; data?: unknown }[]
 }
 export type InvestigationStore = { procedures: RecordItem[]; cases: RoadCase[]; sequences: Record<string, number> }
 export const emptyInvestigationStore = (): InvestigationStore => ({ procedures: [], cases: [], sequences: {} })
-export function readInvestigations() { return readStore(ROAD_INVESTIGATIONS_KEY, emptyInvestigationStore()) }
 export function actionState(action: CorrectiveAction, evidence: Evidence[]) {
   const followUp = action.followUps.at(-1)
   if (!followUp) return "Pendiente"
@@ -77,7 +75,7 @@ export function actionState(action: CorrectiveAction, evidence: Evidence[]) {
 }
 export function stageComplete(record: RoadCase, key: StageKey) {
   const stage = record.stages.find(s => s.key === key)
-  return Boolean(stage && (key !== "EVIDENCE" || record.evidence.some(e => e.targetId === stage.id)))
+  return Boolean(stage && (key !== "EVIDENCE" || record.evidence.some(e => e.targetId === stage.id || (!e.targetId && record.version !== undefined))))
 }
 export function nextStage(record: RoadCase) { return stageDefinitions.find(s => !stageComplete(record, s.key)) }
 export function lessonsDocumented(record: RoadCase) {
@@ -143,21 +141,4 @@ export function validateEvaluation(record: RoadCase, action: CorrectiveAction, d
   if (date < followUp.date || date > dateToday()) return "La fecha de evaluación no puede ser anterior al seguimiento ni estar en el futuro."
   if (!evaluatorId || !notes.trim()) return "Selecciona el evaluador y registra su conclusión."
   return null
-}
-export function demoInvestigations(catalogs: Catalogs): InvestigationStore {
-  const at = new Date().toISOString()
-  const person = catalogs.people[0]?.value ?? ""
-  const procedureValues: Values = {
-    name: "Procedimiento de investigación interna de siniestros viales", version: "1.0", methodology: "Árbol de causas", responsibleId: person,
-    scope: "Siniestros de colaboradores en desplazamientos laborales y en el entorno próximo de la organización.",
-    reportProtocol: "Registrar el evento, acciones inmediatas y responsables del reporte.", collectionProtocol: "Evaluar la escena y conservar soportes y testimonios.",
-    analysisProtocol: "Reconstruir el evento; identificar causas por factor y analizar la causa raíz.", controlProtocol: "Identificar fallos de control y definir acciones con responsable y plazo.",
-    lessonsProtocol: "Comunicar las lecciones mediante el CSV y evaluar la eficacia de las acciones por el líder PESV.",
-    authorityCoordination: "Registrar actuaciones de autoridades y relacionar la investigación laboral cuando aplique. La investigación interna no sustituye la de las autoridades.",
-    confidentiality: "Acceso limitado al equipo investigador; conservación de soportes e historial.",
-  }
-  const procedure: RecordItem = { id: "pesv-road-procedure-demo", kind: procedureKind.id, values: procedureValues, activities: [], entries: [], evidence: [], links: snapshotLinks(procedureKind, procedureValues, catalogs), createdAt: at, updatedAt: at, history: [{ at, action: "Procedimiento de demostración registrado", snapshot: procedureValues }] }
-  const values: Values = { ...initialValues(reportKind), name: "Colisión leve durante recorrido urbano", occurrenceDate: dateToday(), occurrenceTime: "09:00", place: "Cruce urbano de la ruta operativa", journey: "Desplazamiento laboral", peopleIds: [person], reporterId: person, firstResponderId: person, responsibleId: person, investigatorIds: catalogs.people.slice(0, 2).map(p => p.value), immediateActions: "Se registró el siniestro y se activó la cadena interna de reporte.", dueDate: dateToday(), routeIds: catalogs.routes.slice(0, 1).map(r => r.value), vehicleIds: catalogs.vehicles.slice(0, 1).map(v => v.value), riskIds: catalogs.risks.slice(0, 1).map(r => r.value), emergencyPlanId: catalogs.emergencyPlans[0]?.value ?? "" }
-  const record: RoadCase = { id: "pesv-road-case-demo", consecutive: `SV-${dateToday().slice(0, 4)}-001`, values, procedureId: procedure.id, procedureSnapshot: structuredClone(procedureValues), externalInvestigators: [], links: snapshotLinks(reportKind, values, catalogs), stages: [], actions: [], diffusions: [], evidence: [], createdAt: at, updatedAt: at, history: [{ at, event: "Reporte de demostración creado", data: values }] }
-  return { procedures: [procedure], cases: [record], sequences: { [dateToday().slice(0, 4)]: 1 } }
 }

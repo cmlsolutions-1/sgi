@@ -21,6 +21,12 @@ function load(file, cache = new Map()) {
 }
 const response = data => Response.json({ ok: true, data })
 async function main() {
+  const profiles = load('lib/pesv/diagnosis-profiles.ts')
+  const profile = { id: 'read-only', sourceEmployeeId: 'employee-id', name: ' Ana ', birthDate: '1990-02-28', gender: 'FEMENINO', role: 'Operadora', educationLevel: 'Técnica', maritalStatus: 'Soltera', licenseValidUntil: '2027-01-01', trainings: 0, competencyEvaluation: 'Realizada', roadAccidents: 0, trafficFines: 0, finesPaymentStatus: 'Sin infracciones', commuteTransport: 'Bus', isWorkDriver: false, vehicleTypeDriven: 'No aplica', linkedAt: '2026-01-01' }
+  assert.deepEqual(profiles.missingCollaboratorFields(profile), [])
+  assert.deepEqual(profiles.missingCollaboratorFields({ ...profile, educationLevel: null, licenseValidUntil: '2027-02-30', linkedAt: null }), ['Escolaridad', 'Vencimiento de la licencia', 'Fecha de vinculación'])
+  assert.equal(profiles.collaboratorPayload(profile).name, 'Ana')
+  assert.equal(profiles.collaboratorPayload(profile).id, undefined)
   const api = load('services/pesvService.ts')
   assert.equal(api.pesvResources.objectives, '/api/pesv/objectives/objectives')
   for (const [resource, url] of Object.entries(api.pesvResources)) {
@@ -85,6 +91,58 @@ async function main() {
   const objective = load('lib/pesv/objectives-api.ts')
   assert.deepEqual(objective.objectivePayload({ year: '2026', baseline: '0', target: '100', name: 'Prueba' }, 2), { year: 2026, baseline: 0, target: 100, name: 'Prueba', version: 2 })
   const planning = load('lib/pesv/planning-api.ts'), domain = load('lib/pesv/planning.ts')
+  const investigation = load('lib/pesv/road-investigations-api.ts')
+  const operationalKinds = {
+    'emergency-plan': 'emergencyPlans', 'road-drill': 'roadDrills',
+    'road-protocol': 'roadProtocols', 'managed-road': 'managedRoads',
+    'road-action': 'roadActions', 'road-inspection': 'roadInspections',
+    'road-maintenance': 'roadMaintenance', 'road-incident': 'roadIncidents',
+  }
+  for (const module of ['emergencies', 'managed-roads']) {
+    assert.equal(planning.isPlanningApiModule(module), true)
+    for (const kind of domain.configs[module].kinds) {
+      assert.equal(planning.planningResource(kind.id), operationalKinds[kind.id])
+      const payload = planning.planningPayload(kind, { ...domain.initialValues(kind), version: '1.0' }, [], {}, 7)
+      assert.equal(payload.recordVersion, 7)
+      assert.equal(payload.version, kind.fields.some(f => f.key === 'version') ? '1.0' : undefined)
+    }
+  }
+  calls = []
+  respond = url => response(url.includes('/road-inspections?page=') ? [{ id: 'inspection', status: 'COMPLETED' }] : url.includes('/documents?') ? [] : url.endsWith('/inspection') ? { id: 'inspection', name: 'Inspección', recordVersion: 2 } : [])
+  const emptyCatalogs = new Proxy({}, { get: () => [] })
+  assert.equal((await planning.planningRecords('managed-roads', emptyCatalogs))[0].remoteVersion, 2)
+  assert.ok(!calls.some(call => call.url.includes('/inspection/entries')))
+  calls = []
+  respond = url => response(url.includes('/road-inspections?') ? [] : { recordVersion: 3, nextInspectionDate: '2026-11-13' })
+  await planning.syncManagedRoadInspection({ id: 'inspection', values: { roadId: 'road', inspectionDate: '2026-11-13', nextInspectionDate: '2027-11-13' } })
+  assert.deepEqual(JSON.parse(calls.at(-1).body), { nextInspectionDate: '2027-11-13', recordVersion: 3 })
+  const stage = { id: 'stage', key: 'CAUSES', date: '2026-11-13', authorId: 'author', notes: 'Análisis', details: { human: 'Hallazgo' }, version: 3 }
+  calls = []
+  respond = url => response(url.includes('/documents?') ? [{ id: 'doc', referenceId: 'stage', referenceType: 'PESV_INVESTIGATION_STAGE', originalName: 'soporte.pdf' }] : {
+    record: { id: 'case', name: 'Siniestro', procedureId: 'procedure', consecutive: 'INV-2026-0001', version: 4 },
+    stages: [{ ...investigation.stagePayload(stage), id: 'stage' }], actions: [], followUps: [], evaluations: [], diffusions: [], history: [],
+  })
+  const remoteCase = await investigation.investigationCase('case', emptyCatalogs, [])
+  assert.equal(remoteCase.stages[0].notes, stage.notes)
+  assert.deepEqual(remoteCase.stages[0].details, stage.details)
+  assert.equal(remoteCase.evidence[0].targetId, 'stage')
+  assert.equal(remoteCase.consecutive, 'INV-2026-0001')
+  calls = []; respond = () => response({ id: 'doc' })
+  await api.uploadPesvDocument('roadDrills', 'drill', file, '', 'entry')
+  await api.uploadPesvDocument('roadMaintenance', 'maintenance', file, '', 'entry')
+  await api.uploadPesvDocument('roadInvestigations', 'case', file, '', 'stage')
+  assert.deepEqual(calls.map(c => c.body.get('type')), ['PESV_EMERGENCY_EVIDENCE', 'PESV_MANAGED_ROAD_EVIDENCE', 'PESV_INVESTIGATION_EVIDENCE'])
+  assert.deepEqual(calls.map(c => c.body.get('targetId')), ['entry', 'entry', 'stage'])
+  await assert.rejects(() => api.uploadPesvDocument('investigationProcedures', 'procedure', file), /no admite/)
+  calls = []
+  const stages = load('lib/pesv/road-investigations.ts').stageDefinitions.map(({ key }) => ({ id: key, key }))
+  const readyCase = { ...remoteCase, stages, actions: [{ id: 'action', followUps: [{ id: 'follow-up', progress: 100 }], evaluations: [{ followUpId: 'follow-up', result: 'EFICAZ' }] }], diffusions: [{ id: 'diffusion' }], evidence: [{ targetId: 'EVIDENCE' }, { targetId: 'diffusion' }] }
+  await investigation.closeInvestigationIfReady({ ...readyCase, evidence: [] })
+  assert.equal(calls.length, 0)
+  await investigation.closeInvestigationIfReady(readyCase)
+  assert.deepEqual(calls.map(c => [c.method, c.url]), [['PUT', '/api/pesv/road-investigations/case/close']])
+  assert.deepEqual(investigation.investigationPayload({ name: 'Siniestro' }, 'procedure', [{ id: 'local', name: 'Ana', organization: 'Empresa' }], 4).externalInvestigators, [{ name: 'Ana', organization: 'Empresa' }])
+  assert.ok(!/localStorage|readStore|FileReader|demoInvestigations/.test(fs.readFileSync(path.join(root, 'app/dashboard/pesv-investigations/page.tsx'), 'utf8')))
   assert.equal(planning.planningResource('program'), 'programs')
   assert.equal(planning.planningResource('work-activity'), 'workActivities')
   assert.equal(planning.planningResource('competency'), 'competencies')
@@ -104,9 +162,9 @@ async function main() {
   const risk = load('lib/pesv/road-risks-api.ts')
   const riskPayload = risk.roadRiskPayload({ name: 'Riesgo', diagnosisId: '', sourceId: '', sourceLabel: 'server-only', exposure: 3, probability: 2, history: ['do-not-send'] }, 2)
   assert.equal(riskPayload.version, 2); assert.equal(riskPayload.sourceLabel, undefined); assert.equal(riskPayload.history, undefined); assert.equal(riskPayload.diagnosisId, undefined)
-  const integrated = ['PESV_PROGRAMS', 'PESV_WORK_PLAN', 'PESV_RISKS', 'PESV_TRAINING', 'PESV_BEHAVIOR']
+  const integrated = ['PESV_PROGRAMS', 'PESV_WORK_PLAN', 'PESV_RISKS', 'PESV_TRAINING', 'PESV_BEHAVIOR', 'PESV_EMERGENCIES', 'PESV_INVESTIGATIONS', 'PESV_MANAGED_ROADS']
   for (const code of integrated) assert.ok(nav.filterNavigationByModules(nav.navigation, parent([child(code)])).find(i => i.code === 'PESV').subItems.some(i => i.code === code))
   assert.ok(!/localStorage|FileReader/.test(fs.readFileSync(path.join(root, 'app/dashboard/pesv-risks/page.tsx'), 'utf8')))
-  console.log('PESV API tests passed: CRUD routes, pagination, permissions, five new integrations, concurrency, evidence and safe DTO payloads')
+  console.log('PESV API tests passed: CRUD routes, pagination, permissions, concurrency, evidence and DTO payloads')
 }
 main().catch(error => { console.error(error); process.exitCode = 1 })

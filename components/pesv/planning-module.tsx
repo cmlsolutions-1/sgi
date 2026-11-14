@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react"
-import { isPlanningApiModule, planningCatalogs, planningEntryPayload, planningPayload, planningRecords, planningResource } from "@/lib/pesv/planning-api"
+import { isPlanningApiModule, planningCatalogs, planningEntryPayload, planningPayload, planningRecords, planningResource, syncManagedRoadInspection } from "@/lib/pesv/planning-api"
 import { deletePesv, downloadPesv, pesvBlob, pesvPath, pesvRequest, savePesv, uploadPesvDocument } from "@/services/pesvService"
 import Link from "next/link"
 import { Download, Edit, Eye, FileCheck2, MoreHorizontal, Plus, Search, Trash2, Upload } from "lucide-react"
@@ -68,7 +68,7 @@ function sectionVisualIcon(section: string): FormVisualIcon {
   return "details"
 }
 const money = (value: string) => new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(Number(value || 0))
-const emptyCatalogs: Catalogs = { policies: [], risks: [], people: [], objectives: [], programs: [], competencies: [], trainingActivities: [], procedures: [], routes: [], vehicles: [], emergencyPlans: [], workActivities: [], managedRoads: [], roadProtocols: [], journeyProcedures: [], journeys: [], vehicleProfiles: [], inspectionProcedures: [], changeProcedures: [], contractors: [], archiveProcedures: [], roadInvestigations: [], lossMatrices: [], auditProcedures: [], pesvAudits: [], auditFindings: [], communicationMechanisms: [] }
+export const emptyCatalogs: Catalogs = { policies: [], risks: [], people: [], objectives: [], programs: [], competencies: [], trainingActivities: [], procedures: [], routes: [], vehicles: [], emergencyPlans: [], workActivities: [], managedRoads: [], roadProtocols: [], journeyProcedures: [], journeys: [], vehicleProfiles: [], inspectionProcedures: [], changeProcedures: [], contractors: [], archiveProcedures: [], roadInvestigations: [], lossMatrices: [], auditProcedures: [], pesvAudits: [], auditFindings: [], communicationMechanisms: [] }
 const sourceLinks: Partial<Record<Reference, { href: string; label: string }>> = {
   lossMatrices: { href: "/dashboard/pesv-statistics", label: "Matriz de pérdida" },
   auditProcedures: { href: "/dashboard/pesv-audits", label: "Procedimiento de auditoría PESV" },
@@ -150,14 +150,7 @@ function displayValue(field: Field, record: RecordItem, catalogs: Catalogs) {
 function createDemo(kind: Kind, catalogs: Catalogs, records: RecordItem[] = []): RecordItem | null {
   const values = initialValues(kind)
   const year = currentYear()
-  const base = { year: String(year), startDate: `${year}-01-01`, endDate: `${year}-12-31`, nextReviewDate: `${year + 1}-01-01` }
-  const p = catalogs.people[0]?.value ?? ""
-  const policyId = catalogs.policies[0]?.value ?? ""
-  const patches: Record<string, Values> = {
-    "emergency-plan": { ...base, name: "PPRAEV de desplazamientos laborales", version: "1.0", responsibleId: p, scope: "Colaboradores y contratistas durante desplazamientos laborales.", routeIds: catalogs.routes.map(r => r.value), riskIds: catalogs.risks.slice(0, 1).map(r => r.value), routeRisks: "Cruces urbanos, tráfico mixto y distracción durante recorridos frecuentes.", accidentReporting: "Registrar ubicación, hora y descripción del evento y activar la cadena de llamado.", callChain: "Primer respondiente → coordinador operativo → líder PESV → gerencia. Directorio por completar.", emergencyNumber: "123", externalContacts: "Organismos de socorro de la zona: directorio por completar.", medicalCenters: "Centro médico de referencia: nombre, ubicación, teléfono y acceso por completar.", responderIds: [p], responderProtocol: "Activar el plan de respuesta y coordinar con los organismos de socorro.", pasProtect: "Protección de la zona conforme al protocolo de la organización.", pasAlert: "Activación de la cadena de llamado y reporte de ubicación del evento.", pasAssist: "Atención dentro de las competencias del primer respondiente y coordinación con personal capacitado.", equipment: "Botiquines, extintores, chalecos reflectivos y conos. Inventario y ubicación por completar.", trainingProtocol: "Formación y evaluación de protocolos de atención, reporte y PAS.", trainingIds: catalogs.trainingActivities.slice(0, 1).map(r => r.value), drillStrategy: "Un simulacro vial anual con evaluación de tiempos y roles.", communityCoordination: "Invitar a organismos de socorro, comité y comunidad de las rutas cuando sea posible." },
-    "road-drill": { ...base, name: "Simulacro anual de respuesta vial", planId: catalogs.emergencyPlans[0]?.value ?? "", scenario: "Siniestro vial durante un desplazamiento laboral.", place: "Zona controlada de la organización", responsibleId: p, startDate: dateToday(), endDate: dateToday(), participantIds: catalogs.people.map(r => r.value), externalParticipants: "Participación de organismos de socorro sujeta a coordinación.", objective: "Evaluar la cadena de llamado, roles y protocolo de respuesta.", equipment: "Botiquín, extintores y señalización del escenario.", expectedResponseMinutes: "10", evaluationCriteria: "Tiempo de respuesta, comunicaciones, roles y oportunidades de mejora." },
-  }
-  Object.assign(values, patches[kind.id] ?? operationalDemo(kind, catalogs, dateToday()) ?? assuranceDemo(kind, catalogs, dateToday()))
+  Object.assign(values, operationalDemo(kind, catalogs, dateToday()) ?? assuranceDemo(kind, catalogs, dateToday()))
   Object.assign(values, deriveAssurance(kind.id, values, records))
   const activities: Activity[] = kind.activities ? [{ id: "demo-activity", name: "Taller de conducción sin distracciones", responsible: catalogs.people[0]?.label ?? "Responsable PESV", startDate: `${year}-10-15`, endDate: `${year}-10-15`, budget: "350000" }] : []
   if (validateRecord(kind, values, activities, catalogs)) return null
@@ -225,7 +218,6 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
           records.push(demo)
           if (k.id === "competency") catalogs.competencies.push({ value: demo.id, label: `${text(demo.values.name)} · ${text(demo.values.year)}` })
           if (k.id === "procedure") catalogs.procedures.push({ value: demo.id, label: text(demo.values.name) })
-          if (k.id === "emergency-plan") catalogs.emergencyPlans.push({ value: demo.id, label: text(demo.values.name), year: text(demo.values.year) })
           const reference = operationalCatalogKinds[k.id as keyof typeof operationalCatalogKinds] ?? assuranceCatalogKinds[k.id as keyof typeof assuranceCatalogKinds]
           if (reference) catalogs[reference].push({ value: demo.id, label: text(demo.values.name), year: text(demo.values.year) })
         }
@@ -356,7 +348,12 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
     try {
       if (apiModule) {
         await uploadPesvDocument(planningResource(owner?.kind ?? kind.id), uploadTarget.itemId, file, "", uploadTarget.targetId)
-        await reloadRemote(); setUploadTarget(null); toast.success("Evidencia cargada")
+        setUploadTarget(null); toast.success("Evidencia cargada")
+        if (owner?.kind === "road-inspection") {
+          try { await syncManagedRoadInspection(owner) }
+          catch (error) { toast.warning("Evidencia guardada, pero no se pudo actualizar la próxima inspección: " + (error instanceof Error ? error.message : "")) }
+        }
+        await reloadRemote().catch(error => toast.error("No se pudo actualizar la vista: " + error.message))
         return
       }
       const url = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result)); reader.onerror = reject; reader.readAsDataURL(file) })
@@ -364,19 +361,16 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
       const evidence: Evidence = { id: crypto.randomUUID(), name: file.name, mime: file.type, url, uploadedAt: at, targetId: uploadTarget.targetId }
       let next = items.map(i => i.id === uploadTarget.itemId ? { ...i, updatedAt: at, evidence: [...i.evidence, evidence], history: [...i.history, { at, action: `Evidencia cargada: ${file.name}${uploadTarget.targetId ? " (registro de seguimiento, revisión o divulgación)" : ""}` }] } : i)
       const supported = next.find(i => i.id === uploadTarget.itemId)!
-      if (supported.kind === "road-inspection" || (supported.kind === "contractor-check" && itemStatus(supported) === "Verificado")) {
-        const road = supported.kind === "road-inspection"
-        const parentId = text(supported.values[road ? "roadId" : "contractorId"])
-        const dateKey = road ? "nextInspectionDate" : "nextVerificationDate"
-        const completedDate = text(supported.values[road ? "inspectionDate" : "verificationDate"])
-        const newer = next.some(i => i.id !== supported.id && i.kind === supported.kind && i.values[road ? "roadId" : "contractorId"] === parentId && text(i.values[road ? "inspectionDate" : "verificationDate"]) > completedDate && i.evidence.length)
-        if (!newer) next = next.map(i => i.id === parentId ? { ...i, updatedAt: at, values: { ...i.values, [dateKey]: supported.values[dateKey] }, history: [...i.history, { at, action: road ? "Inspección documentada; próxima inspección actualizada" : "Verificación documentada; próxima verificación actualizada", snapshot: { ...i.values, [dateKey]: supported.values[dateKey] } }] } : i)
+      if (supported.kind === "contractor-check" && itemStatus(supported) === "Verificado") {
+        const parentId = text(supported.values.contractorId)
+        const newer = next.some(i => i.id !== supported.id && i.kind === supported.kind && i.values.contractorId === parentId && text(i.values.verificationDate) > text(supported.values.verificationDate) && i.evidence.length)
+        if (!newer) next = next.map(i => i.id === parentId ? { ...i, updatedAt: at, values: { ...i.values, nextVerificationDate: supported.values.nextVerificationDate }, history: [...i.history, { at, action: "Verificación documentada; próxima verificación actualizada", snapshot: { ...i.values, nextVerificationDate: supported.values.nextVerificationDate } }] } : i)
       }
       if (persist(next)) { setUploadTarget(null); toast.success("Evidencia cargada") }
     } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo leer el archivo") } finally { setUploading(false) }
   }
   function download(record?: RecordItem) {
-    if (apiModule && !record) {
+    if (apiModule && !record && module !== "emergencies" && module !== "managed-roads") {
       const serverStatus = ({ Pendiente: "PENDING", "En ejecución": "IN_PROGRESS", Cumplido: "COMPLETED", Vencido: "OVERDUE", Archivado: "ARCHIVED" } as Record<string, string>)[status] ?? status
       const params = new URLSearchParams({ ...(year ? { year } : {}), ...(search ? { search } : {}), ...(serverStatus ? { status: serverStatus } : {}) })
       void downloadPesv(`${pesvPath(planningResource(kind.id))}/export?${params}`, `pesv-${module}.pdf`).catch(error => toast.error(error.message))

@@ -39,6 +39,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
+import { collaboratorFields, collaboratorPayload, missingCollaboratorFields, type CollaboratorDraft } from "@/lib/pesv/diagnosis-profiles"
 
 type DiagnosisEvidence = {
   id: string
@@ -51,6 +52,7 @@ type DiagnosisEvidence = {
 
 type CollaboratorRoadProfile = {
   id: string
+  sourceEmployeeId?: string | null
   name: string
   birthDate: string
   gender: "MASCULINO" | "FEMENINO"
@@ -153,9 +155,12 @@ const defaultForm: DiagnosisForm = {
   emergencyDrillsDescription: "Simulacro anual de atención de siniestro vial con revisión de tiempos de respuesta y roles.",
   findings:
     "Actualizar evaluación de competencia de conductores, reforzar control documental de vehículos y socializar rutas críticas frecuentes.",
-  updateDate: new Date().toISOString().slice(0, 10),
+  updateDate: "",
 }
 
+function diagnosisDate() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date())
+}
 const statusLabels: Record<PesvDiagnosis["status"], string> = {
   DRAFT: "Borrador",
   DOCUMENTED: "Documentado",
@@ -197,10 +202,30 @@ function DiagnosisDialog({
   open: boolean
   diagnosis: PesvDiagnosis | null
   onClose: () => void
-  onSave: (form: DiagnosisForm, diagnosisId?: string) => Promise<boolean>
+  onSave: (form: DiagnosisForm, diagnosisId?: string, profiles?: CollaboratorDraft[]) => Promise<boolean>
 }) {
   const [form, setForm] = useState<DiagnosisForm>(defaultForm)
   const editing = Boolean(diagnosis)
+  const [profiles, setProfiles] = useState<CollaboratorDraft[]>([])
+  const [profilesReady, setProfilesReady] = useState(false)
+  const [profilesError, setProfilesError] = useState("")
+  const [allowIncomplete, setAllowIncomplete] = useState(false)
+  const [profilesChanged, setProfilesChanged] = useState(false)
+  const incomplete = profiles.filter(row => missingCollaboratorFields(row).length > 0)
+
+  useEffect(() => {
+    if (!open) return
+    let active = true
+    setProfiles([]); setProfilesReady(false); setProfilesError(""); setAllowIncomplete(false); setProfilesChanged(false)
+    const existing = diagnosis?.collaborators ?? []
+    void pesvRequest<{ collaborators: CollaboratorDraft[] }>("/api/pesv/diagnoses/catalogs").then(result => {
+      if (!active) return
+      const seen = new Set(existing.map(row => row.sourceEmployeeId).filter(Boolean))
+      setProfiles([...existing, ...result.collaborators.filter(row => !seen.has(row.sourceEmployeeId as string))])
+      setProfilesReady(true)
+    }).catch(() => { if (active) setProfilesError("No se pudo consultar el catálogo de colaboradores. Cierra y vuelve a abrir el formulario para reintentar.") })
+    return () => { active = false }
+  }, [open, diagnosis])
 
   useEffect(() => {
     if (!open) return
@@ -222,7 +247,7 @@ function DiagnosisDialog({
             findings: diagnosis.findings,
             updateDate: diagnosis.updateDate,
           }
-        : defaultForm,
+        : { ...defaultForm, year: Number(diagnosisDate().slice(0, 4)), updateDate: diagnosisDate() },
     )
   }, [diagnosis, open])
 
@@ -233,6 +258,10 @@ function DiagnosisDialog({
     if (!form.servicesDescription.trim()) return toast.error("Describe los servicios de la organización")
     if (!form.contractorsDescription.trim()) return toast.error("Describe contratistas, terceros y flotas")
     if (!form.findings.trim()) return toast.error("Registra los hallazgos del diagnóstico")
+    const includeProfiles = !editing || profilesChanged
+    if (includeProfiles && !profilesReady) return toast.error(profilesError || "Espera a que cargue el catálogo de colaboradores")
+    if (includeProfiles && profiles.slice(0, diagnosis?.collaborators.length ?? 0).some(row => missingCollaboratorFields(row).length)) return toast.error("Completa los campos inválidos de los perfiles ya guardados para no eliminarlos del diagnóstico")
+    if (includeProfiles && incomplete.length && !allowIncomplete) return toast.error("Completa los perfiles viales o confirma que los pendientes se guardarán más adelante")
 
     const saved = await onSave(
       {
@@ -244,6 +273,7 @@ function DiagnosisDialog({
         findings: form.findings.trim(),
       },
       diagnosis?.id,
+      includeProfiles ? profiles.filter(row => !missingCollaboratorFields(row).length) : undefined,
     )
     if (saved) onClose()
   }
@@ -262,6 +292,13 @@ function DiagnosisDialog({
 
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-5 overflow-x-hidden overflow-y-auto bg-slate-50/40 px-6 py-5">
+            <Button type="button" variant="outline" onClick={() => {
+              const section = document.getElementById("diagnosis-collaborator-profiles")
+              section?.scrollIntoView({ block: "start" })
+              section?.focus({ preventScroll: true })
+            }}>
+              Perfiles viales de colaboradores
+            </Button>
             <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <FormSectionTitle icon="area" title="Organización" />
               <div className="grid gap-4 sm:grid-cols-2">
@@ -340,6 +377,37 @@ function DiagnosisDialog({
               </Label>
             </section>
 
+            <section id="diagnosis-collaborator-profiles" tabIndex={-1} className="space-y-3 rounded-md border border-border p-4">
+              <FormSectionTitle icon="details" title="Perfiles viales de colaboradores" />
+              {profilesError ? <p role="alert" className="text-sm text-destructive">{profilesError}</p> : !profilesReady ? <p role="status" className="text-sm">Cargando colaboradores…</p> : <>
+                {profiles.length === 0 && <p className="text-sm text-muted-foreground">Sin colaboradores en el catálogo.</p>}
+                {profiles.map((row, index) => {
+                  const missing = missingCollaboratorFields(row)
+                  return <details key={index} className="border-b border-border py-2">
+                    <summary className="cursor-pointer text-sm font-medium">{String(row.name || `Colaborador ${index + 1}`)} · {missing.length ? `${missing.length} campos pendientes o inválidos` : "Completo"}</summary>
+                    {missing.length > 0 && <p className="mt-2 text-sm text-muted-foreground">{missing.join(", ")}</p>}
+                    <div className="grid gap-3 py-3 sm:grid-cols-2">
+                      {collaboratorFields.map(([key, label, kind]) => {
+                        const value = row[key]
+                        function update(next: string | boolean | number | null) {
+                          setProfiles(rows => rows.map((item, i) => i === index ? { ...item, [key]: next } : item))
+                          setProfilesChanged(true)
+                        }
+                        return <Label key={key} className="grid gap-2">{label}
+                          {kind === "boolean" ? <input type="checkbox" checked={value === true} onChange={event => update(event.target.checked)} />
+                            : kind === "gender" ? <select className="h-9 rounded-md border border-input bg-background px-2" value={String(value ?? "")} onChange={event => update(event.target.value)}><option value="">Selecciona</option><option value="MASCULINO">Masculino</option><option value="FEMENINO">Femenino</option></select>
+                            : <Input type={kind === "date" || kind === "number" ? kind : "text"} min={kind === "number" ? 0 : undefined} maxLength={typeof kind === "number" ? kind : undefined} value={String(value ?? "")} onChange={event => update(kind === "number" ? event.target.value === "" ? null : Number(event.target.value) : event.target.value)} />}
+                        </Label>
+                      })}
+                    </div>
+                  </details>
+                })}
+                {incomplete.length > 0 && <Label className="flex items-start gap-2 text-sm">
+                  <input type="checkbox" checked={allowIncomplete} onChange={event => setAllowIncomplete(event.target.checked)} />
+                  Guardar sin incluir {incomplete.length} {incomplete.length === 1 ? "perfil pendiente" : "perfiles pendientes"}.
+                </Label>}
+              </>}
+            </section>
             <section className="rounded-md border border-primary/20 bg-primary/5 p-4">
               <div className="flex items-start gap-3">
                 <Upload className="mt-0.5 h-5 w-5 text-primary" />
@@ -515,23 +583,12 @@ export default function PesvDiagnosisPage() {
     )
   }, [diagnoses, search])
 
-  async function saveDiagnosis(form: DiagnosisForm, id?: string): Promise<boolean> {
+  async function saveDiagnosis(form: DiagnosisForm, id?: string, profiles?: CollaboratorDraft[]): Promise<boolean> {
     if (saving) return false
     setSaving(true)
     try {
       const payload: Record<string, unknown> = { ...form, ...pesvVersion(diagnoses.find(item => item.id === id)) }
-      if (!id) {
-        const catalogs = await pesvRequest<Record<string, unknown>>("/api/pesv/diagnoses/catalogs")
-        const fields = {
-          collaborators: ["sourceEmployeeId", "name", "birthDate", "gender", "role", "educationLevel", "maritalStatus", "licenseValidUntil", "trainings", "competencyEvaluation", "roadAccidents", "trafficFines", "finesPaymentStatus", "commuteTransport", "isWorkDriver", "vehicleTypeDriven", "linkedAt"],
-          vehicles: ["plate", "vin", "engineNumber", "mileage", "manufactureDate", "technicalSpecs", "soatValidUntil", "inspectionValidUntil", "roadAccidents", "preventiveMaintenancePlan", "maintenanceActions", "vehicleType", "estimatedMonthlyKm", "ownershipType"],
-          routes: ["origin", "destination", "kilometers", "weeklyFrequency", "monthlyFrequency", "yearlyFrequency"],
-        }
-        for (const [key, allowed] of Object.entries(fields)) {
-          const rows = catalogs[key]
-          if (Array.isArray(rows)) payload[key] = rows.map(row => Object.fromEntries(Object.entries(row).filter(([field]) => allowed.includes(field))))
-        }
-      }
+      if (profiles) payload.collaborators = profiles.map(collaboratorPayload)
       await savePesv("diagnoses", payload, id)
       await reload().catch(error => { toast.error("Cambios guardados, pero no se pudo actualizar la vista: " + error.message) })
       toast.success(id ? "Registro actualizado" : "Registro creado")

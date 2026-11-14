@@ -69,3 +69,10 @@ Las pruebas de navegador usan respuestas de contrato aisladas y no modifican
 registros del backend real. Para la aceptacion en staging, probar con una empresa
 y usuario autorizados: crear, editar, adjuntar, consultar/descargar documentos,
 registrar revision/seguimiento, exportar y retirar permisos de cada hijo.
+# Emergencias, investigaciones y vías administradas
+
+- Emergencias: `/api/pesv/emergencies/{emergency-plans,road-drills}`. Vías: `/api/pesv/managed-roads/{road-protocols,managed-roads,road-actions,road-inspections,road-maintenance,road-incidents}`. Los cambios usan `recordVersion`; la versión visible del documento se conserva por separado.
+- Investigación: `/api/pesv/investigation-procedures` y `/api/pesv/road-investigations`. El servidor asigna el consecutivo y registra el cierre mediante `PUT /close`. Las evidencias se asocian al caso o al registro hijo con `targetId`.
+- El DTO de etapas no admite `details`: SafeCloud guarda los detalles como sección reversible de `notes`. Para soportar integraciones y exportaciones estructuradas, agregar `details` al DTO, entidad y respuesta.
+- Falta CRUD documental para procedimientos de investigación. La acción de carga existente informa esta limitación. El backend registra al usuario autenticado como evaluador; el empleado seleccionado se conserva como evaluador designado en las observaciones, no como autor de auditoría.
+- La referencia `emergencyPlanId` de investigación actualmente apunta al módulo general de emergencias, no a PPRAEV. Para vincular el PPRAEV del PESV, el backend debe cambiar la referencia y exponer los catálogos relacionados para usuarios con permisos de investigación.

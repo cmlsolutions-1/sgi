@@ -305,14 +305,21 @@ export function completion(item: RecordItem) {
   return item.entries.filter(e => e.kind === "FOLLOW_UP").at(-1)?.progress ?? 0
 }
 export function itemStatus(item: RecordItem) {
+  if (item.remoteStatus !== "ARCHIVED") {
+    if (item.kind === "emergency-plan") return "Documentado"
+    if (item.kind === "road-drill" && completion(item) === 100 && !item.evidence.some(e => e.targetId === item.entries.filter(e => e.kind === "FOLLOW_UP").at(-1)?.id)) return "Pendiente de evidencia"
+    if (["road-protocol", "managed-road", "road-inspection", "road-incident", "road-action", "road-maintenance"].includes(item.kind)) {
+      const status = operationalStatus(item, dateToday())
+      if (status) return status
+    }
+  }
   if (item.remoteStatus) return ({ PENDING: "Pendiente", IN_PROGRESS: "En ejecución", COMPLETED: "Cumplido", OVERDUE: "Vencido", ARCHIVED: "Archivado" } as Record<string, string>)[item.remoteStatus] ?? item.remoteStatus
   const assurance = assuranceStatus(item, dateToday())
   if (assurance) return assurance
   const operational = operationalStatus(item, dateToday())
   if (operational) return operational
   if (item.kind === "competency" || item.kind === "behavior-evaluation") return text(item.values.result)
-  if (item.kind === "procedure" || item.kind === "emergency-plan") return "Documentado"
-  if (item.kind === "road-drill" && completion(item) === 100 && !item.evidence.some(e => e.targetId === item.entries.filter(e => e.kind === "FOLLOW_UP").at(-1)?.id)) return "Pendiente de evidencia"
+  if (item.kind === "procedure") return "Documentado"
   const progress = completion(item)
   return progress >= 100 ? "Cumplido" : progress > 0 ? "En ejecución" : "Pendiente"
 }

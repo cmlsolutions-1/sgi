@@ -14,6 +14,16 @@ export const pesvResources = {
   trainingActivities: "/api/pesv/training/training-activities",
   behaviorProcedures: "/api/pesv/behavior/procedures",
   behaviorEvaluations: "/api/pesv/behavior/behavior-evaluations",
+  emergencyPlans: "/api/pesv/emergencies/emergency-plans",
+  roadDrills: "/api/pesv/emergencies/road-drills",
+  roadProtocols: "/api/pesv/managed-roads/road-protocols",
+  managedRoads: "/api/pesv/managed-roads/managed-roads",
+  roadActions: "/api/pesv/managed-roads/road-actions",
+  roadInspections: "/api/pesv/managed-roads/road-inspections",
+  roadMaintenance: "/api/pesv/managed-roads/road-maintenance",
+  roadIncidents: "/api/pesv/managed-roads/road-incidents",
+  investigationProcedures: "/api/pesv/investigation-procedures",
+  roadInvestigations: "/api/pesv/road-investigations",
 } as const
 export type PesvResource = keyof typeof pesvResources
 export type PesvDocument = { id: string; fileName: string; description: string; uploadedAt: string; mimeType: string; url?: string; targetId?: string }
@@ -51,7 +61,7 @@ export async function savePesv<T>(resource: PesvResource, body: unknown, id?: st
 export async function deletePesv(resource: PesvResource, id: string) { await pesvRequest(pesvPath(resource, id), "DELETE") }
 export async function listPesvDocuments(resource: PesvResource, id: string): Promise<PesvDocument[]> {
   const docs = await listPesv<Record<string, unknown>>(`${pesvPath(resource, id)}/documents`)
-  return docs.map(document => ({ id: String(document.id), fileName: String(document.originalName ?? document.fileName ?? "Documento"), description: String(document.description ?? ""), mimeType: String(document.mimeType ?? "application/octet-stream"), uploadedAt: String(document.uploadedAt ?? document.createdAt ?? ""), ...(document.targetId || ["PESV_COMMITTEE_REVIEW", "PESV_OBJECTIVE_ENTRY", "PESV_PROGRAM_ENTRY", "PESV_WORK_ACTIVITY_ENTRY", "PESV_ROAD_RISK_REVIEW", "PESV_TRAINING_ENTRY", "PESV_BEHAVIOR_ENTRY"].includes(String(document.referenceType)) ? { targetId: String(document.targetId ?? document.referenceId) } : {}) }))
+  return docs.map(document => ({ id: String(document.id), fileName: String(document.originalName ?? document.fileName ?? "Documento"), description: String(document.description ?? ""), mimeType: String(document.mimeType ?? "application/octet-stream"), uploadedAt: String(document.uploadedAt ?? document.createdAt ?? ""), ...(document.targetId || ["PESV_COMMITTEE_REVIEW", "PESV_OBJECTIVE_ENTRY", "PESV_PROGRAM_ENTRY", "PESV_WORK_ACTIVITY_ENTRY", "PESV_ROAD_RISK_REVIEW", "PESV_TRAINING_ENTRY", "PESV_BEHAVIOR_ENTRY", "PESV_EMERGENCY_ENTRY", "PESV_MANAGED_ROAD_ENTRY", "PESV_INVESTIGATION_STAGE", "PESV_INVESTIGATION_ACTION", "PESV_INVESTIGATION_FOLLOW_UP", "PESV_INVESTIGATION_DIFFUSION"].includes(String(document.referenceType)) ? { targetId: String(document.targetId ?? document.referenceId) } : {}) }))
 }
 export async function getPesv<T>(resource: PesvResource, id: string): Promise<T> {
   const record = await pesvRequest<T>(pesvPath(resource, id))
@@ -77,12 +87,13 @@ export async function loadPesv<T extends { id: string }>(resource: PesvResource)
   }))
 }
 export async function uploadPesvDocument(resource: PesvResource, id: string, file: File, description = "", targetId?: string): Promise<void> {
+  if (resource === "investigationProcedures") throw new Error("El backend aún no admite evidencias para procedimientos de investigación.")
   const maxMb = resource === "roadRisks" ? 4 : 3
   if (!file.size || file.size > maxMb * 1024 * 1024) throw new Error(`Selecciona un archivo de hasta ${maxMb} MB`)
   if (file.type !== "application/pdf" && !["image/png", "image/jpeg", "image/webp"].includes(file.type)) throw new Error("Selecciona un PDF o una imagen PNG, JPG o WebP")
   const body = new FormData()
   body.append("file", file); body.append("description", description); body.append("isConfirmed", "true")
-  body.append("type", { responsible: "PESV_RESPONSIBLE_SUPPORT", committee: "PESV_COMMITTEE_EVIDENCE", policies: "PESV_POLICY_SIGNED", leadership: "PESV_LEADERSHIP_EVIDENCE", diagnoses: "PESV_DIAGNOSIS_EVIDENCE", objectives: "PESV_OBJECTIVE_EVIDENCE", programs: "PESV_PROGRAM_EVIDENCE", workActivities: "PESV_WORK_PLAN_EVIDENCE", roadRisks: "PESV_ROAD_RISK_EVIDENCE", competencies: "PESV_TRAINING_EVIDENCE", trainingActivities: "PESV_TRAINING_EVIDENCE", behaviorProcedures: "PESV_BEHAVIOR_EVIDENCE", behaviorEvaluations: "PESV_BEHAVIOR_EVIDENCE" }[resource])
+  body.append("type", { responsible: "PESV_RESPONSIBLE_SUPPORT", committee: "PESV_COMMITTEE_EVIDENCE", policies: "PESV_POLICY_SIGNED", leadership: "PESV_LEADERSHIP_EVIDENCE", diagnoses: "PESV_DIAGNOSIS_EVIDENCE", objectives: "PESV_OBJECTIVE_EVIDENCE", programs: "PESV_PROGRAM_EVIDENCE", workActivities: "PESV_WORK_PLAN_EVIDENCE", roadRisks: "PESV_ROAD_RISK_EVIDENCE", competencies: "PESV_TRAINING_EVIDENCE", trainingActivities: "PESV_TRAINING_EVIDENCE", behaviorProcedures: "PESV_BEHAVIOR_EVIDENCE", behaviorEvaluations: "PESV_BEHAVIOR_EVIDENCE", emergencyPlans: "PESV_EMERGENCY_EVIDENCE", roadDrills: "PESV_EMERGENCY_EVIDENCE", roadProtocols: "PESV_MANAGED_ROAD_EVIDENCE", managedRoads: "PESV_MANAGED_ROAD_EVIDENCE", roadActions: "PESV_MANAGED_ROAD_EVIDENCE", roadInspections: "PESV_MANAGED_ROAD_EVIDENCE", roadMaintenance: "PESV_MANAGED_ROAD_EVIDENCE", roadIncidents: "PESV_MANAGED_ROAD_EVIDENCE", roadInvestigations: "PESV_INVESTIGATION_EVIDENCE" }[resource])
   if (targetId) body.append("targetId", targetId)
   await data(await apiFetch(`${pesvPath(resource, id)}/documents`, { method: "POST", body }))
 }
