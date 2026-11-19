@@ -58,6 +58,13 @@ const moduleEndpoints: Record<string, string | string[]> = {
   PESV_EMERGENCIES: [pesvResources.emergencyPlans, pesvResources.roadDrills],
   PESV_INVESTIGATIONS: [pesvResources.roadInvestigations, pesvResources.investigationProcedures],
   PESV_MANAGED_ROADS: [pesvResources.roadProtocols, pesvResources.managedRoads, pesvResources.roadActions, pesvResources.roadInspections, pesvResources.roadMaintenance, pesvResources.roadIncidents],
+  PESV_JOURNEYS: [pesvResources.journeyProcedures, pesvResources.journeys],
+  PESV_VEHICLE_INSPECTIONS: [pesvResources.inspectionProcedures, pesvResources.vehicleProfiles, pesvResources.vehicleInspections, pesvResources.vehicleMaintenance],
+  PESV_CHANGE_CONTRACTORS: [pesvResources.changeProcedures, pesvResources.changes, pesvResources.contractors, pesvResources.contractorChecks],
+  PESV_DOCUMENT_RETENTION: [pesvResources.archiveProcedures, pesvResources.archiveRecords, pesvResources.archiveReviews],
+  PESV_STATISTICS: [pesvResources.statisticalEvents, pesvResources.statisticalAnalyses, pesvResources.lossMatrices],
+  PESV_AUDITS: [pesvResources.auditProcedures, pesvResources.pesvAudits, pesvResources.auditFindings],
+  PESV_INDICATORS: [pesvResources.indicatorSheets, pesvResources.indicatorMeasurements, pesvResources.indicatorReviews, pesvResources.indicatorReports],
 }
 const stateLabel: Record<ModuleState, string> = {
   unavailable: "No disponible",

@@ -47,11 +47,12 @@
     "cmdk": "1.0.4",
     "date-fns": "4.1.0",
     "embla-carousel-react": "8.5.1",
+    "exceljs": "4.4.0",
     "input-otp": "1.4.1",
     "jspdf": "4.2.1",
     "jspdf-autotable": "5.0.9",
     "lucide-react": "0.454.0",
-    "next": "16.4.3",
+    "next": "16.4.6",
     "next-themes": "0.4.6",
     "pdf-lib": "1.17.1",
     "react": "19.2.9",
@@ -67,6 +68,11 @@
     "vaul": "1.1.2",
     "zod": "4.6.7",
     "zustand": "5.0.10"
+  },
+  "overrides": {
+    "exceljs": {
+      "uuid": "11.1.1"
+    }
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.1.17",

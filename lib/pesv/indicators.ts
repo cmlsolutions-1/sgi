@@ -33,12 +33,12 @@ export const definitions: IndicatorDefinition[] = [
   d("audit", "13 · NCAC", "Aumentar el cierre de no conformidades de auditoría", "No conformidades gestionadas y cerradas frente a las identificadas y analizadas en auditoría PESV.", "Anual", all, "Aumentar", "PERCENTAGE", "No conformidades gestionadas y cerradas", "No conformidades identificadas y analizadas", "Última auditoría interna PESV y soportes de cierre de hallazgos", "/dashboard/audits"),
 ]
 
-export type IndicatorSheet = { id: string; year: string; name: string; description: string; sources: string; sourceReliability: string; baseline: string; target: string; responsibleId: string; workActivityIds: string[]; workActivityNames: string[] }
-export type Measurement = { id: string; indicatorId: string; year: string; period: string; loss: string; numerator: number; denominator: number; result: number | null; analysis: string; source: string; sourceDetails: string; registeredAt: string; definition: IndicatorDefinition; sheet: IndicatorSheet; rateConstant: number; costMethod: "SUM" | "PRODUCT"; evidence: Evidence[]; supersedesId?: string; correctionReason?: string }
+export type IndicatorSheet = { remoteId?: string; remoteVersion?: number; id: string; year: string; name: string; description: string; sources: string; sourceReliability: string; baseline: string; target: string; responsibleId: string; workActivityIds: string[]; workActivityNames: string[] }
+export type Measurement = { remoteVersion?: number; id: string; indicatorId: string; year: string; period: string; loss: string; numerator: number; denominator: number; result: number | null; analysis: string; source: string; sourceDetails: string; registeredAt: string; definition: IndicatorDefinition; sheet: IndicatorSheet; rateConstant: number; costMethod: "SUM" | "PRODUCT"; evidence: Evidence[]; supersedesId?: string; correctionReason?: string }
 export type CsvReview = { id: string; year: string; quarter: string; date: string; reviewerIds: string[]; reviewerNames: string[]; conclusion: string; decisions: string; measurements: Measurement[]; evidence: Evidence[]; createdAt: string }
 export type ReportRow = { id: string; label: string; category: string; count: number }
 export type StepResult = { step: number; status: "Sin evaluar" | "Cumple" | "No cumple" | "No aplica"; observations: string }
-export type AnnualReport = { id: string; values: Values; fleet: ReportRow[]; actors: ReportRow[]; contractors: ReportRow[]; fines: ReportRow[]; steps: StepResult[]; measurements: Measurement[]; reviews: CsvReview[]; objectives: RecordItem[]; nextObjectives: RecordItem[]; programs: RecordItem[]; nextPrograms: RecordItem[]; evidence: Evidence[]; createdAt: string; presentations: { date: string; authority: string; reference: string; at: string }[] }
+export type AnnualReport = { remoteVersion?: number; id: string; values: Values; fleet: ReportRow[]; actors: ReportRow[]; contractors: ReportRow[]; fines: ReportRow[]; steps: StepResult[]; measurements: Measurement[]; reviews: CsvReview[]; objectives: RecordItem[]; nextObjectives: RecordItem[]; programs: RecordItem[]; nextPrograms: RecordItem[]; evidence: Evidence[]; createdAt: string; presentations: { date: string; authority: string; reference: string; at: string }[] }
 export type IndicatorsState = {
   protocol: Values; protocolEvidence: Evidence[]; level: Level; rateConstant: number; costMethod: "SUM" | "PRODUCT"
   sheets: IndicatorSheet[]; measurements: Measurement[]; reviews: CsvReview[]; reports: AnnualReport[]
@@ -130,17 +130,17 @@ export function evidenceDate(timestamp: string) {
 function supportedExecution(item: RecordItem, end: string) {
   return item.entries.some(e => e.kind === "FOLLOW_UP" && e.date <= end && e.progress === 100 && item.evidence.some(file => file.targetId === e.id && evidenceDate(file.uploadedAt) && evidenceDate(file.uploadedAt) <= end))
 }
-export function sourceSuggestion(definition: IndicatorDefinition, year: string, period: string, sheet: IndicatorSheet, loss = ""): { numerator: string; denominator: string; details: string } | null {
+export function sourceSuggestion(definition: IndicatorDefinition, year: string, period: string, sheet: IndicatorSheet, loss = "", remote?: { records: Partial<Record<Parameters<typeof readItems>[0], RecordItem[]>>; diagnoses: { year: number; updateDate: string; collaborators: { id: string }[] }[] }): { numerator: string; denominator: string; details: string } | null {
   const { start, end } = periodRange(year, definition.frequency, period)
-  const cohorts = (module: Parameters<typeof readItems>[0], kind: string) => readStore<RecordItem[] | null>(`safecloud:pesv-${module}`, null)?.filter(i => i.kind === kind && text(i.values.year) === year && inRange(text(i.values.endDate), start, end))
+  const cohorts = (module: Parameters<typeof readItems>[0], kind: string) => (remote ? remote.records[module] : readStore<RecordItem[] | null>(`safecloud:pesv-${module}`, null))?.filter(i => i.kind === kind && text(i.values.year) === year && inRange(text(i.values.endDate), start, end))
   if (definition.id === "tsv" || definition.id === "cost") {
-    const source = readStore<RecordItem[] | null>("safecloud:pesv-statistics", null)
+    const source = remote ? remote.records.statistics : readStore<RecordItem[] | null>("safecloud:pesv-statistics", null)
     if (!source) return null
     const records = source.filter(i => i.kind === "statistical-event" && i.values.journey === "Laboral" && inRange(text(i.values.eventDate), start, end) && (loss === "Choques simples" ? ["Solo daños materiales", "Primeros auxilios"].includes(text(i.values.personLoss)) : i.values.personLoss === loss))
     return definition.id === "tsv" ? { numerator: String(records.length), denominator: "", details: "Siniestros laborales del registro estadístico, clasificados por afectación a personas. Completa kilómetros con el registro real de toda la flota." } : { numerator: String(records.reduce((n, i) => n + Number(i.values.directCosts || 0), 0)), denominator: String(records.reduce((n, i) => n + Number(i.values.indirectCosts || 0), 0)), details: "Costos directos e indirectos de siniestros laborales del período y nivel de pérdida seleccionado." }
   }
   if (definition.id === "audit") {
-    const audits = storedAssurance("audits")
+    const audits = remote ? remote.records.audits ?? [] : storedAssurance("audits")
     if (!audits.length) return null
     const selected = audits.filter(i => i.kind === "audit-finding" && i.values.year === year && i.values.findingType === "No conformidad")
     const closed = selected.filter(i => completedFinding(i) && text(i.values.verificationDate) <= end && i.evidence.some(e => e.targetId === `VERIFICATION:${text(i.values.verificationToken)}` && evidenceDate(e.uploadedAt) <= end))
@@ -162,14 +162,14 @@ export function sourceSuggestion(definition: IndicatorDefinition, year: string, 
     return { numerator: String(reached.length), denominator: String(selected.length), details: `Metas con fecha final en el período ${start} a ${end}. Se usa la última medición registrada hasta el corte.` }
   }
   if (definition.id === "inspections") {
-    const checks = readStore<RecordItem[] | null>("safecloud:pesv-vehicle-inspections", null)
+    const checks = remote ? remote.records["vehicle-inspections"] : readStore<RecordItem[] | null>("safecloud:pesv-vehicle-inspections", null)
     if (!checks) return null
     const pairs = new Set(checks.filter(i => i.kind === "vehicle-inspection" && i.values.moment === "Preoperacional diaria" && inRange(text(i.values.inspectionDate), start, end) && i.evidence.some(e => evidenceDate(e.uploadedAt) && evidenceDate(e.uploadedAt) <= end)).map(i => `${text(i.values.vehicleProfileId)}:${text(i.values.inspectionDate)}`))
     return { numerator: String(pairs.size), denominator: "", details: "Vehículos-día únicos con inspección y evidencia. Completa el denominador con el registro real de operación; no se infiere del tamaño de la flota." }
   }
   if (definition.id === "coverage") {
-    const formation = readStore<RecordItem[] | null>("safecloud:pesv-training", null)
-    const diagnoses = readStore<{ year: number; updateDate: string; collaborators: { id: string }[] }[] | null>("safecloud:pesv-diagnosis", null)?.filter(d => String(d.year) === year && d.updateDate <= end).sort((a, b) => a.updateDate.localeCompare(b.updateDate))
+    const formation = remote ? remote.records.training : readStore<RecordItem[] | null>("safecloud:pesv-training", null)
+    const diagnoses = (remote ? remote.diagnoses : readStore<{ year: number; updateDate: string; collaborators: { id: string }[] }[] | null>("safecloud:pesv-diagnosis", null))?.filter(d => String(d.year) === year && d.updateDate <= end).sort((a, b) => a.updateDate.localeCompare(b.updateDate))
     if (!formation) return null
     const people = new Set(formation.filter(i => i.kind === "training-activity" && text(i.values.year) === year).flatMap(i => i.entries.filter(e => e.kind === "FOLLOW_UP" && e.progress === 100 && inRange(e.date, `${year}-01-01`, end) && i.evidence.some(file => file.targetId === e.id && evidenceDate(file.uploadedAt) && evidenceDate(file.uploadedAt) <= end)).flatMap(e => e.attendeeIds ?? [])))
     return { numerator: String(people.size), denominator: diagnoses?.length ? String(new Set(diagnoses.at(-1)!.collaborators.map(c => c.id)).size) : "", details: `Asistentes únicos acreditados entre ${year}-01-01 y ${end}. Total de colaboradores tomado del último diagnóstico disponible al corte, si existe.` }

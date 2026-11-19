@@ -28,6 +28,7 @@ import {
 import { toast } from "sonner"
 
 import { EmployeeFormDialog } from "@/components/dashboard/employee-form-dialog"
+import { EmployeeImportDialog } from "@/components/employee/EmployeeImportDialog"
 import { AnalyticsBarChart, AnalyticsChartCard, AnalyticsDonutChart } from "@/components/dashboard/analytics-charts"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -1955,13 +1956,14 @@ export default function EmployeesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Funcionarios</h1>
           <p className="text-muted-foreground">Gestion del talento humano</p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <EmployeeImportDialog onImported={loadEmployees} />
           <EmployeeFormDialog onSave={handleCreateEmployee} />
         </div>
       </div>

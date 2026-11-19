@@ -1,7 +1,9 @@
 "use client"
 
-import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react"
-import { isPlanningApiModule, planningCatalogs, planningEntryPayload, planningPayload, planningRecords, planningResource, syncManagedRoadInspection } from "@/lib/pesv/planning-api"
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react"
+import { isPlanningApiModule, planningCatalogs, planningDocumentTarget, planningEntryPayload, planningFieldDefaults, planningPayload, planningRecords, planningResource, syncManagedRoadInspection, resetFindingVerification, syncContractorVerification } from "@/lib/pesv/planning-api"
+import { moduleCodes, remoteInventory } from "@/lib/pesv/remote-inventory"
+import { useAuthStore } from "@/store/auth.store"
 import { deletePesv, downloadPesv, pesvBlob, pesvPath, pesvRequest, savePesv, uploadPesvDocument } from "@/services/pesvService"
 import Link from "next/link"
 import { Download, Edit, Eye, FileCheck2, MoreHorizontal, Plus, Search, Trash2, Upload } from "lucide-react"
@@ -18,12 +20,12 @@ import { SafeCloudFormDrawerFrame } from "@/components/ui/safecloud-form-drawer"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
-  configs, completion, currentYear, dateToday, ids, initialValues, itemStatus, loadCatalogs, nextReview,
+  configs, completion, currentYear, dateToday, entryDateError, followUpProgressError, ids, initialValues, itemStatus, loadCatalogs, nextReview,
   readItems, readStore, storageKey, text, validateRecord, visibleFields,
   type Activity, type Catalogs, type Entry, type Evidence, type Field, type Kind, type Option,
   type PesvModule, type RecordItem, type Reference, type Values,
 } from "@/lib/pesv/planning"
-import { archiveInventory, archiveYears, operationalCatalogKinds, operationalDemo, operationalConfigs, retentionUntil, type ArchivedEvidence } from "@/lib/pesv/operations"
+import { archiveInventory, archiveYears, hasCumulativeProgress, operationalCatalogKinds, operationalDemo, operationalConfigs, retentionUntil, type ArchivedEvidence } from "@/lib/pesv/operations"
 import { assuranceCatalogKinds, assuranceConfigs, assuranceDemo, completedFinding, deriveAssurance, documentedAudit, investigationDefaults } from "@/lib/pesv/assurance"
 import { AssuranceOverview } from "@/components/pesv/assurance-overview"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
@@ -134,6 +136,7 @@ export function ReferenceInput({ field, value, options, onChange }: { field: Fie
   </div>
 }
 export function FieldInput({ field, value, catalogs, onChange }: { field: Field; value: string | string[]; catalogs: Catalogs; onChange: (value: string | string[]) => void }) {
+  if (field.type === "time") return <Input readOnly={field.readOnly} aria-label={field.label} type="time" step={60} required={field.required} value={text(value)} onChange={e => onChange(e.target.value)} />
   if (field.type === "reference" && field.reference) return <ReferenceInput field={field} value={value} options={catalogs[field.reference]} onChange={onChange} />
   if (field.type === "textarea") return <Textarea readOnly={field.readOnly} aria-label={field.label} required={field.required} className="min-h-24 resize-y" value={text(value)} onChange={e => onChange(e.target.value)} />
   if (field.type === "select") return <PesvSelect ariaLabel={field.label} value={text(value)} options={(field.options ?? []).map(option => ({ value: option, label: option }))} onValueChange={onChange} />
@@ -195,16 +198,19 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
   const [inventoryOpen, setInventoryOpen] = useState(false)
   const [loadError, setLoadError] = useState("")
   const [mutating, setMutating] = useState(false)
+  const fieldRequest = useRef(0)
+  const [resolvingField, setResolvingField] = useState(false)
   async function reloadRemote() {
     const remoteCatalogs = await planningCatalogs(module, emptyCatalogs)
     const records = await planningRecords(module, remoteCatalogs)
     setItems(records); setCatalogs(remoteCatalogs); setLoadError("")
+    if (module === "document-retention") setInventory(await remoteInventory(remoteCatalogs, moduleCodes(useAuthStore.getState().modules)))
   }
   function refresh() { if (apiModule) return; setCatalogs(loadCatalogs()); if (module === "document-retention") setInventory(loadInventory()) }
   useEffect(() => {
     if (apiModule) {
       let active = true
-      void (async () => { try { const remoteCatalogs = await planningCatalogs(module, emptyCatalogs); const records = await planningRecords(module, remoteCatalogs); if (active) { setItems(records); setCatalogs(remoteCatalogs); setLoadError("") } } catch (error) { if (active) setLoadError(error instanceof Error ? error.message : "No se pudo cargar el módulo") } finally { if (active) setReady(true) } })()
+      void (async () => { try { const remoteCatalogs = await planningCatalogs(module, emptyCatalogs); const records = await planningRecords(module, remoteCatalogs); const inventory = module === "document-retention" ? await remoteInventory(remoteCatalogs, moduleCodes(useAuthStore.getState().modules)) : []; if (active) { setItems(records); setCatalogs(remoteCatalogs); setInventory(inventory); setLoadError("") } } catch (error) { if (active) setLoadError(error instanceof Error ? error.message : "No se pudo cargar el módulo") } finally { if (active) setReady(true) } })()
       return () => { active = false }
     }
     const catalogs = loadCatalogs()
@@ -240,11 +246,22 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
   const detailKind = detail ? config.kinds.find(k => k.id === detail.kind)! : kind
   const entryItem = items.find(i => i.id === entryTarget?.itemId)
   function openForm(item?: RecordItem) {
+    fieldRequest.current++; setResolvingField(false)
     if (item?.kind === "audit-finding" && completedFinding(item)) { toast.error("El hallazgo ya está cerrado y verificado. Conserva el cierre y registra una nueva acción."); return }
     refresh(); setEditingId(item?.id ?? null); setValues(item ? structuredClone(item.values) : deriveAssurance(kind.id, initialValues(kind), items)); setActivities(item ? structuredClone(item.activities) : []); setFormOpen(true)
   }
   function updateField(key: string, value: string | string[]) {
     const patch: Values = { [key]: value }
+    if (apiModule) {
+      const request = ++fieldRequest.current
+      setValues(prev => deriveAssurance(kind.id, { ...prev, ...patch }, items))
+      const needsDefaults = (kind.id === "statistical-event" && key === "investigationId") || (kind.id === "vehicle-profile" && key === "diagnosisVehicleId") || (kind.id === "vehicle-inspection" && key === "vehicleProfileId")
+      if (needsDefaults && typeof value === "string") {
+        setResolvingField(true)
+        void planningFieldDefaults(kind.id, key, value, items).then(defaults => { if (request === fieldRequest.current) setValues(prev => deriveAssurance(kind.id, { ...prev, ...defaults }, items)) }).catch(error => toast.error(error.message)).finally(() => { if (request === fieldRequest.current) setResolvingField(false) })
+      } else setResolvingField(false)
+      return
+    }
     if (kind.id === "statistical-event" && key === "investigationId" && typeof value === "string") Object.assign(patch, investigationDefaults(value))
     if (kind.id === "vehicle-profile" && key === "diagnosisVehicleId" && typeof value === "string") {
       const [diagnosisId, vehicleId] = value.split(":")
@@ -260,16 +277,24 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
   }
   async function save(event: FormEvent) {
     event.preventDefault()
-    if (mutating) return
+    if (mutating || resolvingField) return
     const currentCatalogs = apiModule ? catalogs : loadCatalogs()
     const existing = items.find(i => i.id === editingId)
     if (existing?.kind === "pesv-feedback" && existing.evidence.some(e => e.targetId === "RESPONSE")) { toast.error("La respuesta ya está documentada. Crea un nuevo registro para conservar su trazabilidad."); return }
     const derived = deriveAssurance(kind.id, values, items)
+    if (apiModule && kind.id === "vehicle-inspection") {
+      const profile = items.find(item => item.id === derived.vehicleProfileId)
+      if (profile && profile.values.vehicleType !== derived.vehicleType) { toast.error("El tipo inspeccionado debe coincidir con la hoja de vida del vehículo."); return }
+    }
+    if (apiModule && kind.id === "contractor-check") {
+      const contractor = items.find(item => item.id === derived.contractorId)
+      if (contractor?.values.pesvRequired === "Sí" && derived.check_pesv === "No aplica") { toast.error("El PESV es exigible para este contratista; no se puede marcar como No aplica."); return }
+    }
     if (kind.id === "statistical-event" && text(values.investigationId) && items.some(i => i.id !== editingId && i.kind === kind.id && i.values.investigationId === values.investigationId)) { toast.error("Esta investigación ya está en el registro estadístico. Edita el registro existente para evitar duplicados."); return }
     if (existing && ["statistical-analysis", "pesv-acpm-format"].includes(kind.id) && existing.evidence.length) { toast.error("El documento ya tiene evidencia. Crea una nueva versión para conservar su trazabilidad."); return }
     if (existing && kind.id === "pesv-audit" && documentedAudit(existing)) { toast.error("La auditoría ya tiene informe. Conserva su versión y registra una nueva auditoría."); return }
     if (existing && kind.id === "loss-matrix" && items.some(i => i.kind === "statistical-event" && i.values.matrixId === existing.id)) { toast.error("La matriz ya tiene siniestros asociados. Crea una nueva versión de los criterios."); return }
-    const error = validateRecord(kind, derived, activities, currentCatalogs, existing)
+    const error = validateRecord(kind, derived, activities, currentCatalogs, existing, !apiModule)
     if (error) { toast.error(error); return }
     if (["vehicle-inspection", "road-inspection", "contractor-check"].includes(kind.id) && existing?.evidence.length) { toast.error("Este registro ya tiene soportes. Crea una nueva inspección o verificación para conservar su trazabilidad."); return }
     if (kind.id === "archive-review" && items.some(i => i.id !== editingId && i.kind === kind.id && i.values.year === values.year && i.values.quarter === values.quarter)) { toast.error("Ya existe una revisión para este trimestre. Consulta el registro existente."); return }
@@ -279,7 +304,7 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
     const activeValues = Object.fromEntries(visibleFields(kind, derived).map(f => [f.key, typeof derived[f.key] === "string" ? text(derived[f.key]).trim() : derived[f.key]])) as Values
     if (kind.id === "audit-finding" && activeValues.efficacy !== "Pendiente") activeValues.verificationToken = existing?.values.verificationToken && ["efficacy", "verificationDate", "verificationNotes", "evaluatorId"].every(key => activeValues[key] === existing.values[key]) ? existing.values.verificationToken : crypto.randomUUID()
     if (kind.id === "archive-review") {
-      const files = loadInventory()
+      const files = apiModule ? inventory : loadInventory()
       activeValues.inventorySnapshot = `${files.length} evidencias; ${files.filter(e => e.until >= dateToday()).length} en conservación; ${files.filter(e => e.until < dateToday()).length} con plazo mínimo cumplido. Corte: ${dateToday()}.`
     }
     const links: Record<string, Option[]> = {}
@@ -287,7 +312,7 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
     const at = new Date().toISOString()
     if (apiModule) {
       setMutating(true)
-      try { await savePesv(planningResource(kind.id), planningPayload(kind, activeValues, activities, currentCatalogs, existing?.remoteVersion), existing?.id); await reloadRemote(); setYear(text(activeValues.year)); setFormOpen(false); toast.success("Registro guardado") }
+      try { await savePesv(planningResource(kind.id), planningPayload(kind, activeValues, activities, currentCatalogs, existing?.remoteVersion), existing?.id); setYear(text(activeValues.year)); setFormOpen(false); toast.success("Registro guardado"); await reloadRemote().catch(error => toast.error("Registro guardado, pero no se pudo actualizar la vista: " + error.message)) }
       catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo guardar el registro") }
       finally { setMutating(false) }
       return
@@ -296,18 +321,20 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
     if (persist(existing ? items.map(i => i.id === existing.id ? record : i) : [...items, record])) { setYear(text(activeValues.year)); setFormOpen(false); toast.success("Registro guardado") }
   }
   function openEntry(item: RecordItem, entryKind: Entry["kind"]) {
+    if (hasCumulativeProgress(item.kind) && entryKind === "FOLLOW_UP" && completion(item) >= 100) { toast.info(followUpProgressError(item, 0)); return }
     const last = item.entries.filter(e => e.kind === "FOLLOW_UP").at(-1)
-    setEntryForm({ date: dateToday(), observations: "", progress: String(completion(item)), measuredValue: String(last?.measuredValue ?? item.values.baseline ?? 0), medium: "Correo", audience: "Todos los colaboradores", conclusion: "", nextReviewDate: `${currentYear() + 1}${dateToday().slice(4)}` })
+    setEntryForm({ date: dateToday(), observations: "", progress: hasCumulativeProgress(item.kind) ? "" : String(completion(item)), measuredValue: String(last?.measuredValue ?? item.values.baseline ?? 0), medium: "Correo", audience: "Todos los colaboradores", conclusion: "", nextReviewDate: `${currentYear() + 1}${dateToday().slice(4)}` })
     setAttendeeIds([]); setEvaluationOutcome(""); setEntryTarget({ itemId: item.id, kind: entryKind })
   }
   async function saveEntry(event: FormEvent) {
     event.preventDefault()
     if (!entryTarget || !entryItem) return
     if (entryItem.kind === "audit-finding" && completedFinding(entryItem)) { toast.error("El hallazgo está cerrado y verificado. Registra una nueva acción para conservar el cierre."); return }
-    const start = text(entryItem.values.startDate) || text(entryItem.values.periodStart) || entryItem.createdAt.slice(0, 10)
-    const previous = entryItem.entries.filter(e => e.kind === entryTarget.kind).at(-1)
-    if (entryForm.date < start || entryForm.date > dateToday() || (previous && entryForm.date < previous.date)) { toast.error("La fecha debe ser posterior al inicio y al último registro, y no puede estar en el futuro."); return }
+    const dateError = entryDateError(entryItem, entryTarget.kind, entryForm.date)
+    if (dateError) { toast.error(dateError); return }
     const progress = Number(entryForm.progress), measuredValue = Number(entryForm.measuredValue)
+    const progressError = entryTarget.kind === "FOLLOW_UP" ? followUpProgressError(entryItem, progress) : null
+    if (progressError) { toast.error(progressError); return }
     if (entryTarget.kind === "FOLLOW_UP" && (!Number.isFinite(progress) || progress < 0 || progress > 100 || !Number.isFinite(measuredValue) || measuredValue < 0)) { toast.error("Revisa el avance (0–100%) y el valor medido."); return }
     if (entryItem.kind === "change" && entryTarget.kind === "FOLLOW_UP" && entryItem.values.decision !== "Aprobado") { toast.error("Aprueba el cambio antes de registrar su implementación."); return }
     if (entryItem.kind === "objective" && entryItem.values.unit === "Porcentaje (%)" && measuredValue > 100) { toast.error("La medición porcentual no puede superar 100."); return }
@@ -325,7 +352,15 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
       if (mutating) return
       setMutating(true)
       const payload = planningEntryPayload(entryItem.kind, entry)
-      try { await pesvRequest(`${pesvPath(planningResource(entryItem.kind), entryItem.id)}/entries`, "POST", payload); await reloadRemote(); setEntryTarget(null); toast.success("Registro guardado; ya puedes cargar su evidencia.") }
+      try {
+        await pesvRequest(`${pesvPath(planningResource(entryItem.kind), entryItem.id)}/entries`, "POST", payload)
+        setEntryTarget(null)
+        if (entryItem.kind === "audit-finding") {
+          await resetFindingVerification(entryItem.id).catch(error => toast.warning("Seguimiento guardado, pero no se pudo reiniciar la verificación: " + error.message))
+        }
+        toast.success("Registro guardado; ya puedes cargar su evidencia.")
+        await reloadRemote().catch(error => toast.error("No se pudo actualizar la vista: " + error.message))
+      }
       catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo guardar el seguimiento") }
       finally { setMutating(false) }
       return
@@ -347,11 +382,16 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
     setUploading(true)
     try {
       if (apiModule) {
-        await uploadPesvDocument(planningResource(owner?.kind ?? kind.id), uploadTarget.itemId, file, "", uploadTarget.targetId)
+        const target = owner ? await planningDocumentTarget(owner, uploadTarget.targetId) : { targetId: uploadTarget.targetId, description: "" }
+        await uploadPesvDocument(planningResource(owner?.kind ?? kind.id), uploadTarget.itemId, file, target.description, target.targetId)
         setUploadTarget(null); toast.success("Evidencia cargada")
         if (owner?.kind === "road-inspection") {
           try { await syncManagedRoadInspection(owner) }
           catch (error) { toast.warning("Evidencia guardada, pero no se pudo actualizar la próxima inspección: " + (error instanceof Error ? error.message : "")) }
+        }
+        if (owner?.kind === "contractor-check") {
+          try { await syncContractorVerification(owner) }
+          catch (error) { toast.warning("Evidencia guardada, pero no se pudo actualizar la próxima verificación: " + (error instanceof Error ? error.message : "")) }
         }
         await reloadRemote().catch(error => toast.error("No se pudo actualizar la vista: " + error.message))
         return
@@ -455,7 +495,8 @@ export default function PesvPlanningModule({ module }: { module: PesvModule }) {
     </Modal>
     <FormDrawer icon={entryTarget?.kind === "DIFFUSION" ? "meeting" : "tracking"} open={!!entryTarget} onOpenChange={open => !open && setEntryTarget(null)} title={entryTitle(entryTarget?.kind ?? "FOLLOW_UP")} footer={<><Button variant="outline" onClick={() => setEntryTarget(null)}>Cancelar</Button><Button disabled={mutating} form="pesv-entry-form" type="submit">Guardar</Button></>}>
       <form id="pesv-entry-form" onSubmit={saveEntry} className="grid gap-4 sm:grid-cols-2"><FormField label="Fecha"><Input aria-label="Fecha del registro" type="date" required max={dateToday()} value={entryForm.date} onChange={e => setEntryForm(prev => ({ ...prev, date: e.target.value }))} /></FormField>
-        {entryTarget?.kind === "FOLLOW_UP" && (entryItem?.kind === "objective" ? <FormField label={`Valor medido (${text(entryItem.values.unit)})`}><Input aria-label="Valor medido" required type="number" min={0} max={entryItem.values.unit === "Porcentaje (%)" ? 100 : undefined} step="any" value={entryForm.measuredValue} onChange={e => setEntryForm(prev => ({ ...prev, measuredValue: e.target.value }))} /></FormField> : <FormField label="Avance de cumplimiento (%)"><Input aria-label="Avance de cumplimiento" required type="number" min={0} max={100} value={entryForm.progress} onChange={e => setEntryForm(prev => ({ ...prev, progress: e.target.value }))} /></FormField>)}
+        {entryTarget?.kind === "FOLLOW_UP" && entryItem && hasCumulativeProgress(entryItem.kind) && <div className="sm:col-span-2 text-sm" aria-live="polite"><p>Avance acumulado: <strong>{completion(entryItem)}%</strong> · Pendiente: <strong>{Math.round((100 - completion(entryItem)) * 100) / 100}%</strong></p>{Number(entryForm.progress) > 0 && <p>Total con este seguimiento: <strong>{Math.round((completion(entryItem) + Number(entryForm.progress)) * 100) / 100}%</strong></p>}</div>}
+        {entryTarget?.kind === "FOLLOW_UP" && (entryItem?.kind === "objective" ? <FormField label={`Valor medido (${text(entryItem.values.unit)})`}><Input aria-label="Valor medido" required type="number" min={0} max={entryItem.values.unit === "Porcentaje (%)" ? 100 : undefined} step="any" value={entryForm.measuredValue} onChange={e => setEntryForm(prev => ({ ...prev, measuredValue: e.target.value }))} /></FormField> : <FormField label={hasCumulativeProgress(entryItem?.kind) ? "Avance adicional de este seguimiento (%)" : "Avance de cumplimiento (%)"}><Input aria-label="Avance de cumplimiento" required type="number" min={hasCumulativeProgress(entryItem?.kind) ? 0.01 : 0} max={entryItem && hasCumulativeProgress(entryItem.kind) ? Math.round((100 - completion(entryItem)) * 100) / 100 : 100} step={hasCumulativeProgress(entryItem?.kind) ? "0.01" : 1} value={entryForm.progress} onChange={e => setEntryForm(prev => ({ ...prev, progress: e.target.value }))} /></FormField>)}
         {entryTarget?.kind === "ANNUAL_REVIEW" && <><FormField label="Próxima revisión (máximo un año)"><Input aria-label="Próxima revisión" required type="date" value={entryForm.nextReviewDate} onChange={e => setEntryForm(prev => ({ ...prev, nextReviewDate: e.target.value }))} /></FormField><div className="sm:col-span-2"><FormField label="Conclusión, actualización y evaluación de resultados"><Textarea required aria-label="Conclusión de revisión" value={entryForm.conclusion} onChange={e => setEntryForm(prev => ({ ...prev, conclusion: e.target.value }))} /></FormField></div></>}
         {entryTarget?.kind === "DIFFUSION" && <><FormField label="Medio de divulgación"><PesvSelect ariaLabel="Medio de divulgación" value={entryForm.medium} onValueChange={value => setEntryForm(prev => ({ ...prev, medium: value }))} options={["Correo", "WhatsApp", "Reunión", "Cartelera", "Intranet", "Otro"].map(item => ({ value: item, label: item }))} /></FormField><div className="sm:col-span-2"><FormField label="Destinatarios / colaboradores informados"><Input aria-label="Destinatarios" required value={entryForm.audience} onChange={e => setEntryForm(prev => ({ ...prev, audience: e.target.value }))} /></FormField></div></>}
         {entryItem?.kind === "training-activity" && entryTarget?.kind === "FOLLOW_UP" && <><div className="sm:col-span-2"><FormField label="Colaboradores asistentes"><ReferenceInput field={{ key: "attendees", label: "Asistentes", section: "", multiple: true, reference: "people" }} value={attendeeIds} options={ids(entryItem.values.participantIds).map(id => catalogs.people.find(p => p.value === id) ?? entryItem.links.participantIds?.find(p => p.value === id)).filter((p): p is Option => Boolean(p))} onChange={v => setAttendeeIds(ids(v))} /></FormField></div><div className="sm:col-span-2"><FormField label="Resultado de evaluación del aprendizaje"><Textarea required aria-label="Resultado de aprendizaje" value={evaluationOutcome} onChange={e => setEvaluationOutcome(e.target.value)} /></FormField></div></>}
