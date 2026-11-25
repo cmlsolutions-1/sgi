@@ -1,7 +1,7 @@
 // components/manager/super-admin/SuperAdminDashboard.tsx
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { KeyRound, Loader2, LogOut, Save, ShieldCheck } from "lucide-react"
 import { doLogout } from "@/lib/auth/logout"
@@ -20,69 +20,15 @@ import { CiiuCard } from "@/components/manager/super-admin/dialogs/CiiuCard"
 import { CompaniesCard } from "@/components/manager/super-admin/dialogs/CompaniesCard"
 import { UsersCard } from "@/components/manager/super-admin/UsersCard"
 import { ManageModulesDialog } from "@/components/manager/super-admin/dialogs/ManageModulesDialog"
-import { getModulesByCompany, listModules, syncAdminCompanyPermissions } from "@/services/modulesService"
+import { getModulesByCompany, listModules } from "@/services/modulesService"
 import { listPermissions } from "@/services/permissionService"
-import { createRole, listRolesByCompany, updateRoleBySystemAdmin } from "@/services/roleService"
+import { listRolesByCompany, RolePermissionScopeError, updateRoleBySystemAdmin } from "@/services/roleService"
+import { activeParentModuleIds } from "@/lib/company-modules"
+import { groupCompanyPermissions, selectedInactiveParentPermissions } from "@/lib/manager/permission-groups"
 import type { Company } from "@/types/manager/super-admin"
 import type { Module } from "@/types/manager/module"
 import type { Permission } from "@/types/manager/permission"
 import type { Role } from "@/types/manager/role"
-
-const childModulesStoragePrefix = "sgi:company-child-modules:"
-
-function readStoredChildModuleIds(companyId: string): string[] | null {
-  if (typeof window === "undefined") return null
-
-  try {
-    const rawValue = window.localStorage.getItem(`${childModulesStoragePrefix}${companyId}`)
-    if (rawValue === null) return null
-
-    const parsed = JSON.parse(rawValue)
-    return Array.isArray(parsed) ? parsed.filter((value): value is string => typeof value === "string") : null
-  } catch {
-    return null
-  }
-}
-
-function normalizeActiveModuleIds(activeModules: Module[], moduleCatalog: Module[]): string[] {
-  const parentIds = new Set(moduleCatalog.map((module) => module.id))
-
-  return Array.from(new Set(activeModules.flatMap((module) => {
-    if (module.parentId) return [module.id]
-
-    return parentIds.has(module.id) ? [module.id] : []
-  })))
-}
-
-function countActiveChildModules(company: Company, moduleCatalog: Module[]) {
-  const validChildIds = new Set(moduleCatalog.flatMap((module) => module.children.map((child) => child.id)))
-  const storedChildIds = readStoredChildModuleIds(company.id)
-
-  if (storedChildIds) {
-    return storedChildIds.filter((moduleId) => validChildIds.has(moduleId)).length
-  }
-
-  const activeIds = new Set(company.activeModules)
-  const activeChildIds = new Set<string>()
-
-  moduleCatalog.forEach((module) => {
-    if (activeIds.has(module.id)) {
-      module.children.forEach((child) => activeChildIds.add(child.id))
-      return
-    }
-
-    module.children.forEach((child) => {
-      if (activeIds.has(child.id)) activeChildIds.add(child.id)
-    })
-  })
-
-  return activeChildIds.size
-}
-
-function getPermissionGroup(permissionName: string) {
-  const [, ...rest] = permissionName.split(" ")
-  return rest.join(" ").trim() || "General"
-}
 
 function normalizeRolePermissionIds(role: Role | null, permissions: Permission[]): string[] {
   if (!role) return []
@@ -141,6 +87,13 @@ export default function SuperAdminDashboard() {
   const [loadingPermissions, setLoadingPermissions] = useState(false)
   const [savingPermissions, setSavingPermissions] = useState(false)
   const [moduleCatalog, setModuleCatalog] = useState<Module[]>([])
+  const [catalogError, setCatalogError] = useState<string | null>(null)
+  const [loadingCatalog, setLoadingCatalog] = useState(true)
+  const [permissionsError, setPermissionsError] = useState<string | null>(null)
+  const [rejectedPermissionIds, setRejectedPermissionIds] = useState<string[]>([])
+  const permissionsRequest = useRef(0)
+  const selectedCompanyId = useRef(selectedCompany?.id)
+  selectedCompanyId.current = selectedCompany?.id
 
   // ✅ Seleccionar primera empresa automáticamente
   useEffect(() => {
@@ -149,37 +102,36 @@ export default function SuperAdminDashboard() {
     }
   }, [companies, selectedCompany, selectCompany])
 
-  useEffect(() => {
-    listModules()
-      .then(setModuleCatalog)
-      .catch((error) => {
-        console.warn("No se pudo cargar el catalogo de modulos:", error)
-      })
+  const loadModuleCatalog = useCallback(async () => {
+    setLoadingCatalog(true); setCatalogError(null)
+    try { setModuleCatalog(await listModules()) }
+    catch (error) { setCatalogError((error as Error).message ?? "No se pudo cargar el catálogo de módulos") }
+    finally { setLoadingCatalog(false) }
   }, [])
+
+  useEffect(() => { void loadModuleCatalog() }, [loadModuleCatalog])
 
   // ✅ Función PURA: solo obtiene módulos, NO actualiza estado
   // Esto evita dependencias circulares
   const fetchCompanyModules = useCallback(async (companyId: string): Promise<string[]> => {
     try {
       const [moduleCatalog, modulesData] = await Promise.all([listModules(), getModulesByCompany(companyId)])
-      return normalizeActiveModuleIds(modulesData, moduleCatalog)
+      return activeParentModuleIds(modulesData, moduleCatalog)
     } catch (err) {
       console.error("Error cargando módulos:", err)
-      return []
+      throw err
     }
   }, [])
 
   // ✅ Cargar detalles cuando cambia el ID de la empresa
   useEffect(() => {
+    let cancelled = false
     const loadCompanyDetails = async () => {
       if (!selectedCompany) return
 
-      console.log("🔄 Cargando detalles para empresa:", selectedCompany.id)
-
       // Obtener módulos (fetch puro)
       const activeModuleIds = await fetchCompanyModules(selectedCompany.id)
-
-      console.log("✅ Módulos obtenidos:", activeModuleIds)
+      if (cancelled) return
 
       // Actualizar selectedCompany
       const updatedCompany: Company = {
@@ -195,7 +147,8 @@ export default function SuperAdminDashboard() {
       await fetchUsers()
     }
 
-    loadCompanyDetails()
+    loadCompanyDetails().catch(error => { if (!cancelled) toast.error(error.message ?? "No se pudieron cargar los módulos") })
+    return () => { cancelled = true }
   }, [selectedCompany?.id, fetchCompanyModules, selectCompany, updateCompanyInList, fetchUsers])
 
   async function handleLogout() {
@@ -206,6 +159,7 @@ export default function SuperAdminDashboard() {
     if (!selectedCompany) return
 
     const activeModuleIds = activeModuleIdsFromSave ?? await fetchCompanyModules(selectedCompany.id)
+    if (selectedCompanyId.current !== selectedCompany.id) return
     const updatedCompany: Company = {
       ...selectedCompany,
       activeModules: activeModuleIds,
@@ -225,18 +179,14 @@ export default function SuperAdminDashboard() {
     ? selectedCompany.activeModules.length > 0
     : false
 
-  const groupedPermissions = useMemo(() => {
-    return permissions.reduce<Record<string, Permission[]>>((groups, permission) => {
-      const group = getPermissionGroup(permission.name)
-      groups[group] = groups[group] ?? []
-      groups[group].push(permission)
-      return groups
-    }, {})
-  }, [permissions])
-
-  const permissionGroups = useMemo(() => Object.keys(groupedPermissions).sort(), [groupedPermissions])
+  const permissionHierarchy = useMemo(() => groupCompanyPermissions(permissions, moduleCatalog), [permissions, moduleCatalog])
+  const blockedPermissionIds = useMemo(() => new Set([
+    ...selectedInactiveParentPermissions(permissions, moduleCatalog, selectedCompany?.activeModules ?? [], selectedPermissionIds).map(permission => permission.id),
+    ...rejectedPermissionIds.filter(id => selectedPermissionIds.includes(id)),
+  ]), [permissions, moduleCatalog, selectedCompany?.activeModules, selectedPermissionIds, rejectedPermissionIds])
 
   const loadAdminCompanyPermissions = useCallback(async () => {
+    const request = ++permissionsRequest.current
     if (!selectedCompany) {
       setAdminCompanyRole(null)
       setSelectedPermissionIds([])
@@ -244,22 +194,29 @@ export default function SuperAdminDashboard() {
     }
 
     setLoadingPermissions(true)
+    setPermissionsError(null)
+    setRejectedPermissionIds([])
+    setAdminCompanyRole(null)
+    setSelectedPermissionIds([])
+    setPermissions([])
     try {
       const [permissionsData, rolesData] = await Promise.all([
         listPermissions(),
         listRolesByCompany(selectedCompany.id),
       ])
       const role = rolesData.find((item) => item.name === "ADMIN_COMPANY") ?? null
-
+      if (request !== permissionsRequest.current || selectedCompanyId.current !== selectedCompany.id) return
       setPermissions(permissionsData)
       setAdminCompanyRole(role)
       setSelectedPermissionIds(normalizeRolePermissionIds(role, permissionsData))
     } catch (error: any) {
+      if (request !== permissionsRequest.current) return
+      setPermissionsError(error.message ?? "No se pudieron cargar los permisos")
       toast.error(error.message ?? "No se pudieron cargar los permisos")
     } finally {
-      setLoadingPermissions(false)
+      if (request === permissionsRequest.current) setLoadingPermissions(false)
     }
-  }, [selectedCompany])
+  }, [selectedCompany?.id])
 
   useEffect(() => {
     loadAdminCompanyPermissions()
@@ -273,12 +230,12 @@ export default function SuperAdminDashboard() {
     )
   }
 
-  function togglePermissionGroup(group: string) {
-    const groupIds = (groupedPermissions[group] ?? []).map((permission) => permission.id)
+  function togglePermissionGroup(items: Permission[], enabled = true) {
+    const groupIds = items.map((permission) => permission.id)
     const allSelected = groupIds.every((id) => selectedPermissionIds.includes(id))
 
     setSelectedPermissionIds((current) =>
-      allSelected
+      allSelected || !enabled
         ? current.filter((id) => !groupIds.includes(id))
         : Array.from(new Set([...current, ...groupIds])),
     )
@@ -290,41 +247,45 @@ export default function SuperAdminDashboard() {
       return
     }
 
-    if (selectedPermissionIds.length === 0) {
-      toast.error("Selecciona al menos un permiso")
+    if (!adminCompanyRole || loadingPermissions || savingPermissions || permissionsError || catalogError || loadingCatalog) {
+      toast.error("No se puede guardar sin cargar el rol ADMIN_COMPANY de esta empresa")
+      return
+    }
+
+    if (blockedPermissionIds.size) {
+      toast.error("Revisa los permisos señalados: habilita su módulo padre o retíralos de la selección antes de guardar.")
       return
     }
 
     setSavingPermissions(true)
     try {
+      const assigned = await getModulesByCompany(selectedCompany.id)
+      if (selectedCompanyId.current !== selectedCompany.id) return
+      const activeModules = activeParentModuleIds(assigned, moduleCatalog)
+      const updatedCompany = { ...selectedCompany, activeModules }
+      selectCompany(updatedCompany)
+      updateCompanyInList(updatedCompany)
+      if (selectedInactiveParentPermissions(permissions, moduleCatalog, activeModules, selectedPermissionIds).length) {
+        toast.error("Los módulos activos de la empresa cambiaron. Revisa los permisos señalados antes de guardar.")
+        return
+      }
       const payload = {
         name: "ADMIN_COMPANY",
-        description: "Administrador de empresa",
+        description: adminCompanyRole.description ?? "Administrador de empresa",
         permissionIds: selectedPermissionIds,
       }
 
-      if (adminCompanyRole) {
-        await updateRoleBySystemAdmin(adminCompanyRole.id, selectedCompany.id, payload)
-      } else {
-        const created = await createRole(payload)
-        setAdminCompanyRole(created)
-      }
-
+      await updateRoleBySystemAdmin(adminCompanyRole.id, selectedCompany.id, payload)
+      if (selectedCompanyId.current !== selectedCompany.id) return
       toast.success("Permisos de ADMIN_COMPANY actualizados")
       await loadAdminCompanyPermissions()
     } catch (error: any) {
-      if (selectedCompany && String(error.message ?? "").includes("permisos no están permitidos")) {
-        try {
-          await syncAdminCompanyPermissions(selectedCompany.id)
-          toast.success("Permisos sincronizados con los modulos activos")
-          await loadAdminCompanyPermissions()
-          return
-        } catch (syncError: any) {
-          toast.error(syncError.message ?? "No se pudieron sincronizar los permisos")
-          return
-        }
+      if (selectedCompanyId.current !== selectedCompany.id) return
+      if (error instanceof RolePermissionScopeError && error.rejectedPermissionIds.length) {
+        setRejectedPermissionIds(error.rejectedPermissionIds)
+        toast.error(`El servidor rechazó ${error.rejectedPermissionIds.length} permisos. Revisa el detalle señalado en el panel.`)
+        return
       }
-
       toast.error(error.message ?? "No se pudieron guardar los permisos")
     } finally {
       setSavingPermissions(false)
@@ -426,7 +387,7 @@ export default function SuperAdminDashboard() {
       />
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-6">
+        <div className="min-w-0 lg:col-span-2 space-y-6">
           <CompaniesCard
             companies={companies}
             selectedCompany={selectedCompany}
@@ -434,7 +395,7 @@ export default function SuperAdminDashboard() {
             onCreateCompany={handleCreateCompany}
             onUpdateCompany={handleUpdateCompany}
             onToggleCompanyStatus={handleToggleCompanyStatus}
-            getActiveChildModuleCount={(company) => countActiveChildModules(company, moduleCatalog)}
+            getActiveParentModuleCount={(company) => new Set(company.activeModules.filter(id => moduleCatalog.some(module => module.id === id && module.parentId === null))).size}
             onOpenModules={(company) => {
               selectCompany(company)
               setModulesOpen(true)
@@ -455,15 +416,15 @@ export default function SuperAdminDashboard() {
           />
         </div>
 
-        <div className="space-y-6">
-          <Card className="bg-card border-border">
+        <div className="min-w-0 space-y-6">
+          <Card className="min-w-0 bg-card border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base font-medium">
                 <ShieldCheck className="h-5 w-5" />
                 Permisos ADMIN_COMPANY
               </CardTitle>
               <CardDescription>
-                Activa los permisos del rol administrador de la empresa seleccionada.
+                Accesos del rol administrador, organizados por módulo padre y submódulo.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -471,11 +432,17 @@ export default function SuperAdminDashboard() {
                 <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
                   Selecciona una empresa para gestionar sus permisos.
                 </div>
-              ) : loadingPermissions ? (
+              ) : loadingPermissions || loadingCatalog ? (
                 <div className="flex items-center justify-center py-10 text-sm text-muted-foreground">
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Cargando permisos...
                 </div>
+              ) : catalogError ? (
+                <div role="alert" className="space-y-3 text-sm text-destructive"><p>{catalogError}</p><Button variant="outline" onClick={loadModuleCatalog}>Reintentar</Button></div>
+              ) : permissionsError ? (
+                <div role="alert" className="space-y-3 text-sm text-destructive"><p>{permissionsError}</p><Button variant="outline" onClick={loadAdminCompanyPermissions}>Reintentar</Button></div>
+              ) : !adminCompanyRole ? (
+                <p role="alert" className="text-sm text-muted-foreground">Esta empresa no tiene un rol ADMIN_COMPANY disponible. No se creará un rol en otra empresa.</p>
               ) : (
                 <>
                   <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-secondary/50 p-3">
@@ -483,47 +450,43 @@ export default function SuperAdminDashboard() {
                       <KeyRound className="h-4 w-4 text-muted-foreground" />
                       {selectedCompany.name}
                     </div>
-                    <Badge variant="secondary">{selectedPermissionIds.length} permisos</Badge>
+                    <Badge variant="secondary">{selectedPermissionIds.length} {selectedPermissionIds.length === 1 ? "permiso" : "permisos"}</Badge>
                   </div>
 
+                  {blockedPermissionIds.size > 0 && <section role="alert" className="space-y-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-900">
+                    <h4 className="font-semibold">Permisos que requieren revisión ({blockedPermissionIds.size})</h4>
+                    <p>La selección contiene permisos de padres inactivos o rechazados por el servidor. No se ha guardado ningún cambio.</p>
+                    <ul className="max-h-36 list-disc space-y-1 overflow-y-auto pl-4">{[...blockedPermissionIds].map(id => <li key={id}>{permissions.find(permission => permission.id === id)?.name ?? `Permiso ${id}`}</li>)}</ul>
+                    <Button variant="outline" className="h-auto w-full whitespace-normal border-red-300 text-red-900 hover:bg-red-100" disabled={savingPermissions} onClick={() => setSelectedPermissionIds(current => current.filter(id => !blockedPermissionIds.has(id)))}>Retirar estos permisos de la selección</Button>
+                    <p className="text-xs">Luego revisa la selección y pulsa Guardar permisos. Si necesitas esos accesos, verifica primero la activación de su padre y vuelve a consultar los permisos.</p>
+                    {!!rejectedPermissionIds.length && <Button variant="ghost" size="sm" disabled={savingPermissions} onClick={loadAdminCompanyPermissions}>Volver a consultar permisos</Button>}
+                  </section>}
+
                   <div className="max-h-[520px] space-y-3 overflow-y-auto pr-1">
-                    {permissionGroups.length === 0 ? (
+                    {permissions.length === 0 ? (
                       <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
                         No hay permisos disponibles.
                       </div>
                     ) : (
-                      permissionGroups.map((group) => {
-                        const items = groupedPermissions[group] ?? []
-                        const selectedCount = items.filter((permission) => selectedPermissionIds.includes(permission.id)).length
-
-                        return (
-                          <div key={group} className="rounded-lg border border-border bg-white p-3">
-                            <div className="mb-2 flex items-center justify-between gap-3">
-                              <button
-                                type="button"
-                                onClick={() => togglePermissionGroup(group)}
-                                className="text-left text-sm font-semibold text-foreground hover:text-primary"
-                              >
-                                {group}
-                              </button>
-                              <Badge variant="outline" className="text-xs">
-                                {selectedCount}/{items.length}
-                              </Badge>
-                            </div>
-                            <div className="space-y-2">
-                              {items.map((permission) => (
-                                <label key={permission.id} className="flex items-center gap-3 rounded-md bg-secondary/40 p-2 text-sm">
-                                  <Checkbox
-                                    checked={selectedPermissionIds.includes(permission.id)}
-                                    onCheckedChange={() => togglePermission(permission.id)}
-                                  />
-                                  <span>{permission.name}</span>
-                                </label>
-                              ))}
-                            </div>
-                          </div>
-                        )
-                      })
+                      <>
+                        {permissionHierarchy.groups.map(({ parent, children }) => {
+                          const active = selectedCompany.activeModules.includes(parent.id)
+                          const items = children.flatMap(child => child.permissions)
+                          const selectedCount = items.filter(permission => selectedPermissionIds.includes(permission.id)).length
+                          return <details key={parent.id} open={active || selectedCount > 0} className="border-b border-border pb-3">
+                            <summary className="cursor-pointer py-2 text-sm font-semibold text-foreground"><span>{parent.name}</span><span className={`ml-2 text-xs font-normal ${active ? "text-green-700" : "text-muted-foreground"}`}>{active ? "Padre activo" : "Padre inactivo"} · {selectedCount}/{items.length}</span></summary>
+                            {children.filter(child => child.permissions.length).map(({ child, permissions: childPermissions }) => {
+                              const count = childPermissions.filter(permission => selectedPermissionIds.includes(permission.id)).length
+                              return <fieldset key={child.id} className="mt-2 min-w-0 border-l-2 border-sky-200 pl-3">
+                                <legend className="max-w-full py-1 text-sm font-medium">{child.name}</legend>
+                                <label className="mb-2 flex items-center gap-2 text-xs text-muted-foreground"><Checkbox aria-label={`Todos los permisos de ${parent.name}: ${child.name}`} checked={count === childPermissions.length ? true : count ? "indeterminate" : false} disabled={savingPermissions || (!active && count === 0)} onCheckedChange={() => togglePermissionGroup(childPermissions, active)} />Todos los permisos <span>({count}/{childPermissions.length})</span></label>
+                                <div className="space-y-1">{childPermissions.map(permission => <label key={permission.id} className="flex items-start gap-2 rounded-md px-1 py-1.5 text-sm hover:bg-secondary/40"><Checkbox className="mt-0.5 shrink-0" checked={selectedPermissionIds.includes(permission.id)} disabled={savingPermissions || (!active && !selectedPermissionIds.includes(permission.id))} onCheckedChange={() => togglePermission(permission.id)} /><span className="min-w-0 break-words">{permission.name}</span></label>)}</div>
+                              </fieldset>
+                            })}
+                          </details>
+                        })}
+                        {!!permissionHierarchy.unknown.length && <section className="border-t pt-3"><h4 className="text-sm font-semibold">Sin submódulo identificado</h4><p className="mt-1 text-xs text-muted-foreground">El catálogo no permite identificar su módulo. No se habilitan nuevas asignaciones desde este grupo.</p>{permissionHierarchy.unknown.map(permission => <label key={permission.id} className="flex items-start gap-2 py-2 text-sm"><Checkbox checked={selectedPermissionIds.includes(permission.id)} disabled={savingPermissions || !selectedPermissionIds.includes(permission.id)} onCheckedChange={() => togglePermission(permission.id)} /><span className="min-w-0 break-words">{permission.name}</span></label>)}</section>}
+                      </>
                     )}
                   </div>
 
@@ -531,7 +494,7 @@ export default function SuperAdminDashboard() {
                     type="button"
                     className="w-full gap-2"
                     onClick={handleSaveAdminCompanyPermissions}
-                    disabled={savingPermissions || permissions.length === 0}
+                    disabled={savingPermissions || loadingPermissions || !moduleCatalog.length}
                   >
                     {savingPermissions ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                     Guardar permisos

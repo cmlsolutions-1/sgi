@@ -31,7 +31,7 @@ type Props = {
     email: string
   }) => Promise<void>
   onToggleCompanyStatus: (company: Company) => Promise<void>
-  getActiveChildModuleCount: (company: Company) => number
+  getActiveParentModuleCount: (company: Company) => number
   onOpenModules: (company: Company) => void
 }
 
@@ -42,7 +42,7 @@ export function CompaniesCard({
   onCreateCompany,
   onUpdateCompany,
   onToggleCompanyStatus,
-  getActiveChildModuleCount,
+  getActiveParentModuleCount,
   onOpenModules,
 }: Props) {
   const [updatingCompanyId, setUpdatingCompanyId] = useState<string | null>(null)
@@ -71,7 +71,7 @@ export function CompaniesCard({
         <div className="space-y-3">
           {companies.map((company) => {
             const isSelected = selectedCompany?.id === company.id
-            const activeChildModules = getActiveChildModuleCount(company)
+            const activeParentModules = getActiveParentModuleCount(company)
             const isUpdatingStatus = updatingCompanyId === company.id
             return (
               <div
@@ -112,7 +112,7 @@ export function CompaniesCard({
                     <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
                       <span>{company.totalUsers} usuarios</span>
                       <span>•</span>
-                      <span>{activeChildModules} módulos hijos activos</span>
+                      <span>{activeParentModules} módulos padres activos</span>
                       <span>•</span>
                       <span>Creada: {new Date(company.registrationDate).toLocaleDateString("es-ES")}</span>
                     </div>

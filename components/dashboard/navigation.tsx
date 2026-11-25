@@ -343,14 +343,8 @@ function collectModuleCodes(modules: ModuleNode[]): Set<string> {
   return codes
 }
 
-const alwaysVisibleCodes = new Set<string>([
-  "DATA_PROCESSING",
-  "DATA_AUTHORIZATIONS",
-])
-
 const moduleCodeAliases: Record<string, string[]> = {
   DOCUMENTS: ["DOCUMENTS", "DOCUMENT", "DOCUMENT_MANAGEMENT", "DOCUMENTAL_MANAGEMENT"],
-  INCIDENTS: ["INCIDENTS", "LABOR"],
   DATA_PROCESSING: ["DATA_PROCESSING", "DATA_CONSENT", "PERSONAL_DATA", "PERSONAL_DATA_PROCESSING"],
   DATA_AUTHORIZATIONS: [
     "DATA_AUTHORIZATIONS",
@@ -362,7 +356,6 @@ const moduleCodeAliases: Record<string, string[]> = {
 }
 
 function isCodeAllowed(code: string, allowedCodes: Set<string>) {
-  if (alwaysVisibleCodes.has(code)) return true
   if (code === "PESV" || pesvModuleCodes.includes(code)) return isPesvModuleAllowed(code, allowedCodes)
 
   const aliases = moduleCodeAliases[code] ?? [code]
@@ -392,6 +385,7 @@ function getDirectChildCodesByParentCode(modules: ModuleNode[], parentCode: stri
 
   parents.forEach((parent) => {
     parent.children?.forEach((child) => codes.add(child.code))
+    modules.filter(module => module.parentId === parent.id).forEach(child => codes.add(child.code))
   })
 
   return codes
@@ -403,32 +397,14 @@ function isSubItemAllowed(
   modules: ModuleNode[],
   allowedCodes: Set<string>,
 ) {
-  if (!subItem.code) return true
-  if (alwaysVisibleCodes.has(subItem.code)) return true
+  if (!subItem.code) return false
   if (!parentCode) return isCodeAllowed(subItem.code, allowedCodes)
   if (subItem.code === parentCode) return isCodeAllowed(parentCode, allowedCodes)
-  if (subItem.code === "INVESTIGATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "SPECIAL_RISK" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "CUSTODY" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "EMPLOYEE_ANALYTICS" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "SST_TRAINING_CERTIFICATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "SST_OBJECTIVES" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "SST_INDICATORS" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "SST_AUDITS" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "INITIAL_EVALUATION" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "ACCOUNTABILITY" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "LEGAL_MATRIX" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "SST_COMMUNICATIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "HEALTHY_LIFESTYLES" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "HYGIENE_SERVICES" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "WASTE_MANAGEMENT" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "HAZARDOUS_SUBSTANCES" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "ENVIRONMENTAL_MEASUREMENTS" && isCodeAllowed(parentCode, allowedCodes)) return true
-  if (subItem.code === "INSPECTIONS" && isCodeAllowed(parentCode, allowedCodes)) return true
   const parentChildCodes = getDirectChildCodesByParentCode(modules, parentCode)
 
-  if (parentChildCodes.size === 0) {
-    return isCodeAllowed(subItem.code, allowedCodes)
+  if (!findModulesByCode(modules, parentCode).length) {
+    const explicitChildren = modules.filter(module => module.parentId !== null)
+    return isCodeAllowed(subItem.code, collectModuleCodes(explicitChildren))
   }
 
   const aliases = moduleCodeAliases[subItem.code] ?? [subItem.code]
@@ -472,7 +448,7 @@ export function getFirstAllowedNavigationHref(modules: ModuleNode[]): string {
 }
 
 export function isDashboardPathAllowed(pathname: string, modules: ModuleNode[]): boolean {
-  if (pathname === "/dashboard" || pathname.startsWith("/dashboard/settings")) {
+  if (pathname === "/dashboard" || pathname === "/dashboard/settings" || pathname.startsWith("/dashboard/settings/")) {
     return true
   }
 
@@ -489,7 +465,7 @@ export function isDashboardPathAllowed(pathname: string, modules: ModuleNode[]):
 
   return items.some((item) => {
     if (!hasSubItems(item)) {
-      return pathname === item.href || pathname.startsWith(`${item.href}/`)
+      return pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(`${item.href}/`))
     }
 
     return item.subItems.some((subItem) => pathname === subItem.href || pathname.startsWith(`${subItem.href}/`))

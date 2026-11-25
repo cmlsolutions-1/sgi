@@ -15,6 +15,7 @@ export async function GET(req: Request) {
 
   const r = await fetch(`${API_URL}/api/modules/me`, {
     method: "GET",
+    cache: "no-store",
     headers: { Authorization: auth },
   });
 
@@ -27,5 +28,5 @@ export async function GET(req: Request) {
     );
   }
 
-  return NextResponse.json(data, { status: 200 });
+  return NextResponse.json(data, { status: 200, headers: { "Cache-Control": "private, no-store" } });
 }

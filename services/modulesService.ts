@@ -30,14 +30,14 @@ async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
  * ✅ Usado en login/page.tsx
  */
 export async function getMyModules(): Promise<ModuleNode[]> {
-  const res = await apiFetch("/api/modules/me", { method: "GET" })
+  const res = await apiFetch("/api/modules/me", { method: "GET", cache: "no-store" })
   const json = await res.json().catch(() => null)
 
-  if (!res.ok) {
+  if (!res.ok || !json?.ok || !Array.isArray(json.data)) {
     throw new Error(json?.message ?? "No se pudo cargar módulos")
   }
 
-  return (json?.data ?? []) as ModuleNode[]
+  return json.data as ModuleNode[]
 }
 
 /**

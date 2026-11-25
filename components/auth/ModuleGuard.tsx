@@ -1,56 +1,26 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { getMyModules } from "@/services/modulesService"
-import { useAuthStore } from "@/store/auth.store"
+import { useModuleAccess } from "@/components/auth/ModuleAccessProvider"
+import { Button } from "@/components/ui/button"
 import { getFirstAllowedNavigationHref, isDashboardPathAllowed } from "@/components/dashboard/navigation"
 
 export default function ModuleGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
-  const accessToken = useAuthStore((s) => s.accessToken)
-  const modules = useAuthStore((s) => s.modules)
-  const setModules = useAuthStore((s) => s.setModules)
-  const [loading, setLoading] = useState(modules.length === 0)
-
-  useEffect(() => {
-    if (!accessToken) {
-      setLoading(false)
-      return
-    }
-
-    if (modules.length > 0) {
-      setLoading(false)
-      return
-    }
-
-    let active = true
-
-    getMyModules()
-      .then((userModules) => {
-        if (!active) return
-        setModules(userModules)
-        setLoading(false)
-      })
-      .catch(() => {
-        if (!active) return
-        setLoading(false)
-      })
-
-    return () => {
-      active = false
-    }
-  }, [accessToken, modules.length, setModules])
+  const { modules, loading, error, refresh } = useModuleAccess()
 
   const allowed = useMemo(() => isDashboardPathAllowed(pathname, modules), [pathname, modules])
   const fallbackHref = useMemo(() => getFirstAllowedNavigationHref(modules), [modules])
 
   useEffect(() => {
-    if (loading || allowed) return
+    if (loading || error || allowed) return
 
     router.replace(fallbackHref)
-  }, [allowed, fallbackHref, loading, router])
+  }, [allowed, fallbackHref, loading, error, router])
+
+  if (error) return <div role="alert" className="space-y-3 p-4 text-sm"><p>No se pudieron verificar tus módulos autorizados.</p><Button variant="outline" onClick={() => void refresh()}>Reintentar</Button></div>
 
   if (loading || !allowed) {
     return (

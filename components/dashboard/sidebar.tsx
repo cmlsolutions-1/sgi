@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { doLogout } from "@/lib/auth/logout";
 import { filterNavigationByModules, navigation } from "./navigation"
-import { getMyModules } from "@/services/modulesService";
-import { useAuthStore } from "@/store/auth.store";
+import { useModuleAccess } from "@/components/auth/ModuleAccessProvider";
 
 
 import { useEffect, useMemo, useState } from "react";
@@ -70,21 +69,8 @@ export function Sidebar() {
   const pathname = usePathname();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [loggingOut, setLoggingOut] = useState(false);
-  const accessToken = useAuthStore((s) => s.accessToken);
-  const modules = useAuthStore((s) => s.modules);
-  const setModules = useAuthStore((s) => s.setModules);
+  const { modules } = useModuleAccess();
   const visibleNavigation = useMemo(() => filterNavigationByModules(navigation, modules), [modules]);
-
-  useEffect(() => {
-    if (!accessToken || loggingOut) return;
-    if (modules.length > 0) return;
-
-    getMyModules()
-      .then(setModules)
-      .catch((error) => {
-        console.warn("No se pudieron cargar los modulos del usuario:", error);
-      });
-  }, [accessToken, loggingOut, modules.length, setModules]);
 
   useEffect(() => {
     const activeGroup = visibleNavigation.find((item) =>
@@ -298,21 +284,8 @@ export function MobileSidebar({
 }) {
   const pathname = usePathname();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const accessToken = useAuthStore((s) => s.accessToken);
-  const modules = useAuthStore((s) => s.modules);
-  const setModules = useAuthStore((s) => s.setModules);
+  const { modules } = useModuleAccess();
   const visibleNavigation = useMemo(() => filterNavigationByModules(navigation, modules), [modules]);
-
-  useEffect(() => {
-    if (!accessToken) return;
-    if (modules.length > 0) return;
-
-    getMyModules()
-      .then(setModules)
-      .catch((error) => {
-        console.warn("No se pudieron cargar los modulos del usuario:", error);
-      });
-  }, [accessToken, modules.length, setModules]);
 
   useEffect(() => {
     const activeGroup = visibleNavigation.find((item) =>
