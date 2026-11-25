@@ -10,3 +10,6 @@ npm-debug.log*
 pnpm-debug.log*
 tsconfig.tsbuildinfo
 Thumbs.db
+
+# Respaldos locales de recuperacion
+*.pre-recuperacion
