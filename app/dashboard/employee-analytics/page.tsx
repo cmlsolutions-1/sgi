@@ -23,6 +23,7 @@ import {
   UserRound,
 } from "lucide-react"
 import { toast } from "sonner"
+import { downloadCorporatePdfBlob } from "@/lib/pdf/safecloud-corporate-pdf"
 
 import { AnalyticsBarChart, AnalyticsChartCard, AnalyticsDonutChart } from "@/components/dashboard/analytics-charts"
 import {
@@ -942,12 +943,7 @@ export default function EmployeeAnalyticsPage() {
   async function downloadAnalysisPdf(record: AnalysisRecord) {
     try {
       const blob = await exportEmployeeAnalyticsPdf(record.id)
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement("a")
-      link.href = url
-      link.download = `estadisticas-analisis-${record.year}-${record.incidentType}.pdf`
-      link.click()
-      URL.revokeObjectURL(url)
+      await downloadCorporatePdfBlob(blob, { documentName: "Estadísticas y Análisis" }, `estadisticas-analisis-${record.year}-${record.incidentType}.pdf`)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo descargar el análisis")
     }

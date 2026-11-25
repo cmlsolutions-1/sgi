@@ -1,4 +1,4 @@
-import { operationalConfigs, operationalStatus, validateOperationalRecord } from "./operations"
+import { cumulativeProgress, hasCumulativeProgress, operationalConfigs, operationalStatus, validateOperationalRecord } from "./operations"
 import { assuranceConfigs, assuranceStatus, validateAssurance } from "./assurance"
 
 export type PesvModule = "objectives" | "programs" | "work-plan" | "training" | "behavior" | "emergencies" | "managed-roads" | "journeys" | "vehicle-inspections" | "change-contractors" | "document-retention" | "statistics" | "audits" | "improvement" | "communications"
@@ -7,7 +7,7 @@ export type Option = { value: string; label: string; description?: string; eligi
 export type Reference = "policies" | "risks" | "objectives" | "programs" | "people" | "competencies" | "trainingActivities" | "procedures" | "routes" | "vehicles" | "emergencyPlans" | "workActivities" | "managedRoads" | "roadProtocols" | "journeyProcedures" | "journeys" | "vehicleProfiles" | "inspectionProcedures" | "changeProcedures" | "contractors" | "archiveProcedures" | "roadInvestigations" | "lossMatrices" | "auditProcedures" | "pesvAudits" | "auditFindings" | "communicationMechanisms"
 export type Field = {
   key: string; label: string; section: string
-  type?: "text" | "textarea" | "number" | "date" | "year" | "money" | "select" | "reference"
+  type?: "text" | "textarea" | "number" | "date" | "time" | "year" | "money" | "select" | "reference"
   required?: boolean; options?: string[]; reference?: Reference; multiple?: boolean
   min?: number; max?: number; showFor?: string[]; showWhen?: [string, string]; wide?: boolean
   requiredWhen?: [string, string[]]
@@ -19,9 +19,10 @@ export type Kind = {
   columns: string[]; tracking?: boolean; annualReview?: boolean; diffusion?: boolean; activities?: boolean
 }
 export type ModuleConfig = { title: string; subtitle: string; kinds: Kind[] }
-export type Activity = { id: string; name: string; responsible: string; startDate: string; endDate: string; budget: string }
+export type Activity = { id: string; name: string; responsible: string; responsibleId?: string; startDate: string; endDate: string; budget: string; status?: string; observations?: string }
 export type Evidence = { id: string; name: string; mime: string; url: string; uploadedAt: string; targetId?: string }
 export type Entry = {
+  createdAt?: string
   id: string; kind: "FOLLOW_UP" | "ANNUAL_REVIEW" | "DIFFUSION"; date: string
   observations: string; progress?: number; measuredValue?: number; medium?: string; audience?: string
   conclusion?: string; nextReviewDate?: string
@@ -29,6 +30,7 @@ export type Entry = {
   responseMinutes?: number
 }
 export type RecordItem = {
+  remoteVersion?: number; remoteStatus?: string; remoteProgress?: number
   id: string; kind: string; values: Values; activities: Activity[]; entries: Entry[]
   evidence: Evidence[]; createdAt: string; updatedAt: string
   history: { at: string; action: string; snapshot?: Values; activities?: Activity[] }[]
@@ -37,6 +39,24 @@ export type RecordItem = {
 export type Catalogs = Record<Reference, Option[]>
 export const dateToday = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Bogota" })
 export const currentYear = () => Number(dateToday().slice(0, 4))
+export function bogotaCalendarDate(value: string) {
+  if (!value) return ""
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ""
+  return date.toLocaleDateString("en-CA", { timeZone: "America/Bogota" })
+}
+export function entryDateError(item: RecordItem, kind: Entry["kind"], date: string, today = dateToday()): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return "Selecciona una fecha válida."
+  if (date > today) return "La fecha no puede estar en el futuro."
+  // Procedures have no business start date; their creation timestamp is not a disclosure boundary.
+  const start = bogotaCalendarDate(text(item.values.startDate) || text(item.values.periodStart) || (item.kind === "journey-procedure" ? "" : item.createdAt))
+  if (start && date < start) return `La fecha debe ser igual o posterior al inicio del registro (${start}).`
+  const entries = item.entries.filter(entry => item.kind === "journey-procedure" || item.kind === "journey" || entry.kind === kind)
+  const lastDate = entries.map(entry => bogotaCalendarDate(entry.date)).filter(Boolean).sort().at(-1)
+  if (lastDate && date < lastDate) return `La fecha debe ser igual o posterior al último registro (${lastDate}).`
+  return null
+}
 export const storageKey = (module: PesvModule) => `safecloud:pesv-${module}`
 export const text = (value: string | string[] | undefined) => Array.isArray(value) ? value.join(", ") : value ?? ""
 export const ids = (value: string | string[] | undefined): string[] => Array.isArray(value) ? value : value ? [value] : []
@@ -290,6 +310,8 @@ export function loadCatalogs(): Catalogs {
   }
 }
 export function completion(item: RecordItem) {
+  if (hasCumulativeProgress(item.kind)) return cumulativeProgress(item)
+  if (item.remoteProgress !== undefined) return item.remoteProgress
   if (item.kind === "objective") {
     const value = item.entries.filter(e => e.kind === "FOLLOW_UP").at(-1)?.measuredValue
     if (value === undefined) return 0
@@ -301,21 +323,41 @@ export function completion(item: RecordItem) {
   }
   return item.entries.filter(e => e.kind === "FOLLOW_UP").at(-1)?.progress ?? 0
 }
+export function followUpProgressError(item: RecordItem, progress: number): string | null {
+  if (!hasCumulativeProgress(item.kind)) return null
+  const current = completion(item)
+  if (current >= 100) return `${item.kind === "journey" ? "El desplazamiento" : "El mantenimiento"} ya alcanzó el 100% de avance.`
+  if (!Number.isFinite(progress) || progress <= 0) return "Ingresa un aporte de avance mayor a 0%."
+  if (Math.round((current + progress) * 100) / 100 > 100) return `El avance actual es ${current}%. Puedes agregar como máximo ${Math.round((100 - current) * 100) / 100}%.`
+  return null
+}
 export function itemStatus(item: RecordItem) {
+  if (item.remoteStatus !== "ARCHIVED") {
+    if (["journey-procedure", "journey", "inspection-procedure", "vehicle-profile", "vehicle-inspection", "vehicle-maintenance", "change-procedure", "change", "contractor", "contractor-check", "archive-procedure", "archive-record", "archive-review", "statistical-event", "statistical-analysis", "loss-matrix", "audit-procedure", "pesv-audit", "audit-finding"].includes(item.kind)) {
+      const status = assuranceStatus(item, dateToday()) ?? operationalStatus(item, dateToday())
+      if (status) return status
+    }
+    if (item.kind === "emergency-plan") return "Documentado"
+    if (item.kind === "road-drill" && completion(item) === 100 && !item.evidence.some(e => e.targetId === item.entries.filter(e => e.kind === "FOLLOW_UP").at(-1)?.id)) return "Pendiente de evidencia"
+    if (["road-protocol", "managed-road", "road-inspection", "road-incident", "road-action", "road-maintenance"].includes(item.kind)) {
+      const status = operationalStatus(item, dateToday())
+      if (status) return status
+    }
+  }
+  if (item.remoteStatus) return ({ PENDING: "Pendiente", IN_PROGRESS: "En ejecución", COMPLETED: "Cumplido", OVERDUE: "Vencido", ARCHIVED: "Archivado" } as Record<string, string>)[item.remoteStatus] ?? item.remoteStatus
   const assurance = assuranceStatus(item, dateToday())
   if (assurance) return assurance
   const operational = operationalStatus(item, dateToday())
   if (operational) return operational
   if (item.kind === "competency" || item.kind === "behavior-evaluation") return text(item.values.result)
-  if (item.kind === "procedure" || item.kind === "emergency-plan") return "Documentado"
-  if (item.kind === "road-drill" && completion(item) === 100 && !item.evidence.some(e => e.targetId === item.entries.filter(e => e.kind === "FOLLOW_UP").at(-1)?.id)) return "Pendiente de evidencia"
+  if (item.kind === "procedure") return "Documentado"
   const progress = completion(item)
   return progress >= 100 ? "Cumplido" : progress > 0 ? "En ejecución" : "Pendiente"
 }
 export function nextReview(item: RecordItem) {
   return item.entries.filter(e => e.kind === "ANNUAL_REVIEW").at(-1)?.nextReviewDate ?? text(item.values.nextReviewDate)
 }
-export function validateRecord(kind: Kind, values: Values, activities: Activity[], catalogs: Catalogs, previous?: RecordItem) {
+export function validateRecord(kind: Kind, values: Values, activities: Activity[], catalogs: Catalogs, previous?: RecordItem, useLocalSources = true) {
   for (const f of visibleFields(kind, values)) {
     const value = values[f.key]
     if (f.required && !text(value).trim()) return `Completa el campo: ${f.label}.`
@@ -357,14 +399,14 @@ export function validateRecord(kind: Kind, values: Values, activities: Activity[
       if (!Number.isFinite(Number(activity.budget)) || Number(activity.budget) < 0) return "El presupuesto de las actividades no puede ser negativo."
     }
   }
-  if (kind.id === "vehicle-inspection") {
+  if (kind.id === "vehicle-inspection" && useLocalSources) {
     const profile = readItems("vehicle-inspections").find(p => p.id === values.vehicleProfileId)
     if (profile && profile.values.vehicleType !== values.vehicleType) return "El tipo inspeccionado debe coincidir con la hoja de vida del vehículo."
   }
   if (kind.id === "contractor-check") {
-    const contractor = readItems("change-contractors").find(p => p.id === values.contractorId)
+    const contractor = useLocalSources ? readItems("change-contractors").find(p => p.id === values.contractorId) : undefined
     if (contractor?.values.pesvRequired === "Sí" && values.check_pesv === "No aplica") return "El PESV es exigible para este contratista; no se puede marcar como No aplica."
     if (values.reason === "Previo a recorrido ocasional" && !text(values.journeyId)) return "Relaciona el recorrido para verificar al contratista ocasional antes de salir."
   }
-  return validateAssurance(kind, values, previous, dateToday()) ?? validateOperationalRecord(kind, values, previous, dateToday())
+  return validateAssurance(kind, values, previous, dateToday(), useLocalSources) ?? validateOperationalRecord(kind, values, previous, dateToday())
 }

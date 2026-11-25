@@ -8,11 +8,22 @@ import type {
   RolesResponse,
 } from "@/types/manager/role"
 
+export class RolePermissionScopeError extends Error {
+  constructor(message: string, public readonly rejectedPermissionIds: string[]) {
+    super(message)
+    this.name = "RolePermissionScopeError"
+  }
+}
+
 async function parseOrThrow<T>(res: Response, fallbackMsg: string): Promise<T> {
   const json = (await res.json().catch(() => null)) as RoleResponse | RolesResponse | null
 
   if (!res.ok || !json?.ok) {
     const msg = json?.message ?? fallbackMsg
+    if (msg.includes("permisos no están permitidos para esta empresa")) {
+      const ids = msg.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi) ?? []
+      throw new RolePermissionScopeError(msg, [...new Set(ids)])
+    }
     throw new Error(msg)
   }
 

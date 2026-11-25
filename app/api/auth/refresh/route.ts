@@ -1,14 +1,5 @@
 import { NextResponse } from "next/server";
-import { decodeJwt } from "@/lib/jwt";
-
-function getTokenMaxAge(token: string) {
-  const payload = decodeJwt(token);
-  const exp = typeof payload?.exp === "number" ? payload.exp : null;
-
-  if (!exp) return 60 * 60;
-
-  return Math.max(exp - Math.floor(Date.now() / 1000), 0);
-}
+import { verifySessionJwt, sessionVerificationConfig } from "@/lib/jwt-verification";
 
 export async function POST(req: Request) {
   try {
@@ -26,6 +17,7 @@ export async function POST(req: Request) {
     const r = await fetch(`${API_URL}/api/auth/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      cache: "no-store",
       body: JSON.stringify({ refreshToken }),
     });
 
@@ -50,9 +42,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Respuesta inválida del servidor" }, { status: 502 });
     }
 
+    const payload = await verifySessionJwt(newAccess, sessionVerificationConfig());
+    if (!payload) return NextResponse.json({ message: "No se pudo verificar la sesion renovada. Contacta al administrador del sistema." }, { status: 502 });
+
     const response = NextResponse.json(
       { token: newAccess, refreshToken: newRefresh },
-      { status: 200 }
+      { status: 200, headers: { "Cache-Control": "no-store" } }
     );
 
     response.cookies.set("sgc_session", newAccess, {
@@ -60,7 +55,7 @@ export async function POST(req: Request) {
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
       path: "/",
-      maxAge: getTokenMaxAge(newAccess),
+      maxAge: Math.max(payload.exp - Math.floor(Date.now() / 1000), 0),
     });
 
     return response;

@@ -1,5 +1,7 @@
 import { apiFetch } from "@/lib/apiClient"
 import { listEmployees } from "@/services/employeeService"
+import { downloadCorporatePdfBlob } from "@/lib/pdf/safecloud-corporate-pdf"
+import { applySafeCloudPdfDefaults } from "@/lib/pdf/safecloud-pdf-style"
 import type { Employee } from "@/types/manager/employee"
 import type {
   DataAuthorizationStatus,
@@ -91,7 +93,7 @@ type AcceptDataConsentResponse = {
 
 export type ConsentEvidenceType = "SIGNATURE" | "CERTIFICATE"
 
-function getErrorMessage(json: ApiErrorResponse | null, fallbackMsg: string) {
+function getErrorMessage(json: ApiErrorResponse | ApiResponse<unknown> | null, fallbackMsg: string) {
   const detail = json?.errors?.find((error) => error.message)?.message
   const message = detail ?? json?.message ?? fallbackMsg
 
@@ -464,10 +466,10 @@ export async function downloadConsentCertificate(consent: EmployeeDataConsent) {
   ])
   const signatureDataUrl = await blobToDataUrl(signatureEvidence.blob)
   const logoDataUrl = await loadPublicImageDataUrl("/SGI-nube.png").catch(() => null)
-  const doc = new jsPDF({ unit: "mm", format: "letter" })
+  const doc = applySafeCloudPdfDefaults(new jsPDF({ unit: "mm", format: "letter", putOnlyUsedFonts: true, compress: true }))
   const pageWidth = doc.internal.pageSize.getWidth()
   const pageHeight = doc.internal.pageSize.getHeight()
-  const margin = 16
+  const margin = 14
   const contentWidth = pageWidth - margin * 2
   let y = margin
 
@@ -570,7 +572,7 @@ export async function downloadConsentCertificate(consent: EmployeeDataConsent) {
   addSectionTitle("Firma del titular")
   ensureSpace(45)
   doc.setDrawColor(203, 213, 225)
-  doc.roundedRect(margin, y, contentWidth, 34, 2, 2)
+  doc.roundedRect(margin, y, contentWidth, 34, 2, 2, "S")
   const imageFormat = signatureEvidence.blob.type.includes("jpeg") ? "JPEG" : "PNG"
   doc.addImage(signatureDataUrl, imageFormat, margin + 8, y + 4, contentWidth - 16, 22, undefined, "FAST")
   y += 40
@@ -584,29 +586,13 @@ export async function downloadConsentCertificate(consent: EmployeeDataConsent) {
   doc.setTextColor(71, 85, 105)
   doc.text("Firma electrónica manuscrita del titular", pageWidth / 2, y + 10, { align: "center" })
 
-  const pageCount = doc.getNumberOfPages()
-  for (let page = 1; page <= pageCount; page += 1) {
-    doc.setPage(page)
-    doc.setFont("helvetica", "normal")
-    doc.setFontSize(7.5)
-    doc.setTextColor(100, 116, 139)
-    doc.text(
-      `Documento generado por SafeCloud. Página ${page} de ${pageCount}. Fecha de generación: ${formatCertificateDateTime(new Date().toISOString())}`,
-      margin,
-      pageHeight - 8,
-    )
-  }
-
   const blob = doc.output("blob")
   const filename = certificateFilename(consent)
-  const url = URL.createObjectURL(blob)
-  const anchor = window.document.createElement("a")
-  anchor.href = url
-  anchor.download = filename
-  window.document.body.appendChild(anchor)
-  anchor.click()
-  anchor.remove()
-  URL.revokeObjectURL(url)
+  await downloadCorporatePdfBlob(blob, {
+    documentName: "Constancia de autorización para el tratamiento de datos personales",
+    version: consent.templateVersion,
+    companyName: consent.employee.companyName,
+  }, filename)
 }
 
 export async function downloadConsentSignature(consent: EmployeeDataConsent) {

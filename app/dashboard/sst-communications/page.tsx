@@ -17,6 +17,7 @@ import {
   Upload,
 } from "lucide-react"
 import { toast } from "sonner"
+import { downloadCorporatePdfBlob } from "@/lib/pdf/safecloud-corporate-pdf"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -612,7 +613,7 @@ export default function SstCommunicationsPage() {
     setBusyRecordId(record.id)
     try {
       const blob = await downloadSstCommunicationSignaturePdf(record.id)
-      downloadBlob(blob, `comunicacion-sst-${record.mechanismName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`)
+      await downloadCorporatePdfBlob(blob, { documentName: "Comunicación SST" }, `comunicacion-sst-${record.mechanismName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo descargar el PDF para firma")
     } finally {

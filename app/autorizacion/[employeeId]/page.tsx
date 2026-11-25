@@ -94,7 +94,7 @@ export default function PublicAuthorizationPage() {
     try {
       const result = await verifyDataConsentIdentity(employeeId, token, documentNumber, birthDate)
       if (!result.ok || !result.publicConsent || !result.verificationToken) {
-        setIdentityError(result.message)
+        setIdentityError(result.message ?? "No se pudo validar la identidad")
         return
       }
 

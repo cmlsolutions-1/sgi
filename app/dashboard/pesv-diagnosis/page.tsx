@@ -1,5 +1,7 @@
 "use client"
 
+import { loadPesv, pesvVersion, savePesv, deletePesv, uploadPesvDocument, pesvBlob, pesvDocumentUrl, downloadPesv, pesvPath, pesvRequest } from "@/services/pesvService"
+
 import { type FormEvent, useEffect, useMemo, useState } from "react"
 import {
   CalendarDays,
@@ -17,7 +19,6 @@ import {
   Upload,
   UsersRound,
 } from "lucide-react"
-import jsPDF from "jspdf"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -38,6 +39,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { PesvModuleHeader } from "@/components/pesv/module-experience"
 import { KpiStrip } from "@/components/dashboard/kpi-strip"
+import { collaboratorFields, collaboratorPayload, missingCollaboratorFields, type CollaboratorDraft } from "@/lib/pesv/diagnosis-profiles"
 
 type DiagnosisEvidence = {
   id: string
@@ -50,6 +52,7 @@ type DiagnosisEvidence = {
 
 type CollaboratorRoadProfile = {
   id: string
+  sourceEmployeeId?: string | null
   name: string
   birthDate: string
   gender: "MASCULINO" | "FEMENINO"
@@ -135,106 +138,6 @@ type EvidencePreview = {
   generated: boolean
 }
 
-const STORAGE_KEY = "safecloud:pesv-diagnosis"
-
-const mockCollaborators: CollaboratorRoadProfile[] = [
-  {
-    id: "collab-road-1",
-    name: "Diana Mendoza",
-    birthDate: "1990-01-15",
-    gender: "FEMENINO",
-    role: "Responsable SG-SST",
-    educationLevel: "Profesional",
-    maritalStatus: "Casada",
-    licenseValidUntil: "2028-06-30",
-    trainings: 3,
-    competencyEvaluation: "Aprobada",
-    roadAccidents: 0,
-    trafficFines: 0,
-    finesPaymentStatus: "Sin comparendos",
-    commuteTransport: "Vehículo particular",
-    isWorkDriver: true,
-    vehicleTypeDriven: "Automóvil",
-    linkedAt: "2024-02-01",
-  },
-  {
-    id: "collab-road-2",
-    name: "Carlos Ramírez",
-    birthDate: "1988-05-20",
-    gender: "MASCULINO",
-    role: "Coordinador operativo",
-    educationLevel: "Técnico",
-    maritalStatus: "Soltero",
-    licenseValidUntil: "2027-12-10",
-    trainings: 2,
-    competencyEvaluation: "Pendiente actualización",
-    roadAccidents: 1,
-    trafficFines: 1,
-    finesPaymentStatus: "Pagado",
-    commuteTransport: "Motocicleta",
-    isWorkDriver: true,
-    vehicleTypeDriven: "Motocicleta",
-    linkedAt: "2023-08-15",
-  },
-]
-
-const mockVehicles: VehicleRoadProfile[] = [
-  {
-    id: "vehicle-road-1",
-    plate: "ABC123",
-    vin: "9BWZZZ377VT004251",
-    engineNumber: "ENG-2026-001",
-    mileage: 42500,
-    manufactureDate: "2021-04-12",
-    technicalSpecs: "Automóvil 1.6L, ABS, airbags frontales, cinturones de tres puntos.",
-    soatValidUntil: "2027-04-12",
-    inspectionValidUntil: "2027-03-20",
-    roadAccidents: 0,
-    preventiveMaintenancePlan: "Mantenimiento preventivo cada 5.000 km o 6 meses.",
-    maintenanceActions: "Cambio de aceite, revisión de frenos y alineación realizados.",
-    vehicleType: "Automóvil",
-    estimatedMonthlyKm: 1200,
-    ownershipType: "PROPIO",
-  },
-  {
-    id: "vehicle-road-2",
-    plate: "MOT45D",
-    vin: "LC6PCKLL8N0008421",
-    engineNumber: "MOT-77821",
-    mileage: 18900,
-    manufactureDate: "2022-09-05",
-    technicalSpecs: "Motocicleta 150cc, freno de disco delantero, luces LED.",
-    soatValidUntil: "2026-11-15",
-    inspectionValidUntil: "2026-11-01",
-    roadAccidents: 1,
-    preventiveMaintenancePlan: "Mantenimiento mensual por alto uso operativo.",
-    maintenanceActions: "Cambio de llantas y revisión de sistema eléctrico.",
-    vehicleType: "Motocicleta",
-    estimatedMonthlyKm: 900,
-    ownershipType: "SERVICIO",
-  },
-]
-
-const mockRoutes: FrequentRoute[] = [
-  {
-    id: "route-1",
-    origin: "Sede principal",
-    destination: "Cliente zona industrial",
-    kilometers: 18,
-    weeklyFrequency: 4,
-    monthlyFrequency: 16,
-    yearlyFrequency: 192,
-  },
-  {
-    id: "route-2",
-    origin: "Sede principal",
-    destination: "Bodega norte",
-    kilometers: 11,
-    weeklyFrequency: 3,
-    monthlyFrequency: 12,
-    yearlyFrequency: 144,
-  },
-]
 
 const defaultForm: DiagnosisForm = {
   year: new Date().getFullYear(),
@@ -252,31 +155,16 @@ const defaultForm: DiagnosisForm = {
   emergencyDrillsDescription: "Simulacro anual de atención de siniestro vial con revisión de tiempos de respuesta y roles.",
   findings:
     "Actualizar evaluación de competencia de conductores, reforzar control documental de vehículos y socializar rutas críticas frecuentes.",
-  updateDate: new Date().toISOString().slice(0, 10),
+  updateDate: "",
 }
 
-const initialDiagnoses: PesvDiagnosis[] = [
-  {
-    id: "pesv-diagnosis-1",
-    ...defaultForm,
-    collaborators: mockCollaborators,
-    vehicles: mockVehicles,
-    routes: mockRoutes,
-    status: "DOCUMENTED",
-    createdAt: "2026-09-12T08:00:00",
-    updatedAt: "2026-09-12T08:00:00",
-  },
-]
-
+function diagnosisDate() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date())
+}
 const statusLabels: Record<PesvDiagnosis["status"], string> = {
   DRAFT: "Borrador",
   DOCUMENTED: "Documentado",
   UPDATED: "Actualizado",
-}
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return `${prefix}-${crypto.randomUUID()}`
-  return `${prefix}-${Date.now()}`
 }
 
 function formatDate(value?: string | null) {
@@ -295,23 +183,6 @@ function formatDateTime(value?: string | null) {
   }).format(date)
 }
 
-function readDiagnoses() {
-  if (typeof window === "undefined") return initialDiagnoses
-
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw) as PesvDiagnosis[]
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(initialDiagnoses))
-    return initialDiagnoses
-  } catch {
-    return initialDiagnoses
-  }
-}
-
-function writeDiagnoses(diagnoses: PesvDiagnosis[]) {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(diagnoses))
-}
-
 function statusClassName(status: PesvDiagnosis["status"]) {
   if (status === "UPDATED") return "border-emerald-200 bg-emerald-50 text-emerald-700"
   if (status === "DOCUMENTED") return "border-sky-200 bg-sky-50 text-sky-700"
@@ -320,103 +191,6 @@ function statusClassName(status: PesvDiagnosis["status"]) {
 
 function canEmbed(mimeType?: string) {
   return Boolean(mimeType?.startsWith("image/") || mimeType === "application/pdf" || mimeType?.startsWith("text/"))
-}
-
-function buildEvidenceText(diagnosis: PesvDiagnosis, evidence: DiagnosisEvidence) {
-  return `Diagnostico PESV
-Año: ${diagnosis.year}
-Actualizacion: ${formatDate(diagnosis.updateDate)}
-Sedes: ${diagnosis.sitesCount}
-Colaboradores: ${diagnosis.collaborators.length}
-Vehiculos: ${diagnosis.vehicles.length}
-Rutas frecuentes: ${diagnosis.routes.length}
-
-Documento: ${evidence.fileName}
-Descripcion: ${evidence.description || "Sin descripcion"}
-Cargado: ${formatDateTime(evidence.uploadedAt)}
-`
-}
-
-function downloadDiagnosisPdf(diagnosis: PesvDiagnosis) {
-  const doc = new jsPDF("p", "mm", "a4")
-  const margin = 16
-  const pageWidth = doc.internal.pageSize.getWidth()
-  const contentWidth = pageWidth - margin * 2
-  let y = 18
-
-  function addSection(title: string, content: string) {
-    if (y > 248) {
-      doc.addPage()
-      y = 18
-    }
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(10)
-    doc.setTextColor(30, 41, 59)
-    doc.text(title, margin, y)
-    y += 6
-    doc.setFont("helvetica", "normal")
-    doc.setFontSize(9)
-    const lines = doc.splitTextToSize(content || "No registrado", contentWidth)
-    doc.text(lines, margin, y)
-    y += lines.length * 5 + 7
-  }
-
-  doc.setFillColor(31, 92, 77)
-  doc.roundedRect(margin, 12, contentWidth, 26, 3, 3, "F")
-  doc.setTextColor(255, 255, 255)
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(13)
-  doc.text("DIAGNÓSTICO PESV", margin + 5, 24)
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(8)
-  doc.text(`Año ${diagnosis.year} · Actualizado ${formatDate(diagnosis.updateDate)}`, margin + 5, 31)
-
-  y = 50
-  addSection("Sedes y servicios", `${diagnosis.sitesCount} sede(s). ${diagnosis.servicesDescription}`)
-  addSection(
-    "Contratistas y flotas",
-    `${diagnosis.contractorsDescription} Permanentes: ${diagnosis.permanentContractors}. Ocasionales: ${diagnosis.occasionalContractors}. Flotas fidelizadas: ${diagnosis.loyalFleets}. Flotas ocasionales: ${diagnosis.occasionalFleets}. Afiliados: ${diagnosis.affiliates}.`,
-  )
-  addSection("Hallazgos principales", diagnosis.findings)
-  addSection(
-    "Emergencias viales",
-    `${diagnosis.emergencyPlanTrained} colaboradores capacitados. Equipos: ${diagnosis.firstAidEquipmentDescription}. Simulacros: ${diagnosis.emergencyDrillsDescription}`,
-  )
-
-  if (y > 230) {
-    doc.addPage()
-    y = 18
-  }
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(10)
-  doc.text("Resumen de colaboradores", margin, y)
-  y += 7
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(8.5)
-  diagnosis.collaborators.forEach((collaborator, index) => {
-    const line = `${index + 1}. ${collaborator.name} · ${collaborator.role} · Licencia: ${formatDate(collaborator.licenseValidUntil)} · Conductor: ${collaborator.isWorkDriver ? "Si" : "No"}`
-    doc.text(doc.splitTextToSize(line, contentWidth), margin, y)
-    y += 7
-  })
-
-  y += 4
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(10)
-  doc.text("Hoja de vida vehicular", margin, y)
-  y += 7
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(8.5)
-  diagnosis.vehicles.forEach((vehicle, index) => {
-    if (y > 262) {
-      doc.addPage()
-      y = 18
-    }
-    const line = `${index + 1}. ${vehicle.plate} · ${vehicle.vehicleType} · VIN ${vehicle.vin} · SOAT ${formatDate(vehicle.soatValidUntil)} · Tecnomecánica ${formatDate(vehicle.inspectionValidUntil)} · ${vehicle.estimatedMonthlyKm} km/mes`
-    doc.text(doc.splitTextToSize(line, contentWidth), margin, y)
-    y += 8
-  })
-
-  doc.save(`diagnostico-pesv-${diagnosis.year}.pdf`)
 }
 
 function DiagnosisDialog({
@@ -428,10 +202,30 @@ function DiagnosisDialog({
   open: boolean
   diagnosis: PesvDiagnosis | null
   onClose: () => void
-  onSave: (form: DiagnosisForm, diagnosisId?: string) => void
+  onSave: (form: DiagnosisForm, diagnosisId?: string, profiles?: CollaboratorDraft[]) => Promise<boolean>
 }) {
   const [form, setForm] = useState<DiagnosisForm>(defaultForm)
   const editing = Boolean(diagnosis)
+  const [profiles, setProfiles] = useState<CollaboratorDraft[]>([])
+  const [profilesReady, setProfilesReady] = useState(false)
+  const [profilesError, setProfilesError] = useState("")
+  const [allowIncomplete, setAllowIncomplete] = useState(false)
+  const [profilesChanged, setProfilesChanged] = useState(false)
+  const incomplete = profiles.filter(row => missingCollaboratorFields(row).length > 0)
+
+  useEffect(() => {
+    if (!open) return
+    let active = true
+    setProfiles([]); setProfilesReady(false); setProfilesError(""); setAllowIncomplete(false); setProfilesChanged(false)
+    const existing = diagnosis?.collaborators ?? []
+    void pesvRequest<{ collaborators: CollaboratorDraft[] }>("/api/pesv/diagnoses/catalogs").then(result => {
+      if (!active) return
+      const seen = new Set(existing.map(row => row.sourceEmployeeId).filter(Boolean))
+      setProfiles([...existing, ...result.collaborators.filter(row => !seen.has(row.sourceEmployeeId as string))])
+      setProfilesReady(true)
+    }).catch(() => { if (active) setProfilesError("No se pudo consultar el catálogo de colaboradores. Cierra y vuelve a abrir el formulario para reintentar.") })
+    return () => { active = false }
+  }, [open, diagnosis])
 
   useEffect(() => {
     if (!open) return
@@ -453,19 +247,23 @@ function DiagnosisDialog({
             findings: diagnosis.findings,
             updateDate: diagnosis.updateDate,
           }
-        : defaultForm,
+        : { ...defaultForm, year: Number(diagnosisDate().slice(0, 4)), updateDate: diagnosisDate() },
     )
   }, [diagnosis, open])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!form.year) return toast.error("Ingresa el año del diagnóstico")
     if (!form.updateDate) return toast.error("Selecciona la fecha de actualización")
     if (!form.servicesDescription.trim()) return toast.error("Describe los servicios de la organización")
     if (!form.contractorsDescription.trim()) return toast.error("Describe contratistas, terceros y flotas")
     if (!form.findings.trim()) return toast.error("Registra los hallazgos del diagnóstico")
+    const includeProfiles = !editing || profilesChanged
+    if (includeProfiles && !profilesReady) return toast.error(profilesError || "Espera a que cargue el catálogo de colaboradores")
+    if (includeProfiles && profiles.slice(0, diagnosis?.collaborators.length ?? 0).some(row => missingCollaboratorFields(row).length)) return toast.error("Completa los campos inválidos de los perfiles ya guardados para no eliminarlos del diagnóstico")
+    if (includeProfiles && incomplete.length && !allowIncomplete) return toast.error("Completa los perfiles viales o confirma que los pendientes se guardarán más adelante")
 
-    onSave(
+    const saved = await onSave(
       {
         ...form,
         servicesDescription: form.servicesDescription.trim(),
@@ -475,8 +273,9 @@ function DiagnosisDialog({
         findings: form.findings.trim(),
       },
       diagnosis?.id,
+      includeProfiles ? profiles.filter(row => !missingCollaboratorFields(row).length) : undefined,
     )
-    onClose()
+    if (saved) onClose()
   }
 
   return (
@@ -493,6 +292,13 @@ function DiagnosisDialog({
 
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-5 overflow-x-hidden overflow-y-auto bg-slate-50/40 px-6 py-5">
+            <Button type="button" variant="outline" onClick={() => {
+              const section = document.getElementById("diagnosis-collaborator-profiles")
+              section?.scrollIntoView({ block: "start" })
+              section?.focus({ preventScroll: true })
+            }}>
+              Perfiles viales de colaboradores
+            </Button>
             <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <FormSectionTitle icon="area" title="Organización" />
               <div className="grid gap-4 sm:grid-cols-2">
@@ -571,6 +377,37 @@ function DiagnosisDialog({
               </Label>
             </section>
 
+            <section id="diagnosis-collaborator-profiles" tabIndex={-1} className="space-y-3 rounded-md border border-border p-4">
+              <FormSectionTitle icon="details" title="Perfiles viales de colaboradores" />
+              {profilesError ? <p role="alert" className="text-sm text-destructive">{profilesError}</p> : !profilesReady ? <p role="status" className="text-sm">Cargando colaboradores…</p> : <>
+                {profiles.length === 0 && <p className="text-sm text-muted-foreground">Sin colaboradores en el catálogo.</p>}
+                {profiles.map((row, index) => {
+                  const missing = missingCollaboratorFields(row)
+                  return <details key={index} className="border-b border-border py-2">
+                    <summary className="cursor-pointer text-sm font-medium">{String(row.name || `Colaborador ${index + 1}`)} · {missing.length ? `${missing.length} campos pendientes o inválidos` : "Completo"}</summary>
+                    {missing.length > 0 && <p className="mt-2 text-sm text-muted-foreground">{missing.join(", ")}</p>}
+                    <div className="grid gap-3 py-3 sm:grid-cols-2">
+                      {collaboratorFields.map(([key, label, kind]) => {
+                        const value = row[key]
+                        function update(next: string | boolean | number | null) {
+                          setProfiles(rows => rows.map((item, i) => i === index ? { ...item, [key]: next } : item))
+                          setProfilesChanged(true)
+                        }
+                        return <Label key={key} className="grid gap-2">{label}
+                          {kind === "boolean" ? <input type="checkbox" checked={value === true} onChange={event => update(event.target.checked)} />
+                            : kind === "gender" ? <select className="h-9 rounded-md border border-input bg-background px-2" value={String(value ?? "")} onChange={event => update(event.target.value)}><option value="">Selecciona</option><option value="MASCULINO">Masculino</option><option value="FEMENINO">Femenino</option></select>
+                            : <Input type={kind === "date" || kind === "number" ? kind : "text"} min={kind === "number" ? 0 : undefined} maxLength={typeof kind === "number" ? kind : undefined} value={String(value ?? "")} onChange={event => update(kind === "number" ? event.target.value === "" ? null : Number(event.target.value) : event.target.value)} />}
+                        </Label>
+                      })}
+                    </div>
+                  </details>
+                })}
+                {incomplete.length > 0 && <Label className="flex items-start gap-2 text-sm">
+                  <input type="checkbox" checked={allowIncomplete} onChange={event => setAllowIncomplete(event.target.checked)} />
+                  Guardar sin incluir {incomplete.length} {incomplete.length === 1 ? "perfil pendiente" : "perfiles pendientes"}.
+                </Label>}
+              </>}
+            </section>
             <section className="rounded-md border border-primary/20 bg-primary/5 p-4">
               <div className="flex items-start gap-3">
                 <Upload className="mt-0.5 h-5 w-5 text-primary" />
@@ -600,7 +437,7 @@ function EvidenceDialog({
 }: {
   diagnosis: PesvDiagnosis | null
   onClose: () => void
-  onSave: (diagnosisId: string, form: EvidenceForm, file: File | null) => void
+  onSave: (diagnosisId: string, form: EvidenceForm, file: File | null) => Promise<boolean>
 }) {
   const [form, setForm] = useState<EvidenceForm>({ fileName: "", description: "" })
   const [file, setFile] = useState<File | null>(null)
@@ -614,13 +451,13 @@ function EvidenceDialog({
     setFile(null)
   }, [diagnosis])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!diagnosis) return
     if (!form.fileName.trim() && !file) return toast.error("Selecciona o registra el soporte del diagnóstico")
 
-    onSave(diagnosis.id, form, file)
-    onClose()
+    const saved = await onSave(diagnosis.id, form, file)
+    if (saved) onClose()
   }
 
   return (
@@ -707,16 +544,22 @@ function EvidencePreviewDialog({
 }
 
 export default function PesvDiagnosisPage() {
-  const [diagnoses, setDiagnoses] = useState<PesvDiagnosis[]>(initialDiagnoses)
+  const [diagnoses, setDiagnoses] = useState<PesvDiagnosis[]>([])
   const [search, setSearch] = useState("")
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingDiagnosis, setEditingDiagnosis] = useState<PesvDiagnosis | null>(null)
   const [evidenceDiagnosis, setEvidenceDiagnosis] = useState<PesvDiagnosis | null>(null)
   const [preview, setPreview] = useState<EvidencePreview | null>(null)
 
-  useEffect(() => {
-    setDiagnoses(readDiagnoses())
-  }, [])
+  const [loadError, setLoadError] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  async function reload() {
+    const result = await loadPesv<PesvDiagnosis>("diagnoses")
+    setDiagnoses(result.map(item => ({ ...item, collaborators: item.collaborators ?? [], vehicles: item.vehicles ?? [], routes: item.routes ?? [] })))
+    setLoadError("")
+  }
+  useEffect(() => { let active = true; loadPesv<PesvDiagnosis>("diagnoses").then(result => { if (active) setDiagnoses(result.map(item => ({ ...item, collaborators: item.collaborators ?? [], vehicles: item.vehicles ?? [], routes: item.routes ?? [] }))) }).catch(error => { if (active) setLoadError(error.message) }).finally(() => { if (active) setLoading(false) }); return () => { active = false } }, [])
 
   const latestDiagnosis = diagnoses[0]
   const stats = useMemo(() => {
@@ -740,123 +583,49 @@ export default function PesvDiagnosisPage() {
     )
   }, [diagnoses, search])
 
-  function persist(nextDiagnoses: PesvDiagnosis[]) {
-    setDiagnoses(nextDiagnoses)
-    writeDiagnoses(nextDiagnoses)
+  async function saveDiagnosis(form: DiagnosisForm, id?: string, profiles?: CollaboratorDraft[]): Promise<boolean> {
+    if (saving) return false
+    setSaving(true)
+    try {
+      const payload: Record<string, unknown> = { ...form, ...pesvVersion(diagnoses.find(item => item.id === id)) }
+      if (profiles) payload.collaborators = profiles.map(collaboratorPayload)
+      await savePesv("diagnoses", payload, id)
+      await reload().catch(error => { toast.error("Cambios guardados, pero no se pudo actualizar la vista: " + error.message) })
+      toast.success(id ? "Registro actualizado" : "Registro creado")
+      return true
+    } catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo guardar"); return false }
+    finally { setSaving(false) }
   }
-
-  function saveDiagnosis(form: DiagnosisForm, diagnosisId?: string) {
-    const now = new Date().toISOString()
-
-    if (diagnosisId) {
-      persist(
-        diagnoses.map((diagnosis) =>
-          diagnosis.id === diagnosisId
-            ? {
-                ...diagnosis,
-                ...form,
-                status: diagnosis.evidence ? "UPDATED" : "DOCUMENTED",
-                updatedAt: now,
-              }
-            : diagnosis,
-        ),
-      )
-      toast.success("Diagnóstico actualizado")
-      return
-    }
-
-    persist([
-      {
-        id: createId("pesv-diagnosis"),
-        ...form,
-        collaborators: mockCollaborators,
-        vehicles: mockVehicles,
-        routes: mockRoutes,
-        status: "DOCUMENTED",
-        createdAt: now,
-        updatedAt: now,
-      },
-      ...diagnoses,
-    ])
-    toast.success("Diagnóstico creado. Ahora puedes cargar su evidencia desde acciones.")
+  async function saveEvidence(id: string, form: EvidenceForm, file: File | null): Promise<boolean> {
+    if (!file) { toast.error("Selecciona el archivo que deseas cargar"); return false }
+    if (saving) return false
+    setSaving(true)
+    try { await uploadPesvDocument("diagnoses", id, file, form.description); await reload().catch(error => { toast.error("Cambios guardados, pero no se pudo actualizar la vista: " + error.message) }); toast.success("Evidencia cargada"); return true }
+    catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo cargar"); return false }
+    finally { setSaving(false) }
   }
-
-  function saveEvidence(diagnosisId: string, form: EvidenceForm, file: File | null) {
-    const evidence: DiagnosisEvidence = {
-      id: createId("pesv-diagnosis-evidence"),
-      fileName: form.fileName.trim() || file?.name || "diagnostico-pesv.pdf",
-      description: form.description.trim(),
-      uploadedAt: new Date().toISOString(),
-      mimeType: file?.type || "text/plain",
-      url: file ? URL.createObjectURL(file) : undefined,
-    }
-
-    persist(
-      diagnoses.map((diagnosis) =>
-        diagnosis.id === diagnosisId
-          ? { ...diagnosis, evidence, status: "UPDATED", updatedAt: evidence.uploadedAt }
-          : diagnosis,
-      ),
-    )
-    toast.success("Evidencia del diagnóstico cargada")
+  async function deleteDiagnosis(diagnosis: PesvDiagnosis) {
+    if (saving || !window.confirm("¿Eliminar este registro?")) return
+    setSaving(true)
+    try { await deletePesv("diagnoses", diagnosis.id); await reload().catch(error => { toast.error("Cambios guardados, pero no se pudo actualizar la vista: " + error.message) }); toast.success("Registro eliminado") }
+    catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo eliminar") }
+    finally { setSaving(false) }
   }
-
-  function deleteDiagnosis(diagnosis: PesvDiagnosis) {
-    if (!window.confirm(`Eliminar el diagnóstico PESV ${diagnosis.year}?`)) return
-    persist(diagnoses.filter((current) => current.id !== diagnosis.id))
-    toast.success("Diagnóstico eliminado")
+  async function viewEvidence(diagnosis: PesvDiagnosis) {
+    if (!diagnosis.evidence) return
+    try { const blob = await pesvBlob(pesvDocumentUrl("diagnoses", diagnosis.id, diagnosis.evidence.id), diagnosis.evidence.mimeType); setPreview({ title: diagnosis.evidence.fileName, url: URL.createObjectURL(blob), mimeType: blob.type || diagnosis.evidence.mimeType || "application/octet-stream", generated: true }) }
+    catch (error) { toast.error(error instanceof Error ? error.message : "No se pudo abrir el documento") }
   }
-
-  function viewEvidence(diagnosis: PesvDiagnosis) {
-    if (!diagnosis.evidence) {
-      toast.error("Este diagnóstico no tiene evidencia cargada")
-      return
-    }
-
-    if (diagnosis.evidence.url) {
-      setPreview({
-        title: diagnosis.evidence.fileName,
-        url: diagnosis.evidence.url,
-        mimeType: diagnosis.evidence.mimeType || "application/octet-stream",
-        generated: false,
-      })
-      return
-    }
-
-    const blob = new Blob([buildEvidenceText(diagnosis, diagnosis.evidence)], { type: "text/plain;charset=utf-8" })
-    setPreview({
-      title: diagnosis.evidence.fileName,
-      url: URL.createObjectURL(blob),
-      mimeType: "text/plain",
-      generated: true,
-    })
-  }
-
-  function closePreview() {
-    if (preview?.generated) URL.revokeObjectURL(preview.url)
-    setPreview(null)
-  }
-
+  function closePreview() { if (preview) URL.revokeObjectURL(preview.url); setPreview(null) }
   function downloadEvidence(diagnosis: PesvDiagnosis) {
-    if (!diagnosis.evidence) {
-      toast.error("Este diagnóstico no tiene evidencia cargada")
-      return
-    }
-
-    const url =
-      diagnosis.evidence.url ??
-      URL.createObjectURL(new Blob([buildEvidenceText(diagnosis, diagnosis.evidence)], { type: "text/plain;charset=utf-8" }))
-
-    const link = document.createElement("a")
-    link.href = url
-    link.download = diagnosis.evidence.fileName
-    link.click()
-
-    if (!diagnosis.evidence.url) URL.revokeObjectURL(url)
+    if (!diagnosis.evidence) return
+    void downloadPesv(pesvDocumentUrl("diagnoses", diagnosis.id, diagnosis.evidence.id), diagnosis.evidence.fileName).catch(error => toast.error(error.message))
   }
 
   return (
     <main className="space-y-6">
+      {loading && <p role="status">Cargando registros…</p>}
+      {loadError && <div role="alert" className="border-l-2 border-red-500 p-3 text-sm text-red-700">{loadError}<Button variant="outline" onClick={() => { void reload().catch(error => setLoadError(error.message)) }}>Reintentar</Button></div>}
       <PesvModuleHeader title="Diagnóstico PESV" description="Documenta anualmente problemas de seguridad vial, perfiles de colaboradores, hoja de vida vehicular, rutas y emergencias." icon={FileText} actions={
         <Button
           className="w-full gap-2 sm:w-auto"
@@ -869,7 +638,6 @@ export default function PesvDiagnosisPage() {
           Nuevo diagnóstico
         </Button>
       } />
-      {diagnoses.some(diagnosis => diagnosis.id === "pesv-diagnosis-1") && <div className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900"><strong>Información demostrativa.</strong> La caracterización inicial es un ejemplo y no representa información real de la empresa.</div>}
 
       <KpiStrip items={[
         { title: "Diagnósticos", value: stats.total, description: "Vigencias documentadas", icon: "total", tone: "blue" },
@@ -933,7 +701,7 @@ export default function PesvDiagnosisPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-60">
-                          <DropdownMenuItem onSelect={() => downloadDiagnosisPdf(diagnosis)}>
+                          <DropdownMenuItem onSelect={() => { void downloadPesv(`${pesvPath("diagnoses", diagnosis.id)}/export`, "pesv-diagnoses.pdf").catch(error => toast.error(error.message)) }}>
                             <Download className="h-4 w-4" />
                             Descargar diagnóstico
                           </DropdownMenuItem>

@@ -129,7 +129,7 @@ export function investigationDefaults(id: string): Values {
   if (!source) return {}
   return { name: value(source.values.name), eventDate: value(source.values.occurrenceDate), year: value(source.values.occurrenceDate).slice(0, 4), place: value(source.values.place), peopleIds: source.values.peopleIds ?? [], source: `Investigación interna: ${value(source.values.name)}`, immediateCauses: source.stages.find(s => s.key === "CAUSES")?.notes ?? "", rootCauses: source.stages.find(s => s.key === "ROOT")?.notes ?? "" }
 }
-export function validateAssurance(kind: Kind, values: Values, previous: RecordItem | undefined, today: string) {
+export function validateAssurance(kind: Kind, values: Values, previous: RecordItem | undefined, today: string, useLocalSources = true) {
   if (kind.id === "pesv-acpm-format" && previous && ["year", "documentDate", "startDate", "endDate", "consecutive"].some(key => value(previous.values[key]) !== value(values[key]))) return "Conserva el consecutivo y las fechas del formato creado."
   const pastDates = ["eventDate", "analysisDate", "auditDate", "documentDate", "communicationDate", "receivedDate", "responseDate", "verificationDate"]
   if (pastDates.some(k => value(values[k]) && value(values[k]) > today)) return "Las fechas de registros realizados no pueden estar en el futuro."
@@ -142,7 +142,7 @@ export function validateAssurance(kind: Kind, values: Values, previous: RecordIt
   }
   if (kind.id === "statistical-analysis" && (value(values.periodEnd) > value(values.analysisDate) || value(values.periodStart).slice(0, 4) !== value(values.year) || value(values.periodEnd).slice(0, 4) !== value(values.year))) return "El período debe estar en la vigencia y finalizar antes del análisis."
   if (kind.id === "pesv-audit") {
-    const leader = read<{ employeeId: string } | null>("safecloud:pesv-responsible", null)
+    const leader = useLocalSources ? read<{ employeeId: string } | null>("safecloud:pesv-responsible", null) : null
     if (leader && Array.isArray(values.auditorIds) && values.auditorIds.includes(leader.employeeId)) return "El auditor debe ser diferente al líder del PESV."
     if (pesvSteps.some((_, i) => values[`step_${i + 1}`] === "No aplica" && stepApplies(i + 1, value(values.level)))) return "No marques como No aplica un paso exigible para el nivel seleccionado."
     if (values.phase === "Realizada" && !auditComplete(values)) return "Completa los 24 pasos, soportes y conclusiones; justifica los no aplicables según el nivel."

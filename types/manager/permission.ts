@@ -6,6 +6,9 @@ export type Permission = {
   name: string
   key?: string
   description?: string
+  moduleId?: string
+  moduleCode?: string
+  module?: { id?: string; code?: string }
 }
 
 export type PermissionsResponse = ApiResponse<Permission[]>

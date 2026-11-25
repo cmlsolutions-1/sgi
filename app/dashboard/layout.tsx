@@ -7,6 +7,7 @@ import { SgiPreferencesProvider } from "@/components/dashboard/SgiPreferencesPro
 
 import AuthGuard from "@/components/auth/AuthGuard";
 import ModuleGuard from "@/components/auth/ModuleGuard";
+import { ModuleAccessProvider } from "@/components/auth/ModuleAccessProvider";
 
 export default function DashboardLayout({
   children,
@@ -15,6 +16,7 @@ export default function DashboardLayout({
 }) {
   return (
     <AuthGuard redirectAdminToManager>
+    <ModuleAccessProvider>
     <SgiPreferencesProvider />
     <div className="flex h-dvh min-h-0 overflow-hidden bg-background">
       <Sidebar />
@@ -25,6 +27,7 @@ export default function DashboardLayout({
         </main>
       </div>
     </div>
+    </ModuleAccessProvider>
     </AuthGuard>
   )
 }

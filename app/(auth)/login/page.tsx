@@ -19,6 +19,7 @@ import { AlertCircle, Building2, Eye, EyeOff, Lock, Mail } from "lucide-react";
 
 import { tokenHasRole } from "@/lib/jwt";
 import { useAuthStore, type AuthState } from "@/store/auth.store";
+import { getCompanyById } from "@/services/companyService";
 
 type Company = { id: string; name: string };
 type Role = "superadmin" | "asesor" | "empresa";
@@ -27,6 +28,7 @@ export default function LoginPage() {
   const router = useRouter();
   const setTokens = useAuthStore((s: AuthState) => s.setTokens);
   const setModules = useAuthStore((s: AuthState) => s.setModules);
+  const setCompany = useAuthStore((s: AuthState) => s.setCompany);
 
 
   const [step, setStep] = useState<1 | 2>(1);
@@ -86,8 +88,6 @@ export default function LoginPage() {
   setLoading(true);
   setError("");
 
-  console.log("LOGIN DATA:", { email, userId, companyId, password });
-
   try {
     const res = await fetch("/api/auth/login", {
       method: "POST",
@@ -95,9 +95,7 @@ export default function LoginPage() {
       body: JSON.stringify({ userId, password }),
     });
 
-    // leer JSON UNA SOLA VEZ
     const json = await res.json().catch(() => ({}));
-    console.log("LOGIN RESPONSE:", res.status, json);
 
     if (!res.ok) {
       setError(json?.error ?? json?.message ?? "Credenciales incorrectas");
@@ -114,6 +112,18 @@ export default function LoginPage() {
 
     // guardar tokens en Zustand
     setTokens(json.token, json.refreshToken);
+
+    const selectedCompany = companies.find((company) => company.id === companyId) ?? null;
+    if (selectedCompany) {
+      try {
+        const company = await getCompanyById(selectedCompany.id);
+        setCompany({ id: company.id, name: company.name, nit: company.nit });
+      } catch {
+        setCompany(selectedCompany);
+      }
+    } else {
+      setCompany(null);
+    }
 
     if (isAdmin) {
       setModules([]);

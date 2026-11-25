@@ -1,5 +1,7 @@
 "use client"
 
+import { listPesv, pesvResources } from "@/services/pesvService"
+
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { ArrowRight, CircleHelp, Info, Search, ShieldCheck } from "lucide-react"
@@ -29,7 +31,7 @@ import {
 } from "@/lib/pesv/module-catalog"
 import { useAuthStore, type ModuleNode } from "@/store/auth.store"
 
-type ModuleState = "empty" | "records" | "demo"
+type ModuleState = "empty" | "records" | "demo" | "unavailable"
 
 function collectCodes(modules: ModuleNode[]) {
   const codes = new Set<string>()
@@ -45,44 +47,34 @@ function collectCodes(modules: ModuleNode[]) {
   return codes
 }
 
-function hasStoredContent(value: unknown): boolean {
-  if (Array.isArray(value)) return value.length > 0
-  if (!value || typeof value !== "object") return Boolean(value)
-  return Object.keys(value as Record<string, unknown>).length > 0
+const moduleEndpoints: Record<string, string | string[]> = {
+  PESV_RESPONSIBLE: pesvResources.responsible, PESV_COMMITTEE: pesvResources.committee,
+  PESV_POLICY: pesvResources.policies, PESV_LEADERSHIP: pesvResources.leadership,
+  PESV_DIAGNOSIS: pesvResources.diagnoses, PESV_OBJECTIVES: pesvResources.objectives,
+  PESV_PROGRAMS: pesvResources.programs, PESV_WORK_PLAN: pesvResources.workActivities,
+  PESV_RISKS: pesvResources.roadRisks,
+  PESV_TRAINING: [pesvResources.competencies, pesvResources.trainingActivities],
+  PESV_BEHAVIOR: [pesvResources.behaviorProcedures, pesvResources.behaviorEvaluations],
+  PESV_EMERGENCIES: [pesvResources.emergencyPlans, pesvResources.roadDrills],
+  PESV_INVESTIGATIONS: [pesvResources.roadInvestigations, pesvResources.investigationProcedures],
+  PESV_MANAGED_ROADS: [pesvResources.roadProtocols, pesvResources.managedRoads, pesvResources.roadActions, pesvResources.roadInspections, pesvResources.roadMaintenance, pesvResources.roadIncidents],
+  PESV_JOURNEYS: [pesvResources.journeyProcedures, pesvResources.journeys],
+  PESV_VEHICLE_INSPECTIONS: [pesvResources.inspectionProcedures, pesvResources.vehicleProfiles, pesvResources.vehicleInspections, pesvResources.vehicleMaintenance],
+  PESV_CHANGE_CONTRACTORS: [pesvResources.changeProcedures, pesvResources.changes, pesvResources.contractors, pesvResources.contractorChecks],
+  PESV_DOCUMENT_RETENTION: [pesvResources.archiveProcedures, pesvResources.archiveRecords, pesvResources.archiveReviews],
+  PESV_STATISTICS: [pesvResources.statisticalEvents, pesvResources.statisticalAnalyses, pesvResources.lossMatrices],
+  PESV_AUDITS: [pesvResources.auditProcedures, pesvResources.pesvAudits, pesvResources.auditFindings],
+  PESV_INDICATORS: [pesvResources.indicatorSheets, pesvResources.indicatorMeasurements, pesvResources.indicatorReviews, pesvResources.indicatorReports],
 }
-
-function containsDemoInformation(value: unknown) {
-  const serialized = JSON.stringify(value).toLowerCase()
-  return [
-    "demostración",
-    "demostracion",
-    "demo-",
-    "pesv-risk-demo",
-    "collab-road-",
-    "vehicle-road-",
-    "route-road-",
-  ].some((marker) => serialized.includes(marker))
-}
-
-function readModuleState(module: PesvModuleCatalogItem): ModuleState {
-  try {
-    const raw = window.localStorage.getItem(module.storageKey)
-    if (!raw) return "empty"
-    const value: unknown = JSON.parse(raw)
-    if (!hasStoredContent(value)) return "empty"
-    return containsDemoInformation(value) ? "demo" : "records"
-  } catch {
-    return "empty"
-  }
-}
-
 const stateLabel: Record<ModuleState, string> = {
+  unavailable: "No disponible",
   empty: "Sin registros",
   records: "Con información",
   demo: "Información de demostración",
 }
 
 const stateClassName: Record<ModuleState, string> = {
+  unavailable: "border-red-200 bg-red-50 text-red-700",
   empty: "border-slate-200 bg-slate-50 text-slate-600",
   records: "border-emerald-200 bg-emerald-50 text-emerald-700",
   demo: "border-amber-200 bg-amber-50 text-amber-800",
@@ -99,9 +91,12 @@ export default function PesvPage() {
   )
 
   useEffect(() => {
-    setModuleStates(
-      Object.fromEntries(allowedModules.map((module) => [module.code, readModuleState(module)])),
-    )
+    let active = true
+    Promise.all(allowedModules.map(async module => {
+      try { const records = (await Promise.all([moduleEndpoints[module.code]].flat().map(endpoint => listPesv<{ id: string }>(endpoint)))).flat(); return [module.code, records.length ? "records" : "empty"] as const }
+      catch { return [module.code, "unavailable"] as const }
+    })).then(states => { if (active) setModuleStates(Object.fromEntries(states)) })
+    return () => { active = false }
   }, [allowedModules])
 
   const normalizedQuery = query.trim().toLowerCase()

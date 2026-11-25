@@ -165,7 +165,7 @@ export function DepartmentChart() {
                 paddingAngle={5}
                 dataKey="empleados"
                 nameKey="name"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent = 0 }) => `${name} ${(percent * 100).toFixed(0)}%`}
                 labelLine={false}
               >
                 {departmentData.map((_, index) => (

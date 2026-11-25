@@ -3,6 +3,7 @@
 import { type FormEvent, useEffect, useMemo, useState } from "react"
 import { BarChart3, CalendarDays, CheckCircle2, Download, FileText, Filter, Loader2, Plus, Search } from "lucide-react"
 import { toast } from "sonner"
+import { downloadCorporatePdfBlob } from "@/lib/pdf/safecloud-corporate-pdf"
 
 import { AnalyticsBarChart, AnalyticsChartCard, AnalyticsDonutChart } from "@/components/dashboard/analytics-charts"
 import { Badge } from "@/components/ui/badge"
@@ -259,12 +260,7 @@ export default function SstIndicatorsPage() {
     setExportingId(report.id)
     try {
       const blob = await exportSstIndicatorReport(report.id)
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement("a")
-      link.href = url
-      link.download = `indicadores-sst-${report.year}-${report.periodLabel.toLowerCase().replace(/\s+/g, "-")}.pdf`
-      link.click()
-      URL.revokeObjectURL(url)
+      await downloadCorporatePdfBlob(blob, { documentName: "Indicadores SST" }, `indicadores-sst-${report.year}-${report.periodLabel.toLowerCase().replace(/\s+/g, "-")}.pdf`)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo exportar el informe.")
     } finally {

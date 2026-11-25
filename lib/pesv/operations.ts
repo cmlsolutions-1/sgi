@@ -91,7 +91,7 @@ export const operationalConfigs: Record<OperationalModule, ModuleConfig> = {
       { id: "journey", title: "Desplazamientos", singular: "desplazamiento", tracking: true, columns: ["name", "type", "driverId", "startDate", "endDate"], fields: [
         ...nameYear("Recorrido"), relation("procedureId", "Procedimiento aplicable", "Recorrido", "journeyProcedures"),
         f("type", "Tipo de desplazamiento", "Recorrido", "select", { options: ["Laboral", "Integración", "Pedagógico", "Otro extramural"] }),
-        f("planningDate", "Fecha de planificación", "Recorrido", "date"), ...schedule("Recorrido"), f("departureTime", "Hora de salida (HH:mm)", "Recorrido"), f("arrivalTime", "Hora de llegada prevista (HH:mm)", "Recorrido"),
+        f("planningDate", "Fecha de planificación", "Recorrido", "date"), ...schedule("Recorrido"), f("departureTime", "Hora de salida (HH:mm)", "Recorrido", "time"), f("arrivalTime", "Hora de llegada prevista (HH:mm)", "Recorrido", "time"),
         f("origin", "Origen", "Ruta y riesgos"), f("destination", "Destino", "Ruta y riesgos"), relation("routeIds", "Rutas del diagnóstico", "Ruta y riesgos", "routes", true, false),
         relation("riskIds", "Riesgos relacionados", "Ruta y riesgos", "risks", true, false), prose("criticalPoints", "Puntos críticos y controles en ruta", "Ruta y riesgos"),
         prose("siteRisks", "Riesgos del origen y destino, incluidos sitios de terceros", "Ruta y riesgos"), prose("siteAccess", "Plan de ingreso y salida", "Ruta y riesgos"),
@@ -134,7 +134,7 @@ export const operationalConfigs: Record<OperationalModule, ModuleConfig> = {
       ] },
       { id: "vehicle-inspection", title: "Inspecciones preoperacionales", singular: "inspección preoperacional", columns: ["name", "vehicleProfileId", "inspectionDate", "moment", "inspectorId"], fields: [
         ...nameYear("Registro"), relation("procedureId", "Procedimiento de inspección", "Registro", "inspectionProcedures"), relation("vehicleProfileId", "Hoja de vida del vehículo", "Registro", "vehicleProfiles"),
-        f("inspectionDate", "Fecha de inspección", "Registro", "date"), f("inspectionTime", "Hora de inspección (HH:mm)", "Registro"),
+        f("inspectionDate", "Fecha de inspección", "Registro", "date"), f("inspectionTime", "Hora de inspección (HH:mm)", "Registro", "time"),
         f("moment", "Momento", "Registro", "select", { options: ["Preoperacional diaria", "Después del recorrido", "Fin de jornada", "Cambio de conductor"] }),
         person("inspectorId", "Inspector / conductor", "Registro"), person("controllerId", "Responsable del control", "Registro"),
         f("vehicleType", "Tipo de vehículo inspeccionado", "Registro", "select", { options: ["Automotor", "Motocicleta", "No automotor", "Equipo"] }),
@@ -244,8 +244,19 @@ export function checksStatus(values: Values, checks: readonly (readonly [string,
   const results = checks.map(([key]) => value(values, `check_${key}`))
   return results.includes("No cumple") ? "No apto" : results.some(r => !r || r === "Sin verificar") ? "Pendiente de verificación" : "Apto"
 }
+export const hasCumulativeProgress = (kind: string | undefined) => kind === "journey" || kind === "vehicle-maintenance"
+export function cumulativeProgress(item: RecordItem) {
+  return Math.min(100, Math.round(item.entries.filter(e => e.kind === "FOLLOW_UP").reduce((total, entry) => total + (entry.progress ?? 0), 0) * 100) / 100)
+}
 export function operationalStatus(item: RecordItem, today: string): string | null {
   const v = item.values
+  if (hasCumulativeProgress(item.kind)) {
+    const progress = cumulativeProgress(item)
+    const latest = item.entries.filter(e => e.kind === "FOLLOW_UP").at(-1)
+    if (progress >= 100) return latest && !item.evidence.some(e => e.targetId === latest.id) ? "Pendiente de evidencia" : "Cumplido"
+    if (value(v, "endDate") && value(v, "endDate") < today) return "Vencido"
+    return progress > 0 ? "En ejecución" : "Pendiente"
+  }
   if (["road-protocol", "journey-procedure", "inspection-procedure", "change-procedure", "archive-procedure"].includes(item.kind)) return "Documentado"
   if (item.kind === "vehicle-inspection") {
     const result = checksStatus(v, inspectionChecks)

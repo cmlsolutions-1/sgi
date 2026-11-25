@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { downloadCorporatePdfBlob } from "@/lib/pdf/safecloud-corporate-pdf"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -1030,7 +1031,11 @@ export default function HazardousSubstancesPage() {
   async function downloadRecordPdf(record: HazardousSubstanceRecord) {
     try {
       const blob = await exportHazardousSubstance(record.id)
-      saveBlob(blob, `sustancias-peligrosas-${recordTitle(record).replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`)
+      await downloadCorporatePdfBlob(
+        blob,
+        { documentName: `Sustancias Peligrosas - ${recordTitle(record)}` },
+        `sustancias-peligrosas-${recordTitle(record).replace(/[^a-zA-Z0-9]+/g, "_")}.pdf`,
+      )
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo exportar el registro")
     }

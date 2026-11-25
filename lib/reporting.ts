@@ -1,5 +1,6 @@
-import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
+import { saveCorporatePdf } from "@/lib/pdf/safecloud-corporate-pdf"
+import { addSafeCloudPdfHeading, createSafeCloudPdf, SAFE_CLOUD_PDF_STYLE } from "@/lib/pdf/safecloud-pdf-style"
 
 export type DateRangeMode = "all" | "bimester" | "quarter" | "custom"
 
@@ -139,28 +140,15 @@ export function buildReportPdf<T>({
   rows: T[]
   columns: Array<PdfTableColumn<T>>
 }) {
-  const doc = new jsPDF({ unit: "mm", format: "letter" })
-  let y = 16
-
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(14)
-  doc.text(title, 14, y)
-  y += 7
-
-  if (subtitle) {
-    doc.setFont("helvetica", "normal")
-    doc.setFontSize(9)
-    doc.text(subtitle, 14, y)
-    y += 8
-  }
+  const doc = createSafeCloudPdf({ format: "letter" })
+  let y = addSafeCloudPdfHeading(doc, title, subtitle)
 
   if (summary?.length) {
     autoTable(doc, {
       startY: y,
       head: [["Indicador", "Valor"]],
       body: summary.map(([label, value]) => [label, String(value)]),
-      styles: { fontSize: 8, cellPadding: 2 },
-      headStyles: { fillColor: [47, 142, 216] },
+      styles: { fontSize: SAFE_CLOUD_PDF_STYLE.captionSize },
       margin: { left: 14, right: 14 },
     })
     y = ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? y) + 8
@@ -170,10 +158,8 @@ export function buildReportPdf<T>({
     startY: y,
     head: [columns.map((column) => column.header)],
     body: rows.map((row) => columns.map((column) => String(column.value(row) ?? ""))),
-    styles: { fontSize: 7, cellPadding: 1.6, overflow: "linebreak" },
-    headStyles: { fillColor: [47, 142, 216] },
-    margin: { left: 8, right: 8 },
+    styles: { fontSize: SAFE_CLOUD_PDF_STYLE.captionSize },
   })
 
-  doc.save(filename)
+  void saveCorporatePdf(doc, { documentName: title }, filename)
 }
