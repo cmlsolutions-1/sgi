@@ -85,8 +85,25 @@ export function statisticalSummary(items: RecordItem[], start: string, end: stri
     return { journey, level, events: group.length, fatalities: group.reduce((n, i) => n + Number(i.values.fatalities || 0), 0), injured: group.reduce((n, i) => n + Number(i.values.severeInjuries || 0) + Number(i.values.lightInjuries || 0), 0), costs: group.reduce((n, i) => n + Number(i.values.directCosts || 0) + Number(i.values.indirectCosts || 0), 0) }
   }))
 }
+export function auditCompletionError(values: Values): string | null {
+  if (!value(values.auditDate).trim()) return "Registra la fecha de realización de la auditoría."
+  const unevaluated: number[] = [], withoutNotes: number[] = [], notApplicable: number[] = [], required: number[] = []
+  pesvSteps.forEach((_, index) => {
+    const step = index + 1, result = value(values[`step_${step}`]), applies = stepApplies(step, value(values.level))
+    if (!["Cumple", "No cumple", "No aplica"].includes(result)) unevaluated.push(step)
+    if (!value(values[`stepNotes_${step}`]).trim()) withoutNotes.push(step)
+    if (!applies && result !== "No aplica") notApplicable.push(step)
+    if (applies && result === "No aplica") required.push(step)
+  })
+  if (required.length) return `Los pasos ${required.join(", ")} son exigibles para el nivel ${value(values.level)}; selecciona Cumple o No cumple, no No aplica.`
+  if (notApplicable.length) return `Para el nivel ${value(values.level)}, marca No aplica y registra la justificación en los pasos ${notApplicable.join(", ")}.`
+  if (unevaluated.length) return `Falta evaluar los pasos ${unevaluated.join(", ")}. Selecciona un resultado en cada uno.`
+  if (withoutNotes.length) return `Falta diligenciar Soporte / hallazgo / justificación en los pasos ${withoutNotes.join(", ")}. Es obligatorio también cuando el resultado es Cumple o No cumple; el informe PDF se carga después de guardar.`
+  if (!value(values.conclusions).trim()) return "Completa Conclusiones, fortalezas y oportunidades de mejora en la sección Informe."
+  return null
+}
 export function auditComplete(values: Values) {
-  return values.phase === "Realizada" && Boolean(value(values.auditDate)) && Boolean(value(values.conclusions).trim()) && pesvSteps.every((_, i) => ["Cumple", "No cumple", "No aplica"].includes(value(values[`step_${i + 1}`])) && Boolean(value(values[`stepNotes_${i + 1}`]).trim()) && (stepApplies(i + 1, value(values.level)) || values[`step_${i + 1}`] === "No aplica"))
+  return values.phase === "Realizada" && auditCompletionError(values) === null
 }
 export function documentedAudit(item: RecordItem) { return item.kind === "pesv-audit" && auditComplete(item.values) && item.evidence.some(e => !e.targetId && e.mime === "application/pdf") }
 export function completedFinding(item: RecordItem) {
@@ -144,8 +161,9 @@ export function validateAssurance(kind: Kind, values: Values, previous: RecordIt
   if (kind.id === "pesv-audit") {
     const leader = useLocalSources ? read<{ employeeId: string } | null>("safecloud:pesv-responsible", null) : null
     if (leader && Array.isArray(values.auditorIds) && values.auditorIds.includes(leader.employeeId)) return "El auditor debe ser diferente al líder del PESV."
-    if (pesvSteps.some((_, i) => values[`step_${i + 1}`] === "No aplica" && stepApplies(i + 1, value(values.level)))) return "No marques como No aplica un paso exigible para el nivel seleccionado."
-    if (values.phase === "Realizada" && !auditComplete(values)) return "Completa los 24 pasos, soportes y conclusiones; justifica los no aplicables según el nivel."
+    const required = pesvSteps.findIndex((_, i) => values[`step_${i + 1}`] === "No aplica" && stepApplies(i + 1, value(values.level)))
+    if (required >= 0) return `El paso ${required + 1}. ${pesvSteps[required]} es exigible para el nivel ${value(values.level)}; selecciona Cumple o No cumple.`
+    if (values.phase === "Realizada") return auditCompletionError(values)
   }
   if (kind.id === "audit-finding" && values.efficacy !== "Pendiente") {
     const last = previous?.entries.filter(e => e.kind === "FOLLOW_UP").at(-1)

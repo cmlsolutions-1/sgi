@@ -50,9 +50,10 @@ export function entryDateError(item: RecordItem, kind: Entry["kind"], date: stri
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return "Selecciona una fecha válida."
   if (date > today) return "La fecha no puede estar en el futuro."
   // Procedures have no business start date; their creation timestamp is not a disclosure boundary.
-  const start = bogotaCalendarDate(text(item.values.startDate) || text(item.values.periodStart) || (item.kind === "journey-procedure" ? "" : item.createdAt))
+  const procedureWithoutStart = ["journey-procedure", "change-procedure", "archive-procedure"].includes(item.kind)
+  const start = bogotaCalendarDate(text(item.values.startDate) || text(item.values.periodStart) || (procedureWithoutStart ? "" : item.createdAt))
   if (start && date < start) return `La fecha debe ser igual o posterior al inicio del registro (${start}).`
-  const entries = item.entries.filter(entry => item.kind === "journey-procedure" || item.kind === "journey" || entry.kind === kind)
+  const entries = item.entries.filter(entry => procedureWithoutStart || item.kind === "journey" || entry.kind === kind)
   const lastDate = entries.map(entry => bogotaCalendarDate(entry.date)).filter(Boolean).sort().at(-1)
   if (lastDate && date < lastDate) return `La fecha debe ser igual o posterior al último registro (${lastDate}).`
   return null
@@ -330,6 +331,13 @@ export function followUpProgressError(item: RecordItem, progress: number): strin
   if (!Number.isFinite(progress) || progress <= 0) return "Ingresa un aporte de avance mayor a 0%."
   if (Math.round((current + progress) * 100) / 100 > 100) return `El avance actual es ${current}%. Puedes agregar como máximo ${Math.round((100 - current) * 100) / 100}%.`
   return null
+}
+export function initialFollowUpValues(item: RecordItem) {
+  const last = item.entries.filter(entry => entry.kind === "FOLLOW_UP").at(-1)
+  return {
+    progress: hasCumulativeProgress(item.kind) ? "" : String(completion(item)),
+    measuredValue: String(last?.measuredValue ?? (item.kind === "objective" ? item.values.baseline || 0 : 0)),
+  }
 }
 export function itemStatus(item: RecordItem) {
   if (item.remoteStatus !== "ARCHIVED") {

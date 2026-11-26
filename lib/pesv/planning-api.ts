@@ -76,6 +76,10 @@ function referenceLinks(record: Record<string, unknown>, kind: Kind, catalogs: C
     return [field.key, ids.map(id => snapshots.find(option => option.value === id) ?? catalogs[field.reference!].find(option => option.value === id) ?? { value: id, label: String(record[field.key.replace(/Id$/, "Name")] ?? id) })]
   }))
 }
+function activitiesOf(value: unknown, catalogs: Catalogs): Activity[] {
+  if (!Array.isArray(value)) return []
+  return (value as Record<string, unknown>[]).map(activity => ({ id: String(activity.id), name: String(activity.name), responsibleId: String(activity.responsibleId), responsible: String(activity.responsibleNameSnapshot ?? catalogs.people.find(p => p.value === activity.responsibleId)?.label ?? activity.responsibleId), startDate: String(activity.startDate), endDate: String(activity.endDate), budget: String(activity.budget ?? 0), status: String(activity.status), observations: String(activity.observations ?? "") }))
+}
 export async function planningRecords(module: PesvModule, catalogs: Catalogs): Promise<RecordItem[]> {
   if (module === "objectives") return objectiveRecords()
   const results = await Promise.all(configs[module].kinds.map(async kind => {
@@ -89,16 +93,19 @@ export async function planningRecords(module: PesvModule, catalogs: Catalogs): P
       const orderedEntries = [...entries].sort((a, b) => a.date.localeCompare(b.date) || (a.createdAt ?? "").localeCompare(b.createdAt ?? ""))
       const token = kind.id === "audit-finding" ? await verificationToken(record, orderedEntries.filter(e => e.kind === "FOLLOW_UP").at(-1)?.id) : ""
       if (token) record.verificationToken = token
-      const activities = Array.isArray(record.activities) ? record.activities as Record<string, unknown>[] : []
       const history = Array.isArray(record.history) ? record.history as Record<string, unknown>[] : []
       return {
         id: record.id, kind: kind.id, values: { ...valuesOf(record, kind), ...Object.fromEntries(["verificationToken", "inventorySnapshot", "matrixSnapshot", "statisticsSnapshot"].filter(key => record[key] != null).map(key => [key, String(record[key])])) },
         remoteVersion: Number(record.recordVersion ?? record.version), remoteStatus: String(record.status), ...(typeof record.progress === "number" ? { remoteProgress: record.progress } : {}),
         createdAt: String(record.createdAt), updatedAt: String(record.updatedAt), entries: orderedEntries,
         links: referenceLinks(record, kind, catalogs),
-        activities: activities.map(activity => ({ id: String(activity.id), name: String(activity.name), responsibleId: String(activity.responsibleId), responsible: String(activity.responsibleNameSnapshot ?? catalogs.people.find(p => p.value === activity.responsibleId)?.label ?? activity.responsibleId), startDate: String(activity.startDate), endDate: String(activity.endDate), budget: String(activity.budget ?? 0), status: String(activity.status), observations: String(activity.observations ?? "") })),
+        activities: activitiesOf(record.activities, catalogs),
         evidence: documents.map(document => ({ id: document.id, name: document.fileName, mime: document.mimeType, uploadedAt: document.uploadedAt, targetId: token && document.description === `SafeCloud:verificacion:${token}` ? `VERIFICATION:${token}` : document.targetId, url: pesvDocumentUrl(resource, record.id, document.id) })),
-        history: history.map(event => ({ at: String(event.at ?? event.createdAt), action: String(event.action ?? event.event), ...(event.snapshot && typeof event.snapshot === "object" ? { snapshot: valuesOf(event.snapshot as Record<string, unknown>, kind) } : {}) })),
+        history: history.map(event => {
+          const snapshot = event.snapshot && typeof event.snapshot === "object" ? event.snapshot as Record<string, unknown> : null
+          const current = kind.id === "program" && snapshot?.current && typeof snapshot.current === "object" ? snapshot.current as Record<string, unknown> : snapshot
+          return { at: String(event.at ?? event.createdAt), action: String(event.action ?? event.event), ...(current ? { snapshot: valuesOf(current, kind), ...(kind.activities ? { activities: activitiesOf(current.activities, catalogs) } : {}) } : {}) }
+        }),
       } satisfies RecordItem
     }))
   }))
@@ -128,11 +135,12 @@ export function planningPayload(kind: Kind, values: Values, activities: Activity
   }
   if (version !== undefined) payload[operational || kind.id === "procedure" || kind.id === "behavior-evaluation" ? "recordVersion" : "version"] = version
   if (kind.activities) payload.activities = activities.map(activity => {
-    if (Number(activity.budget) !== 0) throw new Error("El backend aún no admite presupuesto por actividad del cronograma. No se guardará descartando ese dato; solicita agregar budget al contrato de actividades.")
+    const budget = Number(activity.budget)
+    if (!String(activity.budget ?? "").trim() || !Number.isFinite(budget) || budget < 0) throw new Error("Ingresa un presupuesto válido mayor o igual a cero para cada actividad del cronograma")
     const matches = catalogs.people.filter(person => person.value === activity.responsible || person.label === activity.responsible)
     const responsibleId = activity.responsibleId || (matches.length === 1 ? matches[0].value : undefined)
     if (!responsibleId) throw new Error("Selecciona un funcionario del catálogo como responsable de cada actividad del cronograma")
-    return { name: activity.name.trim(), responsibleId, startDate: activity.startDate, endDate: activity.endDate, status: activity.status ?? "PENDING", ...(activity.observations ? { observations: activity.observations } : {}) }
+    return { name: activity.name.trim(), responsibleId, startDate: activity.startDate, endDate: activity.endDate, budget, status: activity.status ?? "PENDING", ...(activity.observations ? { observations: activity.observations } : {}) }
   })
   return payload
 }

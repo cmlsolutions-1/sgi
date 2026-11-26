@@ -24,6 +24,8 @@ Las pantallas y acciones existentes se conservan. No usan registros de demostrac
 
 ## Pendientes bloqueantes en Indicadores
 
+Reverificado contra el código backend disponible el 25 de noviembre de 2026: 3 definiciones compatibles y 11 pendientes de alineación. La integración no debe considerarse completa hasta resolver los puntos siguientes.
+
 **No se deben guardar mediciones con definiciones distintas a las que ve el usuario.** El frontend verifica el catálogo remoto antes de escribir y no sustituye fórmulas, frecuencias ni significados silenciosamente. Los códigos mantienen la correspondencia con el contrato entregado, no con una definición de otra métrica que casualmente tenga igual fórmula.
 
 | Código | Pantalla/contrato actual | Diferencia encontrada en backend |
@@ -52,6 +54,14 @@ Otros ajustes necesarios para mantener las acciones actuales:
 3. **Fichas sin actividades específicas:** el DTO exige al menos un `workActivityId`. La pantalla permite no vincular actividades. Confirmar si debe admitirse `[]`; mientras tanto el frontend muestra la exigencia real del servidor.
 4. **Snapshots:** las mediciones backend solo incluyen ID, nombre y versión de la ficha; el reporte anual solo incluye referencias y resultados mínimos. Para una representación estructurada compartida, devolver snapshots completos de ficha, mediciones, revisiones, objetivos y programas.
 5. **Borradores de autogestión:** la pantalla existente permite generar un reporte con pendientes y lo identifica como borrador. La API exige año cerrado, mediciones completas y observaciones no vacías de los pasos. Confirmar cómo persistir esos borradores sin relajar la validación de una presentación definitiva.
+6. **PDF anual:** existe `GET annual-reports/:id/export`, pero su generador imprime `rows.value` literalmente, incluidos los snapshots JSON. Para conservar el documento legible existente, el frontend sigue generando su PDF con los registros obtenidos de la API. Esto no usa mocks ni persistencia local. Antes de reemplazarlo por la exportación del servidor, esta debe interpretar las secciones y conservar el contenido y presentación del informe.
+
+### Retiro de datos locales en Indicadores
+
+- Se eliminaron el generador de mediciones de demostración, el protocolo precargado y los lectores locales de reportes e inventarios.
+- Las sugerencias de variables requieren fuentes remotas explícitas; no existe alternativa que consulte datos guardados en el navegador.
+- El reporte anual toma copias independientes de los registros remotos para conservar el corte histórico. El ID y la fecha de creación definitivos los devuelve el backend.
+- Se conservaron las pantallas, botones, acciones, fórmulas y PDFs existentes. Las limitaciones documentadas no se suplen con registros ficticios ni archivos locales.
 
 ## Adaptaciones reversibles de datos existentes
 

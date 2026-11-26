@@ -126,6 +126,20 @@ async function main() {
   assert.equal(domain.entryDateError(eveningProcedure, 'DIFFUSION', '2026-11-17', '2026-11-18'), null)
   assert.equal(domain.entryDateError({ ...eveningProcedure, createdAt: '2026-11-19T07:00:00Z' }, 'DIFFUSION', '2026-11-18', '2026-11-18'), null)
   assert.equal(domain.entryDateError({ ...eveningProcedure, entries: [{ kind: 'ANNUAL_REVIEW', date: '2026-11-18' }] }, 'DIFFUSION', '2026-11-18', '2026-11-18'), null)
+  const changeProcedure = { ...eveningProcedure, kind: 'change-procedure', createdAt: '2026-11-26T07:00:00Z' }
+  assert.equal(domain.entryDateError(changeProcedure, 'DIFFUSION', '2026-11-25', '2026-11-25'), null)
+  assert.equal(domain.entryDateError(changeProcedure, 'DIFFUSION', '2026-11-24', '2026-11-25'), null)
+  assert.match(domain.entryDateError(changeProcedure, 'DIFFUSION', '2026-11-26', '2026-11-25'), /futuro/)
+  const reviewedProcedure = { ...changeProcedure, entries: [{ kind: 'ANNUAL_REVIEW', date: '2026-11-25' }] }
+  assert.match(domain.entryDateError(reviewedProcedure, 'DIFFUSION', '2026-11-24', '2026-11-25'), /último registro/)
+  assert.equal(domain.entryDateError(reviewedProcedure, 'DIFFUSION', '2026-11-25', '2026-11-25'), null)
+  const archiveProcedure = { ...changeProcedure, kind: 'archive-procedure' }
+  assert.equal(domain.entryDateError(archiveProcedure, 'ANNUAL_REVIEW', '2026-11-25', '2026-11-25'), null)
+  assert.equal(domain.entryDateError(archiveProcedure, 'ANNUAL_REVIEW', '2026-11-24', '2026-11-25'), null)
+  assert.match(domain.entryDateError(archiveProcedure, 'ANNUAL_REVIEW', '2026-11-26', '2026-11-25'), /futuro/)
+  const previouslyReviewedArchive = { ...archiveProcedure, entries: [{ kind: 'ANNUAL_REVIEW', date: '2026-11-25' }] }
+  assert.match(domain.entryDateError(previouslyReviewedArchive, 'ANNUAL_REVIEW', '2026-11-24', '2026-11-25'), /último registro/)
+  assert.equal(domain.entryDateError(previouslyReviewedArchive, 'ANNUAL_REVIEW', '2026-11-25', '2026-11-25'), null)
   assert.match(domain.entryDateError({ ...eveningProcedure, kind: 'journey', values: { startDate: '2026-11-18' } }, 'DIFFUSION', '2026-11-17', '2026-11-18'), /inicio/)
   assert.match(domain.entryDateError({ ...eveningProcedure, createdAt: '2026-11-17T18:00:00Z', entries: [{ kind: 'ANNUAL_REVIEW', date: '2026-11-18' }] }, 'DIFFUSION', '2026-11-17', '2026-11-18'), /último registro/)
   const contracts = require('./fixtures/pesv-phase4-contracts.json')
@@ -203,6 +217,21 @@ async function main() {
   assert.equal(actualIndicators.state.sheets[0].baseline, '20')
   assert.equal(actualIndicators.state.measurements[0].evidence[0].name, 'acta.pdf')
   assert.equal(actualIndicators.state.history.length, 1)
+  const remoteObjective = { id: 'objective-api', values: { year: '2026', name: 'Objetivo real' } }
+  const annualDraft = indicatorApi.buildApiAnnual({ year: '2026', companyName: 'Empresa real' }, { fleet: [], actors: [], contractors: [], fines: [] }, [], actualIndicators.state, { records: { objectives: [remoteObjective] }, diagnoses: [] })
+  assert.equal(annualDraft.id, '', 'The server assigns the report ID')
+  assert.equal(annualDraft.measurements[0].id, 'measurement-id')
+  remoteObjective.values.name = 'Cambio posterior'
+  actualIndicators.state.measurements[0].numerator = 99
+  assert.equal(annualDraft.objectives[0].values.name, 'Objetivo real')
+  assert.equal(annualDraft.measurements[0].numerator, 1, 'Draft snapshots do not change with loaded API state')
+  const annualPayload = indicatorApi.annualReportPayload(annualDraft)
+  assert.equal(annualPayload.year, 2026)
+  assert.equal(JSON.parse(annualPayload.rows.find(row => row.category === 'SNAPSHOT' && row.label === 'measurements').value)[0].sheet.baseline, '10')
+  const beforeFailure = respond
+  respond = () => { throw new Error('Backend unavailable') }
+  await assert.rejects(() => indicatorApi.loadApiIndicators({ workActivities: [] }), /Backend unavailable/)
+  respond = beforeFailure
   const findingValues = { efficacy: 'Eficaz', evaluatorId: 'employee', verificationDate: '2026-01-02', verificationNotes: 'Verificado' }
   const verification = await planning.verificationToken(findingValues, 'follow-up-1')
   assert.equal(verification.length, 64)
@@ -293,11 +322,44 @@ async function main() {
   assert.equal(planning.planningEntryPayload('journey', { id: 'entry', kind: 'FOLLOW_UP', progress: 75, measuredValue: 0 }).measuredValue, 0)
   assert.deepEqual(planning.planningEntryPayload('journey', { id: 'entry', kind: 'DIFFUSION', date: '2026-11-18', medium: 'Correo' }), { kind: 'DIFFUSION', date: '2026-11-18', medium: 'Correo' })
   const program = domain.configs.programs.kinds[0]
+  const newProgramFollowUp = { kind: 'program', values: { baseline: 'Sin controles implementados' }, entries: [] }
+  assert.deepEqual(domain.initialFollowUpValues(newProgramFollowUp), { progress: '0', measuredValue: '0' })
+  assert.deepEqual(domain.initialFollowUpValues({ ...newProgramFollowUp, remoteProgress: 20, entries: [{ kind: 'FOLLOW_UP', progress: 20, measuredValue: 8.5 }] }), { progress: '20', measuredValue: '8.5' })
+  assert.equal(domain.initialFollowUpValues({ ...newProgramFollowUp, kind: 'objective', values: { baseline: '15' } }).measuredValue, '15')
+  assert.equal(domain.initialFollowUpValues({ ...newProgramFollowUp, kind: 'journey' }).progress, '')
+  assert.deepEqual(planning.planningEntryPayload('program', { id: 'client-only', kind: 'FOLLOW_UP', date: '2026-11-25', progress: 20, measuredValue: 8.5, observations: 'Medición del indicador' }), { kind: 'FOLLOW_UP', date: '2026-11-25', progress: 20, measuredValue: 8.5, observations: 'Medición del indicador' })
   const activity = { id: 'client-only', name: 'Actividad', responsibleId: 'person-id', responsible: 'Ana', startDate: '2026-01-01', endDate: '2026-12-31', budget: '0' }
   const catalogs = { people: [{ value: 'person-id', label: 'Ana' }] }
   const programPayload = planning.planningPayload(program, domain.initialValues(program), [activity], catalogs)
   assert.equal(programPayload.activities[0].responsibleId, 'person-id'); assert.equal(programPayload.activities[0].id, undefined)
-  assert.throws(() => planning.planningPayload(program, domain.initialValues(program), [{ ...activity, budget: '100' }], catalogs), /presupuesto/)
+  assert.equal(programPayload.activities[0].budget, 0)
+  for (const budget of ['100', '250000', '250000.50']) {
+    const payload = planning.planningPayload(program, { ...domain.initialValues(program), budget: '1000000' }, [{ ...activity, budget }], catalogs, 4)
+    assert.equal(payload.activities[0].budget, Number(budget))
+    assert.equal(payload.budget, 1000000, 'The total program budget is independent of activity budgets')
+    assert.equal(payload.version, 4)
+    calls = []; respond = () => response({ id: 'program-id' })
+    await api.savePesv('programs', payload)
+    await api.savePesv('programs', payload, 'program-id')
+    assert.equal(calls[0].method, 'POST'); assert.equal(calls[1].method, 'PUT')
+    for (const call of calls) assert.equal(JSON.parse(call.body).activities[0].budget, Number(budget))
+  }
+  for (const budget of ['-1', 'Infinity', 'NaN', 'abc', '']) assert.throws(() => planning.planningPayload(program, domain.initialValues(program), [{ ...activity, budget }], catalogs), /presupuesto/)
+  const serverActivity = { ...activity, id: 'server-activity', budget: 350000.5 }
+  const serverProgram = { id: 'program-id', name: 'Programa', status: 'PENDING', budget: 1000000, version: 4, activities: [serverActivity, { ...serverActivity, id: 'legacy-activity', budget: undefined }], history: [
+    { event: 'CREATED', createdAt: '2026-01-01T15:00:00Z', snapshot: { name: 'Programa anterior', budget: 800000, activities: [{ ...serverActivity, budget: 200000 }] } },
+    { event: 'UPDATED', createdAt: '2026-02-01T15:00:00Z', snapshot: { previous: { budget: 800000 }, current: { name: 'Programa actualizado', budget: 1000000, activities: [serverActivity] } } },
+  ] }
+  respond = url => response(url.includes('/documents') || url.includes('/entries') ? [] : url.includes('/program-id') ? serverProgram : { items: [{ id: 'program-id' }], total: 1 })
+  const [loadedProgram] = await planning.planningRecords('programs', catalogs)
+  assert.equal(loadedProgram.activities[0].budget, '350000.5')
+  assert.equal(loadedProgram.activities[1].budget, '0')
+  assert.equal(loadedProgram.history[0].activities[0].budget, '200000')
+  assert.equal(loadedProgram.history[1].activities[0].budget, '350000.5')
+  assert.equal(loadedProgram.history[1].snapshot.name, 'Programa actualizado')
+  const reedited = planning.planningPayload(program, loadedProgram.values, loadedProgram.activities, catalogs, loadedProgram.remoteVersion)
+  assert.equal(reedited.activities[0].budget, 350000.5)
+  assert.equal(reedited.activities[1].budget, 0)
   const risk = load('lib/pesv/road-risks-api.ts')
   const riskPayload = risk.roadRiskPayload({ name: 'Riesgo', diagnosisId: '', sourceId: '', sourceLabel: 'server-only', exposure: 3, probability: 2, history: ['do-not-send'] }, 2)
   assert.equal(riskPayload.version, 2); assert.equal(riskPayload.sourceLabel, undefined); assert.equal(riskPayload.history, undefined); assert.equal(riskPayload.diagnosisId, undefined)

@@ -1,8 +1,7 @@
-import { currentYear, dateToday, ids, loadCatalogs, readItems, readStore, text, type Evidence, type Field, type Kind, type RecordItem, type Values } from "./planning"
-import { completedFinding, latestAnnualAudit, storedAssurance } from "./assurance"
+import { dateToday, text, type Evidence, type Field, type Kind, type PesvModule, type RecordItem, type Values } from "./planning"
+import { completedFinding } from "./assurance"
 import { pesvSteps } from "./standards"
 
-export const INDICATORS_KEY = "safecloud:pesv-indicators"
 export const methodologySource = "https://www.cancilleria.gov.co/normograma/compilacion/docs/resolucion_mintransporte_40595_2022.htm"
 export type Level = "Básico" | "Estándar" | "Avanzado"
 export type Frequency = "Mensual" | "Trimestral" | "Anual"
@@ -118,8 +117,7 @@ export function emptySheet(definition: IndicatorDefinition, year: string): Indic
   return { id: definition.id, year, name: definition.name, description: definition.description, sources: definition.sources, sourceReliability: "", baseline: "", target: "", responsibleId: "", workActivityIds: [], workActivityNames: [] }
 }
 export function initialIndicatorsState(): IndicatorsState {
-  const catalogs = loadCatalogs()
-  return { level: "Básico", rateConstant: 5000000, costMethod: "SUM", protocol: { name: "Protocolo de medición y análisis de indicadores PESV", version: "1.0", responsibleId: catalogs.people[0]?.value ?? "", collection: "Consolidar las variables de cada fuente, validar responsables y conservar el soporte de cada corte.", quality: "Verificar período, duplicados, unidades y consistencia de numeradores y denominadores antes de medir.", analysis: "El Comité de Seguridad Vial evalúa resultados y brechas al cierre de cada trimestre y registra sus decisiones.", communication: "Comunicar resultados y acciones al CSV y a la dirección, conservando actas y reportes." }, protocolEvidence: [], sheets: [], measurements: [], reviews: [], reports: [], history: [] }
+  return { level: "Básico", rateConstant: 5000000, costMethod: "SUM", protocol: Object.fromEntries(protocolKind.fields.map(f => [f.key, ""])), protocolEvidence: [], sheets: [], measurements: [], reviews: [], reports: [], history: [] }
 }
 const inRange = (date: string, start: string, end: string) => date >= start && date <= end
 export function evidenceDate(timestamp: string) {
@@ -130,17 +128,18 @@ export function evidenceDate(timestamp: string) {
 function supportedExecution(item: RecordItem, end: string) {
   return item.entries.some(e => e.kind === "FOLLOW_UP" && e.date <= end && e.progress === 100 && item.evidence.some(file => file.targetId === e.id && evidenceDate(file.uploadedAt) && evidenceDate(file.uploadedAt) <= end))
 }
-export function sourceSuggestion(definition: IndicatorDefinition, year: string, period: string, sheet: IndicatorSheet, loss = "", remote?: { records: Partial<Record<Parameters<typeof readItems>[0], RecordItem[]>>; diagnoses: { year: number; updateDate: string; collaborators: { id: string }[] }[] }): { numerator: string; denominator: string; details: string } | null {
+export type IndicatorSourceData = { records: Partial<Record<PesvModule, RecordItem[]>>; diagnoses: { year: number; updateDate: string; collaborators: { id: string }[] }[] }
+export function sourceSuggestion(definition: IndicatorDefinition, year: string, period: string, sheet: IndicatorSheet, loss: string, remote: IndicatorSourceData): { numerator: string; denominator: string; details: string } | null {
   const { start, end } = periodRange(year, definition.frequency, period)
-  const cohorts = (module: Parameters<typeof readItems>[0], kind: string) => (remote ? remote.records[module] : readStore<RecordItem[] | null>(`safecloud:pesv-${module}`, null))?.filter(i => i.kind === kind && text(i.values.year) === year && inRange(text(i.values.endDate), start, end))
+  const cohorts = (module: PesvModule, kind: string) => remote.records[module]?.filter(i => i.kind === kind && text(i.values.year) === year && inRange(text(i.values.endDate), start, end))
   if (definition.id === "tsv" || definition.id === "cost") {
-    const source = remote ? remote.records.statistics : readStore<RecordItem[] | null>("safecloud:pesv-statistics", null)
+    const source = remote.records.statistics
     if (!source) return null
     const records = source.filter(i => i.kind === "statistical-event" && i.values.journey === "Laboral" && inRange(text(i.values.eventDate), start, end) && (loss === "Choques simples" ? ["Solo daños materiales", "Primeros auxilios"].includes(text(i.values.personLoss)) : i.values.personLoss === loss))
     return definition.id === "tsv" ? { numerator: String(records.length), denominator: "", details: "Siniestros laborales del registro estadístico, clasificados por afectación a personas. Completa kilómetros con el registro real de toda la flota." } : { numerator: String(records.reduce((n, i) => n + Number(i.values.directCosts || 0), 0)), denominator: String(records.reduce((n, i) => n + Number(i.values.indirectCosts || 0), 0)), details: "Costos directos e indirectos de siniestros laborales del período y nivel de pérdida seleccionado." }
   }
   if (definition.id === "audit") {
-    const audits = remote ? remote.records.audits ?? [] : storedAssurance("audits")
+    const audits = remote.records.audits ?? []
     if (!audits.length) return null
     const selected = audits.filter(i => i.kind === "audit-finding" && i.values.year === year && i.values.findingType === "No conformidad")
     const closed = selected.filter(i => completedFinding(i) && text(i.values.verificationDate) <= end && i.evidence.some(e => e.targetId === `VERIFICATION:${text(i.values.verificationToken)}` && evidenceDate(e.uploadedAt) <= end))
@@ -162,42 +161,21 @@ export function sourceSuggestion(definition: IndicatorDefinition, year: string, 
     return { numerator: String(reached.length), denominator: String(selected.length), details: `Metas con fecha final en el período ${start} a ${end}. Se usa la última medición registrada hasta el corte.` }
   }
   if (definition.id === "inspections") {
-    const checks = remote ? remote.records["vehicle-inspections"] : readStore<RecordItem[] | null>("safecloud:pesv-vehicle-inspections", null)
+    const checks = remote.records["vehicle-inspections"]
     if (!checks) return null
     const pairs = new Set(checks.filter(i => i.kind === "vehicle-inspection" && i.values.moment === "Preoperacional diaria" && inRange(text(i.values.inspectionDate), start, end) && i.evidence.some(e => evidenceDate(e.uploadedAt) && evidenceDate(e.uploadedAt) <= end)).map(i => `${text(i.values.vehicleProfileId)}:${text(i.values.inspectionDate)}`))
     return { numerator: String(pairs.size), denominator: "", details: "Vehículos-día únicos con inspección y evidencia. Completa el denominador con el registro real de operación; no se infiere del tamaño de la flota." }
   }
   if (definition.id === "coverage") {
-    const formation = remote ? remote.records.training : readStore<RecordItem[] | null>("safecloud:pesv-training", null)
-    const diagnoses = (remote ? remote.diagnoses : readStore<{ year: number; updateDate: string; collaborators: { id: string }[] }[] | null>("safecloud:pesv-diagnosis", null))?.filter(d => String(d.year) === year && d.updateDate <= end).sort((a, b) => a.updateDate.localeCompare(b.updateDate))
+    const formation = remote.records.training
+    const diagnoses = remote.diagnoses.filter(d => String(d.year) === year && d.updateDate <= end).sort((a, b) => a.updateDate.localeCompare(b.updateDate))
     if (!formation) return null
     const people = new Set(formation.filter(i => i.kind === "training-activity" && text(i.values.year) === year).flatMap(i => i.entries.filter(e => e.kind === "FOLLOW_UP" && e.progress === 100 && inRange(e.date, `${year}-01-01`, end) && i.evidence.some(file => file.targetId === e.id && evidenceDate(file.uploadedAt) && evidenceDate(file.uploadedAt) <= end)).flatMap(e => e.attendeeIds ?? [])))
     return { numerator: String(people.size), denominator: diagnoses?.length ? String(new Set(diagnoses.at(-1)!.collaborators.map(c => c.id)).size) : "", details: `Asistentes únicos acreditados entre ${year}-01-01 y ${end}. Total de colaboradores tomado del último diagnóstico disponible al corte, si existe.` }
   }
   return null
 }
-export function reportInitialValues(year: string): Values {
-  const audit = latestAnnualAudit(year)
-  const leader = readStore<{ employeeName: string; roleDescription: string; employeeEmail: string } | null>("safecloud:pesv-responsible", null)
-  const policy = readStore<{ legalRepresentative: string }[]>("safecloud:pesv-policy", []).at(-1)
-  const diagnosis = readStore<{ year: number; servicesDescription: string }[]>("safecloud:pesv-diagnosis", []).find(d => String(d.year) === year)
-  return { year, companyName: "", nit: "", address: "", phone: "", representative: policy?.legalRepresentative ?? "", mission: diagnosis?.servicesDescription ?? "", size: "", leaderName: leader?.employeeName ?? "", leaderRole: leader?.roleDescription ?? "", leaderEmail: leader?.employeeEmail ?? "", auditors: audit?.links.auditorIds?.map(o => o.label).join("; ") ?? "", auditDate: text(audit?.values.auditDate), authority: "", analysis: "", improvements: "" }
-}
-export function reportSourceRows(year: string) {
-  const diagnosis = readStore<{ year: number; updateDate: string; vehicles: { vehicleType: string; ownershipType: string }[]; collaborators: { isWorkDriver: boolean }[] }[]>("safecloud:pesv-diagnosis", []).filter(d => String(d.year) === year).sort((a, b) => a.updateDate.localeCompare(b.updateDate)).at(-1)
-  const fleet: ReportRow[] = []
-  for (const v of diagnosis?.vehicles ?? []) {
-    const existing = fleet.find(row => row.label === v.vehicleType && row.category === v.ownershipType)
-    if (existing) existing.count++; else fleet.push({ id: crypto.randomUUID(), label: v.vehicleType, category: v.ownershipType, count: 1 })
-  }
-  const contractors = readItems("change-contractors").filter(i => i.kind === "contractor" && text(i.values.year) === year).map(i => ({ id: crypto.randomUUID(), label: text(i.values.service), category: text(i.values.relationship), count: 1 }))
-  return { fleet, contractors, actors: diagnosis ? [{ id: crypto.randomUUID(), label: "Conductores", category: "", count: diagnosis.collaborators.filter(c => c.isWorkDriver).length }] : [], fines: [] as ReportRow[] }
-}
 export const stepNames = pesvSteps
-export function auditReportSteps(year: string): StepResult[] {
-  const audit = latestAnnualAudit(year)
-  return stepNames.map((_, index) => ({ step: index + 1, status: audit ? text(audit.values[`step_${index + 1}`]) as StepResult["status"] : "Sin evaluar", observations: text(audit?.values[`stepNotes_${index + 1}`]) }))
-}
 export function reportWarnings(report: AnnualReport, level: Level, today = dateToday()) {
   const warnings: string[] = []
   if (`${text(report.values.year)}-12-31` > today) warnings.push("El año reportado no ha terminado.")
@@ -214,14 +192,7 @@ export function reportWarnings(report: AnnualReport, level: Level, today = dateT
   if (["1", "2", "3", "4"].some(q => !report.reviews.some(r => r.quarter === q && r.evidence.length))) warnings.push("Faltan revisiones trimestrales del CSV con acta de soporte.")
   return warnings
 }
-export function makeAnnualReport(values: Values, rows: { fleet: ReportRow[]; actors: ReportRow[]; contractors: ReportRow[]; fines: ReportRow[] }, steps: StepResult[], state: IndicatorsState): AnnualReport {
+export function makeAnnualReport(values: Values, rows: { fleet: ReportRow[]; actors: ReportRow[]; contractors: ReportRow[]; fines: ReportRow[] }, steps: StepResult[], state: IndicatorsState, sources: IndicatorSourceData): AnnualReport {
   const year = text(values.year)
-  return { id: crypto.randomUUID(), values: structuredClone({ ...values, level: state.level, rateConstant: String(state.rateConstant), costMethod: state.costMethod }), ...structuredClone(rows), steps: structuredClone(steps), measurements: structuredClone(activeMeasurements(state.measurements).filter(m => m.year === year)), reviews: structuredClone(state.reviews.filter(r => r.year === year)), objectives: structuredClone(readItems("objectives").filter(i => text(i.values.year) === year)), nextObjectives: structuredClone(readItems("objectives").filter(i => Number(i.values.year) === Number(year) + 1)), programs: structuredClone(readItems("programs").filter(i => text(i.values.year) === year)), nextPrograms: structuredClone(readItems("programs").filter(i => Number(i.values.year) === Number(year) + 1)), evidence: [], createdAt: new Date().toISOString(), presentations: [] }
-}
-export function demonstrationMeasurements(state: IndicatorsState): Measurement[] {
-  const year = String(currentYear()), end = `${year}-03-31`
-  if (end > dateToday()) return []
-  const definition = definitions.find(d => d.id === "work")!
-  const sheet: IndicatorSheet = { ...emptySheet(definition, year), baseline: "50", target: "100", responsibleId: loadCatalogs().people[0]?.value ?? "", sourceReliability: "Ejemplo de plan y actas de ejecución verificados por el responsable." }
-  return [{ id: "pesv-indicator-demo-1", indicatorId: definition.id, year, period: "1", loss: "", numerator: 3, denominator: 4, result: 75, source: "Datos de demostración: plan anual y actas de ejecución", sourceDetails: "Medición de ejemplo; no representa los datos de la empresa.", analysis: "Tres de cuatro actividades ejecutadas. Reprogramar la actividad pendiente y verificar su cumplimiento.", registeredAt: new Date().toISOString(), definition, sheet, rateConstant: state.rateConstant, costMethod: state.costMethod, evidence: [] }]
+  return { id: "", values: structuredClone({ ...values, level: state.level, rateConstant: String(state.rateConstant), costMethod: state.costMethod }), ...structuredClone(rows), steps: structuredClone(steps), measurements: structuredClone(activeMeasurements(state.measurements).filter(m => m.year === year)), reviews: structuredClone(state.reviews.filter(r => r.year === year)), objectives: structuredClone((sources.records.objectives ?? []).filter(i => text(i.values.year) === year)), nextObjectives: structuredClone((sources.records.objectives ?? []).filter(i => Number(i.values.year) === Number(year) + 1)), programs: structuredClone((sources.records.programs ?? []).filter(i => text(i.values.year) === year)), nextPrograms: structuredClone((sources.records.programs ?? []).filter(i => Number(i.values.year) === Number(year) + 1)), evidence: [], createdAt: "", presentations: [] }
 }

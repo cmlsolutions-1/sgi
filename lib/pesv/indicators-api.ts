@@ -2,7 +2,7 @@ import { getPesv, listPesv, listPesvDocuments, pesvDocumentUrl, pesvPath, pesvRe
 import { catalogOptions, planningCatalogs, planningRecords } from "./planning-api"
 import { pesvModuleCatalog } from "./module-catalog"
 import { text, type Catalogs, type Evidence, type PesvModule, type RecordItem, type Values } from "./planning"
-import { activeMeasurements, annualReportKind, definitions, emptySheet, protocolKind, stepNames, type AnnualReport, type CsvReview, type IndicatorDefinition, type IndicatorSheet, type IndicatorsState, type Level, type Measurement, type ReportRow, type StepResult } from "./indicators"
+import { annualReportKind, definitions, emptySheet, initialIndicatorsState, makeAnnualReport, protocolKind, stepNames, type AnnualReport, type CsvReview, type IndicatorDefinition, type IndicatorSheet, type IndicatorsState, type Level, type Measurement, type ReportRow, type StepResult } from "./indicators"
 
 type Row = Record<string, unknown> & { id: string }
 const object = (value: unknown): Record<string, unknown> => value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {}
@@ -27,7 +27,7 @@ function localDefinition(id: unknown) {
   return result
 }
 export function emptyApiIndicators(): IndicatorsState {
-  return { protocol: Object.fromEntries(protocolKind.fields.map(f => [f.key, ""])), protocolEvidence: [], level: "Básico", rateConstant: 5000000, costMethod: "SUM", sheets: [], measurements: [], reviews: [], reports: [], history: [] }
+  return initialIndicatorsState()
 }
 function decodeProtocol(value: unknown): Values {
   if (typeof value !== "string" || !value) return emptyApiIndicators().protocol
@@ -217,12 +217,5 @@ export function apiReportInitial(year: string, source: IndicatorSources) {
   }
 }
 export function buildApiAnnual(values: Values, inventories: Pick<AnnualReport, "fleet" | "actors" | "contractors" | "fines">, steps: StepResult[], state: IndicatorsState, sources: IndicatorSources): AnnualReport {
-  const year = text(values.year)
-  return {
-    id: "", values: { ...values, level: state.level, rateConstant: String(state.rateConstant), costMethod: state.costMethod }, ...inventories, steps,
-    measurements: activeMeasurements(state.measurements).filter(m => m.year === year), reviews: state.reviews.filter(r => r.year === year),
-    objectives: (sources.records.objectives ?? []).filter(i => i.values.year === year), nextObjectives: (sources.records.objectives ?? []).filter(i => Number(i.values.year) === Number(year) + 1),
-    programs: (sources.records.programs ?? []).filter(i => i.values.year === year), nextPrograms: (sources.records.programs ?? []).filter(i => Number(i.values.year) === Number(year) + 1),
-    evidence: [], createdAt: "", presentations: [],
-  }
+  return makeAnnualReport(values, inventories, steps, state, sources)
 }
