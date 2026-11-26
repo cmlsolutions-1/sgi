@@ -19,6 +19,7 @@ import { useUsers } from "@/hooks/useUsers"
 import { CiiuCard } from "@/components/manager/super-admin/dialogs/CiiuCard"
 import { CompaniesCard } from "@/components/manager/super-admin/dialogs/CompaniesCard"
 import { UsersCard } from "@/components/manager/super-admin/UsersCard"
+import { SubscriptionManager } from "@/components/subscriptions/subscription-manager"
 import { ManageModulesDialog } from "@/components/manager/super-admin/dialogs/ManageModulesDialog"
 import { getModulesByCompany, listModules } from "@/services/modulesService"
 import { listPermissions } from "@/services/permissionService"
@@ -376,6 +377,8 @@ export default function SuperAdminDashboard() {
           </CardHeader>
         </Card>
       </div>
+
+      <SubscriptionManager company={selectedCompany} />
 
       <CiiuCard
         ciiu={ciiu.ciiu}

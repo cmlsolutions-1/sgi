@@ -1,0 +1,58 @@
+const assert = require('node:assert/strict')
+const fs = require('node:fs')
+const ts = require('typescript')
+const path = require('node:path')
+const root = path.resolve(__dirname, '..')
+const source = fs.readFileSync(path.join(root, 'lib/subscriptions/model.ts'), 'utf8')
+const moduleUnderTest = { exports: {} }
+new Function('module', 'exports', ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText)(moduleUnderTest, moduleUnderTest.exports)
+const api = moduleUnderTest.exports
+const state = api.createDemoState(), subscription = state.subscriptions[0]
+assert.equal(api.validateSubscription(subscription), null)
+const usage = api.consumption(subscription)
+assert.equal(usage.contractedCompanies, 6)
+assert.equal(usage.includedGB, 66)
+assert.equal(usage.capacityBytes, 66 * api.GB)
+assert.equal(usage.usedBytes, 54.12 * api.GB)
+assert.equal(usage.threshold, 80)
+assert.equal(api.subscriptionWarnings(subscription).length, 0)
+const increased = { ...subscription, extraStorageGB: 10 }
+assert.equal(api.consumption(increased).capacityBytes, 76 * api.GB)
+assert.equal(api.consumption(increased).threshold, 0)
+assert.equal(api.consumption(increased).contractedCompanies, 6)
+for (const [fraction, threshold] of [[0, 0], [.799, 0], [.8, 80], [.9, 90], [1, 100], [1.2, 100]]) {
+  const changed = { ...subscription, companies: [{ ...subscription.companies[0], usedBytes: Math.round(66 * api.GB * fraction) }] }
+  assert.equal(api.consumption(changed).threshold, threshold)
+  assert.equal(api.validateSubscription(changed), null, 'Overages are informative, not operational blockers')
+}
+const empty = { ...subscription, quantities: { PLAN_1: 0, PLAN_2: 0, PLAN_3: 0 }, extraStorageGB: 0, companies: [] }
+assert.equal(api.consumption(empty).percentage, 0)
+assert.equal(api.consumption({ ...empty, companies: [subscription.companies[0]] }).threshold, 100)
+assert.equal(api.consumption({ ...subscription, companies: subscription.companies.map(c => ({ ...c, inactiveEmployees: 999 })) }).usedBytes, usage.usedBytes)
+assert.equal(api.validateSubscription({ ...subscription, extraStorageGB: -1 }), 'Revisa el almacenamiento adicional.')
+assert.notEqual(api.validateSubscription({ ...subscription, quantities: { ...subscription.quantities, PLAN_1: 1.5 } }), null)
+assert.notEqual(api.validateSubscription({ ...subscription, companies: [{ ...subscription.companies[0], usedBytes: NaN }] }), null)
+assert.notEqual(api.validateSubscription({ ...subscription, companies: [{ ...subscription.companies[0], activeEmployees: -1 }] }), null)
+assert.equal(api.companyView(state, 'real-company'), null)
+const beforePreview = JSON.stringify(state)
+const preview = api.companyPreview(state, 'unassigned-company')
+assert.equal(preview.isExample, true)
+assert.equal(preview.company.activeEmployees, 38)
+assert.equal(api.consumption(preview.subscription).capacityBytes, 66 * api.GB)
+assert.equal(JSON.stringify(state), beforePreview, 'Preview must not automatically associate real companies')
+assert.equal(api.companyPreview({ ...state, subscriptions: [] }, 'unassigned').isExample, true)
+state.bindings['real-company'] = { subscriptionId: subscription.id, companyId: subscription.companies[0].id }
+state.bindings['other-company'] = { subscriptionId: subscription.id, companyId: subscription.companies[1].id }
+assert.equal(api.companyView(state, 'real-company').company.activeEmployees, 38)
+assert.equal(api.companyView(state, 'other-company').company.activeEmployees, 52)
+assert.equal(api.companyPreview(state, 'other-company').isExample, false)
+assert.equal(api.companyPreview(state, 'other-company').company.activeEmployees, 52)
+assert.equal(api.consumption(api.companyView(state, 'other-company').subscription).usedBytes, usage.usedBytes)
+assert.notEqual(api.alertKey('real-company', subscription), api.alertKey('other-company', subscription))
+assert.equal(api.subscriptionWarnings({ ...subscription, companies: [...subscription.companies, { ...subscription.companies[0], id: 'extra', plan: null }] }).length, 2)
+assert.equal(api.plans.PLAN_1.employees, 50)
+assert.equal(api.plans.PLAN_2.employees, 100)
+assert.equal(api.plans.PLAN_3.employees, 250)
+assert.equal(api.formatStorage(3 * api.GB), '3 GB')
+assert.ok(!/apiFetch|fetch\(|savePesv/.test(source))
+console.log('Subscription checks passed: mixed plans, pooled bytes, company counts, thresholds, overages, tenant preview bindings and validation')
